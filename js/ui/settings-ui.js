@@ -6,7 +6,7 @@
 G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const VERSION = '0.4.0 · 2026-10-15';
+  const VERSION = '0.4.1 · 2026-10-15';
   const REPO = G.PROJECT_REPO || 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 

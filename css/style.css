@@ -833,14 +833,33 @@ a.btn { text-decoration: none; display: inline-block; color: var(--ink); }
 [data-nas="reauth"][hidden] { display: none !important; }
 
 /* Read-only network diagnostics stay reachable in a running game. */
-#nas-network-toggle { position:fixed;right:10px;top:56px;z-index:1200;font-size:12px;padding:7px; }
+#nas-network-toggle { position:fixed;right:16px;top:48px;z-index:1200;height:26px;min-width:66px;padding:3px 6px;font-size:11px;gap:5px; }
 #nas-network-panel { position:fixed;right:10px;top:100px;z-index:1201;width:min(360px,calc(100vw - 20px));max-height:calc(100dvh - 110px);overflow:auto;padding:12px;font:14px/1.4 sans-serif;background:#17325f;color:#fff;border:2px solid #8bacf1;box-shadow:0 5px 24px #0009; }
 #nas-network-toggle[hidden],#nas-network-panel[hidden] { display:none!important; }
 .network-row { display:flex;justify-content:space-between;gap:12px;margin:4px 0; }
 .network-row strong { white-space:nowrap; }
-@media(max-height:500px){#nas-network-panel {top:45px;max-height:calc(100dvh - 55px);}#nas-network-toggle {top:8px;right:58px;}}
+@media(max-height:500px){#nas-network-panel {top:45px;max-height:calc(100dvh - 55px);}#nas-network-toggle {top:48px;right:12px;}}
 
 button:focus-visible,a:focus-visible,.card:focus,.cell:focus,.answer:focus{outline:3px solid #ffdc54;outline-offset:3px;}
 
 /* Keep the diagnostics shortcut away from the compact menu settings button. */
 body:has(#scr-menu:not(.hidden)):not(:has(#scr-settings:not(.hidden))) #nas-network-toggle{display:none;}
+
+/* Same quiet dark pixel-HUD treatment as move slots, not oversized menu buttons. */
+.hud-action{display:inline-flex;align-items:center;justify-content:center;gap:4px;border:1px solid rgba(140,170,210,.4);border-radius:5px;background:rgba(10,16,28,.82);color:#eaf2ff;font:700 11px var(--font);padding:4px 6px;box-shadow:0 2px 0 rgba(0,0,0,.55);text-shadow:1px 1px #0a1430;cursor:pointer;touch-action:manipulation;}
+.hud-action:hover,.hud-action:focus-visible{border-color:#ffd23f;background:rgba(20,30,50,.96);}
+.hud-action:active{transform:translateY(1px);box-shadow:none;}
+.hud-action:disabled{opacity:.45;cursor:default;}
+.hud-action img{image-rendering:pixelated;flex-shrink:0;}
+.hud-action kbd{font:inherit;font-size:9px;color:#8fa3c4;margin-left:2px;}
+#team-controls{position:fixed;left:16px;z-index:40;max-width:calc(100vw - 32px);font:700 10px var(--font);pointer-events:auto;}
+#team-controls[hidden],#team-rescue[hidden]{display:none;}
+.team-actions{display:flex;gap:4px;}
+.team-actions .hud-action{min-height:28px;}
+#team-rescue{margin-top:4px;color:#ffb0b8;text-shadow:1px 1px #0a1430;max-width:230px;overflow:hidden;}
+#team-rescue>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.network-signal{display:inline-flex;align-items:flex-end;gap:2px;height:12px;color:#8fa3c4;}
+.network-signal i{display:block;width:3px;background:currentColor;}
+.network-signal i:nth-child(1){height:4px}.network-signal i:nth-child(2){height:8px}.network-signal i:nth-child(3){height:12px}
+[data-health=good] .network-signal{color:#5fe08a}[data-health=fair] .network-signal{color:#ffd23f}[data-health=poor] .network-signal,[data-health=offline] .network-signal{color:#ff5f6d}
+@media(pointer:coarse){.team-actions .hud-action{min-height:32px;padding:5px 7px}.hud-action kbd{display:none}}

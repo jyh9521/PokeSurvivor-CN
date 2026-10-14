@@ -256,7 +256,7 @@ G.Game = (() => {
     }
   };
   let awayBy = null;
-  const awayText = () => G.Coop.migrating?G.T('Transfiriendo anfitrión…'):G.I18n.f('Reconectando: esperando a {name}…',awayBy);
+  const awayText = () => G.I18n.f('Reconectando: esperando a {name}…',awayBy);
 
   /** Has llevado a casa a un Pokémon perdido y se une a ti (events.js). */
   G.onRescue = (dex, name) => {
@@ -877,7 +877,6 @@ G.Game = (() => {
     /** Para grabar vídeos: abre las cartas de subir de nivel. */
     debugLevelUp() { tampered = true; pl.level++; pendingLevels++; },
     toUI() { state = 'ui'; Backdrop.restore(); },
-    get migrationReady(){return !pendingLevels&&!openItem&&!laterItems.length;},exportMigration(){return {...teamState(),biome};},importMigration(s){coopApi.syncTeam(s);biome=s.biome;},
     get state() { return state; }, get player() { return pl; }, st
   };
 })();

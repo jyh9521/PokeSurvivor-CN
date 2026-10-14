@@ -376,7 +376,7 @@ G.HUD = (() => {
     ctx.restore();
   }
 
-  function drawMarks(ctx,w,h,pl){const names={gather:'Reunirse',help:'Ayuda',danger:'Peligro'};for(const m of G.Coop.marks){const sx=(m.x-G.Camera.left())*G.Camera.scale,sy=(m.y-G.Camera.top())*G.Camera.scale;const x=G.U.clamp(sx,40,w-40),y=G.U.clamp(sy,90,h-100);ctx.save();ctx.strokeStyle=m.kind==='danger'?'#ff6775':'#ffe06b';ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,14,0,Math.PI*2);ctx.stroke();ctx.font=F(800,12);ctx.textAlign='center';ctx.fillText(G.T(names[m.kind]),x,y-22);ctx.beginPath();ctx.moveTo(x,y);const a=Math.atan2(sy-y,sx-x);ctx.lineTo(x+Math.cos(a)*23,y+Math.sin(a)*23);ctx.stroke();ctx.restore();}}
+  function drawMarks(ctx,w,h,pl){const names={gather:'Reunirse',help:'Ayuda',danger:'Peligro'},icons={gather:'bond',help:'heart',danger:'flag'};for(const m of G.Coop.marks){const sx=(m.x-G.Camera.left())*G.Camera.scale,sy=(m.y-G.Camera.top())*G.Camera.scale,x=G.U.clamp(sx,24,w-24),y=G.U.clamp(sy,100,h-100);ctx.save();ctx.fillStyle='rgba(10,16,28,.85)';roundRect(ctx,x-11,y-11,22,22,4);ctx.fill();G.Icons.draw(ctx,icons[m.kind],x-8,y-8,16);ctx.font=F(700,10);ctx.textAlign='center';ctx.strokeStyle='#0a1430';ctx.lineWidth=3;ctx.strokeText(G.T(names[m.kind]),x,y-16);ctx.fillStyle=m.kind==='danger'?'#ff8a96':'#ffe06b';ctx.fillText(G.T(names[m.kind]),x,y-16);if(Math.hypot(sx-x,sy-y)>20){const a=Math.atan2(sy-y,sx-x);ctx.translate(x,y);ctx.rotate(a);ctx.beginPath();ctx.moveTo(13,-3);ctx.lineTo(18,0);ctx.lineTo(13,3);ctx.closePath();ctx.fill();}ctx.restore();}}
 
   // ---------------- cooperativo ----------------
 

@@ -4,19 +4,19 @@ G.NetworkUI=(()=>{
   let button,panel;
   function update(){
     if(!button)return;button.hidden=!G.NAS?.enabled||!G.NAS.user||G.DB.guest;
-    if(button.hidden){panel.hidden=true;return;}if(panel.hidden)return;
-    const m=G.NAS.networkMetrics();
+    if(button.hidden){panel.hidden=true;return;}const m=G.NAS.networkMetrics();
+    const latency=m.peerRttMs??m.nasRttMs;const value=m.connected?(latency==null?'—':Math.round(latency)+' ms'):'—';button.querySelector('[data-latency]').textContent=value;button.dataset.health=!m.connected?'offline':latency==null?'pending':latency<120?'good':latency<250?'fair':'poor';button.setAttribute('aria-label',T('Diagnóstico de red')+': '+value);if(panel.hidden)return;
     panel.querySelector('[data-network="status"]').textContent=T(m.connected?'Conectado por NAS':'Sin conexión al NAS')+(m.directPeers?' · WebRTC':'')+(m.background?' · '+T('Pestaña en segundo plano'):'');
     for(const[k,,unit]of fields){const n=m[k];panel.querySelector('[data-network="'+k+'"]').textContent=n==null?'—':(Math.round(n*10)/10).toLocaleString(G.I18n.lang)+(unit?' '+unit:'');}
     panel.querySelector('[data-network="timeouts"]').textContent=m.probeTimeouts+' / '+(m.probeReplies+m.probeTimeouts);
     panel.querySelector('[data-network="disconnects"]').textContent=m.disconnects;
   }
   function init(){
-    button=document.createElement('button');button.id='nas-network-toggle';button.className='btn small';button.textContent=T('Diagnóstico de red');button.hidden=true;
+    button=document.createElement('button');button.id='nas-network-toggle';button.className='hud-action';button.title=T('Diagnóstico de red');button.innerHTML='<span class=network-signal aria-hidden=true><i></i><i></i><i></i></span><span data-latency>—</span>';button.hidden=true;
     panel=document.createElement('section');panel.id='nas-network-panel';panel.className='panel';panel.hidden=true;
     panel.innerHTML='<b>'+T('Diagnóstico de red')+'</b><p data-network="status"></p>'+fields.map(([k,label])=>'<div class="network-row"><span>'+T(label)+'</span><strong data-network="'+k+'">—</strong></div>').join('')+'<div class="network-row"><span>'+T('Sondas agotadas / completadas')+'</span><strong data-network="timeouts"></strong></div><div class="network-row"><span>'+T('Desconexiones')+'</span><strong data-network="disconnects"></strong></div><p class="sub">'+T('Las sondas vencen a los 5 s; no es una medición de pérdida de paquetes. El RTT entre jugadores incluye el NAS y la respuesta del otro navegador.')+'</p><button class="btn small" data-network-export>'+T('Exportar diagnóstico')+'</button> <button class="btn small" data-network-close>'+T('Cerrar')+'</button>';
     document.body.append(button,panel);button.onclick=()=>{panel.hidden=!panel.hidden;update();};panel.querySelector('[data-network-close]').onclick=()=>panel.hidden=true;
-    panel.querySelector('[data-network-export]').onclick=()=>{const value={format:1,version:'0.3.0',recordedAt:new Date().toISOString(),metrics:G.NAS.networkMetrics()},blob=new Blob([JSON.stringify(value,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pokesurvivor-network.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+    panel.querySelector('[data-network-export]').onclick=()=>{const value={format:1,version:'0.4.1',recordedAt:new Date().toISOString(),metrics:G.NAS.networkMetrics()},blob=new Blob([JSON.stringify(value,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pokesurvivor-network.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
     update();setInterval(update,1000);
   }
   window.addEventListener('load',init);return {update};
