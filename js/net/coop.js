@@ -52,7 +52,7 @@ G.Coop = (() => {
   let levelSeq = 0, levelNow = 1, seenSeq = 0, doneSeq = 0, lastHo = '';
   const STALL_MS = 2500;
   let members = [];
-  const reconnecting=new Set(),marks=new Map();let pingAt=-Infinity;
+  const reconnecting=new Set(),marks=new Map();let pingAt=-Infinity,migrating=false;
 
   // ---------------- escalado de dificultad ----------------
 
@@ -67,7 +67,7 @@ G.Coop = (() => {
    * @param cb    { levelStart(lv), resume(), waiting(names), over(data), lost(msg), team(t), shiny(dex) }
    */
   function begin(cfg, pl, cb) {
-    active = true;reconnecting.clear();marks.clear();pingAt=-Infinity;
+    active = true;migrating=false;reconnecting.clear();marks.clear();pingAt=-Infinity;
     me = G.Net.uid; hostUid = cfg.host;
     host = me === hostUid;
     local = pl;
@@ -91,7 +91,7 @@ G.Coop = (() => {
   }
 
   function end() {
-    active = false; host = false; local = null;reconnecting.clear();marks.clear();
+    migrating=false;active = false; host = false; local = null;reconnecting.clear();marks.clear();
     mates.clear(); outEv = []; waiting = new Set(); holds = new Set();
   }
 
@@ -189,7 +189,7 @@ G.Coop = (() => {
     const ja = G.Judgment.netState();       // Arceus en la Sentencia
     if (ja) f.ja = ja;
     // Siempre: quién está eligiendo y, si hay cartas de nivel, cuáles (ver arriba).
-    f.ho = holdNames();f.aw=hostAway||reconnecting.size>0;
+    f.ho = holdNames();f.aw=hostAway||reconnecting.size>0||migrating;
     // Repair enemy creation after a brief connection outage without restarting a run.
     if(!m.repairAt||performance.now()>m.repairAt){m.repairAt=performance.now()+2000;f.meta=f.e.map(a=>{const e=G.EnemyMgr.get(a[0]);return [e.id,e.dex,e.maxHp,e.dmg,e.boss?1:0,e.shiny?1:0,e.behavior];});}
     if (waiting.size) f.lu = [levelSeq, levelNow];
@@ -310,7 +310,7 @@ G.Coop = (() => {
   // --- en el invitado ---
 
   /** Invitado: se para (o sigue) según si el anfitrión está. */
-  function updateAway(){if(api.away)api.away(reconnecting.size?[...reconnecting].map(nameOf).join(', '):hostAway||stalled?nameOf(hostUid):null);}
+  function updateAway(){if(api.away)api.away(migrating?G.T('Cambio de anfitrión'):reconnecting.size?[...reconnecting].map(nameOf).join(', '):hostAway||stalled?nameOf(hostUid):null);}
 
   // Anfitrión: al irse de la pestaña avisa a todos al momento (después ya no
   // podrá mandar nada) y al volver, que sigue.
@@ -511,6 +511,13 @@ G.Coop = (() => {
   function ping(kind='gather'){if(!active||performance.now()-pingAt<3000)return false;pingAt=performance.now();if(host)acceptMark(me,kind,r1(local.x),r1(local.y));else{outEv.push(['mark',kind,r1(local.x),r1(local.y)]);flushClient(true);}return true;}
 
   return {
+    flushMigration(){if(host)flushAll();else flushClient(true);},
+    freezePlayers(states){for(const [uid,a]of Object.entries(states)){const m=mates.get(uid);if(m&&Array.isArray(a)){m.state=a;m.pl.net=readState(a);reconcile(uid,m.pl.net);}}},
+    get migrating(){return migrating;},
+    freezeMigration(v){migrating=!!v;updateAway();},
+    get canMigrate(){return active&&!G.Rift.inArena&&!G.Judgment.active&&G.Game.migrationReady!==false&&!waiting.size&&!holds.size&&!G.Judgment.cinematic&&['playing','held'].includes(G.Game.state);},
+    exportPlayers(){return {[me]:myState(),...Object.fromEntries([...mates].map(([uid,m])=>[uid,m.state||[m.pl.x,m.pl.y,0,0,m.pl.hp,m.pl.maxHp,m.pl.dead?1:0]]))};},
+    migrate(next,s){hostUid=next;host=me===next;local.coopHost=host;reconnecting.clear();waiting.clear();holds.clear();hostAway=false;stalled=false;lastHostAt=performance.now();for(const m of mates.values()){m.lastAt=performance.now();m.repairAt=0;m.q=[];if(s.players[m.uid]){m.state=s.players[m.uid];m.pl.net=readState(m.state);}}G.Migration.apply(s,host);migrating=false;updateAway();},
     ping,get marks(){return [...marks.values()].filter(m=>performance.now()-m.at<8000);},
     ANIMS, COLORS, begin, end, leave, tick, players, puppets, xpFactor, scaleRate, scaleHp,
     cast, hit, status, hurtShown, enemyAdded, enemyGone, enemyShot, pickupAdded, pickupGone, say,

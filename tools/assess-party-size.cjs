@@ -1,0 +1,12 @@
+/* Read-only host-frame microbenchmark; it does NOT raise room capacity. */
+const fs=require('node:fs'),vm=require('node:vm'),{performance}=require('node:perf_hooks');
+const rows=[];for(const n of [4,8,12]){let now=0,receive,bytes=0,packets=0;const uid=i=>String(i+1).padStart(32,'0');
+  class Player{constructor(){Object.assign(this,{x:0,y:0,hp:100,maxHp:100,xpMul:1,magnet:78,moveAngle:0,aim:0,dead:false});}activeGroup(){return [{id:'tackle',lvl:1}];}}
+  const enemies=Array.from({length:64},(_,i)=>({id:i+1,dex:10,x:100+i,y:60,hp:123,maxHp:123,dmg:10,boss:false,shiny:false,behavior:'chaser',anim:{cur:'Walk',dir:0}}));
+  const G={Game:{state:'playing',migrationReady:true},Player,DEX_BY:{1:{dex:1}},startMoveOf:()=> 'tackle',Sprites:{preload(){}},Social:{me:{name:'host'}},U:{dist2:(x,y,a,b)=>(x-a)**2+(y-b)**2},EnemyMgr:{all:()=>enemies,get:id=>enemies[id-1]},Judgment:{netState:()=>null,cinematic:false},Flow:{},Projectiles:{},Spawner:{},Net:{uid:uid(0),interval:()=>1/15,slow:()=>false,viaTurn:()=>false,on:f=>receive=f,onPeer(){},send:(to,data)=>{packets++;bytes+=Buffer.byteLength(JSON.stringify({k:'rtc-wire',room:'a'.repeat(24),lane:'state',seq:packets,data}));}}};
+  vm.runInNewContext(fs.readFileSync('js/net/coop.js','utf8'),{G,document:{addEventListener(){},hidden:false},performance:{now:()=>now},console});const members=Array.from({length:n},(_,i)=>({uid:uid(i),name:'p'+i,dex:1}));
+  G.Coop.begin({host:uid(0),members},new Player(),{team:()=>({time:1,level:1,xp:0,xpNext:100,kills:0,bosses:0,coins:0,t1:0,t10:0}),away(){},choosing:()=>false});
+  const start=performance.now();for(let f=0;f<1500;f++){now+=1000/15;for(let i=1;i<n;i++)receive(uid(i),{k:'f',p:[0,0,0,0,100,100,0,'tackle',1,78,0,1,0,0,0],ev:[]});G.Coop.tick(1/15);}const ms=performance.now()-start;
+  rows.push({players:n,connections:n-1,packetsPerSecond:packets/100,averageBytes:Math.round(bytes/packets),hostStateMbitPerSecond:+(bytes/100*8/1e6).toFixed(3),frameConstructionMs:+(ms/1500).toFixed(3),relayWorstPacketsPerSecond:15*(n-1)*3,enemySpawnMultiplier:1+.75*(n-1),enemyHpMultiplier:1+.3*(n-1),xpDivisor:1+.6*(n-1)});
+}
+fs.mkdirSync('artifacts/playability',{recursive:true});fs.writeFileSync('artifacts/playability/party-size.json',JSON.stringify({kind:'synthetic frame-construction only; no network, physics or rendering acceptance',enemies:64,seconds:100,rows},null,2));console.log(JSON.stringify(rows,null,2));

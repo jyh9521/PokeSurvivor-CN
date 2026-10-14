@@ -6,7 +6,7 @@ DATA="${DATA_PATH:-/mnt/user/appdata/pokesurvivor-cn/data}"
 NAME=pokesurvivor-cn
 STAMP=$(date +%Y%m%d-%H%M%S)
 BACKUP="$NAME-backup-$STAMP"
-IMAGE=pokesurvivor-cn-nas:0.3.0
+IMAGE=pokesurvivor-cn-nas:0.4.0
 # Refuse to accidentally use a new empty data directory.
 test -d "$DATA"
 ACTUAL=$(docker inspect --format '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Source}}{{end}}{{end}}' "$NAME")
@@ -17,7 +17,7 @@ fi
 # Build first: a build failure leaves the running game untouched.
 docker build -t "$IMAGE" .
 # Consistent SQLite backup while the old container is still running.
-docker exec "$NAME" node server/backup.cjs "/data/backups/pre-0.3.0-$STAMP.sqlite"
+docker exec "$NAME" node server/backup.cjs "/data/backups/pre-0.4.0-$STAMP.sqlite"
 docker stop "$NAME"
 docker rename "$NAME" "$BACKUP"
 restore_container() {
@@ -41,5 +41,5 @@ for attempt in 1 2 3 4 5 6; do
   sleep 5
 done
 if [ "$READY" != true ]; then restore_container; exit 1; fi
-printf '\nUpdated. Previous container: %s\nDatabase backup: %s/backups/pre-0.3.0-%s.sqlite\n' "$BACKUP" "$DATA" "$STAMP"
+printf '\nUpdated. Previous container: %s\nDatabase backup: %s/backups/pre-0.4.0-%s.sqlite\n' "$BACKUP" "$DATA" "$STAMP"
 docker logs --tail 30 "$NAME"

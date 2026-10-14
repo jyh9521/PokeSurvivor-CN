@@ -152,6 +152,7 @@
       };
       $('lobby-menu').onclick = () => G.MenuUI.open();
       $('lobby-start').onclick = start;
+      $('lobby-ready').onclick=async()=>{const me=G.Social.room?.members.find(m=>m.uid===G.Social.uid);const r=await G.Social.setReady(!me?.ready);if(!r.ok)G.UI.toast(r.error);};
       $('lobby-start').dataset.sfx = 'confirm';
       // Conecta / desconecta la red al entrar o salir de una sala.
       G.Social.on(what => {
@@ -216,13 +217,13 @@
       box.querySelectorAll('.conn').forEach(el => {
         const m = ms.find(x => x.uid === el.dataset.u);
         if (!m) return;
-        const t = connText(m, room);
+        const t = connText(m, room)+(G.NAS?.enabled?' · '+G.T(m.ready?'Preparado':'Sin preparar'):'');
         el.textContent = t;
         el.className = 'conn' + (t === 'Conectando…' ? ' wait' : '');
       });
 
       // Invitar (sólo el anfitrión y si queda sitio).
-      const canInvite = room.isHost && ms.length < G.Social.MAX_PLAYERS;
+      const canInvite = (G.NAS?.enabled||room.isHost) && room.open!==false && ms.length < G.Social.MAX_PLAYERS;
       $('lobby-inv-title').classList.toggle('hidden', !canInvite);
       const inv = $('lobby-invite');
       inv.classList.toggle('hidden', !canInvite);
@@ -246,12 +247,14 @@
       btn.classList.toggle('hidden', !room.isHost);
       const connecting = ms.some(m => m.uid !== room.host && G.Net.mode(m.uid) === 'connecting');
       const failed = ms.some(m => m.uid !== room.host && G.Net.mode(m.uid) === 'failed');
-      btn.disabled = !room.isHost || ms.length < 2 || connecting || failed;
+      const allReady=!G.NAS?.enabled||ms.every(m=>m.ready&&m.connected!==false);btn.disabled = !room.isHost || ms.length < 2 || connecting || failed||!allReady;
+      const ready=$('lobby-ready');ready.hidden=!G.NAS?.enabled;ready.textContent=G.T(ms.find(m=>m.uid===G.Social.uid)?.ready?'Cancelar preparación':'Prepararse');
+      let transfer=$('lobby-transfer');if(!transfer){transfer=document.createElement('div');transfer.id='lobby-transfer';$('lobby-members').after(transfer);}transfer.replaceChildren();if(G.NAS?.enabled&&room.isHost)for(const m of ms.filter(m=>m.uid!==room.host&&m.connected!==false)){const b=document.createElement('button');b.className='btn small';b.dataset.hostTransfer=m.uid;b.textContent=G.T('Transferir anfitrión')+' → '+m.name;b.onclick=async()=>{const r=await G.Social.transferHost(m.uid);if(!r.ok)G.UI.toast(r.error);};transfer.appendChild(b);}
       btn.textContent = 'Empezar partida (' + ms.length + '/' + G.Social.MAX_PLAYERS + ')';
       $('lobby-note').textContent = !room.isHost ? 'Cuando el anfitrión empiece, entraréis todos a la vez.'
         : ms.length < 2 ? 'Necesitas al menos un amigo en la sala.'
         : failed ? 'No se puede conectar con algún amigo: su red (o la tuya) no deja jugar en grupo. Probad con otra wifi o datos móviles; se reintenta solo.'
-        : connecting ? 'Conectando con tus amigos…' : 'La partida empieza para todos a la vez.';
+        : !allReady?'Todos deben prepararse antes de empezar.': connecting ? 'Conectando con tus amigos…' : 'La partida empieza para todos a la vez.';
     }
 
     async function start() {
@@ -263,6 +266,7 @@
       };
       const opened = await G.Social.setOpen(false);
       if (opened && opened.ok === false) { G.UI.toast(opened.error); return; }
+      const current=G.Social.room;if(G.NAS?.enabled&&current){cfg.host=current.host;cfg.members=current.members;}
       G.Net.broadcast(cfg);
       G.Flow.startCoop(cfg);
     }

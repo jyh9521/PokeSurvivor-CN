@@ -13,7 +13,7 @@
  */
 G.Settings = (() => {
   const KEY = 'ps.settings';
-  const DEF = { quality: 'auto', dmgNumbers: true, calm: false, fps: false, stick: 1 };
+  const DEF = { quality: 'auto', dmgNumbers: true, calm: false, fps: false, stick: 1, skipGacha:false, playerOutline:true, gamepad:true };
   let s = Object.assign({}, DEF);
   try { Object.assign(s, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* nada */ }
   const fns = new Set();
@@ -25,7 +25,7 @@ G.Settings = (() => {
 
   function save() { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* nada */ } }
   function get(k) { return s[k]; }
-  function set(k, v) { s[k] = v; save(); fns.forEach(fn => { try { fn(k, v); } catch (e) { /* nada */ } }); }
+  function set(k, v) { s[k] = v;if(k==='quality'&&v==='potato'){s.dmgNumbers=false;s.calm=true;} save(); fns.forEach(fn => { try { fn(k, v); } catch (e) { /* nada */ } }); }
 
   /** Lo llama el bucle del juego en cada fotograma (sólo durante la partida). */
   function sample(dt) {

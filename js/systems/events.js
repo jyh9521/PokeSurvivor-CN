@@ -347,6 +347,7 @@ G.Events = (() => {
   }
 
   return {
+    checkpoint(s){if(!s)return {nextT,cur,last,thiefT,thieves,lost,followUid:lost?.follow?.uid};({nextT,cur,last,thiefT,thieves}=s);lost=null;if(s.lost){makeLost(s.lost);lost.follow=G.Coop.players().find(p=>p.uid===s.followUid)||G.Game.player;}},
     reset, update, bag, onNet, drawables, drawHud,
     get golden() { return !!cur && cur.id === 'gold'; },
     get current() { return cur ? cur.id : null; },

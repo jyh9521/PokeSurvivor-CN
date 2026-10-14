@@ -691,6 +691,7 @@ G.Judgment = (() => {
   }
 
   return {
+    checkpoint(s){if(!s)return {phase,ct,cfg,ported,landed,canSkip,cues,A,center,arenaT,bossT,bossN,base,downs,hitT,samples};const anim=A?.anim;({phase,ct,cfg,ported,landed,canSkip,cues,center,arenaT,bossT,bossN,base,downs,hitT,samples}=s);A=s.A;if(A){A.anim=anim||new G.Sprites.Animator(ARCEUS,SCALE);A.net=null;}hits=new Map();},
     AT, reset, noteDmg, update, cineTick, skip, bossDown, drawable, drawAir, drawOverlay, onEvent, netState, netApply,
     get active() { return !!phase; },
     get cinematic() { return phase === 'cine'; },

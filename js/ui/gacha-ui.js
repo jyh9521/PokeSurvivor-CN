@@ -7,6 +7,7 @@ G.GachaUI = (() => {
   let gen = 1;
 
   function init() {
+    $('gacha-skip').checked=!!G.Settings.get('skipGacha');$('gacha-skip').onchange=e=>G.Settings.set('skipGacha',e.target.checked);
     $('pull-1').onclick = () => pull(1);
     $('pull-10').onclick = () => pull(10, 't1');
     $('pull-10b').onclick = () => pull(10, 't10');
@@ -81,6 +82,7 @@ G.GachaUI = (() => {
 
   async function pull(n, use = 't1') {
     if (busy) return;
+    const skip=!!G.Settings.get('skipGacha');
     const res = G.Gacha.pull(G.DB.save, n, gen, use);
     if (!res) { G.Audio.sfx('error'); G.UI.toast('No tienes tickets suficientes: consíguelos jugando'); return; }
     G.Progress.checkAch();
@@ -95,7 +97,7 @@ G.GachaUI = (() => {
     fx.classList.remove('hidden');
 
     // La tragaperras (ui/slots.js) y luego las cartas.
-    await G.Slots.play(slot, res);
+    if(!skip)await G.Slots.play(slot, res);
     G.Audio.sfx('burst', { rarity: best });
     slot.style.display = 'none';
 
@@ -103,17 +105,19 @@ G.GachaUI = (() => {
       const mon = G.DEX_BY[r.dex];
       const c = document.createElement('div');
       c.className = 'pcard r' + r.rarity + (r.shiny ? ' shiny' : '');
+      if(skip)c.style.animation='none';
       c.style.setProperty('--rc', r.shiny ? '#9ae6ff' : G.Gacha.RARITY_COLOR[r.rarity]);
       c.innerHTML = `<div class="stars">${G.UI.stars(r.rarity, 24)}</div>`;
-      if(mon)c.appendChild(G.UI.spriteCanvas(r.dex,132,120,{lively:r.rarity>=4||r.shiny,scale:2,shiny:r.shiny}));else c.insertAdjacentHTML('beforeend',G.Icons.html('ticket',64));
+      if(mon)c.appendChild(G.UI.spriteCanvas(r.dex,132,120,{lively:!skip&&(r.rarity>=4||r.shiny),scale:2,shiny:r.shiny}));else c.insertAdjacentHTML('beforeend',G.Icons.html('ticket',64));
       const tag = r.completed?G.T('Resultado convertido en 2 tickets'):r.isNew
         ? `<span class="new">${r.shiny ? '¡SHINY NUEVO!' : '¡NUEVO!'}</span>`
         : G.I18n.f('Repetido · +{x} fragmentos de ticket',r.refund);
       c.insertAdjacentHTML('beforeend', `<b>${r.shiny ? G.Icons.html('shiny', 12) + ' ' : ''}${mon?mon.name:G.T('Banner 5★ completo · 2 tickets')}</b><div class="tag">${tag}</div>`);
       out.appendChild(c);
-      G.Audio.sfx('reveal', { rarity: r.rarity });
-      await wait(n === 10 ? 150 : 0);
+      if(!skip)G.Audio.sfx('reveal', { rarity: r.rarity });
+      if(!skip)await wait(n === 10 ? 150 : 0);
     }
+    if(skip)G.Audio.sfx('reveal',{rarity:best});
     $('pull-close').classList.remove('hidden');
     busy = false;
   }

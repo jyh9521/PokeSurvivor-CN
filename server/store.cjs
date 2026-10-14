@@ -1,5 +1,6 @@
 /* Persistent account/save module: optimistic revisions, history, no client clocks. */
 const {DatabaseSync}=require('node:sqlite');
+const Upgrades=require('../js/data/upgrades.js');
 const {CAMPAIGNS}=require('./rewards.cjs');
 const MAX_COINS=1e9+CAMPAIGNS.reduce((total,c)=>total+c.coins,0);
 const {randomBytes,scrypt:rawScrypt,timingSafeEqual,createHash}=require('node:crypto');
@@ -15,6 +16,7 @@ function validateSave(value,name) {
   for(const key of ['coins'])if(!Number.isSafeInteger(s[key]) || s[key]<0 || s[key]>MAX_COINS)throw error(400,'Invalid '+key);
   for(const key of ['owned','shiny','pupg','stats','tickets'])if(!s[key] || typeof s[key]!=='object' || Array.isArray(s[key]))throw error(400,'Invalid '+key);
   for(const value of Object.values(s.stats))if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1e12)throw error(400,'Invalid stats');
+  for(const [dex,levels]of Object.entries(s.pupg)){if(!s.owned[dex]||!levels||typeof levels!=='object'||Array.isArray(levels))throw error(400,'Invalid upgrades');for(const[id,n]of Object.entries(levels))if(!Number.isSafeInteger(n)||n<0||n>(Upgrades.BY[id]?.max||1000))throw error(400,'Invalid upgrade level');}
   s.profile ||= {favs:[],title:''};s.ach ||= {};s.legends ||= {};
   if(typeof s.profile!=='object'||Array.isArray(s.profile)||!Array.isArray(s.profile.favs)||s.profile.favs.length>3||typeof s.profile.title!=='string'||s.profile.title.length>128)throw error(400,'Invalid profile');
   for(const f of s.profile.favs)if(!f||!Number.isSafeInteger(f.dex)||f.dex<1||f.dex>1100||typeof f.shiny!=='boolean')throw error(400,'Invalid favorite');

@@ -248,6 +248,7 @@ G.Sprites = (() => {
       const dx = Math.round(x - m.ax * k), dy = Math.round(y - m.ay * k);
       const prev = ctx.globalAlpha;
       if (alpha < 1) ctx.globalAlpha = prev * alpha;
+      if(opts.outline){ctx.globalAlpha=prev*.9;const img=white(s.img);for(const [ox,oy]of [[-2,0],[2,0],[0,-2],[0,2]])ctx.drawImage(img,sx,sy,m.w,m.h,dx+ox,dy+oy,m.w*k,m.h*k);ctx.globalAlpha=prev*.85;}
       // Destello: blanco entero (enemigos) o medio blanco encima (tu Pokémon).
       if (!opts.flash || opts.softFlash) ctx.drawImage(s.img, sx, sy, m.w, m.h, dx, dy, m.w * k, m.h * k);
       if (opts.flash) {

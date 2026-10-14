@@ -30,7 +30,7 @@ G.Game = (() => {
     cv = document.getElementById('game');
     ctx = cv.getContext('2d');
     resize();
-    addEventListener('resize', resize);
+    addEventListener('resize', resize);G.Settings.on((k)=>{if(k==='quality')resize();});
     G.Touch.init(cv);
     // En móvil: al cambiar de app o girarlo en vertical, la partida se pausa.
     document.addEventListener('visibilitychange', () => { if (document.hidden) autoPause(); });
@@ -43,7 +43,7 @@ G.Game = (() => {
   function resize() {
     // Resolución interna como mucho ×1,5: en pantallas ×2 dibujar el doble de
     // píxeles era de lo que más costaba, y con el pixel art no se nota.
-    dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    dpr = G.Settings.get('quality')==='potato'?1:Math.min(1.5,window.devicePixelRatio||1);
     w = cv.clientWidth; h = cv.clientHeight;
     cv.width = Math.round(w * dpr);
     cv.height = Math.round(h * dpr);
@@ -256,7 +256,7 @@ G.Game = (() => {
     }
   };
   let awayBy = null;
-  const awayText = () => G.I18n.f('Reconectando: esperando a {name}…',awayBy);
+  const awayText = () => G.Coop.migrating?G.T('Transfiriendo anfitrión…'):G.I18n.f('Reconectando: esperando a {name}…',awayBy);
 
   /** Has llevado a casa a un Pokémon perdido y se une a ti (events.js). */
   G.onRescue = (dex, name) => {
@@ -516,6 +516,7 @@ G.Game = (() => {
   // ---------------- teclado ----------------
 
   function handleKeys() {
+    if(G.MenuUI.upgradeBusy)return;
     if (G.SettingsUI.isOpen) { if (G.Input.tap('escape')) G.SettingsUI.close(); return; }
     // La Sentencia de Arceus: Espacio, Intro o Esc saltan la animación (si se puede).
     if (G.Judgment.cinematic && state === 'playing') {
@@ -595,7 +596,7 @@ G.Game = (() => {
     if (fpsAcc >= 0.5) { fpsShown = Math.round(fpsN / fpsAcc); fpsAcc = 0; fpsN = 0; }
     frameDt = state === 'playing' ? dt : 0;
 
-    handleKeys();
+    G.Gamepad?.poll();handleKeys();
 
     if (state === 'playing') update(dt);
     else if (pl && state !== 'ui') { G.FX.update(dt * 0.25); pl.anim.update(dt * 0.25); }
@@ -749,6 +750,7 @@ G.Game = (() => {
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     }
+    if(pl&&G.Settings.get('playerOutline')){ctx.save();ctx.scale(G.Camera.scale,G.Camera.scale);G.Camera.apply(ctx);pl.highlight(ctx);ctx.restore();}
     if (!G.Judgment.cinematic) G.HUD.draw(ctx, w, h, pl, st);
     G.Judgment.drawOverlay(ctx, w, h);
     G.Touch.draw(ctx);
@@ -875,6 +877,7 @@ G.Game = (() => {
     /** Para grabar vídeos: abre las cartas de subir de nivel. */
     debugLevelUp() { tampered = true; pl.level++; pendingLevels++; },
     toUI() { state = 'ui'; Backdrop.restore(); },
+    get migrationReady(){return !pendingLevels&&!openItem&&!laterItems.length;},exportMigration(){return {...teamState(),biome};},importMigration(s){coopApi.syncTeam(s);biome=s.biome;},
     get state() { return state; }, get player() { return pl; }, st
   };
 })();

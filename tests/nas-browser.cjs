@@ -56,7 +56,7 @@ fs.mkdirSync(OUT,{recursive:true});
     await a.locator('[data-go="friends"]').click();const invite=await a.evaluate(id=>G.Social.invite(id),bid);check('live invite sent',invite.ok);
     await b.locator('#inv-yes').waitFor({state:'visible'});await b.locator('#inv-yes').click();await b.locator('#scr-lobby').waitFor({state:'visible'});
     await a.evaluate(()=>G.LobbyUI.open());await a.locator('#lobby-start').waitFor({state:'visible'});
-    await a.waitForFunction(()=>G.Social.room.members.length===2);await a.locator('#lobby-start').click();
+    await a.waitForFunction(()=>G.Social.room.members.length===2);await a.evaluate(()=>G.Social.setReady(true));await b.evaluate(()=>G.Social.setReady(true));await a.locator('#lobby-start').click();
     await a.waitForFunction(()=>G.Game.state==='playing'&&G.Coop.active);await b.waitForFunction(()=>G.Game.state==='playing'&&G.Coop.active);
     check('two real game instances enter shared NAS-relayed run',await a.evaluate(()=>G.Coop.isHost&&G.Coop.puppets().length===1)&&await b.evaluate(()=>!G.Coop.isHost&&G.Coop.puppets().length===1));
     await a.waitForFunction(()=>G.Net.stats().nasRttMs!=null&&G.Net.stats().peerRttMs!=null&&G.Net.stats().sendHz>=10&&G.Net.stats().receiveHz>=10);

@@ -432,6 +432,8 @@ G.Player = class Player {
     this.anim.loop(this.walking ? 'Walk' : 'Idle', this.walking ? this.baseSpd / 110 : 1);
   }
 
+  highlight(ctx){ctx.save();this.anim.draw(ctx,this.x,this.y,{outline:true});ctx.strokeStyle='#ffdf57';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(this.x,this.y,this.r*1.5,this.r*.6,0,0,Math.PI*2);ctx.stroke();ctx.restore();}
+
   draw(ctx) {
     // Halo del tipo del movimiento activo, en el suelo.
     const m = this.activeMove();

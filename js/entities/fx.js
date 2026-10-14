@@ -21,7 +21,7 @@ G.FX = (() => {
 
   /** Partícula cuadrada. o: { vx, vy, life, size (en píxeles de arte), grav, drag } */
   function px(x, y, color, o = {}) {
-    if (parts.length >= CAP_PARTS[q()]) return;
+    if (parts.length >= (G.Settings.get('quality')==='potato'?80:CAP_PARTS[q()])) return;
     parts.push({ x, y, vx: o.vx || 0, vy: o.vy || 0, t: 0, life: o.life || 0.4, color,
                  s: (o.size || 1) * PX, grav: o.grav || 0, drag: o.drag == null ? 0.9 : o.drag });
   }
@@ -45,7 +45,7 @@ G.FX = (() => {
 
   /** Sprite de efecto suelto. o: { vx, vy, life, scale, angle, spin, grav, frameRate, fade } */
   function sp(shape, pal, x, y, o = {}) {
-    if (sprites.length >= CAP_SPRITES[q()]) return;
+    if (sprites.length >= (G.Settings.get('quality')==='potato'?35:CAP_SPRITES[q()])) return;
     sprites.push({ shape, pal, x, y, vx: o.vx || 0, vy: o.vy || 0, t: 0, life: o.life || 0.4,
                    scale: o.scale || 1, angle: o.angle || 0, spin: o.spin || 0, grav: o.grav || 0,
                    fr: o.frameRate || 10, fade: o.fade !== false });
@@ -53,7 +53,7 @@ G.FX = (() => {
 
   /** Centelleo de shiny (cruz de píxeles que nace y se apaga). */
   function twinkle(x, y) {
-    if (sprites.length >= CAP_SPRITES[q()]) return;
+    if (sprites.length >= (G.Settings.get('quality')==='potato'?35:CAP_SPRITES[q()])) return;
     sprites.push({ twinkle: true, x, y, vx: 0, vy: -8, t: 0, life: G.U.rand(0.45, 0.7) });
   }
 
@@ -78,7 +78,7 @@ G.FX = (() => {
     // grandes, como "¡Muy eficaz!" o los de jefe, siempre entran).
     // Ajustes → "Números de daño": los números se ocultan; los avisos de texto no.
     if ((typeof value === 'number' || /^-\d/.test(value)) && !G.Settings.get('dmgNumbers')) return;
-    if (texts.length >= CAP_TEXTS[q()]) { if (!big) return; texts.shift(); }
+    if (texts.length >= (G.Settings.get('quality')==='potato'?8:CAP_TEXTS[q()])) { if (!big) return; texts.shift(); }
     texts.push({ x: x + G.U.rand(-6, 6), y, vy: -46, t: 0, life: big ? 0.95 : 0.62, s: value, color, big });
   }
 

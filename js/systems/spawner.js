@@ -179,6 +179,6 @@ G.Spawner = (() => {
   /** Invitado en cooperativo: sólo corre el reloj del aviso. */
   function tickBanner(dt) { if (announceT > 0) announceT -= dt; }
 
-  return { reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP,
+  return {checkpoint(s){if(!s)return {acc,bossIdx,surgeT,announce,announceT,preloadT};({acc,bossIdx,surgeT,announce,announceT,preloadT}=s);players=[];}, reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP,
            debugForceShiny(n = 1) { forceShiny = n; } };
 })();

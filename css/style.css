@@ -839,3 +839,8 @@ a.btn { text-decoration: none; display: inline-block; color: var(--ink); }
 .network-row { display:flex;justify-content:space-between;gap:12px;margin:4px 0; }
 .network-row strong { white-space:nowrap; }
 @media(max-height:500px){#nas-network-panel {top:45px;max-height:calc(100dvh - 55px);}#nas-network-toggle {top:8px;right:58px;}}
+
+button:focus-visible,a:focus-visible,.card:focus,.cell:focus,.answer:focus{outline:3px solid #ffdc54;outline-offset:3px;}
+
+/* Keep the diagnostics shortcut away from the compact menu settings button. */
+body:has(#scr-menu:not(.hidden)):not(:has(#scr-settings:not(.hidden))) #nas-network-toggle{display:none;}

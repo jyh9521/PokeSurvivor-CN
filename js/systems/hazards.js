@@ -105,5 +105,5 @@ G.Hazards = (() => {
     }
   }
 
-  return { add, clear, update, draw, inside, get all() { return list; }, get count() { return list.length; } };
+  return {checkpoint(s){if(!s)return {list};list=s.list.map(h=>{const old=list.find(o=>o.kind===h.kind&&o.x===h.x&&o.y===h.y&&Math.abs(o.t-h.t)<.5);return {...h,hit:old?.hit||false};});}, add, clear, update, draw, inside, get all() { return list; }, get count() { return list.length; } };
 })();

@@ -1,7 +1,7 @@
 /* ============ upgrades.js — mejoras permanentes entre runs ============
  * Se compran con Pokémonedas en el menú. `per` es lo que da cada nivel.
  */
-G.Upgrades = (() => {
+(function(factory){if(typeof module==='object'&&module.exports)module.exports=factory();else G.Upgrades=factory();})(()=>{
   const LIST = [
     { id: 'hp',     icon: 'heart', name: 'Vitalidad',      unit: '+8 vida',            max: 10, base: 60,  grow: 1.35 },
     { id: 'atk',    icon: 'fist', name: 'Fuerza',         unit: '+4% daño',           max: 10, base: 80,  grow: 1.38 },
@@ -46,5 +46,9 @@ G.Upgrades = (() => {
     };
   }
 
-  return { LIST, BY, cost, perks };
-})();
+  function normalized(levels){const out={};for(const u of LIST)out[u.id]=Math.max(0,Math.min(u.max,Math.floor(+levels?.[u.id]||0)));return out;}
+  function bulk(save,dex){if(!save.owned[dex])throw Error('Pokémon no obtenido');const levels=normalized(save.pupg[dex]),before=save.coins;let count=0;while(true){const next=LIST.filter(u=>levels[u.id]<u.max).map(u=>({id:u.id,price:cost(u.id,levels[u.id])})).sort((a,b)=>a.price-b.price||a.id.localeCompare(b.id))[0];if(!next||next.price>save.coins)break;save.coins-=next.price;levels[next.id]++;count++;}save.pupg[dex]={...save.pupg[dex],...levels};return {count,spent:before-save.coins};}
+  function refundable(save){let total=0;for(const levels of Object.values(save.pupg||{}))for(const [id,n]of Object.entries(normalized(levels)))for(let i=0;i<n;i++)total+=cost(id,i);return total;}
+  function refund(save){const coins=refundable(save);if(!Number.isSafeInteger(coins)||save.coins+coins>1001000000)throw Error('Saldo fuera de rango');save.coins+=coins;save.pupg=Object.fromEntries(Object.entries(save.pupg).map(([dex,l])=>[dex,Object.fromEntries(Object.entries(l).filter(([id])=>!BY[id]))]).filter(([,l])=>Object.keys(l).length));save.pban={};return {coins};}
+  return { LIST, BY, cost, perks,bulk,refund,refundable };
+});

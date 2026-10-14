@@ -269,6 +269,7 @@ G.Rift = (() => {
   }
 
   return {
+    checkpoint(s){if(!s)return {rift,arena,checkT,asked,downT,misses};const back=arena?.back;({rift,arena,checkT,asked,downT,misses}=s);if(arena&&back)arena.back=back;},
     reset, update, drawable, onEvent, enterRequest() { if (!arena) start(); },
     get rift() { return rift; }, get arena() { return arena; },
     get inArena() { return !!arena; },

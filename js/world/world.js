@@ -586,6 +586,7 @@ G.World = (() => {
   }
 
   return {
+    checkpoint(s){if(!s)return {seed,biome,arena,broken:[...broken],nextPropId,props:[...data].flatMap(([k,c])=>c.props.map(p=>({chunk:k,...p})))};reset(s.seed);biome=s.biome;arena=s.arena;for(const k of s.broken)broken.add(k);for(const p of s.props){const [cx,cy]=p.chunk.split(',').map(Number);const c=chunkData(cx,cy),old=c.props.find(o=>o.tx===p.tx&&o.ty===p.ty);if(old)Object.assign(old,p);}nextPropId=s.nextPropId;images.clear();},
     TS, CW, reset, setBiome, biomeName, liquidKind, liquidEffect, walkable,
     kindAt, isWall, isLiquid, isFree, collide, projectileBlock, propsInCircle, nearestBreakable,
     damageProp, breakAt, specialsNear, update,

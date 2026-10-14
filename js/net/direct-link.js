@@ -21,7 +21,7 @@
       while(p.incoming.has(p.lastEvent+1)){const data=p.incoming.get(++p.lastEvent);p.incoming.delete(p.lastEvent);deliver(uid,data);}
     }
     function channel(p,dc){p.dc=dc;dc.onopen=()=>{if(links.get(p.uid)!==p||p.dc!==dc)return;clearTimeout(p.timer);changed(p.uid,'direct');};
-      dc.onmessage=e=>{try{receive(p.uid,JSON.parse(e.data));}catch{}};
+      dc.onmessage=e=>{if(p.dc!==dc||links.get(p.uid)!==p)return;try{receive(p.uid,JSON.parse(e.data));}catch{}};
       dc.onclose=()=>{if(p.dc===dc)fallback(p);};dc.onerror=()=>{if(p.dc===dc)fallback(p);};}
     function setup(p,attempt){discard(p);p.attempt=attempt;p.candidates=[];const pc=p.pc=new Peer({iceServers});
       pc.onicecandidate=e=>{if(p.pc===pc&&e.candidate)signal(p.uid,{attempt,kind:'candidate',candidate:e.candidate.toJSON()});};

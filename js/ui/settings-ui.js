@@ -6,7 +6,7 @@
 G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const VERSION = '1.2 · 2026-10-09';
+  const VERSION = '0.4.0 · 2026-10-15';
   const REPO = G.PROJECT_REPO || 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 
@@ -78,8 +78,9 @@ G.SettingsUI = (() => {
         + `<div class="chips set-chips" translate="no">${[['es', 'Español'], ['en', 'English'], ['zh-CN', '简体中文']].map(([v, l]) =>
              `<button class="chip ${G.I18n.lang === v ? 'on' : ''}" data-lang="${v}">${l}</button>`).join('')}</div>`
         + section('Calidad', 'Cuántos efectos y partículas se dibujan. <b>Auto</b> la baja sola si el juego va a tirones (ahora: ' + auto + ').')
-        + choice('quality', [['auto', 'Auto'], ['high', 'Alta'], ['mid', 'Media'], ['low', 'Baja']])
+        + choice('quality', [['auto', 'Auto'], ['high', 'Alta'], ['mid', 'Media'], ['low', 'Baja'], ['potato', 'Equipo modesto']])
         + section('Pantalla')
+        + toggle('playerOutline','Resaltar tu personaje','Contorno visible incluso detrás de árboles y enemigos.')
         + toggle('dmgNumbers', 'Números de daño', 'Los números que salen al golpear y al recibir daño.')
         + toggle('calm', 'Menos sacudidas y destellos', 'La cámara tiembla menos y los fogonazos son suaves.')
         + toggle('fps', 'Mostrar FPS', 'Fotogramas por segundo, en la esquina de abajo.')
@@ -87,7 +88,7 @@ G.SettingsUI = (() => {
              <button class="btn small" id="set-full">${isFull() ? 'Salir' : 'Activar'}</button></div>`
            : iosTip() ? `<div class="set-row"><div class="grow"><b>Pantalla completa</b><small>${esc(IOS_TIP)}</small></div></div>` : '');
     } else if (tab === 'ctl') {
-      box.innerHTML = section('En móvil o tablet')
+      box.innerHTML = section('Mando','Mando estándar: stick izquierdo mueve; A confirma, B vuelve, LB/RB cambia ataque, Start pausa. Cruceta navega menús.')+toggle('gamepad','Activar mando','Pulsa un botón para detectar el mando. Los campos de texto siguen usando teclado.')+section('En móvil o tablet')
         + `<p class="sub">Pon el dedo en cualquier parte y arrastra para moverte: el joystick aparece donde tocas. Toca un ataque de abajo para cambiarlo y el botón de arriba a la derecha para pausar. Se juega en horizontal.</p>`
         + `<div class="set-row"><div class="grow"><b>Tamaño del joystick</b><small>Cuánto hay que arrastrar el dedo.</small></div></div>`
         + choice('stick', [[0.8, 'Pequeño'], [1, 'Normal'], [1.25, 'Grande']])

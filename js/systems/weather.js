@@ -141,6 +141,7 @@ G.Weather = (() => {
     ctx.fillStyle = `rgba(${r},${g},${b},${a * k})`;
     ctx.fillRect(0, 0, w, h);
 
+    if(G.Settings.get('quality')==='potato'){parts.length=0;return;}
     const want = { rain: 70, snow: 45, sand: 40, sun: 14, fog: 0 }[cur.kind] * k * (w / 1280);
     while (parts.length < want) parts.push(spawn(w, h, true));
     if (parts.length > want + 4) parts.length = Math.ceil(want);
@@ -169,6 +170,7 @@ G.Weather = (() => {
   }
 
   return {
+    checkpoint(s){if(!s)return {cur,checkT,chipT};({cur,checkT,chipT}=s);parts=[];},
     KINDS, reset, update, draw, mult, speedFor, hurts, onEvent,
     get current() { return cur && level() > 0 ? Object.assign({ left: Math.max(0, cur.dur - cur.t) }, cur, KINDS[cur.kind]) : null; },
     get vignette() { return cur && cur.kind === 'fog' ? level() : 0; },

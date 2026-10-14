@@ -26,7 +26,9 @@ G.Input = (() => {
 
   return {
     /** Vector de movimiento del jugador (teclado o joystick táctil). */
+    inject(c){pressed.add(c);},
     axis() {
+      const pad=G.Gamepad?.axis();if(pad&&(pad[0]||pad[1]))return pad;
       const t = G.Touch && G.Touch.vector();
       if (t && (t[0] || t[1])) return t;
       let x = 0, y = 0;
