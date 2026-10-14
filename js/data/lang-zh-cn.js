@@ -1219,3 +1219,5 @@ G.I18n.add({'Revalidar cuenta de juego':'重新验证游戏账号','Contraseña 
 G.I18n.add({'Ajustes para partidas entre amigos':'好友游戏公开版界面调整','La verificación de cuenta solo aparece al caducar la sesión. Las páginas de ayuda ya no muestran un estado local incorrecto.':'游戏账号验证仅在会话过期时显示；帮助页面不再误报仅本地模式。'}, 'zh-CN');
 
 G.I18n.add({'Regalo de bienvenida de la comunidad':'社区见面礼','Cada cuenta del servidor recibe un millón de monedas una sola vez, además de su saldo. También se aplica a las cuentas nuevas.':'每个服务器账号获得一次 100 万金币，在原余额上增加；已有账号和新账号均可获得。'}, 'zh-CN');
+
+G.I18n.add({'Arreglos de elecciones y grietas en cooperativo':'联机选择与裂隙修复','Los objetos y las cartas de nivel se eligen por turnos; el siguiente envío recupera los avisos perdidos y evita esperas infinitas.':'道具选择与升级选卡依次处理；周期状态帧补偿丢失的通知，避免联机无限等待。','Al volver tarde de una grieta, los invitados conservan los enemigos del mapa que el anfitrión ya ha restaurado.':'非房主玩家较晚离开裂隙时，不再清除房主已经恢复的地图敌人。'}, 'zh-CN');

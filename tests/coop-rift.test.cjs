@@ -1,0 +1,21 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const SOURCE_ROOT=process.env.COOP_FIXTURE_ROOT||path.resolve(__dirname,'..');
+function pair(drop){
+ const nodes={},queue=[];class Player{constructor(){Object.assign(this,{x:0,y:0,hp:100,maxHp:100,xpMul:1,magnet:78});}activeGroup(){return [{id:'tackle',lvl:1}];}}
+ for(const uid of ['host','guest']){
+  const state={level:false,choosing:false,holds:[],resumes:0};let receive;
+  const G={Player,DEX_BY:{1:{dex:1}},startMoveOf:()=> 'tackle',Sprites:{preload(){}},Social:{me:{name:uid}},U:{dist2:()=>0},EnemyMgr:{all:()=>[],get:()=>null},Judgment:{netState:()=>null},Flow:{},Projectiles:{},Spawner:{},Net:{uid,slow:()=>false,viaTurn:()=>false,on:f=>receive=f,onPeer(){},send:(to,msg)=>queue.push([uid,to,JSON.parse(JSON.stringify(msg))]),toHost:msg=>queue.push([uid,'host',JSON.parse(JSON.stringify(msg))])}};
+  const api={levelStart(){state.level=true;},resume(){state.level=false;state.resumes++;},inLevelUp:()=>state.level,choosing:()=>state.choosing,hold:n=>state.holds=Array.from(n),waiting(){},syncTeam(){},away(){},team:()=>({time:1,level:2,xp:0,xpNext:10,kills:0,bosses:0,coins:0,t1:0,t10:0})};
+  vm.runInNewContext(fs.readFileSync(path.join(SOURCE_ROOT,'js/net/coop.js'),'utf8'),{G,document:{addEventListener(){},hidden:false},performance:{now:()=>1000},console});
+  G.Coop.begin({host:'host',members:[{uid:'host',name:'host',dex:1},{uid:'guest',name:'guest',dex:1}]},new Player(),api);
+  nodes[uid]={G,state,receive:(from,msg)=>receive(from,msg)};
+ }
+ const pump=()=>{let budget=100;while(queue.length){assert.ok(budget--,'bounded relay loop');const [from,to,msg]=queue.shift();msg.ev=(msg.ev||[]).filter(ev=>!drop.includes(ev[0]));nodes[to].receive(from,msg);}};
+ const tick=()=>{nodes.host.G.Coop.tick(1);nodes.guest.G.Coop.tick(1);pump();};return {host:nodes.host,guest:nodes.guest,pump,tick};
+}
+test('lost level-start notification recovers from the next host snapshot',()=>{const p=pair(['lu']);p.host.G.Coop.levelStart(2);p.pump();p.tick();assert.equal(p.guest.state.level,true);});
+test('lost picked and resume notifications cannot strand a shared level-up',()=>{const p=pair(['lp','lr']);p.host.G.Coop.levelStart(2);p.pump();p.host.G.Coop.localPicked();p.guest.G.Coop.localPicked();p.pump();p.tick();p.tick();assert.equal(p.host.state.level,false);assert.equal(p.guest.state.level,false);});
+test('lost item hold notifications recover from periodic choosing state',()=>{const p=pair(['hs','he','hp']);p.guest.state.choosing=true;p.guest.G.Coop.holdStart();p.pump();p.tick();assert.deepEqual(p.host.state.holds,['guest']);assert.deepEqual(p.guest.state.holds,['guest']);p.guest.state.choosing=false;p.guest.G.Coop.holdEnd();p.pump();p.tick();assert.deepEqual(p.host.state.holds,[]);assert.deepEqual(p.guest.state.holds,[]);});
+function rift(host){const remote=new Map(),calls={restore:0,clear:0};const pl={x:10,y:20,bonds:0,dead:false};const G={Coop:{active:true,isHost:host},Tiles:{T:1,arenaBiome:()=>1,ARENA_THEMES:{}},Sprites:{PX:1},Game:{player:pl,everyone:()=>[pl],flash(){},offerBond(){}},World:{biome:0,setArena(){},setBiome(){}},Weather:{clear(){}},EnemyMgr:{stash(){},restore(){calls.restore++;},clearRemote(){calls.clear++;remote.clear();}},Projectiles:{clear(){}},Combat:{clearFields(){}},Hazards:{clear(){}},Camera:{},Audio:{sfx(){}},Spawner:{say(){}}};vm.runInNewContext(fs.readFileSync(path.join(SOURCE_ROOT,'js/systems/rift.js'),'utf8'),{G,console});return {G,remote,calls,pl};}
+test('late guest arena return keeps already restored world enemies',()=>{const f=rift(false);f.G.Rift.onEvent(['arena',{tx:100,ty:100,r:11,dex:1,type:'fire'}]);f.G.Rift.onEvent(['al']);f.remote.set(7,{remote:true});f.G.Rift.update(1.3,f.pl,100);assert.equal(f.G.Rift.inArena,false);assert.ok(f.remote.has(7));assert.equal(f.calls.clear,1);assert.equal(f.pl.x,10);});
+test('host arena return still restores its authoritative stash',()=>{const f=rift(true);f.G.Rift.onEvent(['arena',{tx:100,ty:100,r:11,dex:1,type:'fire'}]);f.G.Rift.onEvent(['al']);f.G.Rift.update(1.3,f.pl,100);assert.equal(f.calls.restore,1);});
