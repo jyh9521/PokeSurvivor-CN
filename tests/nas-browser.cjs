@@ -20,7 +20,16 @@ fs.mkdirSync(OUT,{recursive:true});
     const uid=await a.evaluate(()=>G.NAS.user.id),bid=await b.evaluate(()=>G.NAS.user.id);
     check('NAS authentication enabled; online menus reachable',await a.evaluate(()=>G.DB.mode==='nas'&&G.DB.online)&&await a.locator('[data-go="friends"]').isVisible());
     const envelope=await a.evaluate(()=>JSON.parse(localStorage.getItem('ps.nas.save.'+G.NAS.user.id)));
-    check('real browser + SQLite contain matching starter',envelope.save.partner===1&&app.store.getSave(uid).save.partner===1&&envelope.rev===app.store.getSave(uid).rev);
+    check('new account gift persists in browser and NAS exactly once',envelope.save.coins===1000600&&envelope.save.serverRewards.length===1&&app.store.db.prepare('SELECT COUNT(*) AS n FROM reward_receipts WHERE uid=?').get(uid).n===1);
+    // Simulate an old offline copy lacking the server gift, then select that copy.
+    const grantedBalance=await a.evaluate(()=>G.DB.save.coins);
+    await a.evaluate(()=>{G.DB.save.serverRewards=[];G.DB.save.coins-=1000013;G.DB.commit();return G.NAS.flush();});
+    check('old browser cannot overwrite a credited gift',await a.evaluate(()=>!!G.NAS.conflict)&&app.store.getSave(uid).save.coins===grantedBalance);
+    await a.evaluate(()=>G.NAS.resolve('browser'));
+    check('browser conflict choice preserves offline spending and adds missing gift only once',await a.evaluate(()=>G.DB.save.coins)===grantedBalance-13&&app.store.getSave(uid).save.coins===grantedBalance-13);
+    await a.evaluate(()=>{G.DB.commit();return G.NAS.flush();});
+    check('repeated save never repeats the gift',app.store.getSave(uid).save.coins===grantedBalance-13);
+    check('real browser + SQLite contain matching starter',envelope.save.partner===1&&app.store.getSave(uid).save.partner===1&&(await a.evaluate(()=>JSON.parse(localStorage.getItem('ps.nas.save.'+G.NAS.user.id)).rev))===app.store.getSave(uid).rev);
     await a.locator('[data-go="upgrades"]').click();await a.locator('#upg-list [data-buy]:not([disabled])').first().click();await a.evaluate(()=>G.NAS.flush());await a.locator('.scr:not(.hidden) [data-back]').first().click();
     check('purchase reaches both copies',Object.values(app.store.getSave(uid).save.pupg[1]).some(x=>x>0));
     // A second device retrieves the actual NAS snapshot through its own cookie.

@@ -3,8 +3,8 @@ const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const {randomBytes}=require('node:crypto'),{WebSocketServer,WebSocket}=require('ws');
 const {isIP}=require('node:net');
 const {createStore,error}=require('./store.cjs');
-function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',registration=true,trustProxy=false}={}) {
-  fs.mkdirSync(dataDir,{recursive:true});const store=createStore(path.join(dataDir,'pokesurvivor.sqlite'));
+function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',registration=true,trustProxy=false,campaigns}={}) {
+  fs.mkdirSync(dataDir,{recursive:true});const store=createStore(path.join(dataDir,'pokesurvivor.sqlite'),{campaigns});
   if(publicOrigin)publicOrigin=new URL(publicOrigin).origin;
   const sockets=new Map(),rooms=new Map(),invites=new Map(),runs=new Map(),limits=new Map();
   const connected=uid=>sockets.get(uid)?.readyState===WebSocket.OPEN;

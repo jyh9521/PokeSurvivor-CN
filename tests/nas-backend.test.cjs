@@ -4,11 +4,11 @@ const {WebSocket}=require('ws'),{createApp}=require('../server/app.cjs');
 const {validateSave}=require('../server/store.cjs');
 const {DatabaseSync,backup}=require('node:sqlite');
 const seed=name=>({v:3,name,coins:500,owned:{1:{at:1,from:'starter'}},shiny:{},partner:1,partnerShiny:false,pupg:{},stats:{runs:0,bestTime:0},tickets:{t1:0,t10:0},profile:{favs:[],title:''},ach:{},legends:{}});
-async function fixture(t){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-nas-test-'));let app=createApp({dataDir:dir});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));let base='http://127.0.0.1:'+app.server.address().port;
+async function fixture(t){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-nas-test-'));let app=createApp({dataDir:dir,campaigns:[]});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));let base='http://127.0.0.1:'+app.server.address().port;
   t.after(async()=>{await app.close();const p=path.resolve(dir);if(p.startsWith(path.join(path.resolve(os.tmpdir()),'ps-nas-test-')))fs.rmSync(p,{recursive:true,force:true});});
   async function call(url,b,cookie='',method=b?'POST':'GET',origin=base){const r=await fetch(base+'/api/'+url,{method,headers:{...(b?{'content-type':'application/json'}:{}),cookie,origin},body:b?JSON.stringify(b):undefined});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]||cookie};}
   const account=async name=>{const r=await call('register',{name,password:'local-test-password'});assert.equal(r.status,200);return r;};
-    return {get app(){return app;},get base(){return base;},dataDir:dir,call,account,async restart(){await app.close();app=createApp({dataDir:dir});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+app.server.address().port;}};
+    return {get app(){return app;},get base(){return base;},dataDir:dir,call,account,async restart(){await app.close();app=createApp({dataDir:dir,campaigns:[]});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+app.server.address().port;}};
 }
 test('real account cookies, dual-save revisions, conflicts, histories and restart persistence',async t=>{
   const f=await fixture(t),a=await f.account('Alice'),b=await f.account('Bob');

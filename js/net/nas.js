@@ -21,6 +21,12 @@ G.NAS = (() => {
       const data=await r.json();if(!r.ok)throw Object.assign(Error(data.error||'NAS 请求失败。'),{status:r.status,current:data.current});return data;
     }finally{clearTimeout(timer);}
   }
+  // Rebase only server-issued gifts missing from a retained browser copy.
+  function reconcileRewards(localSave,remoteSave){
+    const remote=remoteSave?.serverRewards||[],known=new Set((localSave.serverRewards||[]).map(r=>r.id));
+    for(const r of remote)if(!known.has(r.id)){localSave.coins+=r.coins;known.add(r.id);}
+    localSave.serverRewards=clone(remote);
+  }
   function fresh(name){local.playAsGuest();const s=clone(local.save);s.name=name;return s;}
   function load(result){user=result.user;guest=false;const cached=read(key());rev=result.rev;
     request=cached?.request||null;
@@ -45,7 +51,7 @@ G.NAS = (() => {
       try{while(pending&&!conflict&&++turns<=3){const version=change;
           if(!request){const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);request={rev,save:clone(save),mutation:[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('')};persist();}
           const snapshot=clone(request.save),result=await api('save',request,'PUT');request=null;available=true;rev=result.rev;
-          if(change===version && JSON.stringify(save)===JSON.stringify(snapshot)){assign(save,result.save);pending=false;}persist();}
+          if(change===version && JSON.stringify(save)===JSON.stringify(snapshot)){assign(save,result.save);pending=false;}else reconcileRewards(save,result.save);persist();}
         setState(pending?'pending':'ok');return !pending;
       }catch(e){available=!!e.status&&e.status!==401;if(e.status===409){conflict=e.current;setState('conflict');}else setState(e.status===401?'auth-required':'offline');persist();return false;}
       finally{flushing=null;if(pending&&!conflict){clearTimeout(retry);retry=setTimeout(flush,5000);}}
@@ -53,7 +59,7 @@ G.NAS = (() => {
   }
   function commit(){if(!enabled)return local.commit(...arguments);if(!user||guest||!save)return false;change++;save.updated=Date.now();pending=true;const ok=persist();if(!conflict){clearTimeout(retry);retry=setTimeout(flush,500);}return ok;}
   async function resolve(choice){if(!conflict)return false;write('ps.nas.conflict-backup.'+user.id,{local:save,remote:conflict,at:Date.now()});
-    request=null;change++;rev=conflict.rev;if(choice==='nas'&&conflict.save){assign(save,conflict.save);pending=false;}else if(choice==='browser')pending=true;else return false;
+    request=null;change++;rev=conflict.rev;if(choice==='nas'&&conflict.save){assign(save,conflict.save);pending=false;}else if(choice==='browser'){reconcileRewards(save,conflict.save);pending=true;}else return false;
     conflict=null;persist();setState(pending?'pending':'ok');return pending?flush():true;}
   async function logout(){if(!enabled)return local.logout();await flush();if(pending||conflict){G.UI?.toast('还有未同步进度，请先处理存档同步。',4000);return false;}
     try{await api('logout',{});}catch{}clearTimeout(retry);user=null;save=null;guest=false;socket?.close();socket=null;social={friends:[],invites:[],room:null};activeRoom=null;

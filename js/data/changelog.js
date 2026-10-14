@@ -6,6 +6,7 @@
  * Cada línea en español y en inglés.
  */
 G.CHANGELOG = [
+  { d: '2026-10-14', title: ['Regalo de bienvenida de la comunidad', 'Community welcome gift'], new: [['Cada cuenta del servidor recibe un millón de monedas una sola vez, además de su saldo. También se aplica a las cuentas nuevas.', 'Each server account receives one million coins once, added to its existing balance. New accounts also receive the gift.']] },
   { d: '2026-10-14', title: ['Ajustes para partidas entre amigos', 'Settings for playing with friends'], fix: [['La verificación de cuenta solo aparece al caducar la sesión. Las páginas de ayuda ya no muestran un estado local incorrecto.', 'Account verification only appears after session expiry. Help pages no longer show an incorrect local-only status.']] },
   { d: '2026-10-14', title: ['Partidas cooperativas en tu NAS', 'Co-op on your NAS'], new: [['Modo NAS: juega con hasta cuatro amigos y consulta el ranking de tu servidor. El modo local sigue disponible.', 'NAS mode: play with up to four friends and view your server leaderboard. Local mode remains available.']] },
   { d: '2026-10-14', title: ['Recupera tu cuenta con Gmail', 'Recover your account with Gmail'], new: [

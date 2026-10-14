@@ -1217,3 +1217,5 @@ G.I18n.add({
 G.I18n.add({'Revalidar cuenta de juego':'重新验证游戏账号','Contraseña de tu cuenta de juego':'请输入当前游戏账号密码'}, 'zh-CN');
 
 G.I18n.add({'Ajustes para partidas entre amigos':'好友游戏公开版界面调整','La verificación de cuenta solo aparece al caducar la sesión. Las páginas de ayuda ya no muestran un estado local incorrecto.':'游戏账号验证仅在会话过期时显示；帮助页面不再误报仅本地模式。'}, 'zh-CN');
+
+G.I18n.add({'Regalo de bienvenida de la comunidad':'社区见面礼','Cada cuenta del servidor recibe un millón de monedas una sola vez, además de su saldo. También se aplica a las cuentas nuevas.':'每个服务器账号获得一次 100 万金币，在原余额上增加；已有账号和新账号均可获得。'}, 'zh-CN');
