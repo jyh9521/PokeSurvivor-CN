@@ -1,0 +1,50 @@
+{
+  "pokemon_species_names.csv": {
+    "url": "https://raw.githubusercontent.com/PokeAPI/pokeapi/81d20919845b6a445969b9265aab5cec6b04cece/data/v2/csv/pokemon_species_names.csv",
+    "sha256": "820cde17074cdb1c2b0595c997fb8f998e773bd5da3bb525dec85703c86c5fd9"
+  },
+  "move_names.csv": {
+    "url": "https://raw.githubusercontent.com/PokeAPI/pokeapi/81d20919845b6a445969b9265aab5cec6b04cece/data/v2/csv/move_names.csv",
+    "sha256": "99e23ee38ea53d1473474d463b87651deac3cd4928750f8186feae66da45c147"
+  },
+  "item_names.csv": {
+    "url": "https://raw.githubusercontent.com/PokeAPI/pokeapi/81d20919845b6a445969b9265aab5cec6b04cece/data/v2/csv/item_names.csv",
+    "sha256": "c4ad0b446e395c378d8ba75d6900f051cc9ebb99431d4000adeac35f492852f0"
+  },
+  "type_names.csv": {
+    "url": "https://raw.githubusercontent.com/PokeAPI/pokeapi/81d20919845b6a445969b9265aab5cec6b04cece/data/v2/csv/type_names.csv",
+    "sha256": "685230c51074cf2f723debcf827a4df4c36ab0ec7e929c806ad65a3e40958705"
+  },
+  "region_names.csv": {
+    "url": "https://raw.githubusercontent.com/PokeAPI/pokeapi/81d20919845b6a445969b9265aab5cec6b04cece/data/v2/csv/region_names.csv",
+    "sha256": "9380d909d2179a7f3bbad09969a0c89f623be135a100686596b6284c10231b48"
+  },
+  "official-index.html": {
+    "url": "https://pokedex.pokemon.cn/play/pokedex",
+    "sha256": "2c6cf97596c3bf374593ef0574c40c674fa4fb43c43a1e0b8561bbae591495d8"
+  },
+  "official-pokedex.json": {
+    "url": "https://pokedex.pokemon.cn/play/pokedex/api/v1",
+    "sha256": "e81ade79b569af44f3d59fed73ea6e6ea2d84dc244b084a3a138d71bceb6fa95"
+  },
+  "official-list.js": {
+    "url": "https://pokedex.pokemon.cn/play/resources/pokedex/js/pokemon-list.js?20210224",
+    "sha256": "31bf89dfe2e4cc2094332249728296e5f728938e56a30b78e13de58ebb40909e"
+  },
+  "official-app.js": {
+    "url": "https://pokedex.pokemon.cn/play/resources/pokedex/js/app.js?20220707",
+    "sha256": "c8589144793d46b3a381272fbdee7ca587dfffc32697c3a31cef174f9c7b3c92"
+  },
+  "NotoSansSC-Regular.otf": {
+    "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf",
+    "sha256": "faa6c9df652116dde789d351359f3d7e5d2285a2b2a1f04a2d7244df706d5ea9"
+  },
+  "NotoSansSC-Bold.otf": {
+    "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/SubsetOTF/SC/NotoSansSC-Bold.otf",
+    "sha256": "c6cb5a93abaa9edc8ee7463b7ebb7f42d618d40e6ed2f7a5371c97b0b64767c0"
+  },
+  "Noto-OFL.txt": {
+    "url": "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/LICENSE",
+    "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+  }
+}

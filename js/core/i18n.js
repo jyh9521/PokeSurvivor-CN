@@ -26,7 +26,7 @@ G.I18n = (() => {
   const byPath = /\/en(\/|$)/.test(location.pathname) ? 'en' : /\/zh(\/|$)/.test(location.pathname) ? 'zh-CN' : null;
   const supported = ['es', 'en', 'zh-CN'];
   const nav = ((navigator.languages && navigator.languages[0]) || navigator.language || 'es').toLowerCase();
-  const lang = supported.includes(saved) ? saved : byPath || (nav.startsWith('es') ? 'es' : 'en');
+  const lang = supported.includes(saved) ? saved : byPath || (supported.includes(window.PS_DEFAULT_LANGUAGE) ? window.PS_DEFAULT_LANGUAGE : (nav.startsWith('es') ? 'es' : 'en'));
   const locale = { es: 'es-ES', en: 'en-GB', 'zh-CN': 'zh-CN' }[lang];
   document.documentElement.lang = lang;
 
@@ -149,7 +149,7 @@ G.I18n = (() => {
   }
 
   function startDom() {
-    document.title = { es: 'PokéSurvivor – Juego Pokémon gratis online estilo Survivor.io', en: 'PokéSurvivor – Free online Pokémon survival game (Survivor.io style)', 'zh-CN': 'PokéSurvivor – 免费在线宝可梦生存游戏' }[lang];
+    document.title = { es: 'PokéSurvivor – Juego Pokémon gratis online estilo Survivor.io', en: 'PokéSurvivor – Free online Pokémon survival game (Survivor.io style)', 'zh-CN': 'PokéSurvivor – 宝可梦生存游戏中文本地版' }[lang];
     if (lang === 'es') return;
     // Los enlaces a las páginas de la web, a su versión en inglés.
     const links = { 'guia/': 'guide', 'pokedex/': 'pokedex', 'contacto/': 'contact' };

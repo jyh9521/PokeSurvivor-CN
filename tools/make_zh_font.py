@@ -12,6 +12,10 @@ from fontTools.ttLib import TTFont
 inputs = [ROOT/'dev.html', ROOT/'contacto/index.html', ROOT/'manifest.webmanifest', ROOT/'tools/seo_zh.py', ROOT/'tools/make_seo_pages.py', *sorted((ROOT/'js').rglob('*.js'))]
 text = ''.join(p.read_text(encoding='utf-8') for p in inputs if p.name != 'app.min.js')
 chars = {ord(c) for c in text if ord(c) >= 0x2e80}
+lock = json.loads((ROOT/'tools/localization/input-lock.json').read_text(encoding='utf-8'))
+for name in ['NotoSansSC-Regular.otf', 'NotoSansSC-Bold.otf', 'Noto-OFL.txt']:
+    data = (ROOT/'tools/cache/localization'/name).read_bytes()
+    if hashlib.sha256(data).hexdigest() != lock[name]['sha256']: raise ValueError('Input hash mismatch: '+name)
 faces = []; manifest = {'source':'Noto Sans SC / notofonts/noto-cjk', 'characters':len(chars), 'fonts':[]}
 for weight,label in [(400,'Regular'),(700,'Bold')]:
     font = TTFont(ROOT/f'tools/cache/localization/NotoSansSC-{label}.otf', recalcTimestamp=False)

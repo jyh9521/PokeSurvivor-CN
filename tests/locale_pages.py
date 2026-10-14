@@ -65,11 +65,19 @@ for row in manifest['fonts']:
 
 version=json.loads((ROOT/'version.json').read_text(encoding='utf-8'))['v']
 assert hashlib.sha1((ROOT/'js/app.min.js').read_bytes()).hexdigest()[:10]==version
-for entry,lang,locale in [('index.html','es','es_ES'),('en/index.html','en','en_US'),('zh/index.html','zh-CN','zh_CN')]:
+for entry,lang,locale in [('index.html','zh-CN','zh_CN'),('en/index.html','en','en_US'),('zh/index.html','zh-CN','zh_CN')]:
     source=(ROOT/entry).read_text(encoding='utf-8')
     assert 'app.min.js?v='+version in source
     p=Page(); p.feed(source)
     assert p.lang==lang and p.metas.get('og:locale')==locale,entry
+    base='https://preview.local/'+entry
+    if p.base: base=urljoin(base,p.base)
+    for href in p.links:
+        url=urlsplit(urljoin(base,href))
+        if url.netloc!='preview.local' or url.scheme!='https': continue
+        target=ROOT/unquote(url.path).lstrip('/')
+        if url.path.endswith('/'): target=target/'index.html'
+        assert target.exists(),f'{entry}: {href}'
 manifest=json.loads((ROOT/'manifest.webmanifest').read_text(encoding='utf-8'))
-assert manifest['lang']=='es'
+assert manifest['lang']=='zh-CN'
 print(f'PASS: {len(pages)} Chinese pages, {count} local references, 966 official names, two font faces, bundle fingerprints')

@@ -565,3 +565,11 @@ G.I18n.add({
   'Ya has reportado esta marca': 'You already reported this record',
   '¿Reportar la marca de {x} como trampa?': "Report {x}'s record as cheating?", 'Gracias: la revisaremos': 'Thanks: we will review it'
 });
+
+/* Fork local edition and upstream changes after PR #88. */
+G.I18n.add({
+  "Edición local: crea una cuenta para guardar en este navegador. El modo invitado no guarda. Sin nube, cooperativo ni ranking online.": "Local edition: create a local account to save in this browser. Guest progress is not saved. Cloud saves, co-op and online rankings are disabled.",
+  "Esta edición no tiene anuncios, compras ni donaciones.": "This edition has no ads, purchases or donations.",
+  "En esta edición, las cuentas, contraseñas verificadas y partidas se guardan sólo en este navegador. No se envían a Firebase. El modo invitado no guarda. Borrar los datos del sitio elimina las cuentas y partidas locales.": "Accounts, password verification data and saves stay in this browser, not Firebase. Guests do not save. Clearing site data deletes local accounts and progress.",
+  "Esta edición no incluye amigos, ranking online ni partidas en grupo.": "This edition has no online friends, rankings or co-op."
+}, 'en');

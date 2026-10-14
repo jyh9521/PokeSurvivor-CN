@@ -12,7 +12,7 @@
     if (!miss.length) return false;
     const el = document.getElementById('boot');
     el.innerHTML = 'No se pudo cargar todo el juego (¿se cortó la conexión?).<br><button class="btn gold" style="margin-top:12px" onclick="location.reload()">Recargar</button>';
-    if (window.G && G.I18n) G.I18n.walk(el);
+    if (typeof G === 'object' && G.I18n) G.I18n.walk(el);
     console.warn('[Arranque] faltan:', miss.join(', '));
     return true;
   }
@@ -26,7 +26,7 @@
     const en = typeof G === 'object' && G.I18n ? G.I18n.lang === 'en' : !/^es/i.test(navigator.language || '');
     const el = document.getElementById('boot');
     el.setAttribute('translate', 'no');
-    if (window.G && G.I18n && G.I18n.lang === 'zh-CN') {
+    if (typeof G === 'object' && G.I18n && G.I18n.lang === 'zh-CN') {
       el.innerHTML = '<div class="boot-in"><h1>PokéSurvivor</h1>' +
         '<p><b>目前维护中。</b></p><p>我们正将游戏移至新的服务器，让所有人都能继续免费游玩。' +
         '你的账号、存档与宝可梦都安全无虞，请在几个小时后再回来！</p>' +

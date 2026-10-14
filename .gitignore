@@ -22,3 +22,6 @@ docs/CONTACTOS_CREADORES.md
 
 # Caché local de wrangler (Cloudflare)
 .wrangler/
+
+# Local acceptance copies and packaged builds
+artifacts/

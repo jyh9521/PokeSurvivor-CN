@@ -36,10 +36,6 @@ const server = http.createServer((req, res) => {
       if (new URL(route.request().url()).origin === origin) return route.continue();
       blocked.push(route.request().url()); return route.abort();
     });
-    await context.addInitScript(() => {
-      window.G = {};
-      Object.defineProperty(window.G, 'FIREBASE_CONFIG', { get: () => null, set: () => {} });
-    });
     const page = await context.newPage();
     page.on('pageerror', e => errors.push(e.message));
     const snap = async (name, screenshot = false) => {
@@ -54,8 +50,8 @@ const server = http.createServer((req, res) => {
     };
     await page.goto(origin + '/' + entry);
     await start();
-    check('first visit preserves upstream defaults and explicit locale entry',
-      await page.evaluate(() => G.I18n.lang) === (entry.startsWith('zh/') ? 'zh-CN' : 'en'));
+    check('first visit uses fork defaults and explicit locale entry',
+      await page.evaluate(() => G.I18n.lang) === (entry.startsWith('en/') ? 'en' : 'zh-CN'));
     await page.evaluate(() => localStorage.setItem('ps.lang', 'zh-CN'));
     await page.reload();
     await start();

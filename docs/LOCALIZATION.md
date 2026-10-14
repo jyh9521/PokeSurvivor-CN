@@ -2,7 +2,7 @@
 
 ## 语言与数据约定
 
-语言代码为 `zh-CN`。已保存的 `ps.lang` 有效选择优先，其次是 `/en/` 或 `/zh/` 入口，最后沿用原版浏览器语言规则：西语浏览器使用西语，其余浏览器使用英语。
+语言代码为 `zh-CN`。已保存的 `ps.lang` 有效选择优先，其次是 `/en/` 或 `/zh/` 入口，随后使用发行配置 `PS_DEFAULT_LANGUAGE`（本 fork 为简体中文）；没有发行配置时沿用原版浏览器语言规则：西语浏览器使用西语，其余浏览器使用英语。
 启动页和运行时采用相同规则；所有文本文件均使用 UTF-8。
 
 `G.I18n.add(dict, locale = 'en', context = '')` 注册当前语言的字典，原有英语调用保持兼容。
@@ -65,7 +65,7 @@ python tools/make_zh_names.py
 
 ## 字体
 
-中文采用 [Noto Sans SC](https://github.com/notofonts/noto-cjk/tree/main/Sans/SubsetOTF/SC) 的常规及粗体字形，按当前游戏和中文页面的字符生成 WOFF2 子集。
+中文采用 [Noto Sans SC](https://github.com/notofonts/noto-cjk/tree/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/SubsetOTF/SC) 的常规及粗体字形，按当前游戏和中文页面的字符生成 WOFF2 子集。
 衍生字体名为 `PSChinese`，源字体许可证随项目保存在 `assets/fonts/NotoSansSC-OFL.txt`；字体文件名带内容哈希，适配现有永久资源缓存。
 英文和数字采用原有 Pixelify 字体，子集以外的昵称字符由系统字体补充。
 
@@ -99,3 +99,7 @@ node tests/offline-browser.cjs
 覆盖语言选择、名称和占位符、昵称、称号存档值、存档切换、游戏卡牌、合作界面、移动端、字体及本地文件启动。
 实际 Firebase 同步和 WebRTC 联机需要另外进行联网验证。
 网站生成器的 `SITE` 和仓库的域名配置继续采用原项目设置；部署 fork 时按实际发布地址配置。
+
+## 本 fork 的本地存档发行
+
+构建、默认中文、本地账号、锁定输入哈希及真实存档验证详见 [LOCAL_EDITION.md](LOCAL_EDITION.md)。预览服务器不注入配置，`G.FIREBASE_CONFIG = null` 随发行包实际构建。

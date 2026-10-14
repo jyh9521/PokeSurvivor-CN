@@ -28,7 +28,7 @@ G.NewsUI = (() => {
     const text = pair => G.I18n.lang === 'zh-CN' ? G.T(pair[0]) : pair[en];
     // Cada texto ya va en su idioma: translate="no" para que no lo toque i18n.
     const PARTS = [['new', ['Nuevo', 'New']], ['chg', ['Cambios', 'Changes']], ['fix', ['Arreglos', 'Fixes']]];
-    $('news-body').innerHTML = G.CHANGELOG.map(v =>
+    $('news-body').innerHTML = (G.LOCAL_ONLY ? '<p>' + esc(G.T('Esta edición no incluye amigos, ranking online ni partidas en grupo.')) + '</p>' : '') + G.CHANGELOG.map(v =>
       `<div class="news-day" translate="no"><h3>${esc(v.title ? text(v.title) : '')}<small>${fmt(v.d)}</small></h3>` +
       PARTS.filter(([k]) => v[k] && v[k].length).map(([k, lbl]) =>
         `<div class="news-part"><span class="news-tag ${k}">${text(lbl)}</span><ul>${v[k].map(t => `<li>${esc(text(t))}</li>`).join('')}</ul></div>`).join('') +

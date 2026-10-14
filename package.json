@@ -1,0 +1,22 @@
+{
+  "name": "pokesurvivor-cn",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Independent Simplified Chinese local-save distribution of PokeSurvivor",
+  "scripts": {
+    "start": "node tools/preview.js",
+    "build": "node tools/build-local.cjs",
+    "test": "node --test tests/i18n.test.cjs tests/local-distribution.test.cjs",
+    "test:browser": "node tools/check-local-state.cjs",
+    "test:file": "node tools/check-local-state.cjs --file",
+    "package": "node tools/package-local.cjs",
+    "test:reproducible": "node tools/check-repeat-build.cjs",
+    "test:transaction": "node tools/verify-local-transaction.cjs"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "4.1.1",
+    "playwright": "1.62.1",
+    "terser": "5.44.0"
+  },
+  "buildEpoch": 1791936000
+}

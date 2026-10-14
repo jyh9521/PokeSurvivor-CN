@@ -1,34 +1,29 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>window.PS_DEFAULT_LANGUAGE = 'zh-CN'; window.PS_PAGES = true;</script>
 <meta charset="utf-8">
-<link rel="alternate" hreflang="es" href="https://pokesurvivor.com/">
-<link rel="alternate" hreflang="en" href="https://pokesurvivor.com/en/">
-<link rel="alternate" hreflang="zh-CN" href="https://pokesurvivor.com/zh/">
-
+<meta property="og:locale" content="en_US">
 <base href="../">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>PokéSurvivor – Free online Pokémon survival game (Survivor.io style)</title>
-<meta name="description" content="Survive hordes of Pokémon with your partner in this free fan game for browser and mobile: 966 Pokémon, shinies, legendaries and online co-op with friends. No downloads, no ads.">
-<link rel="canonical" href="https://pokesurvivor.com/en/">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="description" content="Free local-save edition. Create a local account to save in this browser; guest progress is not saved. No cloud saves, co-op or online rankings.">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0a1430">
 <meta name="color-scheme" content="dark">
 <!-- Compartir en redes (WhatsApp, Discord, Twitter/X...) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PokéSurvivor">
-<meta property="og:locale" content="en_US">
-<meta property="og:url" content="https://pokesurvivor.com/en/">
 <meta property="og:title" content="PokéSurvivor – Survive the Pokémon hordes">
-<meta property="og:description" content="A free fan game for browser and mobile: 966 Pokémon, shinies, legendaries and co-op with up to 4 friends. No downloads, no ads.">
-<meta property="og:image" content="https://pokesurvivor.com/assets/og-image.jpg">
+<meta property="og:description" content="Free local-save edition. Create a local account to save in this browser; guest progress is not saved. No cloud saves, co-op or online rankings.">
+<meta property="og:image" content="assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="PokéSurvivor: un Pokémon rodeado de hordas en un mapa pixel art">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="PokéSurvivor – Survive the Pokémon hordes">
-<meta name="twitter:description" content="A free fan game for browser and mobile, with co-op for up to 4. No downloads, no ads.">
-<meta name="twitter:image" content="https://pokesurvivor.com/assets/og-image.jpg">
+<meta name="twitter:description" content="Free local-save edition. Create a local account to save in this browser; guest progress is not saved. No cloud saves, co-op or online rankings.">
+<meta name="twitter:image" content="assets/og-image.jpg">
 <script>window.PS_PAGES = true;</script>
 <link rel="manifest" href="manifest.webmanifest">
 <!-- Google sólo enseña en los resultados iconos de 48 px o múltiplos -->
@@ -41,42 +36,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PokéSurvivor">
-<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+
 <link rel="preload" href="assets/fonts/PixelifyPS-400.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/PixelifyPS-700.ttf" as="font" type="font/ttf" crossorigin>
 <!-- Datos estructurados para Google (tipo de página: videojuego gratuito) -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "@id": "https://pokesurvivor.com/#web",
-      "url": "https://pokesurvivor.com/",
-      "name": "PokéSurvivor",
-      "inLanguage": ["es", "en", "zh-CN"]
-    },
-    {
-      "@type": ["VideoGame", "WebApplication"],
-      "@id": "https://pokesurvivor.com/#juego",
-      "name": "PokéSurvivor",
-      "url": "https://pokesurvivor.com/",
-      "description": "A free Pokémon survival fan game (bullet heaven, Survivor.io style): pick a partner, survive the hordes, level up, evolve your moves, fight legendaries in rifts and play co-op with up to 4 friends.",
-      "image": "https://pokesurvivor.com/assets/og-image.jpg",
-      "inLanguage": ["es", "en", "zh-CN"],
-      "genre": ["Roguelike", "Bullet heaven", "Acción", "Supervivencia"],
-      "gamePlatform": ["Navegador web", "PC", "Android", "iOS"],
-      "applicationCategory": "GameApplication",
-      "operatingSystem": "Cualquiera con navegador web moderno",
-      "playMode": ["SinglePlayer", "CoOp", "MultiPlayer"],
-      "numberOfPlayers": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 4 },
-      "isAccessibleForFree": true,
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" },
-      "isPartOf": { "@id": "https://pokesurvivor.com/#web" }
-    }
-  ]
-}
-</script>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -259,7 +222,7 @@
     <div class="row between"><h2>Aviso legal</h2><button class="btn small ghost" id="legal-close">Cerrar</button></div>
     <h3>Proyecto de fan</h3>
     <p><b>PokéSurvivor</b> es un juego hecho por fans, <b>gratuito y sin ánimo de lucro</b>.
-      No tiene anuncios ni compras. Se puede apoyar con donaciones voluntarias, que se usan sólo para pagar los servidores y el dominio, y que no dan ninguna ventaja en el juego.</p>
+      Esta edición no tiene anuncios, compras ni donaciones.</p>
     <p>No está afiliado, patrocinado ni aprobado por Nintendo, Creatures Inc., GAME FREAK ni
       The Pokémon Company. Pokémon y todos los nombres y personajes relacionados son marcas y
       propiedad de sus respectivos dueños.</p>
@@ -275,18 +238,8 @@
       antes posible: <a id="legal-mail" href="#"></a></p>
     <p>Código fuente: <a id="legal-repo" href="#" target="_blank" rel="noopener"></a></p>
     <h3>Privacidad</h3>
-    <p>Si creas una cuenta, guardamos tu nombre de jugador y tu partida (colección, monedas,
-      mejoras y estadísticas) en Google Firebase para que puedas seguir en cualquier ordenador.
-      Si entras con Google, Firebase guarda también tu correo de Google para identificarte
-      (nunca se enseña a otros jugadores).
-      No usamos tus datos para nada más, ni los compartimos, ni hay publicidad ni seguimiento.
-      Como invitado no se guarda nada fuera de tu navegador.</p>
-    <p>Amigos y ranking: tu <b>apodo</b> es público para otros jugadores. Guardamos tu lista de
-      amigos, si estás en línea y tus mejores tiempos (con tu apodo y tu Pokémon).</p>
-    <p>Partidas en grupo: tu navegador se conecta <b>directamente</b> con el de tus compañeros
-      (como en una videollamada), así que cada uno puede llegar a ver la dirección IP del otro.
-      Juega en grupo sólo con gente que conozcas. Si la conexión directa no es posible, la partida
-      pasa por los servidores de Firebase.</p>
+    <p>En esta edición, las cuentas, contraseñas verificadas y partidas se guardan sólo en este navegador. No se envían a Firebase. El modo invitado no guarda. Borrar los datos del sitio elimina las cuentas y partidas locales.</p>
+    <p>Esta edición no incluye amigos, ranking online ni partidas en grupo.</p>
     <p>Puedes borrar tu cuenta cuando quieras (se borran también tu apodo, tus amigos y tus marcas):</p>
     <div class="row">
       <button class="btn small" id="legal-delete">Borrar mi cuenta y mi partida</button>
@@ -306,7 +259,7 @@
     var s = null; try { s = localStorage.getItem('ps.lang'); } catch (e) {}
     var n = ((navigator.languages && navigator.languages[0]) || navigator.language || 'es').toLowerCase();
     var p = /\/en(\/|$)/.test(location.pathname) ? 'en' : /\/zh(\/|$)/.test(location.pathname) ? 'zh-CN' : null;
-    var l = s === 'es' || s === 'en' || s === 'zh-CN' ? s : p || (n.indexOf('es') === 0 ? 'es' : 'en');
+    var l = s === 'es' || s === 'en' || s === 'zh-CN' ? s : p || (['es', 'en', 'zh-CN'].includes(window.PS_DEFAULT_LANGUAGE) ? window.PS_DEFAULT_LANGUAGE : (n.indexOf('es') === 0 ? 'es' : 'en'));
     document.documentElement.lang = l;
     if (l === 'en') {
       var p = document.querySelectorAll('#boot p');
@@ -563,6 +516,6 @@
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=57591b06cc"></script>
+<script defer src="js/app.min.js?v=5a950268c8"></script>
 </body>
 </html>

@@ -1,0 +1,5 @@
+# Preserve inherited source bytes; define only new executable script formats.
+* -text
+*.cjs text eol=lf
+*.cmd text eol=crlf
+*.sh text eol=lf

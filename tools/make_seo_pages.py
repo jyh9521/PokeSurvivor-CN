@@ -9,7 +9,7 @@ import json, os, re, datetime, html
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 SITE = 'https://pokesurvivor.com/'
-TODAY = datetime.date.today().isoformat()
+TODAY = (datetime.datetime.fromtimestamp(int(os.environ['SOURCE_DATE_EPOCH']), datetime.timezone.utc).date() if os.environ.get('SOURCE_DATE_EPOCH') else datetime.date.today()).isoformat()
 D = json.load(open(os.path.join(ROOT, 'tools', 'cache', 'gamedata.json'), encoding='utf-8'))
 DEX = D['dex']; BY = {p['dex']: p for p in DEX}
 META = {}
@@ -596,7 +596,7 @@ def game_en():
     src = re.sub(r'<meta name="robots" content="noindex">\s*', '', src)
     src = re.sub(r'<!-- dev\.html: página fuente[^>]*-->\n?', '', src)
     s = src.replace('<html lang="es">', '<html lang="en">')
-    s = s.replace('<head>\n<meta charset="utf-8">', '<head>\n<meta charset="utf-8">\n<base href="../">', 1)
+    s = s.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="../">', 1)
     rep = [
         ('<title>PokéSurvivor – Juego Pokémon gratis online estilo Survivor.io</title>', '<title>PokéSurvivor – Free online Pokémon survival game (Survivor.io style)</title>'),
         ('content="Sobrevive a hordas de Pokémon con tu compañero en este fan game gratis para navegador y móvil: 966 Pokémon, shinies, legendarios y cooperativo con amigos. Sin descargas ni anuncios."',

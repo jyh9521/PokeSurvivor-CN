@@ -36,20 +36,20 @@ const tmp = path.join(ROOT, 'tools', 'cache', 'app.js');
 fs.mkdirSync(path.dirname(tmp), { recursive: true });
 fs.writeFileSync(tmp, joined);
 const outJs = path.join(ROOT, 'js', 'app.min.js');
-const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-const shell = process.platform === 'win32';
-execFileSync(npx, ['--yes', 'terser@5', tmp, '--compress', 'passes=1', '--mangle', '--comments', 'false', '--ecma', '2020', '-o', outJs],
-  { stdio: 'inherit', shell });
+const terser = path.join(path.dirname(require.resolve('terser/package.json')), 'bin/terser');
+const obfuscator = path.join(path.dirname(require.resolve('javascript-obfuscator/package.json')), 'bin/javascript-obfuscator');
+execFileSync(process.execPath, [terser, tmp, '--compress', 'passes=1', '--mangle', '--comments', 'false', '--ecma', '2020', '-o', outJs],
+  { stdio: 'inherit' });
 // Y ofuscado: el código queda ilegible y se rompe solo si lo reformatean para
 // tocarlo. Las cadenas, en una tabla codificada (sólo una parte, para no frenar
 // el juego). Semilla fija: el mismo código da siempre el mismo archivo.
 if (!EXPOSE) {
-  execFileSync(npx, ['--yes', 'javascript-obfuscator@4.1.1', outJs, '--output', outJs,
+  execFileSync(process.execPath, [obfuscator, outJs, '--output', outJs,
     '--compact', 'true', '--self-defending', 'true', '--seed', '7',
     '--string-array', 'true', '--string-array-encoding', 'base64', '--string-array-threshold', '0.1',
     '--identifier-names-generator', 'hexadecimal', '--rename-globals', 'false', '--transform-object-keys', 'false',
     '--split-strings', 'false', '--control-flow-flattening', 'false', '--dead-code-injection', 'false',
-    '--unicode-escape-sequence', 'false', '--target', 'browser'], { stdio: 'inherit', shell });
+    '--unicode-escape-sequence', 'false', '--target', 'browser'], { stdio: 'inherit' });
 }
 const min = fs.readFileSync(outJs);
 const hash = crypto.createHash('sha1').update(min).digest('hex').slice(0, 10);
@@ -64,5 +64,5 @@ html = html.replace(/<!-- dev.html: página fuente[^>]*-->/, '<!-- GENERADO desd
 fs.writeFileSync(OUT, html);
 // Versión publicada: los jugadores la miran cada 5 min y, si cambia, el juego se
 // actualiza solo (en el menú, o al acabar la partida). Ver js/core/updater.js.
-fs.writeFileSync(path.join(ROOT, 'version.json'), JSON.stringify({ v: hash, at: new Date().toISOString() }) + '\n');
+fs.writeFileSync(path.join(ROOT, 'version.json'), JSON.stringify({ v: hash, at: new Date(process.env.SOURCE_DATE_EPOCH ? Number(process.env.SOURCE_DATE_EPOCH) * 1000 : Date.now()).toISOString() }) + '\n');
 console.log(`${SIN_SEO ? '[sin SEO] ' : ''}${EXPOSE ? '[SIN PROTEGER, sólo pruebas] ' : ''}ok: ${files.length} scripts · ${(joined.length / 1024).toFixed(0)} KB -> ${(min.length / 1024).toFixed(0)} KB (app.min.js?v=${hash})`);
