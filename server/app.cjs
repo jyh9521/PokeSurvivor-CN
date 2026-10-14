@@ -45,7 +45,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
     return {rows:(url.searchParams.get('friends')==='1'?all.filter(r=>r.uids.some(u=>circle.has(u))):all).slice(0,50),mine:mine<0?null:{pos:mine+1,t:all[mine].t,row:all[mine]}};
   }
   const staticDirs=new Set(['assets','css','js','en','zh','guia','pokedex','legendarios','shinies','tipos','movimientos','objetos','logros','novedades','apoyar','contacto']);
-  const staticFiles=new Set(['index.html','dev.html','sw.js','version.json','manifest.webmanifest','favicon.ico','robots.txt','sitemap.xml','404.html']);
+  const staticFiles=new Set(['index.html','sw.js','version.json','manifest.webmanifest','favicon.ico','robots.txt','sitemap.xml','404.html']);
   const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.ico':'image/x-icon','.ttf':'font/ttf','.woff2':'font/woff2','.json':'application/json','.webmanifest':'application/manifest+json'};
   const server=http.createServer(async(req,res)=>{try{
     const url=new URL(req.url,'http://local');
@@ -54,6 +54,8 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
       if(req.method==='GET'&&url.pathname==='/api/config')return reply(res,200,{backend:'nas',version:1,registration});
       if(req.method==='GET'&&url.pathname==='/api/health')return reply(res,200,{ok:true});
       if(['POST','PUT','DELETE'].includes(req.method)&&!String(req.headers['content-type']).startsWith('application/json'))throw error(415,'JSON required');
+      // Player history and restore remain disabled even for old clients.
+      if(['/api/history','/api/restore'].includes(url.pathname))throw error(403,'玩家历史存档恢复已关闭。');
       const b=req.method==='GET'?{}:await body(req);
       if(req.method==='POST'&&['/api/register','/api/login'].includes(url.pathname)){
         rate('auth:'+clientIP(req),20,60000);const register=url.pathname==='/api/register';if(register&&!registration)throw error(403,'当前已关闭注册。');
@@ -67,8 +69,6 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
         case 'POST /api/delete':await store.credentials(user.name,b.password);leave(user.id);sockets.get(user.id)?.close();store.remove(user);cookie(req,res,'',true);return reply(res,200,{ok:true});
         case 'GET /api/save':return reply(res,200,store.getSave(user.id));
         case 'PUT /api/save':return reply(res,200,store.putSave(user,b.save,b.rev,b.mutation));
-        case 'GET /api/history':return reply(res,200,{history:store.history(user.id)});
-        case 'POST /api/restore':return reply(res,200,store.restore(user,b.revision,b.rev));
         case 'GET /api/social':return reply(res,200,social(user));
         case 'POST /api/friends/request':store.request(user,b.name);notify();return reply(res,200,{ok:true,msg:'好友请求已发送。'});
         case 'POST /api/friends/accept':store.friendship(user,b.uid,true);notify();return reply(res,200,{ok:true,msg:'已添加好友。'});

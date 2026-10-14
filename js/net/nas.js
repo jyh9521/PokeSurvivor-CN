@@ -117,8 +117,5 @@ G.NAS = (() => {
   document.addEventListener('visibilitychange',()=>{if(enabled&&user){if(document.visibilityState==='hidden'){if(pending)flush();}else refreshSave();}});
   async function refreshSave(){if(!enabled||!user||guest)return false;if(pending||conflict)return flush();const version=change;try{const r=await api('save');available=true;if(change!==version||pending)return flush();if(r.save&&r.rev!==rev){rev=r.rev;assign(save,r.save);persist();}setState('ok');return true;}catch(e){setState(e.status===401?'auth-required':'offline');return false;}}
   return {refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
-    async importLocal(name,password){const result=await local.login(name,password);if(!result.ok)return result;write('ps.nas.import-backup.'+user.id,save);assign(save,clone(local.save));save.name=user.name;commit();return {ok:await flush()};},
-    async history(){return (await api('history')).history;},
-    async restore(revision){if(pending||conflict)throw Error('请先完成同步或处理冲突。');const r=await api('restore',{revision,rev});rev=r.rev;assign(save,r.save);persist();return r;}
   };
 })();

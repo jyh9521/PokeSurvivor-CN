@@ -29,12 +29,12 @@ function pages(dir) {
         const lang = file===path.join(ROOT,'en/index.html') ? 'en_US' : 'zh_CN';
         html=html.replace(/<meta property="og:locale"[^>]*>\s*/g,'');
         html=html.replace('<meta charset="utf-8">',`<meta charset="utf-8">\n<meta property="og:locale" content="${lang}">`);
-        const desc=file===path.join(ROOT,'en/index.html') ? 'Free local-save edition. Create a local account to save in this browser; guest progress is not saved. No cloud saves, co-op or online rankings.' : '免费的宝可梦生存游戏中文本地版；创建本地账号保存进度，访客不保存；未启用云存档、联机和在线排行。';
+        const desc=file===path.join(ROOT,'en/index.html') ? 'Free local-save edition. Create a local account to save in this browser; guest progress is not saved. Online features depend on the hosting backend.' : '免费的宝可梦生存游戏中文本地版；创建本地账号保存进度，访客不保存；在线功能取决于部署的后端。';
         html=html.replace(/(<meta (?:name="description"|property="(?:og|twitter):description"|name="twitter:description") content=")[^"]*(">)/g,(_,a,b)=>a+desc+b);
         html=html.replace(/https:\/\/pokesurvivor\.com\/assets\/og-image\.jpg/g,'assets/og-image.jpg');
         html=html.replace(/<meta name="robots"[^>]*>/g,'<meta name="robots" content="noindex, nofollow">');
       }
-      html=html.replace('<body>','<body><aside class="local-edition" style="padding:6px;text-align:center;font:14px sans-serif;background:#17243b;color:#fff">中文本地版 · 存档仅保存在当前浏览器 · 云存档、联机和在线排行未启用</aside>');
+      html=html.replace('<body>','<body><aside class="local-edition" style="padding:6px;text-align:center;font:14px sans-serif;background:#17243b;color:#fff">中文社区版 · 账号与存档状态请在游戏内「设置 → 账号」查看</aside>');
       if(html.includes('id="game"')) html=html.replace(/<aside class="local-edition"[\s\S]*?<\/aside>/,'');
       fs.writeFileSync(file,html);
     }

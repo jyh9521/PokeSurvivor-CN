@@ -24,10 +24,10 @@ test('real account cookies, dual-save revisions, conflicts, histories and restar
   assert.equal((await f.call('save',undefined,b.cookie)).data.save,null);
   s.coins=450;assert.equal((await f.call('save',{rev:2,save:s},a.cookie,'PUT')).data.rev,3);
   s.coins=999;const conflict=await f.call('save',{rev:1,save:s},a.cookie,'PUT');assert.equal(conflict.status,409);assert.equal(conflict.data.current.save.coins,450);
-  assert.equal((await f.call('history',undefined,a.cookie)).data.history[0].rev,2);
-  const restored=await f.call('restore',{revision:1,rev:3},a.cookie);assert.equal(restored.data.rev,4);assert.equal(restored.data.save.coins,500);
-  await f.restart();assert.equal((await f.call('session',undefined,a.cookie)).data.save.coins,500);
-  const snap=path.join(f.dataDir,'backup.sqlite');await backup(f.app.store.db,snap);const copy=new DatabaseSync(snap,{readOnly:true});assert.equal(JSON.parse(copy.prepare('SELECT data FROM saves WHERE uid=?').get(a.data.user.id).data).coins,500);copy.close();
+  assert.equal((await f.call('history',undefined,a.cookie)).status,403);assert.equal(f.app.store.history(a.data.user.id)[0].rev,2);
+  assert.equal((await f.call('restore',{revision:1,rev:3},a.cookie)).status,403);
+  await f.restart();assert.equal((await f.call('session',undefined,a.cookie)).data.save.coins,450);
+  const snap=path.join(f.dataDir,'backup.sqlite');await backup(f.app.store.db,snap);const copy=new DatabaseSync(snap,{readOnly:true});assert.equal(JSON.parse(copy.prepare('SELECT data FROM saves WHERE uid=?').get(a.data.user.id).data).coins,450);copy.close();
   assert.equal((await f.call('save',{rev:3,save:{...seed('Alice'),coins:-1}},a.cookie,'PUT')).status,400);
   assert.equal((await f.call('save',{rev:3,save:seed('Alice')},a.cookie,'PUT','https://foreign.example')).status,403);
   const proto=JSON.parse(JSON.stringify(seed('Alice')).replace('"pupg":{}','"pupg":{"__proto__":{"polluted":true}}'));
@@ -73,4 +73,13 @@ test('NAS room enforces four-player capacity',async t=>{
   for(const u of users.slice(1,4)){assert.equal((await f.call('invite',{uid:u.data.user.id},host.cookie)).status,200);assert.equal((await f.call('invite/accept',{uid:host.data.user.id},u.cookie)).status,200);}
   assert.equal((await f.call('social',undefined,host.cookie)).data.room.members.length,4);
   assert.equal((await f.call('invite',{uid:users[4].data.user.id},host.cookie)).status,409);
+});
+
+test('public release disables history APIs and protects deployment files',async t=>{
+ const f=await fixture(t),a=await f.account('PublicAlice');
+ assert.equal((await f.call('save',{rev:0,save:seed('PublicAlice')},a.cookie,'PUT')).status,200);
+ for(const cookie of ['',a.cookie]){assert.equal((await f.call('history',undefined,cookie)).status,403);assert.equal((await f.call('restore',{revision:1,rev:1},cookie)).status,403);}
+ assert.equal((await f.call('save',undefined,a.cookie)).data.rev,1);
+ for(const url of ['/dev.html','/.env','/server/store.cjs','/data/pokesurvivor.sqlite'])assert.equal((await fetch(f.base+url)).status,403);
+ const dex=await (await fetch(f.base+'/pokedex/')).text();assert.ok(dex.includes('账号与存档状态请在游戏内'));assert.ok(!dex.includes('云存档、联机和在线排行未启用'));
 });

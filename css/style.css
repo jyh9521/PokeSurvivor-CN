@@ -828,3 +828,6 @@ a.btn { text-decoration: none; display: inline-block; color: var(--ink); }
 }
 
 .sync.conflict,.sync.auth-required,.sync.storage-error { background:#e85b5b; }
+
+/* Hidden controls must remain hidden even when buttons have display rules. */
+[data-nas="reauth"][hidden] { display: none !important; }

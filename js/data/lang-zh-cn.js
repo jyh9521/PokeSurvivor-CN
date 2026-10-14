@@ -1213,3 +1213,7 @@ G.I18n.add({
   "Partidas cooperativas en tu NAS": "在自己的 NAS 上联机",
   "Modo NAS: juega con hasta cuatro amigos y consulta el ranking de tu servidor. El modo local sigue disponible.": "NAS 模式支持最多四人联机和本站排行榜；单机本地模式继续保留。"
 }, 'zh-CN');
+
+G.I18n.add({'Revalidar cuenta de juego':'重新验证游戏账号','Contraseña de tu cuenta de juego':'请输入当前游戏账号密码'}, 'zh-CN');
+
+G.I18n.add({'Ajustes para partidas entre amigos':'好友游戏公开版界面调整','La verificación de cuenta solo aparece al caducar la sesión. Las páginas de ayuda ya no muestran un estado local incorrecto.':'游戏账号验证仅在会话过期时显示；帮助页面不再误报仅本地模式。'}, 'zh-CN');

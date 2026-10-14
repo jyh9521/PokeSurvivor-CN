@@ -603,3 +603,5 @@ G.I18n.add({
   "NAS guarda tu cuenta y una copia de tu progreso. Este navegador conserva otra copia. No se utiliza Firebase.": "Your NAS stores your account and a progress copy. This browser keeps another copy. Firebase is not used.",
   "Tu apodo aparece en amigos y ranking. Las partidas en grupo pasan por este NAS.": "Your nickname is visible to friends and on leaderboards. Co-op data is relayed by this NAS."
 }, 'en');
+
+G.I18n.add({'Revalidar cuenta de juego':'Reverify game account','Contraseña de tu cuenta de juego':'Enter your current game account password'}, 'en');

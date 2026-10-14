@@ -5,7 +5,7 @@
  *   (se van guardando según se usan: no se descarga todo de golpe).
  * - Firebase y demás servicios de fuera no se tocan.
  */
-const CODE = 'ps-cn-code-v2', ART = 'ps-cn-art-v2';
+const CODE = 'ps-cn-code-v3', ART = 'ps-cn-art-v2';
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CODE).then(c => c.addAll(['./', './index.html', './css/style.css', './manifest.webmanifest'])).catch(() => {}));

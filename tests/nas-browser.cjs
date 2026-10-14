@@ -1,10 +1,11 @@
-/* Actual two-browser NAS gameplay, no Firebase/config/socket mocks. */
+/* Actual two-browser NAS gameplay, no Firebase/config/socket mocks.
+ * Serve the source entry as index.html in an isolated test root; public dev.html stays blocked. */
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
 const {chromium}=require('playwright'),{createApp}=require('../server/app.cjs');
 const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,'artifacts/selfhost-verification');
 fs.mkdirSync(OUT,{recursive:true});
 (async()=>{
-  const dataDir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-nas-browser-')),app=createApp({dataDir});let browser;
+  const dataDir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-nas-browser-')),root=path.join(dataDir,'web');fs.mkdirSync(root);for(const name of ['js','css','assets'])fs.cpSync(path.join(ROOT,name),path.join(root,name),{recursive:true});for(const name of ['manifest.webmanifest','sw.js','version.json'])fs.copyFileSync(path.join(ROOT,name),path.join(root,name));fs.copyFileSync(path.join(ROOT,'dev.html'),path.join(root,'index.html'));const app=createApp({dataDir,root});let browser;
   const checks=[],errors=[],external=[];
   const check=(name,condition)=>{assert.ok(condition,name);checks.push(name);console.log('PASS',name);};
   try{
@@ -12,7 +13,7 @@ fs.mkdirSync(OUT,{recursive:true});
     browser=await chromium.launch({headless:true,channel:'chrome'});
     const context=async()=>{const c=await browser.newContext({locale:'zh-CN',viewport:{width:1280,height:800},serviceWorkers:'block'});await c.route('**/*',route=>{const u=new URL(route.request().url());if(u.origin!==origin&&/^https?:$/.test(u.protocol)){external.push(u.href);return route.abort();}return route.continue();});return c;};
     const ca=await context(),cb=await context();
-    const open=async c=>{const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());await p.goto(origin+'/dev.html');await p.waitForFunction(()=>G.NAS.enabled&&document.getElementById('boot').classList.contains('hidden'));if(await p.locator('#tap-start').isVisible())await p.locator('#tap-start').click();return p;};
+    const open=async c=>{const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());await p.goto(origin+'/');await p.waitForFunction(()=>G.NAS.enabled&&document.getElementById('boot').classList.contains('hidden'));if(await p.locator('#tap-start').isVisible())await p.locator('#tap-start').click();return p;};
     const a=await open(ca),b=await open(cb);
     async function signup(p,name){await p.locator('[data-tab="register"]').click();await p.locator('#f-user').fill(name);await p.locator('#f-pass').fill('nas-browser-password');await p.locator('#btn-auth').click();await p.locator('#scr-test').waitFor({state:'visible'});for(let i=0;i<30&&await p.locator('#scr-test').isVisible();i++)await p.locator('#test-a .answer').first().click();await p.locator('#res-other').click();await p.locator('#starter-grid .cell').filter({hasText:'妙蛙种子'}).click();await p.locator('#starter-ok').click();await p.locator('#scr-menu').waitFor({state:'visible'});await p.evaluate(()=>G.NAS.flush());}
     await signup(a,'NasAlice');await signup(b,'NasBob');
