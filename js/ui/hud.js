@@ -372,8 +372,11 @@ G.HUD = (() => {
                          : 'WASD moverse  ·  1-4 / Q / E o clic en un ataque para cambiarlo  ·  Esc pausa', w / 2, h - 4);
     }
 
+    if(G.Coop.active)drawMarks(ctx,w,h,pl);
     ctx.restore();
   }
+
+  function drawMarks(ctx,w,h,pl){const names={gather:'Reunirse',help:'Ayuda',danger:'Peligro'};for(const m of G.Coop.marks){const sx=(m.x-G.Camera.left())*G.Camera.scale,sy=(m.y-G.Camera.top())*G.Camera.scale;const x=G.U.clamp(sx,40,w-40),y=G.U.clamp(sy,90,h-100);ctx.save();ctx.strokeStyle=m.kind==='danger'?'#ff6775':'#ffe06b';ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,14,0,Math.PI*2);ctx.stroke();ctx.font=F(800,12);ctx.textAlign='center';ctx.fillText(G.T(names[m.kind]),x,y-22);ctx.beginPath();ctx.moveTo(x,y);const a=Math.atan2(sy-y,sx-x);ctx.lineTo(x+Math.cos(a)*23,y+Math.sin(a)*23);ctx.stroke();ctx.restore();}}
 
   // ---------------- cooperativo ----------------
 

@@ -52,6 +52,7 @@ G.Coop = (() => {
   let levelSeq = 0, levelNow = 1, seenSeq = 0, doneSeq = 0, lastHo = '';
   const STALL_MS = 2500;
   let members = [];
+  const reconnecting=new Set(),marks=new Map();let pingAt=-Infinity;
 
   // ---------------- escalado de dificultad ----------------
 
@@ -66,7 +67,7 @@ G.Coop = (() => {
    * @param cb    { levelStart(lv), resume(), waiting(names), over(data), lost(msg), team(t), shiny(dex) }
    */
   function begin(cfg, pl, cb) {
-    active = true;
+    active = true;reconnecting.clear();marks.clear();pingAt=-Infinity;
     me = G.Net.uid; hostUid = cfg.host;
     host = me === hostUid;
     local = pl;
@@ -85,12 +86,12 @@ G.Coop = (() => {
       p.x = x; p.y = y;
       p.net = { x, y, ang: Math.PI / 2, walk: 0, hp: p.maxHp, maxHp: p.maxHp, dead: 0, mv: G.startMoveOf(mon.dex), ml: 1, mag: 78, aim: Math.PI / 2, rev: 0 };
       G.Sprites.preload([mon.dex], 8000, p.shiny);
-      mates.set(m.uid, { uid: m.uid, name: m.name, color: COLORS[i], pl: p, connected: true, q: [], flushT: 0, xpMul: 1 });
+      mates.set(m.uid, { uid: m.uid, name: m.name, color: COLORS[i], pl: p, connected: true, lastAt:performance.now(), q: [], flushT: 0, xpMul: 1 });
     });
   }
 
   function end() {
-    active = false; host = false; local = null;
+    active = false; host = false; local = null;reconnecting.clear();marks.clear();
     mates.clear(); outEv = []; waiting = new Set(); holds = new Set();
   }
 
@@ -188,7 +189,9 @@ G.Coop = (() => {
     const ja = G.Judgment.netState();       // Arceus en la Sentencia
     if (ja) f.ja = ja;
     // Siempre: quién está eligiendo y, si hay cartas de nivel, cuáles (ver arriba).
-    f.ho = holdNames();
+    f.ho = holdNames();f.aw=hostAway||reconnecting.size>0;
+    // Repair enemy creation after a brief connection outage without restarting a run.
+    if(!m.repairAt||performance.now()>m.repairAt){m.repairAt=performance.now()+2000;f.meta=f.e.map(a=>{const e=G.EnemyMgr.get(a[0]);return [e.id,e.dex,e.maxHp,e.dmg,e.boss?1:0,e.shiny?1:0,e.behavior];});}
     if (waiting.size) f.lu = [levelSeq, levelNow];
     return f;
   }
@@ -207,6 +210,7 @@ G.Coop = (() => {
     if (host) {
       for (const m of mates.values()) {
         if (!m.connected) continue;
+        if(performance.now()-m.lastAt>STALL_MS&&!reconnecting.has(m.uid)){reconnecting.add(m.uid);updateAway();}
         m.flushT -= dt;
         if (m.flushT > 0) continue;
         m.flushT = Math.max(0,m.flushT + rateFor(m.uid));
@@ -233,7 +237,11 @@ G.Coop = (() => {
   });
 
   G.Net.onPeer((u, mode) => {
-    if (!active || (mode !== 'closed' && mode !== 'failed')) return;
+    if(!active)return;
+    if(mode==='reconnecting'){reconnecting.add(u);updateAway();return;}
+    if(mode==='relay'||mode==='direct'){reconnecting.delete(u);const m=mates.get(u);if(m)m.repairAt=0;updateAway();return;}
+    reconnecting.delete(u);updateAway();
+    if(mode!=='closed'&&mode!=='failed')return;
     if (host) mateGone(u);
     else if (u === hostUid) { const cb = api.lost; end(); if (cb) cb('Se ha perdido la conexión con el anfitrión.'); }
   });
@@ -254,7 +262,7 @@ G.Coop = (() => {
   function onClientFrame(from, msg) {
     const m = mates.get(from);
     if (!m || !m.connected) return;
-    if (msg.p) { m.state = msg.p; m.pl.net = readState(msg.p); m.xpMul = m.pl.net.xpMul || 1; reconcile(from, m.pl.net); }
+    if (msg.p) {m.lastAt=performance.now();if(reconnecting.delete(from))updateAway();m.state = msg.p; m.pl.net = readState(msg.p); m.xpMul = m.pl.net.xpMul || 1; reconcile(from, m.pl.net); }
     for (const ev of msg.ev || []) {
       switch (ev[0]) {
         case 'h': {
@@ -281,6 +289,7 @@ G.Coop = (() => {
           G.World.breakAt(ev[1], ev[2]);
           emit(['pb', ev[1], ev[2]], from);
           break;
+        case 'mark':acceptMark(from,ev[1],ev[2],ev[3]);break;
         case 'lp': picked(from); break;
         case 'hs': holdOn(from); break;
         case 'he': holdOff(from); break;
@@ -301,7 +310,7 @@ G.Coop = (() => {
   // --- en el invitado ---
 
   /** Invitado: se para (o sigue) según si el anfitrión está. */
-  function updateAway() { if (api.away) api.away(hostAway || stalled ? nameOf(hostUid) : null); }
+  function updateAway(){if(api.away)api.away(reconnecting.size?[...reconnecting].map(nameOf).join(', '):hostAway||stalled?nameOf(hostUid):null);}
 
   // Anfitrión: al irse de la pestaña avisa a todos al momento (después ya no
   // podrá mandar nada) y al volver, que sigue.
@@ -315,6 +324,9 @@ G.Coop = (() => {
     lastHostAt = performance.now();
     if (stalled) { stalled = false; updateAway(); }
     for (const ev of msg.ev || []) applyHostEvent(ev);
+    if(msg.t===undefined)return;
+    hostAway=!!msg.aw;updateAway();
+    for(const a of msg.meta||[])if(!G.EnemyMgr.get(a[0])){const state=(msg.e||[]).find(e=>e[0]===a[0]);if(state)G.EnemyMgr.addRemote({id:a[0],dex:a[1],hp:a[2],dmg:a[3],boss:!!a[4],shiny:!!a[5],beh:a[6],x:state[1],y:state[2]});}
     if (msg.ja) G.Judgment.netApply(msg.ja);
     // Quién elige y las cartas de nivel, aunque se haya perdido algún aviso.
     if (msg.ho) {
@@ -358,6 +370,7 @@ G.Coop = (() => {
                               friendly: false, color: '#ff7a9e', vis: G.VFX.forType(ev[8]), mtype: ev[8] });
         break;
       case 'c': { const m = mates.get(ev[1]); if (m) G.Combat.ghostCast(m.pl, ev[2], ev[3], ev[4], ev[5]); break; }
+      case 'mark':marks.set(ev[1],{uid:ev[1],kind:ev[2],x:ev[3],y:ev[4],at:performance.now()});break;
       case 'item': api.item(ev[1]); break;
       case 'pk': G.Pickups.addRemote(ev[1], ev[2], ev[3], ev[4], ev[5]); break;
       case 'pc': G.Pickups.removeId(ev[1]); break;
@@ -494,7 +507,11 @@ G.Coop = (() => {
     end();
   }
 
+  function acceptMark(uid,kind,x,y){const p=uid===me?local:mates.get(uid)?.pl;if(!p||!['gather','help','danger'].includes(kind)||!Number.isFinite(x)||!Number.isFinite(y)||G.U.dist2(p.x,p.y,x,y)>160*160)return;const last=marks.get(uid);if(last&&performance.now()-last.at<2500)return;marks.set(uid,{uid,kind,x,y,at:performance.now()});emit(['mark',uid,kind,x,y]);}
+  function ping(kind='gather'){if(!active||performance.now()-pingAt<3000)return false;pingAt=performance.now();if(host)acceptMark(me,kind,r1(local.x),r1(local.y));else{outEv.push(['mark',kind,r1(local.x),r1(local.y)]);flushClient(true);}return true;}
+
   return {
+    ping,get marks(){return [...marks.values()].filter(m=>performance.now()-m.at<8000);},
     ANIMS, COLORS, begin, end, leave, tick, players, puppets, xpFactor, scaleRate, scaleHp,
     cast, hit, status, hurtShown, enemyAdded, enemyGone, enemyShot, pickupAdded, pickupGone, say,
     propBroken, collected, shinyCaught, levelStart, localPicked, over, holdStart, holdEnd,

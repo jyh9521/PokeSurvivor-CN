@@ -233,15 +233,18 @@
       $('prof-close').onclick = close;
       $('scr-profile').onclick = e => { if (e.target.id === 'scr-profile') close(); };
     }
-    function close() { $('scr-profile').classList.add('hidden'); }
+    function close() { profileRequest++;$('scr-profile').classList.add('hidden'); }
 
     /** Abre el perfil de otro jugador por su uid. */
+    let profileRequest=0;
     async function show(uid) {
+      const request=++profileRequest;
       if (!uid) return;
       if (uid === G.Social.uid) { showData(G.Social.profileData()); return; }
       $('prof-body').innerHTML = '<p class="sub">Cargando…</p>';
       $('scr-profile').classList.remove('hidden');
       const d = await G.Social.getProfile(uid);
+      if(request!==profileRequest)return;
       if (!d) { $('prof-body').innerHTML = '<p class="sub">Este jugador aún no tiene perfil.</p>'; return; }
       showData(d);
     }
@@ -262,6 +265,10 @@
         </div>
         <h3>Medallas <span class="sub">${b.medals || 0}</span></h3>
         <div class="prof-medals" id="prof-medals"></div>`;
+      if(G.NAS?.enabled&&d.uid){
+        const status=document.createElement('p');status.textContent=G.T(d.online?'En línea':'Desconectado');body.appendChild(status);
+        if(d.uid!==G.Social.uid){const button=document.createElement('button');button.className='btn small';button.id='profile-friend-request';const f=G.Social.friends.find(f=>f.uid===d.uid);button.textContent=G.T(f?.status==='ok'?'Ya es tu amigo':f?.status==='in'?'Aceptar solicitud':f?.status==='out'?'Solicitud enviada':'Solicitar amistad');button.disabled=f?.status==='ok'||f?.status==='out';button.onclick=async()=>{button.disabled=true;const r=await(f?.status==='in'?G.Social.accept(d.uid):G.Social.requestUid(d.uid));G.UI.toast(r.error||r.msg||G.T('Solicitud enviada'));if(r.ok)show(d.uid);else button.disabled=false;};body.appendChild(button);}
+      }
       const favs = $('prof-favs');
       for (const f of (d.favs || []).slice(0, 3)) {
         if (!G.DEX_BY[f.dex]) continue;

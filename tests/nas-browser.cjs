@@ -11,7 +11,7 @@ fs.mkdirSync(OUT,{recursive:true});
   try{
     await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+app.server.address().port;
     browser=await chromium.launch({headless:true,channel:'chrome'});
-    const context=async()=>{const c=await browser.newContext({locale:'zh-CN',viewport:{width:1280,height:800},serviceWorkers:'block'});await c.route('**/*',route=>{const u=new URL(route.request().url());if(u.origin!==origin&&/^https?:$/.test(u.protocol)){external.push(u.href);return route.abort();}return route.continue();});return c;};
+    const context=async()=>{const c=await browser.newContext({locale:'zh-CN',viewport:{width:1280,height:800},serviceWorkers:'block'});await c.addInitScript(()=>{window.RTCPeerConnection=undefined;});await c.route('**/*',route=>{const u=new URL(route.request().url());if(u.origin!==origin&&/^https?:$/.test(u.protocol)){external.push(u.href);return route.abort();}return route.continue();});return c;};
     const ca=await context(),cb=await context();
     const open=async c=>{const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());await p.goto(origin+'/');await p.waitForFunction(()=>G.NAS.enabled&&document.getElementById('boot').classList.contains('hidden'));if(await p.locator('#tap-start').isVisible())await p.locator('#tap-start').click();return p;};
     const a=await open(ca),b=await open(cb);
@@ -79,7 +79,7 @@ fs.mkdirSync(OUT,{recursive:true});
     await a.waitForFunction(()=>G.Net.stats().targetHz===15&&G.Net.stats().queuedSnapshots===0);await a.waitForFunction(()=>G.Game.state==='playing');
     check('clearing queue pressure returns to normal 15 Hz',await a.evaluate(()=>G.Net.stats().targetHz===15));
     // Drop only one-shot choice notifications on real WebSocket sends. Periodic snapshots remain intact.
-    for(const page of [a,b])await page.evaluate(()=>{window.__originalSend=WebSocket.prototype.send;window.__droppedChoices=0;WebSocket.prototype.send=function(raw){let value;try{value=JSON.parse(raw);}catch{}if(value?.type==='relay'&&value.data?.k==='f'){value.data.ev=(value.data.ev||[]).filter(ev=>{if(['lu','lp','lr','hs','he','hp'].includes(ev[0])){window.__droppedChoices++;return false;}return true;});raw=JSON.stringify(value);}return window.__originalSend.call(this,raw);};});
+    for(const page of [a,b])await page.evaluate(()=>{window.__originalSend=WebSocket.prototype.send;window.__droppedChoices=0;WebSocket.prototype.send=function(raw){let value;try{value=JSON.parse(raw);}catch{}if(value?.type==='relay'&&(value.data?.k==='f'||value.data?.lane==='event')){const packet=value.data.k==='f'?value.data:value.data.data;packet.ev=(packet.ev||[]).filter(ev=>{if(['lu','lp','lr','hs','he','hp'].includes(ev[0])){window.__droppedChoices++;return false;}return true;});raw=JSON.stringify(value);}return window.__originalSend.call(this,raw);};});
     const ids=await b.evaluate(()=>Object.keys(G.Items.BY));await b.evaluate(id=>G.Game.player.equip(id),ids[0]);
     await a.evaluate(id=>G.Coop.broadcast(['item',id]),ids[1]);await b.locator('#scr-item').waitFor({state:'visible'});
     await a.evaluate(()=>{G.Game.player.level++;G.Coop.levelStart(G.Game.player.level);});

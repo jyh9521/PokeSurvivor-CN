@@ -72,7 +72,7 @@ def generate(e):
 
     pid = 'shinies'
     pairs = ''.join(f'<li><span class="pair">{e["sprite"](d,up=e["upof"](pid,lang))}{e["sprite"](d,True,up=e["upof"](pid,lang))}</span><span class="nm">{esc(z(e["BY"][d]["name"]))}</span></li>' for d in e['SHOW'] if e['META'].get(d,{}).get('sh'))
-    body = f'<article class="doc wide"><h1>异色宝可梦：概率与获得方法</h1><p class="lead">异色宝可梦具有不同的配色，十分罕见。本作大多数宝可梦拥有异色版本。</p><h2>怎样获得</h2><ul><li>野生宝可梦出现时，有 <b>1/4096</b> 的概率为异色。发现后会有闪光与提示，击败即可获得。</li><li>地区抽取每次有 <b>1/100</b> 的概率获得异色。</li><li>重复的异色宝可梦会转换为三倍金币。</li><li>拥有伙伴的异色版本后，可在主菜单或图鉴中选择使用。</li></ul><h2>普通与异色版本对照</h2><ul class="dexgrid pairs">{pairs}</ul>{cta(pid,"寻找异色宝可梦")}</article>'
+    body = f'<article class="doc wide"><h1>异色宝可梦：概率与获得方法</h1><p class="lead">异色宝可梦具有不同的配色，十分罕见。本作大多数宝可梦拥有异色版本。</p><h2>怎样获得</h2><ul><li>野生宝可梦出现时，有 <b>1/4096</b> 的概率为异色。发现后会有闪光与提示，击败即可获得。</li><li>地区抽取每次有 <b>1/100</b> 的概率获得异色。</li><li>异色抽取优先选择同稀有度未获得的异色；五星物种不重复。重复普通结果按稀有度折算抽奖券碎片，100 碎片合成 1 张券。</li><li>拥有伙伴的异色版本后，可在主菜单或图鉴中选择使用。</li></ul><h2>普通与异色版本对照</h2><ul class="dexgrid pairs">{pairs}</ul>{cta(pid,"寻找异色宝可梦")}</article>'
     write(pid,'PokéSurvivor 异色宝可梦：概率与获得方法','野生异色概率 1/4096，抽取异色概率 1/100。查看普通与异色宝可梦对照。',body)
 
     pid = 'types'

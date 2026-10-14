@@ -213,7 +213,7 @@ G.Game = (() => {
     waiting(names) { G.RunUI.setWaiting(names); },
     resume() {
       G.RunUI.closeLevelUp();
-      if (state === 'levelup') { state = holdBy.length ? 'held' : 'playing'; afterLevelUp(); }
+      if (state === 'levelup') { state = holdBy.length||awayBy ? 'held' : 'playing'; afterLevelUp(); }
     },
     /** ¿Estás eligiendo algo que para la partida (objeto o vínculo)? */
     choosing() { return state === 'choice'; },
@@ -256,7 +256,7 @@ G.Game = (() => {
     }
   };
   let awayBy = null;
-  const awayText = () => 'Pausa: esperando a ' + awayBy + ' (anfitrión)…';
+  const awayText = () => G.I18n.f('Reconectando: esperando a {name}…',awayBy);
 
   /** Has llevado a casa a un Pokémon perdido y se une a ti (events.js). */
   G.onRescue = (dex, name) => {
@@ -403,7 +403,7 @@ G.Game = (() => {
       G.FX.ring(pl.x, pl.y, 8, 130, '#ff8ad8', 0.8, 6);
       G.FX.burst(pl.x, pl.y - pl.bodyH * 0.5, '#ffb3e6', 40, 240);
       G.Spawner.say('¡Vínculo! ' + group.length + ' movimientos a la vez', 2.6, true);
-      if (state === 'choice') state = holdBy.length ? 'held' : 'playing';
+      if (state === 'choice') state = holdBy.length||awayBy ? 'held' : 'playing';
       if (G.Coop.active) G.Coop.holdEnd();
     });
   }
@@ -445,7 +445,7 @@ G.Game = (() => {
         G.Progress.event('item', { id: got });
       }
       if (!mine) { afterLevelUp(); return; }
-      if (state === 'choice') state = holdBy.length ? 'held' : 'playing';
+      if (state === 'choice') state = holdBy.length||awayBy ? 'held' : 'playing';
       if (G.Coop.active) G.Coop.holdEnd();
       afterLevelUp();
     };
@@ -678,8 +678,9 @@ G.Game = (() => {
 
   /** Caído en grupo: un compañero a tu lado te va levantando. */
   function reviveTick(dt) {
-    const helper = G.Coop.puppets().some(p => !p.dead && G.U.dist2(p.x, p.y, pl.x, pl.y) < 56 * 56);
-    pl.reviveT = helper ? (pl.reviveT || 0) + dt : Math.max(0, (pl.reviveT || 0) - dt * 0.5);
+    const helpers = G.Coop.puppets().filter(p => !p.dead && G.U.dist2(p.x,p.y,pl.x,pl.y)<56*56).length;
+    const helper=helpers>0;
+    pl.reviveT = helper ? (pl.reviveT || 0) + dt*(1+0.5*Math.max(0,helpers-1)) : Math.max(0, (pl.reviveT || 0) - dt * 0.5);
     if (pl.reviveT >= G.Player.REVIVE_TIME) pl.revive(0.5);
   }
 

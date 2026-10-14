@@ -4,11 +4,11 @@ const {WebSocket}=require('ws'),{createApp}=require('../server/app.cjs');
 const {validateSave}=require('../server/store.cjs');
 const {DatabaseSync,backup}=require('node:sqlite');
 const seed=name=>({v:3,name,coins:500,owned:{1:{at:1,from:'starter'}},shiny:{},partner:1,partnerShiny:false,pupg:{},stats:{runs:0,bestTime:0},tickets:{t1:0,t10:0},profile:{favs:[],title:''},ach:{},legends:{}});
-async function fixture(t){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-nas-test-'));let app=createApp({dataDir:dir,campaigns:[]});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));let base='http://127.0.0.1:'+app.server.address().port;
+async function fixture(t){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-nas-test-'));let app=createApp({dataDir:dir,campaigns:[],reconnectMs:100});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));let base='http://127.0.0.1:'+app.server.address().port;
   t.after(async()=>{await app.close();const p=path.resolve(dir);if(p.startsWith(path.join(path.resolve(os.tmpdir()),'ps-nas-test-')))fs.rmSync(p,{recursive:true,force:true});});
-  async function call(url,b,cookie='',method=b?'POST':'GET',origin=base){const r=await fetch(base+'/api/'+url,{method,headers:{...(b?{'content-type':'application/json'}:{}),cookie,origin},body:b?JSON.stringify(b):undefined});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]||cookie};}
+  async function call(url,b,cookie='',method=b?'POST':'GET',origin=base){const r=await fetch(base+'/api/'+url,{method,headers:{...(b?{'content-type':'application/json'}:{}),cookie,origin},body:b?JSON.stringify({...b,protocol:2}):undefined});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]||cookie};}
   const account=async name=>{const r=await call('register',{name,password:'local-test-password'});assert.equal(r.status,200);return r;};
-    return {get app(){return app;},get base(){return base;},dataDir:dir,call,account,async restart(){await app.close();app=createApp({dataDir:dir,campaigns:[]});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+app.server.address().port;}};
+    return {get app(){return app;},get base(){return base;},dataDir:dir,call,account,async restart(){await app.close();app=createApp({dataDir:dir,campaigns:[],reconnectMs:100});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+app.server.address().port;}};
 }
 test('real account cookies, dual-save revisions, conflicts, histories and restart persistence',async t=>{
   const f=await fixture(t),a=await f.account('Alice'),b=await f.account('Bob');
@@ -53,7 +53,7 @@ test('authenticated friends, invitations, real WebSocket relay and room authoriz
   wa.send(JSON.stringify({type:'relay',to:b.data.user.id,data:{k:'start',seed:42,host:'spoofed',members:[]}}));
   const msg=await received;assert.equal(msg.from,a.data.user.id);assert.equal(msg.data.host,a.data.user.id);assert.equal(msg.data.members.length,2);
   const closed=new Promise(r=>wc.once('close',r));wc.send(JSON.stringify({type:'relay',to:a.data.user.id,data:{k:'f'}}));assert.equal(await closed,1008);
-  wa.terminate();await new Promise(r=>setTimeout(r,30));assert.equal((await f.call('social',undefined,b.cookie)).data.room,null);
+  wa.terminate();await new Promise(r=>setTimeout(r,30));const retained=(await f.call('social',undefined,b.cookie)).data.room;assert.equal(retained.id,room.id);assert.equal(retained.members.find(m=>m.uid===a.data.user.id).connected,false);await new Promise(r=>setTimeout(r,150));assert.equal((await f.call('social',undefined,b.cookie)).data.room,null);
 });
 test('leaderboard uses authenticated run and server identity, rejects replay and fake elapsed time',async t=>{
   const f=await fixture(t),a=await f.account('Alice');await f.call('save',{rev:0,save:seed('Alice')},a.cookie,'PUT');

@@ -1,28 +1,30 @@
 /* NAS adapters at the existing DB/Social/Net/Ranking seams; static/file stays local. */
 G.NAS = (() => {
   const local=G.DB,oldSocial=G.Social,oldNet=G.Net,oldRanking=G.Ranking;
+  const clientId=[...crypto.getRandomValues(new Uint8Array(16))].map(n=>n.toString(16).padStart(2,'0')).join('');
   let enabled=false,available=false,user=null,save=null,rev=0,pending=false,conflict=null,guest=false;
-  let socket=null,social={friends:[],invites:[],room:null},activeRoom=null,change=0,flushing=null,retry=0,request=null;
+  let reconnectAt=0,reconnectTimer=null,socket=null,social={friends:[],invites:[],room:null},activeRoom=null,change=0,flushing=null,retry=0,request=null;
   const syncListeners=new Set(),socialListeners=new Set(),messages=new Set(),peers=new Set();
   let state='local',storageOk=true,networkTimer=null,nextProbe=0,serverBuffered=0,disconnects=0;
   let health=G.RelayHealth.create();
   const probesAnswered=new Map();
-  const flow=G.RelayFlow.create({onSent:value=>{if(value.type==='relay'&&value.data?.k==='f')health.tx(value.to);}});
+  const flow=G.RelayFlow.create({onSent:value=>{if(value.type==='relay'&&(value.data?.k==='f'||value.data?.lane==='state'))health.tx(value.to);}});
+  const direct=G.DirectLink.create({signal:(to,data)=>rawRelay(to,{k:'rtc-signal',...data}),relay:rawRelay,deliver:deliver,sent:uid=>health.tx(uid),changed:(uid,mode)=>{if(mode==='overflow'){action('room/leave',{});G.UI?.toast(G.T('Demasiados eventos pendientes; vuelve a la sala.'));}else peers.forEach(f=>f(uid,social.room?.members.find(m=>m.uid===uid)?.connected===false?'reconnecting':mode));}});
   const interval=()=>flow.congested(socket)||serverBuffered>=65536?1/5:1/15;
   function networkTick(){
-    flow.drain(socket,(_v,_key,scope)=>!!activeRoom&&scope===activeRoom);health.sweep();
+    direct.tick();flow.drain(socket,(_v,_key,scope)=>!!activeRoom&&scope===activeRoom);health.sweep();
     if(!socket||socket.readyState!==1||performance.now()<nextProbe)return;nextProbe=performance.now()+2000;
     const own=health.probe('nas');if(own)flow.send(socket,{type:'ping',id:own});
     const peers=social.room?.isHost?social.room.members.filter(m=>m.uid!==user?.id).map(m=>m.uid):[social.room?.host];
     if(activeRoom)for(const peer of peers.filter(Boolean)){const id=health.probe(peer);if(id)relay(peer,{k:'nas-diagnostic-ping',id});}
   }
-  function metrics(){return health.sample({connected:socket?.readyState===1,targetHz:1/interval(),bufferedBytes:socket?.bufferedAmount||0,serverBufferedBytes:serverBuffered,coalescedFrames:flow.stats().coalesced,queuedSnapshots:flow.stats().pending,disconnects,background:document.hidden});}
+  function metrics(){return {...direct.stats(),...health.sample({connected:socket?.readyState===1,targetHz:1/interval(),bufferedBytes:socket?.bufferedAmount||0,serverBufferedBytes:serverBuffered,coalescedFrames:flow.stats().coalesced,queuedSnapshots:flow.stats().pending,disconnects,background:document.hidden})};}
   const clone=v=>JSON.parse(JSON.stringify(v));
   const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;}};
   const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true;}catch{storageOk=false;setState('storage-error');return false;}};
   const key=()=>user?'ps.nas.save.'+user.id:'';
   const notify=()=>socialListeners.forEach(f=>{f('friends');f('invites');f('room');});
-  function receiveSocial(next){const previous=social.room;if(previous?.id!==next.room?.id||(previous?.members||[]).map(m=>m.uid).sort().join('|')!==(next.room?.members||[]).map(m=>m.uid).sort().join('|')){flow.clear();health.clearPeers();probesAnswered.clear();}for(const p of previous?.members||[])if(p.uid!==user?.id&&(previous.id!==next.room?.id||!next.room.members.some(m=>m.uid===p.uid)))peers.forEach(f=>f(p.uid,'closed'));social=next;notify();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,'relay'));});}
+  function receiveSocial(next){const previous=social.room;if(previous?.id!==next.room?.id||(previous?.members||[]).map(m=>m.uid).sort().join('|')!==(next.room?.members||[]).map(m=>m.uid).sort().join('|')){flow.clear();health.clearPeers();probesAnswered.clear();}for(const p of previous?.members||[])if(p.uid!==user?.id&&(previous.id!==next.room?.id||!next.room.members.some(m=>m.uid===p.uid)))peers.forEach(f=>f(p.uid,'closed'));social=next;direct.sync(social.room?.id,user?.id,social.room?.host,social.room?.members||[]);notify();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,p.connected===false?'reconnecting':direct.mode(p.uid)));});}
   const setState=s=>{state=storageOk?s:'storage-error';syncListeners.forEach(f=>f(state));};
   function assign(dst,src){for(const k of Object.keys(dst))if(!(k in src))delete dst[k];for(const k in src){if(dst[k]&&src[k]&&typeof dst[k]==='object'&&typeof src[k]==='object'&&!Array.isArray(dst[k])&&!Array.isArray(src[k]))assign(dst[k],src[k]);else dst[k]=clone(src[k]);}}
   function persist(){if(!user||guest)return false;return write(key(),{user,save,rev,pending,conflict,request});}
@@ -76,19 +78,19 @@ G.NAS = (() => {
   async function logout(){if(!enabled)return local.logout();await flush();if(pending||conflict){G.UI?.toast('还有未同步进度，请先处理存档同步。',4000);return false;}
     try{await api('logout',{});}catch{}clearTimeout(retry);user=null;save=null;guest=false;socket?.close();socket=null;social={friends:[],invites:[],room:null};activeRoom=null;
     try{localStorage.removeItem('ps.nas.session');}catch{}setState('local');notify();return true;}
-  function connect(){if(!enabled||!user||guest)return;if(socket&&(socket.readyState===0||socket.readyState===1))return;
+  function connect(){if(!enabled||!user||guest)return;if(performance.now()<reconnectAt){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,Math.ceil(reconnectAt-performance.now())+25);return;}if(socket&&(socket.readyState===0||socket.readyState===1))return;
     const ws=new WebSocket((location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+'/api/ws');socket=ws;
-    ws.onopen=()=>{available=true;serverBuffered=0;health=G.RelayHealth.create();nextProbe=0;ws.send(JSON.stringify({type:'social'}));clearInterval(networkTimer);networkTimer=setInterval(networkTick,100);networkTick();if(pending&&!conflict)flush();};
+    ws.onopen=()=>{peers.forEach(f=>f(user?.id,'relay'));available=true;serverBuffered=0;health=G.RelayHealth.create();nextProbe=0;ws.send(JSON.stringify({type:'social',client:clientId}));clearInterval(networkTimer);networkTimer=setInterval(networkTick,100);networkTick();if(pending&&!conflict)flush();};
     ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='social')receiveSocial(m.data);
       if(m.type==='pong'){if(health.pong('nas',m.id))serverBuffered=Math.max(0,Number(m.buffered)||0);}
       if(m.type==='relay'){
         if(m.data?.k==='nas-diagnostic-ping'){if(connectedPeer(m.from)&&typeof m.data.id==='string'&&m.data.id.length<=40&&performance.now()-(probesAnswered.get(m.from)??-Infinity)>=500){probesAnswered.set(m.from,performance.now());relay(m.from,{k:'nas-diagnostic-pong',id:m.data.id});}}
         else if(m.data?.k==='nas-diagnostic-pong')health.pong(m.from,m.data.id);
-        else {if(m.data?.k==='f')health.rx(m.from);messages.forEach(f=>f(m.from,m.data));}
+        else if(m.data?.k==='rtc-signal')direct.signal(m.from,m.data);else if(m.data?.k==='rtc-wire')direct.receive(m.from,m.data);else deliver(m.from,m.data);
       }if(m.type==='room-closed'){receiveSocial({...social,room:null});activeRoom=null;}}
       catch(e){console.warn('[NAS]',e.message);}};
-    ws.onclose=e=>{if(socket!==ws)return;clearInterval(networkTimer);networkTimer=null;flow.clear();serverBuffered=0;disconnects++;socket=null;available=e.code===4001;social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,'closed'));});social.room=null;activeRoom=null;notify();
-      if(e.code!==4001&&user&&!guest)setTimeout(connect,3000);};
+    ws.onclose=e=>{if(socket!==ws)return;clearInterval(networkTimer);networkTimer=null;flow.clear();serverBuffered=0;disconnects++;socket=null;reconnectAt=performance.now()+3000;available=e.code===4001;if(e.code===4001){direct.reset();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,'closed'));});social.room=null;activeRoom=null;}else{peers.forEach(f=>f(user?.id,'reconnecting'));direct.sync(social.room?.id,user?.id,social.room?.host,(social.room?.members||[]).map(m=>({...m,connected:false})));}notify();
+      if(e.code!==4001&&user&&!guest){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,3025);}};
   }
   function proxy(original,overrides,always=[]){return new Proxy(original,{get(target,p){return (enabled||always.includes(p))&&p in overrides?Reflect.get(overrides,p):Reflect.get(target,p);}});}
   G.DB=proxy(local,{
@@ -102,28 +104,30 @@ G.NAS = (() => {
     onSync(fn){syncListeners.add(fn);local.onSync(fn);},
     async deleteAccount(password){try{await api('delete',{password});pending=false;conflict=null;const k=key();try{localStorage.removeItem(k);localStorage.removeItem('ps.nas.session');}catch{}user=null;save=null;socket?.close();social={friends:[],invites:[],room:null};notify();return {ok:true};}catch(e){return {ok:false,error:e.message};}},
     get mode(){return 'nas';},get fb(){return null;},get online(){return available&&!!user&&!guest;},get nameAccount(){return !!user;},get hasGoogle(){return false;},
-    get user(){return user?.name||'Invitado';},get uid(){return user?.id;},get guest(){return guest;},get save(){return save;},get loggedIn(){return !!save;},get syncState(){return state;},get localReason(){return 'nas';},get storageOk(){return storageOk;}
+    get user(){return user?.nick||user?.name||'Invitado';},get uid(){return user?.id;},get guest(){return guest;},get save(){return save;},get loggedIn(){return !!save;},get syncState(){return state;},get localReason(){return 'nas';},get storageOk(){return storageOk;}
   },['ready','onSync']);
-  async function action(route,b){try{if ((route==='room/create'||route==='room/member') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,b);await refresh();return r;}catch(e){return {ok:false,error:e.message};}}
+  async function action(route,b){try{if ((route==='room/create'||route==='room/member') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,{...b,protocol:2});await refresh();return r;}catch(e){return {ok:false,error:e.message};}}
   async function refresh(){if(enabled)connect();if(!enabled)return oldSocial.refreshPresence();if(!user||guest)return;try{receiveSocial(await api('social'));available=true;}catch{available=false;}}
   const profile=()=>oldSocial.profileData();
   G.Social=proxy(oldSocial,{
     start:async()=>{connect();await refresh();return user?'ok':'off';},stop:async()=>{await action('room/leave',{});},
-    claimNick:async()=>({ok:true}),request:n=>action('friends/request',{name:n}),accept:uid=>action('friends/accept',{uid}),remove:uid=>action('friends/remove',{uid}),
+    claimNick:n=>setNickname(n),request:n=>action('friends/request',{name:n}),requestUid:uid=>action('friends/request',{uid}),accept:uid=>action('friends/accept',{uid}),remove:uid=>action('friends/remove',{uid}),
     createRoom:()=>action('room/create',{}),joinRoom:id=>{const invitation=social.invites.find(i=>i.room===id);return invitation?action('invite/accept',{uid:invitation.from}):Promise.resolve({ok:false,error:'邀请已失效。'});},leaveRoom:()=>action('room/leave',{}),refreshMember:()=>action('room/member',{}),setOpen:open=>action('room/open',{open}),
     async invite(uid){if(!social.room){const r=await action('room/create',{});if(!r.ok)return r;}return action('invite',{uid});},
     acceptInvite:uid=>action('invite/accept',{uid}),declineInvite:uid=>action('invite/decline',{uid}),
     refreshPresence:refresh,setPlaying(){},publishProfile(){commit();},profileData:profile,
     getProfile:async uid=>{try{return (await api('profile?uid='+encodeURIComponent(uid))).profile;}catch{return null;}},
     on(fn){socialListeners.add(fn);oldSocial.on(fn);},off(fn){socialListeners.delete(fn);oldSocial.off(fn);},
-    get me(){return user?{uid:user.id,name:user.name}:null;},get uid(){return user?.id;},get started(){return !!user;},get friends(){return social.friends;},get invites(){return social.invites;},get room(){return social.room;}
+    get me(){return user?{uid:user.id,name:user.nick||user.name}:null;},get uid(){return user?.id;},get started(){return !!user;},get friends(){return social.friends;},get invites(){return social.invites;},get room(){return social.room;}
   },['on','off']);
-  function relay(to,data){if(socket?.readyState===1&&activeRoom)return flow.send(socket,{type:'relay',to,data},{key:to,scope:activeRoom,replaceable:data.k==='f'&&Array.isArray(data.ev)&&data.ev.length===0});}
+  function deliver(from,data){if(data?.k==='f'&&data.p)health.rx(from);messages.forEach(f=>f(from,data));}
+  function relay(to,data){if(activeRoom)return direct.send(to,data);}
+  function rawRelay(to,data){if(socket?.readyState===1&&activeRoom)return flow.send(socket,{type:'relay',to,data},{key:to,scope:activeRoom,replaceable:(data.k==='f'&&Array.isArray(data.ev)&&data.ev.length===0)||(data.k==='rtc-wire'&&data.lane==='state')});}
   G.Net=proxy(oldNet,{
-    open(id){if(activeRoom!==id){flow.clear();health.clearPeers();}activeRoom=id;connect();},close(){activeRoom=null;flow.clear();health.clearPeers();},syncMembers(){},send:relay,toHost:msg=>relay(social.room?.host,msg),
+    open(id){if(activeRoom!==id){flow.clear();health.clearPeers();}activeRoom=id;connect();},close(){activeRoom=null;direct.reset();flow.clear();health.clearPeers();},syncMembers(){},send:relay,toHost:msg=>relay(social.room?.host,msg),
     broadcast(msg){social.room?.members.filter(m=>m.uid!==user?.id).forEach(m=>relay(m.uid,msg));},
     on(fn){messages.add(fn);oldNet.on(fn);},off(fn){messages.delete(fn);oldNet.off(fn);},onPeer(fn){peers.add(fn);oldNet.onPeer(fn);},
-    mode(uid){return connectedPeer(uid)?'relay':'connecting';},slow(){return flow.congested(socket);},interval, noteFrame(){health.frame();},viaTurn(){return false;},peers(){return social.room?.members.filter(m=>m.uid!==user?.id).map(m=>m.uid)||[];},
+    mode(uid){return connectedPeer(uid)?direct.mode(uid):'connecting';},slow(){return flow.congested(socket);},interval, noteFrame(){health.frame();},viaTurn(){return false;},peers(){return social.room?.members.filter(m=>m.uid!==user?.id).map(m=>m.uid)||[];},
     get uid(){return user?.id;},get hostUid(){return social.room?.host;},get isHost(){return social.room?.isHost;},get open_(){return !!activeRoom;},get turn(){return false;},stats:metrics
   },['on','off','onPeer']);
   function connectedPeer(uid){return socket?.readyState===1&&social.room?.members.some(m=>m.uid===uid);}
@@ -139,6 +143,7 @@ G.NAS = (() => {
   window.addEventListener('online',()=>{if(enabled&&user){connect();refreshSave();}});
   document.addEventListener('visibilitychange',()=>{if(enabled&&user){if(document.visibilityState==='hidden'){if(pending)flush();}else refreshSave();}});
   async function refreshSave(){if(!enabled||!user||guest)return false;if(pending||conflict)return flush();const version=change;try{const r=await api('save');available=true;if(change!==version||pending)return flush();if(r.save&&r.rev!==rev){rev=r.rev;assign(save,r.save);persist();}setState('ok');return true;}catch(e){setState(e.status===401?'auth-required':'offline');return false;}}
-  return {networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
+  async function setNickname(nick){try{const r=await api('nickname',{nick});user=r.user;write('ps.nas.session',user);persist();G.UI?.refreshCoins();await refresh();return {ok:true};}catch(e){return {ok:false,error:e.message};}}
+  return {setNickname,networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
   };
 })();

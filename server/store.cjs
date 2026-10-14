@@ -20,6 +20,7 @@ function validateSave(value,name) {
   for(const f of s.profile.favs)if(!f||!Number.isSafeInteger(f.dex)||f.dex<1||f.dex>1100||typeof f.shiny!=='boolean')throw error(400,'Invalid favorite');
   for(const key of ['ach','legends'])if(typeof s[key]!=='object'||Array.isArray(s[key]))throw error(400,'Invalid '+key);
   for(const key of ['t1','t10'])if(!Number.isSafeInteger(s.tickets[key])||s.tickets[key]<0||s.tickets[key]>1e8)throw error(400,'Invalid tickets');
+  if(s.tickets.fragments!==undefined&&(!Number.isSafeInteger(s.tickets.fragments)||s.tickets.fragments<0||s.tickets.fragments>=100))throw error(400,'Invalid ticket fragments');
   for(const col of ['owned','shiny'])for(const key of Object.keys(s[col]))if(!/^\d{1,4}$/.test(key)||+key<1||+key>1100)throw error(400,'Invalid species');
   if(s.partner!=null && !s.owned[s.partner])throw error(400,'Partner not owned');
   s.name=name;s.updated=Date.now();return s;
@@ -38,8 +39,9 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
   if(!db.prepare('PRAGMA table_info(users)').all().some(c=>c.name==='lower')){
     db.exec('BEGIN IMMEDIATE');try{db.exec('ALTER TABLE users ADD COLUMN lower TEXT');for(const u of db.prepare('SELECT id,name FROM users').all())db.prepare('UPDATE users SET lower=? WHERE id=?').run(u.name.toLowerCase(),u.id);db.exec('CREATE UNIQUE INDEX users_lower ON users(lower); COMMIT');}catch(e){db.exec('ROLLBACK');db.close();throw e;}
   }
-  db.exec('PRAGMA user_version=2');
-  const getUser=id=>db.prepare('SELECT id,name FROM users WHERE id=?').get(id);
+  if(!db.prepare('PRAGMA table_info(users)').all().some(c=>c.name==='nick'))db.exec('ALTER TABLE users ADD COLUMN nick TEXT');
+  db.exec('PRAGMA user_version=3');
+  const getUser=id=>db.prepare('SELECT id,name,nick FROM users WHERE id=?').get(id);
   const getSave=uid=>{const r=db.prepare('SELECT rev,data FROM saves WHERE uid=?').get(uid);return r?{rev:r.rev,save:JSON.parse(r.data)}:{rev:0,save:null};};
   async function credentials(name,password,register=false) {
     name=typeof name==='string'?name.trim():'';
@@ -60,7 +62,7 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
     db.prepare('DELETE FROM sessions WHERE expires<?').run(Date.now());
     const token=randomBytes(32).toString('hex');db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(digest(token),user.id,Date.now()+30*86400e3);return token;
   }
-  function authenticate(token) { if(!token)return null;return db.prepare('SELECT u.id,u.name FROM sessions s JOIN users u ON s.uid=u.id WHERE s.token=? AND s.expires>?').get(digest(token),Date.now())||null; }
+  function authenticate(token) { if(!token)return null;return db.prepare('SELECT u.id,u.name,u.nick FROM sessions s JOIN users u ON s.uid=u.id WHERE s.token=? AND s.expires>?').get(digest(token),Date.now())||null; }
   function putSave(user,value,rev,mutation='') {
     if(!Number.isSafeInteger(rev)||rev<0)throw error(400,'Invalid revision');
     if(mutation&&!/^[a-f0-9]{32}$/.test(mutation))throw error(400,'Invalid mutation');
@@ -89,10 +91,15 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
       db.exec('COMMIT');return {rev:rev+1,save:s};
     }catch(e){db.exec('ROLLBACK');throw e;}
   }
+  function nickname(user,value){
+    const nick=typeof value==='string'?value.trim().normalize('NFKC'):'';
+    if(!/^[\p{L}\p{N}_·-]{2,16}$/u.test(nick))throw error(400,'昵称需 2–16 个汉字、字母、数字或 _·-，不能含空格。');
+    db.prepare('UPDATE users SET nick=? WHERE id=?').run(nick,user.id);return getUser(user.id);
+  }
   const pair=(a,b)=>[a,b].sort();
-  function request(user,name) {
-    if(typeof name!=='string')throw error(400,'Invalid name');
-    const other=db.prepare('SELECT id,name FROM users WHERE lower=?').get(name.trim().toLowerCase());
+  function request(user,name,uid) {
+    if(!uid&&typeof name!=='string')throw error(400,'Invalid name');
+    const other=uid?getUser(uid):db.prepare('SELECT id,name FROM users WHERE lower=?').get(name.trim().toLowerCase());
     if(!other||other.id===user.id)throw error(400,'找不到该玩家，或不能添加自己。');
     const [a,b]=pair(user.id,other.id),old=db.prepare('SELECT * FROM friends WHERE a=? AND b=?').get(a,b);
     if(!old)db.prepare('INSERT INTO friends VALUES(?,?,?,?)').run(a,b,user.id,'pending');
@@ -112,7 +119,7 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
   for(const row of db.prepare('SELECT u.id,u.name FROM users u JOIN saves s ON s.uid=u.id').all()){
     if(campaigns.some(c=>!db.prepare('SELECT 1 FROM reward_receipts WHERE uid=? AND campaign=?').get(row.id,c.id))){const old=getSave(row.id);putSave(row,old.save,old.rev);}
   }
-  return {db,credentials,session,authenticate,getUser,getSave,putSave,request,friendship,friendRows,areFriends,scores,addScore,
+  return {db,credentials,session,authenticate,getUser,getSave,putSave,nickname,request,friendship,friendRows,areFriends,scores,addScore,
     logout(token){db.prepare('DELETE FROM sessions WHERE token=?').run(digest(token));},
     history(uid){return db.prepare('SELECT rev,at FROM history WHERE uid=? ORDER BY rev DESC LIMIT 20').all(uid);},
     restore(user,revision,current){const row=db.prepare('SELECT data FROM history WHERE uid=? AND rev=?').get(user.id,revision);if(!row)throw error(404,'历史存档不存在。');return putSave(user,JSON.parse(row.data),current);},

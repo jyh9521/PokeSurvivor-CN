@@ -61,7 +61,8 @@ G.GachaUI = (() => {
       `<div><span>${G.Icons.html('shiny', 12)} Shiny</span><span>1%</span></div>
        <p class="note">· La tirada ×10 garantiza al menos una Épica.<br>
        · A las ${G.Gacha.PITY_5} tiradas sin Legendaria en un banner, la siguiente lo es.<br>
-       · Los repetidos dan Pokémonedas. Los shiny no se repiten.<br>
+       · Repetidos: 1★ 10, 2★ 20, 3★ 40, 4★ 100 fragmentos. 100 = 1 ticket.<br>
+       · Los 5★ no repiten especie; si ya tienes todos los 5★ del banner, recibes 2 tickets.<br>
        · Los tickets se consiguen jugando: algunos Pokémon los sueltan al caer, y
          los jefes y los legendarios de las grietas, a veces, tickets ×10.</p>`;
 
@@ -69,7 +70,7 @@ G.GachaUI = (() => {
     $('cost-1').innerHTML = `${G.Icons.html('ticket', 18)} 1`;
     $('cost-10').innerHTML = `${G.Icons.html('ticket', 18)} 10`;
     $('cost-10b').innerHTML = `${G.Icons.html('ticket10', 18)} 1`;
-    $('gacha-tickets').innerHTML = `Tienes ${G.Icons.html('ticket', 18)} <b>${t.t1}</b> tickets y ${G.Icons.html('ticket10', 18)} <b>${t.t10}</b> tickets ×10`;
+    $('gacha-tickets').innerHTML = `Tienes ${G.Icons.html('ticket', 18)} <b>${t.t1}</b> tickets y ${G.Icons.html('ticket10', 18)} <b>${t.t10}</b> tickets ×10 · ${G.I18n.f('{x}/100 fragmentos',t.fragments||0)}`;
     $('pull-1').disabled = !G.Gacha.costOf(s, 1);
     $('pull-10').disabled = !G.Gacha.costOf(s, 10, 't1');
     $('pull-10b').disabled = !G.Gacha.costOf(s, 10, 't10');
@@ -104,11 +105,11 @@ G.GachaUI = (() => {
       c.className = 'pcard r' + r.rarity + (r.shiny ? ' shiny' : '');
       c.style.setProperty('--rc', r.shiny ? '#9ae6ff' : G.Gacha.RARITY_COLOR[r.rarity]);
       c.innerHTML = `<div class="stars">${G.UI.stars(r.rarity, 24)}</div>`;
-      c.appendChild(G.UI.spriteCanvas(r.dex, 132, 120, { lively: r.rarity >= 4 || r.shiny, scale: 2, shiny: r.shiny }));
-      const tag = r.isNew
+      if(mon)c.appendChild(G.UI.spriteCanvas(r.dex,132,120,{lively:r.rarity>=4||r.shiny,scale:2,shiny:r.shiny}));else c.insertAdjacentHTML('beforeend',G.Icons.html('ticket',64));
+      const tag = r.completed?G.T('Resultado convertido en 2 tickets'):r.isNew
         ? `<span class="new">${r.shiny ? '¡SHINY NUEVO!' : '¡NUEVO!'}</span>`
-        : `Repetido · <span class="coin"></span> +${r.refund}`;
-      c.insertAdjacentHTML('beforeend', `<b>${r.shiny ? G.Icons.html('shiny', 12) + ' ' : ''}${mon.name}</b><div class="tag">${tag}</div>`);
+        : G.I18n.f('Repetido · +{x} fragmentos de ticket',r.refund);
+      c.insertAdjacentHTML('beforeend', `<b>${r.shiny ? G.Icons.html('shiny', 12) + ' ' : ''}${mon?mon.name:G.T('Banner 5★ completo · 2 tickets')}</b><div class="tag">${tag}</div>`);
       out.appendChild(c);
       G.Audio.sfx('reveal', { rarity: r.rarity });
       await wait(n === 10 ? 150 : 0);

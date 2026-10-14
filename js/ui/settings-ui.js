@@ -135,7 +135,7 @@ G.SettingsUI = (() => {
     const nick = G.Social.me ? G.Social.me.name : (G.DB.user || '');
     const kind = G.DB.mode === 'local' ? 'Cuenta de este navegador' : G.DB.nameAccount ? 'Nombre y contraseña' : 'Google';
     box.innerHTML = section('Cuenta')
-      + `<div class="set-row"><div class="grow"><b>Apodo</b><small>Es único y no se puede cambiar.</small></div><span class="gold" translate="no">${esc(nick)}</span></div>`
+      + `<div class="set-row"><div class="grow"><b>Apodo</b><small>${G.NAS?.enabled?G.T('El apodo público se puede cambiar; la cuenta de acceso no cambia.'):'Es único y no se puede cambiar.'}</small></div><span class="gold" translate="no">${esc(nick)}</span></div>`
       + `<div class="set-row"><div class="grow"><b>Tipo de cuenta</b></div><span>${esc(kind)}</span></div>`
       + `<div class="set-row"><div class="grow"><b>Partida</b></div><span>${esc(SYNC[st] || st)}</span></div>`
       + `<div class="row wrap" style="gap:8px;margin-top:12px">

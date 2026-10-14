@@ -7,7 +7,8 @@
  *   - la tirada ×10 trae al menos un 4★ o superior
  *   - a las 70 tiradas sin 5★ en ese banner, el siguiente es 5★ seguro
  * Shiny: 1 de cada 100 tiradas sale en su versión shiny.
- * Repetidos: se convierten en Pokémonedas (los shiny repetidos, el triple).
+ * Repetidos: fragmentos de ticket por rareza. 100 fragmentos = 1 ticket.
+ * Los 5★ nunca repiten especie; un banner 5★ completo devuelve 2 tickets.
  *
  * Se tira con TICKETS (se consiguen jugando):
  *   ×1   1 ticket
@@ -24,7 +25,7 @@ G.Gacha = (() => {
   const RATES = [[1, 45], [2, 30], [3, 17], [4, 6.5], [5, 1.5]];
   const PITY_5 = 70;
   const SHINY_RATE = 1 / 100;
-  const REFUND = { 1: 15, 2: 30, 3: 60, 4: 120, 5: 300 };
+  const REFUND = { 1: 10, 2: 20, 3: 40, 4: 100, 5: 200 };
   let forceShiny = 0;           // para pruebas y vídeos: las N próximas salen shiny
 
   const RARITY_NAME = { 1: 'Común', 2: 'Poco común', 3: 'Rara', 4: 'Épica', 5: 'Legendaria' };
@@ -78,6 +79,7 @@ G.Gacha = (() => {
    *   { dex, rarity, shiny, isNew, refund }
    */
   function pull(save, n, gen = 1, use = 't1') {
+    if(![1,10].includes(n)||!BANNERS.some(b=>b.gen===gen)||!G.DEX.some(p=>inBanner(p,gen)))return null;
     const cost = costOf(save, n, use);
     if (!cost) return null;
     save.tickets.t1 -= cost.t1;
@@ -96,12 +98,14 @@ G.Gacha = (() => {
 
       const { rarity, list } = poolNear(want, gen);
       if (rarity === 5) save.pity[gen] = 0;
-      let mon = G.U.pick(list);
+      const eligible=rarity===5?list.filter(p=>!save.owned[p.dex]):list;
+      if(!eligible.length){const ticketRefund=credit(save,REFUND[5]);out.push({dex:0,rarity:5,shiny:false,isNew:false,refund:REFUND[5],ticketRefund,completed:true});continue;}
+      let mon = G.U.pick(eligible);
       let shiny = G.Sprites.hasShiny(mon.dex) && (forceShiny > 0 ? (forceShiny--, true) : Math.random() < SHINY_RATE);
       // Los shiny no se repiten: si ya tienes ese, sale otro de la misma rareza
       // cuyo shiny te falte; si los tienes todos, sale normal.
       if (shiny && save.shiny[mon.dex]) {
-        const missing = list.filter(p => G.Sprites.hasShiny(p.dex) && !save.shiny[p.dex]);
+        const missing = eligible.filter(p => G.Sprites.hasShiny(p.dex) && !save.shiny[p.dex]);
         if (missing.length) mon = G.U.pick(missing);
         else shiny = false;
       }
@@ -117,12 +121,14 @@ G.Gacha = (() => {
         if (isNew) save.owned[mon.dex] = { at: Date.now(), from: 'gacha' };
         else refund = REFUND[rarity];
       }
-      save.coins += refund;
-      out.push({ dex: mon.dex, rarity, shiny, isNew, refund });
+      const ticketRefund=credit(save,refund);
+      out.push({ dex: mon.dex, rarity, shiny, isNew, refund, ticketRefund });
     }
     save.stats.pulls = (save.stats.pulls || 0) + n;
     return out;
   }
+
+  function credit(save,fragments){const total=(save.tickets.fragments||0)+fragments;const tickets=Math.floor(total/100);save.tickets.fragments=total%100;save.tickets.t1+=tickets;return tickets;}
 
   return { debugForceShiny(n = 1) { forceShiny = n; },
            costOf, RATES, PITY_5, SHINY_RATE, REFUND, RARITY_NAME, RARITY_COLOR, BANNERS,

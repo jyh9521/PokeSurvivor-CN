@@ -1,3 +1,7 @@
+# 历史记录：0.2.4 的 NAS 诊断
+
+当前 0.3.0 已增加 WebRTC 直连与 NAS 回退，请参见 [COMMUNITY_FEATURES.md](COMMUNITY_FEATURES.md)。下文保留原阶段设计；房间往返探测仍经 NAS。
+
 # NAS 联机频率与网络诊断（0.2.4）
 
 ## 同步与积压处理

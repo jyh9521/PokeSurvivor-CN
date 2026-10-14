@@ -364,7 +364,7 @@ def shinies(lang):
 <h2>Cómo conseguirlos</h2>
 <ul><li><b>Salvajes:</b> cada Pokémon que aparece tiene <b>1 entre 4096</b> de salir shiny (como en los juegos clásicos). Lo verás brillar y saldrá un aviso: derrótalo y es tuyo.</li>
 <li><b>En el gacha:</b> cada tirada tiene <b>1 entre 100</b> de ser shiny.</li>
-<li>Un shiny repetido da el triple de Pokémonedas.</li>
+<li>Los shiny priorizan variantes no obtenidas; los 5★ no repiten especie. Los repetidos normales dan fragmentos de ticket: 100 = 1 ticket.</li>
 <li>Cuando tienes la forma shiny de tu compañero, puedes jugar con ella (se elige en la colección).</li></ul>
 <h2>Normal y shiny</h2><ul class="dexgrid pairs">{pairs}</ul>{cta(pid, lang, 'Sal a cazar shinies')}</article>'''
         title, desc = 'Shinies en PokéSurvivor: probabilidades y cómo conseguirlos', 'Cómo conseguir Pokémon shiny en PokéSurvivor: 1 entre 4096 en estado salvaje y 1 entre 100 en el gacha. Galería de formas normales y shiny.'
@@ -375,7 +375,7 @@ def shinies(lang):
 <h2>How to get them</h2>
 <ul><li><b>In the wild:</b> every Pokémon that spawns has a <b>1 in 4096</b> chance of being shiny (just like the classic games). You'll see it sparkle and get an alert: defeat it and it's yours.</li>
 <li><b>From the gacha:</b> every pull has a <b>1 in 100</b> chance of being shiny.</li>
-<li>A duplicate shiny gives triple PokéCoins.</li>
+<li>Shiny pulls prefer unowned variants; 5-star species never repeat. Normal duplicates give ticket fragments: 100 = 1 ticket.</li>
 <li>Once you own your partner's shiny form, you can play with it (pick it in your collection).</li></ul>
 <h2>Normal and shiny</h2><ul class="dexgrid pairs">{pairs}</ul>{cta(pid, lang, 'Go shiny hunting')}</article>'''
         title, desc = 'Shinies in PokéSurvivor: odds and how to get them', 'How to get shiny Pokémon in PokéSurvivor: 1 in 4096 in the wild and 1 in 100 from the gacha. A gallery of normal and shiny forms.'
