@@ -52,3 +52,7 @@ Python 路径可通过 `PYTHON` 环境变量指定。Python 子进程固定 UTF-
 复审发现英语入口 base 插入依赖旧 header 的精确匹配；已改为基于 charset 插入，并补充英语与中文入口的资源路径回归校验。分享元数据也已改为本地发行说明。
 
 发行后处理曾在未重新生成的联系页累积标记；已改为幂等替换，补充单页标记数量与双次构建／ZIP 哈希一致性检查 `npm run test:reproducible`。
+
+## 0.2.0 NAS 扩展
+
+另见 UNRAID.md。静态／文件模式仍回退本地存档；只有同来源 /api/config 确认 NAS 后端后才启用在线 adapters。

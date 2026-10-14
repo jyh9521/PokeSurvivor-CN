@@ -573,3 +573,33 @@ G.I18n.add({
   "En esta edición, las cuentas, contraseñas verificadas y partidas se guardan sólo en este navegador. No se envían a Firebase. El modo invitado no guarda. Borrar los datos del sitio elimina las cuentas y partidas locales.": "Accounts, password verification data and saves stay in this browser, not Firebase. Guests do not save. Clearing site data deletes local accounts and progress.",
   "Esta edición no incluye amigos, ranking online ni partidas en grupo.": "This edition has no online friends, rankings or co-op."
 }, 'en');
+
+G.I18n.add({
+  "Guardado en navegador y NAS": "Browser and NAS saves",
+  "Pendiente de sincronizar con NAS": "Saved locally; NAS sync pending",
+  "Sincronizando con NAS": "Syncing to NAS",
+  "Sin conexión: copia local conservada": "Offline; local copy retained",
+  "Conflicto: conserva ambas partidas": "Save conflict: both copies retained; choose a version",
+  "Vuelve a entrar para sincronizar": "Sign in again to sync",
+  "El navegador no pudo guardar la copia": "Browser copy failed; export a backup",
+  "Sincronizar ahora": "Sync now",
+  "Historial NAS": "NAS history",
+  "Exportar copia local": "Export local backup",
+  "Importar cuenta local": "Import old local account",
+  "Usar copia del navegador": "Use browser progress",
+  "Usar copia del NAS": "Use NAS progress",
+  "Nombre de cuenta local": "Old local account name",
+  "Contraseña de cuenta local": "Old local account password",
+  "Restaurar versión": "Restore revision",
+  "¿Restaurar esta versión? La copia actual queda en el historial.": "Restore this revision? Current NAS progress is retained in history.",
+  "Sin versiones anteriores": "No previous revisions",
+  "NAS: cuenta y progreso guardados en este navegador y en tu servidor. Sin conexión puedes seguir en solitario.": "NAS edition: progress is saved in this browser and your server. Offline solo play remains available."
+}, 'en');
+
+G.I18n.add({
+  "PokéSurvivor · NAS autohospedado": "PokéSurvivor · Self-hosted NAS",
+  "Volver a autenticar": "Sign in to NAS again",
+  "Contraseña de cuenta NAS": "NAS account password",
+  "NAS guarda tu cuenta y una copia de tu progreso. Este navegador conserva otra copia. No se utiliza Firebase.": "Your NAS stores your account and a progress copy. This browser keeps another copy. Firebase is not used.",
+  "Tu apodo aparece en amigos y ranking. Las partidas en grupo pasan por este NAS.": "Your nickname is visible to friends and on leaderboards. Co-op data is relayed by this NAS."
+}, 'en');

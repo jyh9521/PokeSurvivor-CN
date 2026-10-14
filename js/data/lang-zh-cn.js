@@ -1178,3 +1178,38 @@ G.I18n.add({
   "En esta edición, las cuentas, contraseñas verificadas y partidas se guardan sólo en este navegador. No se envían a Firebase. El modo invitado no guarda. Borrar los datos del sitio elimina las cuentas y partidas locales.": "本版账号、密码校验数据和存档仅保存在当前浏览器，不会发送至 Firebase。访客模式不保存；清除网站数据会删除本地账号和存档。",
   "Esta edición no incluye amigos, ranking online ni partidas en grupo.": "本版未启用在线好友、排行榜和联机。"
 }, 'zh-CN');
+
+G.I18n.add({
+  "Guardado en navegador y NAS": "浏览器与 NAS 双份存档",
+  "Pendiente de sincronizar con NAS": "已保存在浏览器，等待同步 NAS",
+  "Sincronizando con NAS": "正在同步 NAS",
+  "Sin conexión: copia local conservada": "当前离线，本地副本已保留",
+  "Conflicto: conserva ambas partidas": "存在存档冲突，两份进度均已保留，请选择使用哪份",
+  "Vuelve a entrar para sincronizar": "请重新登录以继续同步",
+  "El navegador no pudo guardar la copia": "浏览器副本写入失败，请导出备份",
+  "Sincronizar ahora": "立即同步",
+  "Historial NAS": "NAS 历史版本",
+  "Exportar copia local": "导出本地备份",
+  "Importar cuenta local": "导入原本地账号",
+  "Usar copia del navegador": "使用浏览器进度",
+  "Usar copia del NAS": "使用 NAS 进度",
+  "Nombre de cuenta local": "原本地账号名称",
+  "Contraseña de cuenta local": "原本地账号密码",
+  "Restaurar versión": "恢复版本",
+  "¿Restaurar esta versión? La copia actual queda en el historial.": "恢复这个历史版本？当前 NAS 进度会保留在历史记录中。",
+  "Sin versiones anteriores": "暂无历史版本",
+  "NAS: cuenta y progreso guardados en este navegador y en tu servidor. Sin conexión puedes seguir en solitario.": "NAS 自托管版：账号进度同时保存在当前浏览器和 NAS；离线时可继续单机。"
+}, 'zh-CN');
+
+G.I18n.add({
+  "PokéSurvivor · NAS autohospedado": "PokéSurvivor · NAS 自托管版",
+  "Volver a autenticar": "重新登录 NAS",
+  "Contraseña de cuenta NAS": "NAS 账号密码",
+  "NAS guarda tu cuenta y una copia de tu progreso. Este navegador conserva otra copia. No se utiliza Firebase.": "NAS 保存账号及一份进度，当前浏览器保留另一份进度。本版不使用 Firebase。",
+  "Tu apodo aparece en amigos y ranking. Las partidas en grupo pasan por este NAS.": "好友和排行榜会显示昵称；联机游戏数据通过这个 NAS 转发。"
+}, 'zh-CN');
+
+G.I18n.add({
+  "Partidas cooperativas en tu NAS": "在自己的 NAS 上联机",
+  "Modo NAS: juega con hasta cuatro amigos y consulta el ranking de tu servidor. El modo local sigue disponible.": "NAS 模式支持最多四人联机和本站排行榜；单机本地模式继续保留。"
+}, 'zh-CN');

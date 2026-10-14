@@ -1,8 +1,8 @@
 {
   "name": "pokesurvivor-cn",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Independent Simplified Chinese local-save distribution of PokeSurvivor",
+  "description": "Simplified Chinese local and self-hosted NAS edition with dual saves, co-op and leaderboards",
   "scripts": {
     "start": "node tools/preview.js",
     "build": "node tools/build-local.cjs",
@@ -11,12 +11,23 @@
     "test:file": "node tools/check-local-state.cjs --file",
     "package": "node tools/package-local.cjs",
     "test:reproducible": "node tools/check-repeat-build.cjs",
-    "test:transaction": "node tools/verify-local-transaction.cjs"
+    "test:transaction": "node tools/verify-local-transaction.cjs",
+    "start:nas": "node server/start.cjs",
+    "test:nas": "node --test tests/nas-backend.test.cjs",
+    "test:nas:browser": "node tests/nas-browser.cjs",
+    "backup:nas": "node server/backup.cjs",
+    "test:nas:production": "node tests/nas-production.cjs"
   },
   "devDependencies": {
     "javascript-obfuscator": "4.1.1",
     "playwright": "1.62.1",
     "terser": "5.44.0"
   },
-  "buildEpoch": 1791936000
+  "buildEpoch": 1791936000,
+  "dependencies": {
+    "ws": "8.22.0"
+  },
+  "engines": {
+    "node": ">=24.21.0"
+  }
 }

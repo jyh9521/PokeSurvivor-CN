@@ -2,7 +2,11 @@
 
 PokéSurvivor 的独立简体中文分支，提供单机游玩与浏览器本地存档。
 
-## 游玩
+## NAS 自托管
+
+NAS 模式提供账号、浏览器与 NAS 双份存档、最多四人 WebSocket 联机和在线排行榜，不依赖 Firebase。使用随发行包提供的 Dockerfile 与 Compose 部署，详见 [Unraid 安装与反代说明](docs/UNRAID.md)。直接打开静态网页仍保留单机本地存档模式。
+
+## 本机游玩
 
 安装 Node.js 后双击 **Start-Local.cmd**，或运行 `npm start`，打开 <http://127.0.0.1:8765/>。
 

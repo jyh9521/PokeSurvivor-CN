@@ -1,0 +1,14 @@
+.git
+node_modules
+artifacts
+data
+nas-data
+.env
+*.sqlite*
+tools/cache
+test-results
+videos
+cloudflare
+functions
+.firebase
+*.log

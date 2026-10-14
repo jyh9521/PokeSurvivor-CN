@@ -65,6 +65,7 @@ G.LoginUI = (() => {
 
   /** Explica dónde se guarda la partida según el modo de la base de datos. */
   function modeNote() {
+    if (G.NAS && G.NAS.enabled) return 'NAS: cuenta y progreso guardados en este navegador y en tu servidor. Sin conexión puedes seguir en solitario.';
     if (G.LOCAL_ONLY) return 'Edición local: crea una cuenta para guardar en este navegador. El modo invitado no guarda. Sin nube, cooperativo ni ranking online.';
     if (G.DB.mode === 'cloud') return 'Tu partida se guarda en la nube: entra desde cualquier ordenador. Como invitado no se guarda.';
     const why = G.DB.localReason === 'file'
@@ -108,7 +109,7 @@ G.LoginUI = (() => {
     if (!G.DB.storageOk) $('login-err').textContent = 'Este navegador no deja guardar datos: juega como invitado.';
     $('btn-google').classList.toggle('hidden', G.DB.mode !== 'cloud');
     $('login-mode').textContent = modeNote();
-    $('f-forgot').classList.toggle('hidden', !!G.LOCAL_ONLY);
+    $('f-forgot').classList.toggle('hidden', !!G.LOCAL_ONLY || !!(G.NAS && G.NAS.enabled));
     setTimeout(() => $('f-user').focus(), 50);
   }
 

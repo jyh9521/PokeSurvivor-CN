@@ -26,3 +26,7 @@
 - Pokémon 名称及角色属于相应权利方；本项目为非官方、非商业同人分支，没有广告或付费入口。
 
 源码与维护说明：[jyh9521/PokeSurvivor-CN](https://github.com/jyh9521/PokeSurvivor-CN)。
+
+## NAS 模式
+
+同一份游戏也支持连接自己的 NAS 后端，提供双份存档、联机和在线排行。上述“未启用在线功能”描述的是本机／静态模式。安装说明见仓库的 docs/UNRAID.md。

@@ -25,3 +25,11 @@ docs/CONTACTOS_CREADORES.md
 
 # Local acceptance copies and packaged builds
 artifacts/
+
+# NAS database and secrets stay outside Git
+data/
+nas-data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+.env

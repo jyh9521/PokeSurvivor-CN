@@ -119,6 +119,7 @@ G.SettingsUI = (() => {
              <a class="btn small" href="${REPO}" target="_blank" rel="noopener">Código (GitHub)</a>
            </div>`;
     }
+    if (tab === 'acc' && G.NasUI) G.NasUI.render(box);
     wire(box);
   }
 
@@ -171,7 +172,7 @@ G.SettingsUI = (() => {
     if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
     if (G.Game.state !== 'ui') G.Game.quit && G.Game.quit();
     G.Audio.music(null);
-    G.DB.logout().then(() => G.Flow.toLogin());
+    G.DB.logout().then(r => { if (r !== false) G.Flow.toLogin(); });
   }
 
   return { init, open, close, get isOpen() { return isOpen(); } };

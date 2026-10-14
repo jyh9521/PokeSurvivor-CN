@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / 'tools/cache/python'))
 from fontTools import subset
 from fontTools.ttLib import TTFont
 
-inputs = [ROOT/'dev.html', ROOT/'contacto/index.html', ROOT/'manifest.webmanifest', ROOT/'tools/seo_zh.py', ROOT/'tools/make_seo_pages.py', *sorted((ROOT/'js').rglob('*.js'))]
+inputs = [ROOT/'dev.html', ROOT/'contacto/index.html', ROOT/'manifest.webmanifest', ROOT/'tools/seo_zh.py', ROOT/'tools/make_seo_pages.py', *sorted((ROOT/'js').rglob('*.js')), *sorted((ROOT/'server').rglob('*.cjs'))]
 text = ''.join(p.read_text(encoding='utf-8') for p in inputs if p.name != 'app.min.js')
 chars = {ord(c) for c in text if ord(c) >= 0x2e80}
 lock = json.loads((ROOT/'tools/localization/input-lock.json').read_text(encoding='utf-8'))

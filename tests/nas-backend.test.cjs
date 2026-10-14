@@ -1,0 +1,76 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const {WebSocket}=require('ws'),{createApp}=require('../server/app.cjs');
+const {validateSave}=require('../server/store.cjs');
+const {DatabaseSync,backup}=require('node:sqlite');
+const seed=name=>({v:3,name,coins:500,owned:{1:{at:1,from:'starter'}},shiny:{},partner:1,partnerShiny:false,pupg:{},stats:{runs:0,bestTime:0},tickets:{t1:0,t10:0},profile:{favs:[],title:''},ach:{},legends:{}});
+async function fixture(t){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-nas-test-'));let app=createApp({dataDir:dir});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));let base='http://127.0.0.1:'+app.server.address().port;
+  t.after(async()=>{await app.close();const p=path.resolve(dir);if(p.startsWith(path.join(path.resolve(os.tmpdir()),'ps-nas-test-')))fs.rmSync(p,{recursive:true,force:true});});
+  async function call(url,b,cookie='',method=b?'POST':'GET',origin=base){const r=await fetch(base+'/api/'+url,{method,headers:{...(b?{'content-type':'application/json'}:{}),cookie,origin},body:b?JSON.stringify(b):undefined});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]||cookie};}
+  const account=async name=>{const r=await call('register',{name,password:'local-test-password'});assert.equal(r.status,200);return r;};
+    return {get app(){return app;},get base(){return base;},dataDir:dir,call,account,async restart(){await app.close();app=createApp({dataDir:dir});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+app.server.address().port;}};
+}
+test('real account cookies, dual-save revisions, conflicts, histories and restart persistence',async t=>{
+  const f=await fixture(t),a=await f.account('Alice'),b=await f.account('Bob');
+  assert.match(a.cookie,/^ps_nas=/);assert.equal((await f.call('session')).status,401);
+  assert.equal((await f.call('login',{name:'Alice',password:'incorrect-password'})).status,401);
+  assert.equal((await f.call('register',{name:'ALICE',password:'local-test-password'})).status,409);
+  assert.equal((await f.call('register',{name:'NIÑO',password:'local-test-password'})).status,200);
+  assert.equal((await f.call('register',{name:'niño',password:'local-test-password'})).status,409);
+  const s=seed('Alice'),one=await f.call('save',{rev:0,save:s},a.cookie,'PUT');assert.equal(one.data.rev,1);
+  const duplicate=await f.call('save',{rev:1,save:s,mutation:'a'.repeat(32)},a.cookie,'PUT');assert.equal(duplicate.data.rev,2);
+  assert.equal((await f.call('save',{rev:1,save:s,mutation:'a'.repeat(32)},a.cookie,'PUT')).data.rev,2);
+  assert.equal((await f.call('save',{rev:1,save:{...s,coins:800},mutation:'a'.repeat(32)},a.cookie,'PUT')).status,400);
+  assert.equal((await f.call('save',undefined,b.cookie)).data.save,null);
+  s.coins=450;assert.equal((await f.call('save',{rev:2,save:s},a.cookie,'PUT')).data.rev,3);
+  s.coins=999;const conflict=await f.call('save',{rev:1,save:s},a.cookie,'PUT');assert.equal(conflict.status,409);assert.equal(conflict.data.current.save.coins,450);
+  assert.equal((await f.call('history',undefined,a.cookie)).data.history[0].rev,2);
+  const restored=await f.call('restore',{revision:1,rev:3},a.cookie);assert.equal(restored.data.rev,4);assert.equal(restored.data.save.coins,500);
+  await f.restart();assert.equal((await f.call('session',undefined,a.cookie)).data.save.coins,500);
+  const snap=path.join(f.dataDir,'backup.sqlite');await backup(f.app.store.db,snap);const copy=new DatabaseSync(snap,{readOnly:true});assert.equal(JSON.parse(copy.prepare('SELECT data FROM saves WHERE uid=?').get(a.data.user.id).data).coins,500);copy.close();
+  assert.equal((await f.call('save',{rev:3,save:{...seed('Alice'),coins:-1}},a.cookie,'PUT')).status,400);
+  assert.equal((await f.call('save',{rev:3,save:seed('Alice')},a.cookie,'PUT','https://foreign.example')).status,403);
+  const proto=JSON.parse(JSON.stringify(seed('Alice')).replace('"pupg":{}','"pupg":{"__proto__":{"polluted":true}}'));
+  assert.throws(()=>validateSave(proto,'Alice'),/Invalid save key/);
+  assert.equal((await f.call('delete',{password:'wrong-password'},a.cookie)).status,401);
+  assert.equal((await f.call('delete',{password:'local-test-password'},a.cookie)).status,200);
+  assert.equal((await f.call('session',undefined,a.cookie)).status,401);
+});
+test('authenticated friends, invitations, real WebSocket relay and room authorization',async t=>{
+  const f=await fixture(t),a=await f.account('Alice'),b=await f.account('Bob'),c=await f.account('Charlie');
+  for(const u of [a,b,c])assert.equal((await f.call('save',{rev:0,save:seed(u.data.user.name)},u.cookie,'PUT')).status,200);
+  await f.call('friends/request',{name:'Bob'},a.cookie);assert.equal((await f.call('friends/accept',{uid:b.data.user.id},a.cookie)).status,403);
+  await f.call('friends/accept',{uid:a.data.user.id},b.cookie);
+  const open=async u=>{const ws=new WebSocket(f.base.replace('http:','ws:')+'/api/ws',{headers:{cookie:u.cookie,origin:f.base}});await new Promise((r,j)=>{ws.once('open',r);ws.once('error',j);});t.after(()=>ws.terminate());return ws;};
+  const wa=await open(a),wb=await open(b),wc=await open(c);
+  await f.call('room/create',{},a.cookie);assert.equal((await f.call('invite',{uid:c.data.user.id},a.cookie)).status,403);
+  await f.call('invite',{uid:b.data.user.id},a.cookie);assert.equal((await f.call('invite/accept',{uid:c.data.user.id},b.cookie)).status,409);
+  await f.call('invite/accept',{uid:a.data.user.id},b.cookie);
+  const room=(await f.call('social',undefined,a.cookie)).data.room;assert.equal(room.members.length,2);
+  assert.equal((await f.call('room/open',{open:false},b.cookie)).status,403);
+  await f.call('room/open',{open:false},a.cookie);
+  const received=new Promise(r=>wb.on('message',x=>{const v=JSON.parse(x);if(v.type==='relay')r(v);}));
+  wa.send(JSON.stringify({type:'relay',to:b.data.user.id,data:{k:'start',seed:42,host:'spoofed',members:[]}}));
+  const msg=await received;assert.equal(msg.from,a.data.user.id);assert.equal(msg.data.host,a.data.user.id);assert.equal(msg.data.members.length,2);
+  const closed=new Promise(r=>wc.once('close',r));wc.send(JSON.stringify({type:'relay',to:a.data.user.id,data:{k:'f'}}));assert.equal(await closed,1008);
+  wa.terminate();await new Promise(r=>setTimeout(r,30));assert.equal((await f.call('social',undefined,b.cookie)).data.room,null);
+});
+test('leaderboard uses authenticated run and server identity, rejects replay and fake elapsed time',async t=>{
+  const f=await fixture(t),a=await f.account('Alice');await f.call('save',{rev:0,save:seed('Alice')},a.cookie,'PUT');
+  const run=(await f.call('run',{mode:'s'},a.cookie)).data.id;
+  assert.equal((await f.call('score',{mode:'s',run,mark:{t:9999,lv:1,kills:0}},a.cookie)).status,400);
+  await new Promise(r=>setTimeout(r,1100));
+  const score=await f.call('score',{mode:'s',run,mark:{t:1,lv:2,kills:3,names:['Injected']}},a.cookie);assert.equal(score.status,200);
+  assert.equal((await f.call('score',{mode:'s',run,mark:{t:1,lv:2,kills:3}},a.cookie)).status,403);
+  const rows=(await f.call('ranking?mode=s&period=a&dex=1',undefined,a.cookie)).data.rows;assert.equal(rows.length,1);assert.deepEqual(rows[0].names,['Alice']);
+  assert.equal((await f.call('ranking?mode=bad',undefined,a.cookie)).status,400);
+  assert.equal((await f.call('report',{id:score.data.id},a.cookie)).status,200);
+});
+test('NAS room enforces four-player capacity',async t=>{
+  const f=await fixture(t),users=[];for(const name of ['Alice','Bob','Charlie','Dora','Evan']){const u=await f.account(name);await f.call('save',{rev:0,save:seed(name)},u.cookie,'PUT');users.push(u);}
+  const host=users[0];for(const u of users.slice(1)){await f.call('friends/request',{name:u.data.user.name},host.cookie);await f.call('friends/accept',{uid:host.data.user.id},u.cookie);}
+  await f.call('room/create',{},host.cookie);
+  for(const u of users.slice(1,4)){assert.equal((await f.call('invite',{uid:u.data.user.id},host.cookie)).status,200);assert.equal((await f.call('invite/accept',{uid:host.data.user.id},u.cookie)).status,200);}
+  assert.equal((await f.call('social',undefined,host.cookie)).data.room.members.length,4);
+  assert.equal((await f.call('invite',{uid:users[4].data.user.id},host.cookie)).status,409);
+});

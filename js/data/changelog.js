@@ -6,6 +6,7 @@
  * Cada línea en español y en inglés.
  */
 G.CHANGELOG = [
+  { d: '2026-10-14', title: ['Partidas cooperativas en tu NAS', 'Co-op on your NAS'], new: [['Modo NAS: juega con hasta cuatro amigos y consulta el ranking de tu servidor. El modo local sigue disponible.', 'NAS mode: play with up to four friends and view your server leaderboard. Local mode remains available.']] },
   { d: '2026-10-14', title: ['Recupera tu cuenta con Gmail', 'Recover your account with Gmail'], new: [
     ['Si juegas con nombre y contraseña, puedes vincular tu Gmail: si un día olvidas la contraseña, entras con Google y es tu misma cuenta. Te lo ofrecemos al entrar.',
      'If you play with a name and password, you can link your Gmail: if you ever forget your password, sign in with Google and it is the same account. We offer it when you sign in.']

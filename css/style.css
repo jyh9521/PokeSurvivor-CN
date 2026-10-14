@@ -826,3 +826,5 @@ a.btn { text-decoration: none; display: inline-block; color: var(--ink); }
   #dex-detail .btn { position: sticky; bottom: 0; order: 9; margin-top: auto; padding: 8px 6px; font-size: 15px;
     box-shadow: 0 -6px 10px rgba(5,10,25,.6); }
 }
+
+.sync.conflict,.sync.auth-required,.sync.storage-error { background:#e85b5b; }

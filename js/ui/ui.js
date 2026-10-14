@@ -37,6 +37,7 @@ G.UI = (() => {
     const st = G.DB.guest ? 'guest' : G.DB.syncState;
     const TIP = { ok: 'Guardado en la nube', syncing: 'Guardando…', pending: 'Guardando…',
                   offline: 'Sin conexión: se subirá al volver', local: 'Guardado sólo en este navegador', guest: 'Invitado: no se guarda' };
+    if (G.NAS && G.NAS.enabled) Object.assign(TIP, {ok:'Guardado en navegador y NAS', pending:'Pendiente de sincronizar con NAS', conflict:'Conflicto: conserva ambas partidas', 'auth-required':'Vuelve a entrar para sincronizar', 'storage-error':'El navegador no pudo guardar la copia'});
     $('user-pill').innerHTML = G.Icons.html(G.DB.guest ? 'user' : 'crown', 18) + ' <span translate="no">' + (G.DB.guest ? G.T('Invitado') : (G.DB.user || '')) + '</span>' +
       `<i class="sync ${st}" title="${TIP[st] || ''}"></i>`;
     $('user-pill').title = TIP[st] || '';
@@ -107,6 +108,7 @@ G.UI = (() => {
 
   function openLegal() {
     legalBack = SCREENS.find(s => isOpen(s)) || null;
+    if (G.NAS && G.NAS.enabled) { $('privacy-storage').textContent = G.T('NAS guarda tu cuenta y una copia de tu progreso. Este navegador conserva otra copia. No se utiliza Firebase.'); $('privacy-online').textContent = G.T('Tu apodo aparece en amigos y ranking. Las partidas en grupo pasan por este NAS.'); }
     $('legal-mail').textContent = CONTACT;
     $('legal-mail').href = 'mailto:' + CONTACT + '?subject=Pok%C3%A9Survivor';
     $('legal-repo').textContent = REPO.replace('https://', '');
