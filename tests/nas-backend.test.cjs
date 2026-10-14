@@ -83,3 +83,10 @@ test('public release disables history APIs and protects deployment files',async 
  for(const url of ['/dev.html','/.env','/server/store.cjs','/data/pokesurvivor.sqlite'])assert.equal((await fetch(f.base+url)).status,403);
  const dex=await (await fetch(f.base+'/pokedex/')).text();assert.ok(dex.includes('账号与存档状态请在游戏内'));assert.ok(!dex.includes('云存档、联机和在线排行未启用'));
 });
+
+test('authenticated diagnostic ping works without a room and exposes only queue size',async t=>{
+ const f=await fixture(t),a=await f.account('ProbeUser');const ws=new WebSocket(f.base.replace('http:','ws:')+'/api/ws',{headers:{cookie:a.cookie,origin:f.base}});t.after(()=>ws.terminate());
+ await new Promise((r,j)=>{ws.once('open',r);ws.once('error',j);});
+ const reply=new Promise((r,j)=>{const timer=setTimeout(()=>j(Error('No diagnostic pong')),500);ws.on('message',raw=>{const value=JSON.parse(raw);if(value.type==='pong'){clearTimeout(timer);r(value);}});});
+ ws.send(JSON.stringify({type:'ping',id:'diagnostic-1'}));const value=await reply;assert.equal(value.id,'diagnostic-1');assert.equal(typeof value.buffered,'number');assert.deepEqual(Object.keys(value).sort(),['buffered','id','type']);
+});

@@ -4,13 +4,25 @@ G.NAS = (() => {
   let enabled=false,available=false,user=null,save=null,rev=0,pending=false,conflict=null,guest=false;
   let socket=null,social={friends:[],invites:[],room:null},activeRoom=null,change=0,flushing=null,retry=0,request=null;
   const syncListeners=new Set(),socialListeners=new Set(),messages=new Set(),peers=new Set();
-  let state='local',storageOk=true;
+  let state='local',storageOk=true,networkTimer=null,nextProbe=0,serverBuffered=0,disconnects=0;
+  let health=G.RelayHealth.create();
+  const probesAnswered=new Map();
+  const flow=G.RelayFlow.create({onSent:value=>{if(value.type==='relay'&&value.data?.k==='f')health.tx(value.to);}});
+  const interval=()=>flow.congested(socket)||serverBuffered>=65536?1/5:1/15;
+  function networkTick(){
+    flow.drain(socket,(_v,_key,scope)=>!!activeRoom&&scope===activeRoom);health.sweep();
+    if(!socket||socket.readyState!==1||performance.now()<nextProbe)return;nextProbe=performance.now()+2000;
+    const own=health.probe('nas');if(own)flow.send(socket,{type:'ping',id:own});
+    const peers=social.room?.isHost?social.room.members.filter(m=>m.uid!==user?.id).map(m=>m.uid):[social.room?.host];
+    if(activeRoom)for(const peer of peers.filter(Boolean)){const id=health.probe(peer);if(id)relay(peer,{k:'nas-diagnostic-ping',id});}
+  }
+  function metrics(){return health.sample({connected:socket?.readyState===1,targetHz:1/interval(),bufferedBytes:socket?.bufferedAmount||0,serverBufferedBytes:serverBuffered,coalescedFrames:flow.stats().coalesced,queuedSnapshots:flow.stats().pending,disconnects,background:document.hidden});}
   const clone=v=>JSON.parse(JSON.stringify(v));
   const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;}};
   const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true;}catch{storageOk=false;setState('storage-error');return false;}};
   const key=()=>user?'ps.nas.save.'+user.id:'';
   const notify=()=>socialListeners.forEach(f=>{f('friends');f('invites');f('room');});
-  function receiveSocial(next){const previous=social.room;for(const p of previous?.members||[])if(p.uid!==user?.id&&(previous.id!==next.room?.id||!next.room.members.some(m=>m.uid===p.uid)))peers.forEach(f=>f(p.uid,'closed'));social=next;notify();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,'relay'));});}
+  function receiveSocial(next){const previous=social.room;if(previous?.id!==next.room?.id||(previous?.members||[]).map(m=>m.uid).sort().join('|')!==(next.room?.members||[]).map(m=>m.uid).sort().join('|')){flow.clear();health.clearPeers();probesAnswered.clear();}for(const p of previous?.members||[])if(p.uid!==user?.id&&(previous.id!==next.room?.id||!next.room.members.some(m=>m.uid===p.uid)))peers.forEach(f=>f(p.uid,'closed'));social=next;notify();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,'relay'));});}
   const setState=s=>{state=storageOk?s:'storage-error';syncListeners.forEach(f=>f(state));};
   function assign(dst,src){for(const k of Object.keys(dst))if(!(k in src))delete dst[k];for(const k in src){if(dst[k]&&src[k]&&typeof dst[k]==='object'&&typeof src[k]==='object'&&!Array.isArray(dst[k])&&!Array.isArray(src[k]))assign(dst[k],src[k]);else dst[k]=clone(src[k]);}}
   function persist(){if(!user||guest)return false;return write(key(),{user,save,rev,pending,conflict,request});}
@@ -66,11 +78,16 @@ G.NAS = (() => {
     try{localStorage.removeItem('ps.nas.session');}catch{}setState('local');notify();return true;}
   function connect(){if(!enabled||!user||guest)return;if(socket&&(socket.readyState===0||socket.readyState===1))return;
     const ws=new WebSocket((location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+'/api/ws');socket=ws;
-    ws.onopen=()=>{available=true;ws.send(JSON.stringify({type:'social'}));if(pending&&!conflict)flush();};
+    ws.onopen=()=>{available=true;serverBuffered=0;health=G.RelayHealth.create();nextProbe=0;ws.send(JSON.stringify({type:'social'}));clearInterval(networkTimer);networkTimer=setInterval(networkTick,100);networkTick();if(pending&&!conflict)flush();};
     ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='social')receiveSocial(m.data);
-      if(m.type==='relay')messages.forEach(f=>f(m.from,m.data));if(m.type==='room-closed'){receiveSocial({...social,room:null});activeRoom=null;}}
+      if(m.type==='pong'){if(health.pong('nas',m.id))serverBuffered=Math.max(0,Number(m.buffered)||0);}
+      if(m.type==='relay'){
+        if(m.data?.k==='nas-diagnostic-ping'){if(connectedPeer(m.from)&&typeof m.data.id==='string'&&m.data.id.length<=40&&performance.now()-(probesAnswered.get(m.from)??-Infinity)>=500){probesAnswered.set(m.from,performance.now());relay(m.from,{k:'nas-diagnostic-pong',id:m.data.id});}}
+        else if(m.data?.k==='nas-diagnostic-pong')health.pong(m.from,m.data.id);
+        else {if(m.data?.k==='f')health.rx(m.from);messages.forEach(f=>f(m.from,m.data));}
+      }if(m.type==='room-closed'){receiveSocial({...social,room:null});activeRoom=null;}}
       catch(e){console.warn('[NAS]',e.message);}};
-    ws.onclose=e=>{if(socket!==ws)return;socket=null;available=e.code===4001;social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,'closed'));});social.room=null;activeRoom=null;notify();
+    ws.onclose=e=>{if(socket!==ws)return;clearInterval(networkTimer);networkTimer=null;flow.clear();serverBuffered=0;disconnects++;socket=null;available=e.code===4001;social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,'closed'));});social.room=null;activeRoom=null;notify();
       if(e.code!==4001&&user&&!guest)setTimeout(connect,3000);};
   }
   function proxy(original,overrides,always=[]){return new Proxy(original,{get(target,p){return (enabled||always.includes(p))&&p in overrides?Reflect.get(overrides,p):Reflect.get(target,p);}});}
@@ -101,13 +118,13 @@ G.NAS = (() => {
     on(fn){socialListeners.add(fn);oldSocial.on(fn);},off(fn){socialListeners.delete(fn);oldSocial.off(fn);},
     get me(){return user?{uid:user.id,name:user.name}:null;},get uid(){return user?.id;},get started(){return !!user;},get friends(){return social.friends;},get invites(){return social.invites;},get room(){return social.room;}
   },['on','off']);
-  function relay(to,data){if(socket?.readyState===1&&activeRoom)socket.send(JSON.stringify({type:'relay',to,data}));}
+  function relay(to,data){if(socket?.readyState===1&&activeRoom)return flow.send(socket,{type:'relay',to,data},{key:to,scope:activeRoom,replaceable:data.k==='f'&&Array.isArray(data.ev)&&data.ev.length===0});}
   G.Net=proxy(oldNet,{
-    open(id){activeRoom=id;connect();},close(){activeRoom=null;},syncMembers(){},send:relay,toHost:msg=>relay(social.room?.host,msg),
+    open(id){if(activeRoom!==id){flow.clear();health.clearPeers();}activeRoom=id;connect();},close(){activeRoom=null;flow.clear();health.clearPeers();},syncMembers(){},send:relay,toHost:msg=>relay(social.room?.host,msg),
     broadcast(msg){social.room?.members.filter(m=>m.uid!==user?.id).forEach(m=>relay(m.uid,msg));},
     on(fn){messages.add(fn);oldNet.on(fn);},off(fn){messages.delete(fn);oldNet.off(fn);},onPeer(fn){peers.add(fn);oldNet.onPeer(fn);},
-    mode(uid){return connectedPeer(uid)?'relay':'connecting';},slow(){return true;},viaTurn(){return false;},peers(){return social.room?.members.filter(m=>m.uid!==user?.id).map(m=>m.uid)||[];},
-    get uid(){return user?.id;},get hostUid(){return social.room?.host;},get isHost(){return social.room?.isHost;},get open_(){return !!activeRoom;},get turn(){return false;},stats(){return {backend:'nas',transport:'websocket'};}
+    mode(uid){return connectedPeer(uid)?'relay':'connecting';},slow(){return flow.congested(socket);},interval, noteFrame(){health.frame();},viaTurn(){return false;},peers(){return social.room?.members.filter(m=>m.uid!==user?.id).map(m=>m.uid)||[];},
+    get uid(){return user?.id;},get hostUid(){return social.room?.host;},get isHost(){return social.room?.isHost;},get open_(){return !!activeRoom;},get turn(){return false;},stats:metrics
   },['on','off','onPeer']);
   function connectedPeer(uid){return socket?.readyState===1&&social.room?.members.some(m=>m.uid===uid);}
   let runPromise=null;const reported=new Set();
@@ -122,6 +139,6 @@ G.NAS = (() => {
   window.addEventListener('online',()=>{if(enabled&&user){connect();refreshSave();}});
   document.addEventListener('visibilitychange',()=>{if(enabled&&user){if(document.visibilityState==='hidden'){if(pending)flush();}else refreshSave();}});
   async function refreshSave(){if(!enabled||!user||guest)return false;if(pending||conflict)return flush();const version=change;try{const r=await api('save');available=true;if(change!==version||pending)return flush();if(r.save&&r.rev!==rev){rev=r.rev;assign(save,r.save);persist();}setState('ok');return true;}catch(e){setState(e.status===401?'auth-required':'offline');return false;}}
-  return {refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
+  return {networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
   };
 })();

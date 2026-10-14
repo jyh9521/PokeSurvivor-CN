@@ -586,6 +586,7 @@ G.Game = (() => {
   }
 
   function frame(ts) {
+    if(typeof G.Net.noteFrame==='function')G.Net.noteFrame();
     const real = (ts - last) / 1000 || 0;
     const dt = Math.min(1 / 30, real) * speedK;
     last = ts;

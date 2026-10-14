@@ -2,11 +2,12 @@
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const {randomBytes}=require('node:crypto'),{WebSocketServer,WebSocket}=require('ws');
 const {isIP}=require('node:net');
+const {create:createFlow}=require('../js/net/relay-flow.js');
 const {createStore,error}=require('./store.cjs');
 function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',registration=true,trustProxy=false,campaigns}={}) {
   fs.mkdirSync(dataDir,{recursive:true});const store=createStore(path.join(dataDir,'pokesurvivor.sqlite'),{campaigns});
   if(publicOrigin)publicOrigin=new URL(publicOrigin).origin;
-  const sockets=new Map(),rooms=new Map(),invites=new Map(),runs=new Map(),limits=new Map();
+  const flows=new WeakMap(),sockets=new Map(),rooms=new Map(),invites=new Map(),runs=new Map(),limits=new Map();
   const connected=uid=>sockets.get(uid)?.readyState===WebSocket.OPEN;
   const token=req=>(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('ps_nas='))?.slice(7)||'';
   const userOf=req=>store.authenticate(token(req));
@@ -14,7 +15,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
   const validOrigin=req=>!req.headers.origin || req.headers.origin===expected(req);
   const clientIP=req=>{const forwarded=trustProxy?String(req.headers['x-forwarded-for']||'').split(',').pop().trim():'';return isIP(forwarded)?forwarded:req.socket.remoteAddress||'unknown';};
   function rate(key,max=120,span=60000){const now=Date.now(),r=limits.get(key);if(!r||now-r.at>span){limits.set(key,{at:now,n:1});return;}if(++r.n>max)throw error(429,'请求过于频繁，请稍后重试。');}
-  function send(uid,value){const ws=sockets.get(uid);if(ws?.readyState!==WebSocket.OPEN)return;if(ws.bufferedAmount>=2*1024*1024){ws.close(1013,'Slow connection');return;}ws.send(JSON.stringify(value));}
+  function send(uid,value){const ws=sockets.get(uid);if(ws?.readyState!==WebSocket.OPEN)return;return flows.get(ws).send(ws,value,{key:value.from||'',scope:roomFor(uid)?.id,replaceable:value.type==='relay'&&value.data?.k==='f'&&Array.isArray(value.data.ev)&&value.data.ev.length===0});}
   const roomFor=uid=>[...rooms.values()].find(r=>r.members.some(m=>m.uid===uid));
   function social(user){const room=roomFor(user.id);return {me:{uid:user.id,name:user.name},uid:user.id,
     friends:store.friendRows(user.id).map(f=>{const id=f.a===user.id?f.b:f.a,u=store.getUser(id),r=roomFor(id);return {uid:id,name:u.name,pid:f.a+'_'+f.b,status:f.status==='ok'?'ok':f.requester===user.id?'out':'in',online:connected(id),play:!!r&&!r.open,room:r?.id||''};}),
@@ -97,8 +98,8 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
   const wss=new WebSocketServer({noServer:true,maxPayload:256*1024,perMessageDeflate:false});
   server.requestTimeout=15000;server.headersTimeout=10000;server.keepAliveTimeout=5000;server.maxHeadersCount=100;
   server.on('upgrade',(req,socket,head)=>{try{if(new URL(req.url,'http://local').pathname!=='/api/ws'||!validOrigin(req))throw error(403,'Forbidden');const u=userOf(req);if(!u)throw error(401,'Unauthorized');rate('ws:'+u.id,10);wss.handleUpgrade(req,socket,head,ws=>wss.emit('connection',ws,u));}catch{socket.write('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');socket.destroy();}});
-  wss.on('connection',(ws,user)=>{const old=sockets.get(user.id);sockets.set(user.id,ws);old?.close(4001,'Another device connected');ws.alive=true;ws.on('pong',()=>ws.alive=true);notify();
-    ws.on('message',data=>{try{rate('packet:'+user.id,300,1000);const msg=JSON.parse(data);if(msg.type==='social'){send(user.id,{type:'social',data:social(user)});return;}
+  wss.on('connection',(ws,user)=>{flows.set(ws,createFlow({hardLimit:2*1024*1024,closeCode:1013}));const old=sockets.get(user.id);sockets.set(user.id,ws);old?.close(4001,'Another device connected');ws.on('error',()=>ws.terminate());ws.alive=true;ws.on('pong',()=>ws.alive=true);notify();
+    ws.on('message',data=>{try{rate('packet:'+user.id,300,1000);const msg=JSON.parse(data);if(msg.type==='ping'){if(typeof msg.id!=='string'||! /^[a-z0-9-]{1,40}$/i.test(msg.id))throw error(400,'Invalid probe');send(user.id,{type:'pong',id:msg.id,buffered:ws.bufferedAmount});return;}if(msg.type==='social'){send(user.id,{type:'social',data:social(user)});return;}
       if(msg.type!=='relay')return;const r=roomFor(user.id);if(!r||!msg.data||typeof msg.data!=='object')throw error(403,'No room');
       if(user.id!==r.host&&msg.to!==r.host)throw error(403,'Guests only send to host');
       if(!r.members.some(m=>m.uid===msg.to))throw error(403,'Peer outside room');
@@ -107,7 +108,8 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
     }catch(e){ws.close(e.status===429?1008:1008,'Invalid packet');}});
     ws.on('close',()=>{if(sockets.get(user.id)!==ws)return;sockets.delete(user.id);leave(user.id);notify();});
   });
+  const drainTimer=setInterval(()=>{for(const[uid,ws]of sockets)flows.get(ws)?.drain(ws,(_v,from,scope)=>{const room=roomFor(uid);return !!room&&room.id===scope&&room.members.some(m=>m.uid===from);});},50);drainTimer.unref();
   const timer=setInterval(()=>{for(const ws of sockets.values()){if(!ws.alive){ws.terminate();continue;}ws.alive=false;ws.ping();}for(const[k,r]of runs)if(Date.now()-r.at>7500e3)runs.delete(k);for(const[k,i]of invites)if(Date.now()-i.at>180e3)invites.delete(k);for(const[k,r]of limits)if(Date.now()-r.at>3600e3)limits.delete(k);},30000);timer.unref();
-  return {server,store,rooms,async close(){clearInterval(timer);for(const ws of sockets.values())ws.terminate();await new Promise(r=>server.close(r));wss.close();store.close();}};
+  return {server,store,rooms,async close(){clearInterval(timer);clearInterval(drainTimer);for(const ws of sockets.values())ws.terminate();await new Promise(r=>server.close(r));wss.close();store.close();}};
 }
 module.exports={createApp};

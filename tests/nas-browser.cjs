@@ -59,9 +59,25 @@ fs.mkdirSync(OUT,{recursive:true});
     await a.waitForFunction(()=>G.Social.room.members.length===2);await a.locator('#lobby-start').click();
     await a.waitForFunction(()=>G.Game.state==='playing'&&G.Coop.active);await b.waitForFunction(()=>G.Game.state==='playing'&&G.Coop.active);
     check('two real game instances enter shared NAS-relayed run',await a.evaluate(()=>G.Coop.isHost&&G.Coop.puppets().length===1)&&await b.evaluate(()=>!G.Coop.isHost&&G.Coop.puppets().length===1));
+    await a.waitForFunction(()=>G.Net.stats().nasRttMs!=null&&G.Net.stats().peerRttMs!=null&&G.Net.stats().sendHz>=10&&G.Net.stats().receiveHz>=10);
+    await a.waitForTimeout(2200);
+    const network=await a.evaluate(()=>G.Net.stats());fs.writeFileSync('artifacts/relay-diagnostics/real-room-metrics.json',JSON.stringify(network,null,2));
+    check('healthy room sends and receives near 15 Hz rather than 3 Hz',network.targetHz===15&&network.sendHz>=12&&network.receiveHz>=12);
+    check('real peer probe traverses the NAS relay in both directions',network.peerRttMs!=null&&network.nasRttMs!=null&&network.fps>0);
+    await a.locator('#nas-network-toggle').click();await a.screenshot({path:path.resolve('artifacts/relay-diagnostics/room-diagnostics.png')});await a.locator('[data-network-close]').click();
     const prior=await a.evaluate(()=>G.Coop.puppets()[0].x);
     await b.keyboard.down('KeyD');await b.waitForTimeout(1600);await b.keyboard.up('KeyD');
     check('guest movement arrives in host gameplay',Math.abs((await a.evaluate(()=>G.Coop.puppets()[0].x))-prior)>5);
+    // Controlled browser-queue pressure, with genuine relay and game events underneath.
+    await a.evaluate(()=>{window.__queueDescriptor=Object.getOwnPropertyDescriptor(WebSocket.prototype,'bufferedAmount');Object.defineProperty(WebSocket.prototype,'bufferedAmount',{configurable:true,get(){return 70000;}});});
+    await a.waitForFunction(()=>G.Net.stats().targetHz===5&&G.Net.stats().coalescedFrames>0);
+    check('queue pressure selects 5 Hz and coalesces only stale states',await a.evaluate(()=>G.Net.stats().targetHz===5&&G.Net.stats().queuedSnapshots<=4));
+    const pressureItems=await b.evaluate(()=>Object.keys(G.Items.BY));await b.evaluate(id=>G.Game.player.equip(id),pressureItems[0]);await a.evaluate(id=>G.Coop.broadcast(['item',id]),pressureItems[1]);
+    await b.locator('#scr-item').waitFor({state:'visible'});await b.locator('#item-cards .card').first().click();
+    check('real item event still arrives under queue pressure',await b.evaluate(id=>G.Game.player.item===id,pressureItems[0]));
+    await a.evaluate(()=>{Object.defineProperty(WebSocket.prototype,'bufferedAmount',window.__queueDescriptor);delete window.__queueDescriptor;});
+    await a.waitForFunction(()=>G.Net.stats().targetHz===15&&G.Net.stats().queuedSnapshots===0);await a.waitForFunction(()=>G.Game.state==='playing');
+    check('clearing queue pressure returns to normal 15 Hz',await a.evaluate(()=>G.Net.stats().targetHz===15));
     // Drop only one-shot choice notifications on real WebSocket sends. Periodic snapshots remain intact.
     for(const page of [a,b])await page.evaluate(()=>{window.__originalSend=WebSocket.prototype.send;window.__droppedChoices=0;WebSocket.prototype.send=function(raw){let value;try{value=JSON.parse(raw);}catch{}if(value?.type==='relay'&&value.data?.k==='f'){value.data.ev=(value.data.ev||[]).filter(ev=>{if(['lu','lp','lr','hs','he','hp'].includes(ev[0])){window.__droppedChoices++;return false;}return true;});raw=JSON.stringify(value);}return window.__originalSend.call(this,raw);};});
     const ids=await b.evaluate(()=>Object.keys(G.Items.BY));await b.evaluate(id=>G.Game.player.equip(id),ids[0]);

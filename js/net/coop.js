@@ -28,7 +28,10 @@ G.Coop = (() => {
   // GB: era 7 y se iban unos 110 GB al día, el 12-10-2026) y 3 por el relé de
   // la Realtime Database (1 $ el GB: sólo si todo lo demás falla).
   const RATE_FAST = 1 / 15, RATE_TURN = 1 / 4, RATE_SLOW = 1 / 3;
-  const rateFor = u => (G.Net.slow(u) ? RATE_SLOW : G.Net.viaTurn(u) ? RATE_TURN : RATE_FAST);
+  const rateFor = u => {
+    const interval=typeof G.Net.interval==='function'?G.Net.interval(u):null;
+    return Number.isFinite(interval)&&interval>0?interval:(G.Net.slow(u)?RATE_SLOW:G.Net.viaTurn(u)?RATE_TURN:RATE_FAST);
+  };
   const NEAR = 950;                     // radio de enemigos que se mandan a cada uno
 
   let active = false, host = false, me = null, hostUid = null;
@@ -206,14 +209,14 @@ G.Coop = (() => {
         if (!m.connected) continue;
         m.flushT -= dt;
         if (m.flushT > 0) continue;
-        m.flushT = rateFor(m.uid);
+        m.flushT = Math.max(0,m.flushT + rateFor(m.uid));
         G.Net.send(m.uid, hostFrame(m));
       }
     } else {
       if (!stalled && performance.now() - lastHostAt > STALL_MS) { stalled = true; updateAway(); }
       flushT -= dt;
       if (flushT <= 0) {
-        flushT = rateFor(hostUid);
+        flushT = Math.max(0,flushT + rateFor(hostUid));
         G.Net.toHost({ k: 'f', p: myState(), ev: outEv });
         outEv = [];
       }
