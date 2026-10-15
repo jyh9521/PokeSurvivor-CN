@@ -1,10 +1,12 @@
 /* ============ camera.js — vista y transformación mundo<->pantalla ============
- * El ancho visible del mundo es constante (VIEW_W) sea cual sea el tamaño de
+ * Landscape uses VIEW_W; portrait uses PORTRAIT_VIEW_W for readable sprites.
+ * El ancho visible del mundo es constante por orientación sea cual sea el tamaño de
  * ventana, así el juego se siente igual en cualquier pantalla.
  */
 G.Camera = {
   x: 0, y: 0,
   scale: 1,
+  PORTRAIT_VIEW_W: 480,       // keep sprites readable on narrow upright screens
   VIEW_W: 768,              // un 20% más de vista que al principio (640)
   shake: 0,
   _sx: 0, _sy: 0,
@@ -18,7 +20,7 @@ G.Camera = {
 
   resize(cssW, cssH, dpr = 1) {
     this.dpr = dpr;
-    this.scale = Math.min(cssW / this.VIEW_W, cssH / this.MIN_VIEW_H);
+    this.scale = Math.min(cssW / (cssH > cssW ? this.PORTRAIT_VIEW_W : this.VIEW_W), cssH / this.MIN_VIEW_H);
     this.w = cssW / this.scale;
     this.h = cssH / this.scale;
   },

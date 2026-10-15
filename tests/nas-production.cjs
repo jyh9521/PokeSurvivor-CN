@@ -6,12 +6,13 @@ const {chromium}=require('playwright'),{createApp}=require('../server/app.cjs');
   const errors=[],external=[],checks=[];const check=(n,x)=>{assert.ok(x,n);checks.push(n);console.log('PASS',n);};
   try{
     await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+app.server.address().port;
-    browser=await chromium.launch({headless:true,channel:'chrome'});const ctx=await browser.newContext({locale:'zh-CN',viewport:{width:1280,height:800}});
+    browser=await chromium.launch({headless:true,channel:'chrome'});const ctx=await browser.newContext({locale:'zh-CN',viewport:process.env.PS_PORTRAIT==='1'?{width:390,height:844}:{width:1280,height:800},hasTouch:process.env.PS_PORTRAIT==='1',isMobile:process.env.PS_PORTRAIT==='1'});
     await ctx.addInitScript(()=>{window.__pad=null;Object.defineProperty(navigator,'getGamepads',{value:()=>window.__pad?[window.__pad]:[]});});
     // Service-worker routing bypasses Playwright routes, so observe every request.
     ctx.on('request',r=>{if(/^https?:/.test(r.url())&&new URL(r.url()).origin!==origin)external.push(r.url());});
     const p=await ctx.newPage();const press=async i=>{await p.evaluate(i=>window.__pad.buttons[i].pressed=true,i);await p.waitForTimeout(90);await p.evaluate(i=>window.__pad.buttons[i].pressed=false,i);await p.waitForTimeout(100);};p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept('production-nas-test'));
     await p.goto(origin+'/');await p.waitForFunction(()=>document.getElementById('boot').classList.contains('hidden'));if(await p.locator('#tap-start').isVisible())await p.locator('#tap-start').click();
+    if(process.env.PS_PORTRAIT==='1')check('installed app manifest permits both orientations',(await p.evaluate(()=>fetch('/manifest.webmanifest').then(r=>r.json()))).orientation==='any');
     check('published runtime stays private',await p.evaluate(()=>typeof window.G==='undefined'));
     check('NAS password policy and unavailable Google recovery reflected in UI',await p.locator('#f-pass').getAttribute('minlength')==='8'&&!(await p.locator('#f-forgot').isVisible()));
     await p.locator('[data-tab="register"]').click();await p.locator('#f-user').fill('ProdAlice');await p.locator('#f-pass').fill('production-nas-test');await p.locator('#btn-auth').click();await p.locator('#scr-test').waitFor({state:'visible'});

@@ -6,7 +6,7 @@
 G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const VERSION = '0.7.0 · 2026-10-15';
+  const VERSION = '0.7.1 · 2026-10-15';
   const REPO = G.PROJECT_REPO || 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 
@@ -48,8 +48,8 @@ G.SettingsUI = (() => {
     else {
       const el = document.documentElement;
       const p = (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
-      // En móvil, además se intenta fijar la pantalla en horizontal.
-      if (p && p.then) p.then(() => { try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) { /* nada */ } }).catch(() => {});
+      // Fullscreen follows the device orientation; never force a rotation.
+      if (p && p.catch) p.catch(() => {});
     }
     setTimeout(() => { if (isOpen()) render(); }, 300);
   }
@@ -91,7 +91,7 @@ G.SettingsUI = (() => {
            : iosTip() ? `<div class="set-row"><div class="grow"><b>Pantalla completa</b><small>${esc(IOS_TIP)}</small></div></div>` : '');
     } else if (tab === 'ctl') {
       box.innerHTML = section('Mando','')+'<p class=sub data-pad-controls></p>'+toggle('gamepad','Activar mando','Pulsa un botón para detectar el mando. Los campos de texto siguen usando teclado.')+toggle('rumble','Vibración del mando','Vibra al recibir daño real.')+'<button class="btn small" data-rumble-test>'+G.T('Probar vibración')+'</button><p class=sub data-rumble-status role=status></p>'+section('Iconos del mando','')+'<select class=field data-pad-layout aria-label="'+esc(G.T('Iconos del mando'))+'">'+[['auto','Auto'],['xbox','Xbox'],['playstation','PlayStation'],['nintendo','Nintendo']].map(([v,n])=>'<option value="'+v+'" '+(G.Settings.get('padLayout')===v?'selected':'')+'>'+n+'</option>').join('')+'</select>'+section('En móvil o tablet')
-        + `<p class="sub">Pon el dedo en cualquier parte y arrastra para moverte: el joystick aparece donde tocas. Toca un ataque de abajo para cambiarlo y el botón de arriba a la derecha para pausar. Se juega en horizontal.</p>`
+        + `<p class="sub">Arrastra para moverte; toca un ataque para cambiarlo y la esquina superior derecha para pausar. Puedes jugar en vertical u horizontal.</p>`
         + `<div class="set-row"><div class="grow"><b>Tamaño del joystick</b><small>Cuánto hay que arrastrar el dedo.</small></div></div>`
         + choice('stick', [[0.8, 'Pequeño'], [1, 'Normal'], [1.25, 'Grande']])
         + section('En PC')

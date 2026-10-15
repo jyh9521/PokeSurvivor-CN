@@ -1,0 +1,43 @@
+/* Real source runtime + authenticated NAS. Pad data is a controlled standard device,
+ * not physical-device acceptance. No native dialogs; modal tests use the game UI. */
+const fs=require('fs'),path=require('path'),os=require('os'),vm=require('vm'),assert=require('assert/strict');
+const {chromium}=require('playwright'),{createApp}=require('../server/app.cjs');
+const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,'artifacts/portrait');fs.mkdirSync(OUT,{recursive:true});
+(async()=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-pad-')),root=path.join(dir,'web');fs.mkdirSync(root);for(const n of ['js','css','assets'])fs.cpSync(path.join(ROOT,n),path.join(root,n),{recursive:true});for(const n of ['sw.js','version.json','manifest.webmanifest'])fs.copyFileSync(path.join(ROOT,n),path.join(root,n));fs.copyFileSync(path.join(ROOT,'dev.html'),path.join(root,'index.html'));
+ const app=createApp({dataDir:dir,root,campaigns:[]});let browser;const errors=[],checks=[];const check=(n,x)=>{checks.push({name:n,ok:!!x});console.log(x?'PASS':'FAIL',n);};
+ try{await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+app.server.address().port;const user=await app.store.credentials('PadPlayer','pad-password',true);const db=fs.readFileSync(path.join(ROOT,'js/core/db.js'),'utf8'),seed=vm.runInNewContext('const VERSION=3,START_COINS=500;'+db.slice(db.indexOf('  function newSave('),db.indexOf('  /** Rellena'))+'\nnewSave("PadPlayer")');seed.owned=Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16].map(d=>[d,{at:1,from:'fixture'}]));seed.partner=6;seed.coins=10000;seed.pupg={1:{hp:1}};seed.tickets={t1:15,t10:0};app.store.putSave(user,seed,0);
+ browser=await chromium.launch({channel:'chrome',headless:true});const ctx=await browser.newContext({locale:'zh-CN',viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2,serviceWorkers:'block'});await ctx.addCookies([{name:'ps_nas',value:app.store.session(user),url:origin,httpOnly:true,sameSite:'Strict'}]);await ctx.addInitScript(()=>{window.__pad={index:0,id:'Xbox Controller',connected:true,mapping:'standard',axes:[0,0],buttons:Array.from({length:17},()=>({pressed:false,value:0}))};Object.defineProperty(navigator,'getGamepads',{value:()=>window.__pad?[window.__pad]:[]});});const p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.stack));p.on('console',m=>{if(m.type()==='error'&&/TypeError|ReferenceError|bucle/i.test(m.text()))errors.push(m.text());});p.on('dialog',d=>{errors.push('Unexpected native dialog: '+d.type());d.dismiss();});await p.goto(origin);await p.waitForFunction(()=>typeof G==='object'&&G.NAS.enabled&&document.getElementById('boot').classList.contains('hidden'));const press=async i=>{await p.evaluate(i=>window.__pad.buttons[i].pressed=true,i);await p.waitForTimeout(90);await p.evaluate(i=>window.__pad.buttons[i].pressed=false,i);await p.waitForTimeout(100);};await p.waitForTimeout(180);if(await p.locator('#tap-start').isVisible())await press(0);await p.locator('#scr-menu').waitFor({state:'visible'});await p.evaluate(()=>window.__pad=null);
+
+
+
+ check('portrait boot has no mandatory rotation overlay',await p.locator('#rotate').count()===0&&await p.evaluate(()=>G.Touch.active));
+ const initial=app.store.getSave(user.id);
+ for(const size of [{width:320,height:568},{width:360,height:780},{width:390,height:844},{width:430,height:932}]){
+  await p.setViewportSize(size);await p.waitForTimeout(200);await p.evaluate(()=>document.getElementById('scr-menu').scrollTop=0);
+  check('topbar remains entirely inside '+size.width,await p.locator('#topbar').evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0;}));
+  check('menu has no horizontal overflow '+size.width,await p.locator('#scr-menu').evaluate(el=>el.scrollWidth<=el.clientWidth+1));
+  await p.screenshot({path:path.join(OUT,'menu-'+size.width+'.png')});
+  for(const go of ['dex','upgrades','gacha','goals','friends','rank']){
+   await p.locator('[data-go="'+go+'"]').tap();await p.waitForTimeout(250);
+   const id={dex:'scr-dex',upgrades:'scr-upgrades',gacha:'scr-gacha',goals:'scr-goals',friends:'scr-friends',rank:'scr-rank'}[go];
+   check(go+' box fits portrait '+size.width,await p.locator('#'+id+' > .box').evaluate(el=>{const r=el.getBoundingClientRect();return r.x>=0&&r.right<=innerWidth+1&&r.y>=0&&r.bottom<=innerHeight+1&&el.scrollWidth<=el.clientWidth+2;}));
+   if(size.width===390)await p.screenshot({path:path.join(OUT,go+'.png')});
+   await p.locator('#'+id+' [data-back]').first().tap();
+  }
+ }
+ await p.setViewportSize({width:390,height:844});await p.locator('[data-go=settings]').tap();await p.locator('#set-tabs [data-t=acc]').tap();await p.locator('#nas-nickname').scrollIntoViewIfNeeded();await p.locator('#nas-nickname').tap();await p.setViewportSize({width:390,height:450});await p.locator('#nas-nickname-save').scrollIntoViewIfNeeded();check('nickname remains reachable in keyboard-sized viewport',await p.locator('#nas-nickname-save').isVisible());await p.setViewportSize({width:390,height:844});await p.locator('#set-close').tap();
+ await p.evaluate(()=>{G.Game.startRun();window.__player=G.Game.player;for(const id of G.Moves.ALL.map(m=>m.id)){G.Game.player.addMove(id);if(G.Game.player.slots.length===4)break;}G.Game.player.active=0;G.Game.player.bonds=0;G.Settings.set('showHitbox',true);});await p.waitForTimeout(200);
+ const layout=await p.evaluate(()=>G.HUD.layout(innerWidth,innerHeight,4,true,G.Touch.safeArea()));
+ const cdp=await ctx.newCDPSession(p);const point=(id,x,y)=>({id,x,y,radiusX:3,radiusY:3,force:1});
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point(1,55,580)]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[point(1,110,580)]});const x=await p.evaluate(()=>G.Game.player.x);await p.waitForTimeout(350);check('real browser touch joystick moves player in portrait',await p.evaluate(x=>G.Game.player.x>x+10,x));
+ const move=layout.slots[1];await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point(1,110,580),point(2,move.x+move.w/2,move.y+move.h/2)]});await p.waitForTimeout(120);check('second touch switches attack while joystick stays held',await p.evaluate(()=>G.Game.player.active===1&&G.Touch.vector()?.[0]>0));await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ check('released touch clears movement vector',await p.evaluate(()=>G.Touch.vector()===null));
+ await p.screenshot({path:path.join(OUT,'gameplay-portrait.png')});
+ await p.touchscreen.tap(layout.pause.x+22,layout.pause.y+22);await p.locator('#scr-pause').waitFor();check('portrait canvas pause target opens original pause UI',await p.evaluate(()=>G.Game.state==='paused'));await p.locator('#btn-resume').tap();
+ const time=await p.evaluate(()=>G.Game.st.time);await p.setViewportSize({width:844,height:390});await p.waitForTimeout(200);check('rotation keeps the same running player and time',await p.evaluate(t=>G.Game.state==='playing'&&G.Game.player===window.__player&&G.Game.st.time>=t,time));
+ await p.setViewportSize({width:390,height:844});await p.waitForTimeout(200);check('returning upright neither pauses nor resets the run',await p.evaluate(()=>G.Game.state==='playing'&&G.Game.player===window.__player&&Math.abs(G.Camera.w-480)<.01));
+ await p.evaluate(()=>{G.Game.togglePause();G.RunUI.showLevelUp(2,G.LevelUp.offer(G.Game.player),()=>G.RunUI.closeLevelUp());});await p.waitForTimeout(250);check('portrait skill choices fit and remain scrollable',await p.locator('#scr-levelup > .box').evaluate(el=>el.scrollWidth<=el.clientWidth+1&&el.getBoundingClientRect().bottom<=innerHeight));await p.locator('#cards .card').last().scrollIntoViewIfNeeded();await p.locator('#cards .card').last().tap();check('touch can select a skill at the end of the list',await p.locator('#cards').evaluate(el=>el.classList.contains('done')||document.getElementById('scr-levelup').classList.contains('hidden')));
+ check('layout and rotation leave persisted account/save intact',app.store.getUser(user.id).name==='PadPlayer'&&app.store.getSave(user.id).save.partner===initial.save.partner);
+ const failed=checks.filter(c=>!c.ok);fs.writeFileSync(path.join(OUT,'BROWSER.json'),JSON.stringify({checks,errors},null,2));assert.deepEqual(errors,[]);assert.equal(failed.length,0,JSON.stringify(failed));console.log('PASS PORTRAIT_BROWSER: '+checks.length+' checks; errors=0');
+ }finally{if(browser)await browser.close();await app.close();fs.rmSync(dir,{recursive:true,force:true});}
+})().catch(e=>{console.error(e);process.exitCode=1;});

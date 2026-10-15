@@ -11,7 +11,7 @@ fs.mkdirSync(OUT,{recursive:true});
   try{
     await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+app.server.address().port;
     browser=await chromium.launch({headless:true,channel:'chrome'});
-    const context=async()=>{const c=await browser.newContext({locale:'zh-CN',viewport:{width:1280,height:800},serviceWorkers:'block'});await c.addInitScript(()=>{window.RTCPeerConnection=undefined;});await c.route('**/*',route=>{const u=new URL(route.request().url());if(u.origin!==origin&&/^https?:$/.test(u.protocol)){external.push(u.href);return route.abort();}return route.continue();});return c;};
+    const context=async()=>{const c=await browser.newContext({locale:'zh-CN',viewport:process.env.PS_PORTRAIT==='1'?{width:390,height:844}:{width:1280,height:800},hasTouch:process.env.PS_PORTRAIT==='1',isMobile:process.env.PS_PORTRAIT==='1',serviceWorkers:'block'});await c.addInitScript(()=>{window.RTCPeerConnection=undefined;});await c.route('**/*',route=>{const u=new URL(route.request().url());if(u.origin!==origin&&/^https?:$/.test(u.protocol)){external.push(u.href);return route.abort();}return route.continue();});return c;};
     const ca=await context(),cb=await context();
     const open=async c=>{const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());await p.goto(origin+'/');await p.waitForFunction(()=>G.NAS.enabled&&document.getElementById('boot').classList.contains('hidden'));if(await p.locator('#tap-start').isVisible())await p.locator('#tap-start').click();return p;};
     const a=await open(ca),b=await open(cb);
@@ -59,6 +59,12 @@ fs.mkdirSync(OUT,{recursive:true});
     await a.waitForFunction(()=>G.Social.room.members.length===2);await a.evaluate(()=>G.Social.setReady(true));await b.evaluate(()=>G.Social.setReady(true));await a.locator('#lobby-start').click();
     await a.waitForFunction(()=>G.Game.state==='playing'&&G.Coop.active);await b.waitForFunction(()=>G.Game.state==='playing'&&G.Coop.active);
     check('two real game instances enter shared NAS-relayed run',await a.evaluate(()=>G.Coop.isHost&&G.Coop.puppets().length===1)&&await b.evaluate(()=>!G.Coop.isHost&&G.Coop.puppets().length===1));
+    if(process.env.PS_PORTRAIT==='1'){
+      await b.evaluate(()=>{window.__rotatedPlayer=G.Game.player;window.__rotatedRoom=G.Social.room.id;});
+      await b.setViewportSize({width:844,height:390});await b.waitForTimeout(200);await b.setViewportSize({width:390,height:844});await b.waitForTimeout(200);
+      check('portrait co-op rotation keeps player, room and running state',await b.evaluate(()=>G.Game.player===window.__rotatedPlayer&&G.Social.room.id===window.__rotatedRoom&&G.Game.state==='playing'));
+      await b.evaluate(()=>G.TeamUI.update());check('portrait team shortcuts fit screen with touch-sized targets',await b.locator('.team-actions button').evaluateAll(items=>items.every(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.height>=38;})));
+    }
     await a.waitForFunction(()=>G.Net.stats().nasRttMs!=null&&G.Net.stats().peerRttMs!=null&&G.Net.stats().sendHz>=10&&G.Net.stats().receiveHz>=10);
     await a.waitForTimeout(2200);
     const network=await a.evaluate(()=>G.Net.stats());fs.writeFileSync('artifacts/relay-diagnostics/real-room-metrics.json',JSON.stringify(network,null,2));
