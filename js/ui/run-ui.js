@@ -226,6 +226,7 @@ G.RunUI = (() => {
     $('pause-coop').classList.toggle('hidden', !coop);
     $('btn-quit').textContent = coop ? 'Salir de la partida' : 'Abandonar run';
     G.UI.show('scr-pause');
+    $('btn-resume').focus({preventScroll:true});
   }
 
   function wirePause(onResume, onQuit) {

@@ -517,28 +517,29 @@ G.Game = (() => {
 
   function handleKeys() {
     if(G.Dialog?.open||G.MenuUI.upgradeBusy)return;
+    if(G.Input.tap('escape')&&G.UIFocus.top()){G.UIFocus.back(G.UIFocus.top());return;}
     if (G.SettingsUI.isOpen) { if (G.Input.tap('escape')) G.SettingsUI.close(); return; }
     // La Sentencia de Arceus: Espacio, Intro o Esc saltan la animación (si se puede).
     if (G.Judgment.cinematic && state === 'playing') {
       if (['space', 'enter', 'escape'].some(k => G.Input.tap(k))) G.Judgment.skip();
       return;
     }
-    if (state === 'levelup') {
+    if (state === 'levelup'||G.UI.isOpen('scr-levelup')) {
       for (let i = 0; i < 3; i++) {
-        if (G.Input.tap('digit' + (i + 1)) || G.Input.tap('numpad' + (i + 1))) G.RunUI.pick(i);
+        if (G.Input.action('slots',i)) G.RunUI.pick(i);
       }
-      if (G.Input.tap('keyr')) G.RunUI.reroll();
+      if (G.Input.action('reroll')) G.RunUI.reroll();
       return;
     }
     if (G.UI.isOpen('scr-bond')) {
       for (let i = 0; i < 4; i++) {
-        if (G.Input.tap('digit' + (i + 1)) || G.Input.tap('numpad' + (i + 1))) G.RunUI.pickBond(i);
+        if (G.Input.action('slots',i)) G.RunUI.pickBond(i);
       }
       return;
     }
     if (G.UI.isOpen('scr-item')) {
       for (let i = 0; i < 2; i++) {
-        if (G.Input.tap('digit' + (i + 1)) || G.Input.tap('numpad' + (i + 1))) document.querySelectorAll('#item-cards .card')[i].click();
+        if (G.Input.action('slots',i)) document.querySelectorAll('#item-cards .card')[i].click();
       }
       return;
     }
@@ -548,13 +549,13 @@ G.Game = (() => {
           && document.getElementById('pull-fx').classList.contains('hidden')) G.MenuUI.open();
       return;
     }
-    if (G.Input.tap('escape') || G.Input.tap('keyp')) { togglePause(); return; }
+    if (G.Input.action('pause')) { togglePause(); return; }
     if (state !== 'playing' || !pl) return;
     for (let i = 0; i < 4; i++) {
-      if (G.Input.tap('digit' + (i + 1)) || G.Input.tap('numpad' + (i + 1))) pl.setActive(i);
+      if (G.Input.action('slots',i)) pl.setActive(i);
     }
-    if (G.Input.tap('keyq')) pl.cycle(-1);
-    if (G.Input.tap('keye') || G.Input.tap('tab')) pl.cycle(1);
+    if (G.Input.action('previous')) pl.cycle(-1);
+    if (G.Input.action('next')) pl.cycle(1);
   }
 
   // ---------------- bucle ----------------
@@ -709,7 +710,8 @@ G.Game = (() => {
     // Todo lo que tiene "pies" se ordena por Y: objetos, enemigos, jugador.
     const items = [];
     // Los planos (manantiales, trampas) siempre debajo de todo lo demás.
-    for (const p of G.World.visibleProps(cam)) items.push({ y: p.flat ? p.y - 4000 : p.y, prop: p });
+    const props=G.World.visibleProps(cam);
+    for (const p of props) items.push({ y: p.flat ? p.y - 4000 : p.y, prop: p });
     for (const e of G.EnemyMgr.drawables(cam)) items.push({ y: e.y, ent: e });
     for (const e of extra) items.push({ y: e.y, ent: e });
     const rift = G.Rift.drawable();
@@ -720,8 +722,9 @@ G.Game = (() => {
     items.sort((a, b) => a.y - b.y);
     for (const it of items) {
       if (it.prop) G.World.drawProp(ctx, it.prop, t);
-      else it.ent.draw(ctx);
+      else it.ent?.draw(ctx);
     }
+    if(state!=='ui')G.Occlusion.draw(ctx,extra.filter(Boolean),props,t,frameDt);
   }
 
   function render() {
@@ -750,7 +753,6 @@ G.Game = (() => {
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     }
-    if(pl&&G.Settings.get('playerOutline')){ctx.save();ctx.scale(G.Camera.scale,G.Camera.scale);G.Camera.apply(ctx);pl.highlight(ctx);ctx.restore();}
     if (!G.Judgment.cinematic) G.HUD.draw(ctx, w, h, pl, st);
     G.Judgment.drawOverlay(ctx, w, h);
     G.Touch.draw(ctx);

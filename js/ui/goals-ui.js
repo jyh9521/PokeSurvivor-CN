@@ -32,6 +32,7 @@
     function render() {
       document.querySelectorAll('#goals-tabs .tab').forEach(t => t.classList.toggle('on', t.dataset.tab === tab));
       const box = $('goals-body');
+      delete box.dataset.uiLayer;
       box.innerHTML = '';
       if (tab === 'missions') missions(box);
       else if (tab === 'ach') achievements(box);
@@ -53,6 +54,11 @@
 
     function missions(box) {
       const M = G.DB.save.missions;
+      const actions=document.createElement('div');actions.className='row wrap between';
+      const note=document.createElement('span');note.className='sub';note.textContent=G.T('Todas las diarias y semanales completadas');
+      const all=document.createElement('button');all.id='goals-claim-all';all.className='btn small gold';all.textContent=G.T('Recoger todos los premios');all.disabled=!G.Progress.pending();
+      all.onclick=()=>{all.disabled=true;const count=G.Progress.claimAll();if(count){G.Audio.sfx('buy');G.UI.refreshCoins();}render();};
+      actions.append(note,all);box.appendChild(actions);
       const section = (title, list, weekly) => {
         box.insertAdjacentHTML('beforeend', `<div class="row between goals-h"><h3>${title}</h3>
           <span class="sub">Se renuevan en ${untilText(weekly ? 'w' : 'd')}</span></div>`);
@@ -158,7 +164,7 @@
       for (let i = 0; i < 3; i++) {
         const f = P.favs[i];
         const slot = document.createElement('div');
-        slot.className = 'fav-slot';
+        slot.className = 'fav-slot';slot.dataset.focusKey='favorite-'+i;
         if (f && G.DEX_BY[f.dex]) {
           slot.appendChild(G.UI.spriteCanvas(f.dex, 120, 100, { scale: 2, lively: true, shiny: !!f.shiny }));
           slot.insertAdjacentHTML('beforeend', `<b>${f.shiny ? G.Icons.html('shiny', 12) + ' ' : ''}${esc(G.DEX_BY[f.dex].name)}</b>`);
@@ -188,8 +194,9 @@
     function pickFav(i) {
       const s = G.DB.save;
       const box = $('goals-body');
+      box.dataset.uiLayer='';
       box.innerHTML = `<div class="row between"><h3>Elige el favorito ${i + 1}</h3>
-        <button class="btn small ghost" id="fav-back">Volver</button></div>
+        <button class="btn small ghost" id="fav-back" data-ui-back>Volver</button></div>
         <input class="field" id="fav-q" placeholder="Buscar por nombre" style="max-width:320px;margin:6px 0 10px">
         <div class="grid" id="fav-grid"></div>`;
       $('fav-back').onclick = () => { tab = 'profile'; render(); };

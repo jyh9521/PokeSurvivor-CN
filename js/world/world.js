@@ -489,6 +489,15 @@ G.World = (() => {
     return out;
   }
 
+  function propFrames(p){
+    const variant=p.type==='grass'?(Math.sin(performance.now()/1000*2.4+p.wiggle)>.55?1:0):p.type==='rock'?(p.hp<p.maxHp*.5?1:0):p.type==='altar'?p.kind*2+(p.used?1:0):p.type==='spring'?(p.charge<.15?1:0):p.type==='trap'?p.kind:0;
+    const k=fadeK(),out=[{img:G.Tiles.propSprite(biome,p.type,variant),alpha:k==null?1:k}];
+    if(k!=null)out.unshift({img:G.Tiles.propSprite(fade.from,p.type,variant),alpha:1-k});
+    return out.map(f=>({...f,x:Math.round(p.x-f.img.width*G.Sprites.PX/2),y:Math.round(p.y-f.img.height*G.Sprites.PX+(p.type==='grass'?4:2)),w:f.img.width*G.Sprites.PX,h:f.img.height*G.Sprites.PX}));
+  }
+  function propBounds(p){return propFrames(p);}
+  function drawOccluder(ctx,p){for(const f of propFrames(p)){ctx.save();ctx.globalAlpha*=f.alpha;ctx.drawImage(f.img,f.x,f.y,f.w,f.h);ctx.restore();}}
+
   function drawProp(ctx, p, t) {
     const P = G.Sprites.PX;
     const variant = p.type === 'grass' ? (Math.sin(t * 2.4 + p.wiggle) > 0.55 ? 1 : 0)
@@ -603,7 +612,7 @@ G.World = (() => {
         if (Math.abs(cx * N + N / 2 - a.tx) < R + N && Math.abs(cy * N + N / 2 - a.ty) < R + N) { data.delete(k); images.delete(k); }
       }
     },
-    get arena() { return arena; }, drawGround, drawLiquid, visibleProps, drawProp, drawVignette,
+    get arena() { return arena; }, drawGround, drawLiquid, visibleProps, drawProp, propBounds, drawOccluder, drawVignette,
     get biome() { return biome; }
   };
 })();

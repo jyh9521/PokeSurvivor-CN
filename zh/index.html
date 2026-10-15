@@ -118,7 +118,7 @@
     <p class="sub">Los iniciales de todas las regiones, y dos amigos más.</p>
     <div class="grid" id="starter-grid"></div>
     <div class="row between" style="margin-top:14px">
-      <button id="starter-back" class="btn ghost">Volver</button>
+      <button id="starter-back" data-ui-back class="btn ghost">Volver</button>
       <span id="starter-info" class="grow" style="color:var(--muted)"></span>
       <button id="starter-ok" class="btn gold" disabled>Elegir</button>
     </div>
@@ -126,7 +126,7 @@
 </section>
 
 <!-- ====== Menú principal ====== -->
-<section id="scr-menu" class="scr hidden">
+<section id="scr-menu" data-ui-chrome class="scr hidden">
   <div class="menu-left">
     <div class="logo">
       <div class="t1">PokéSurvivor</div>
@@ -169,13 +169,13 @@
   <button id="btn-settings" class="btn small ghost" title="Ajustes"></button>
   <button id="btn-logout" class="btn small ghost">Salir</button>
 </div>
-<div id="sound-panel" class="box sound-panel hidden"></div>
+<div id="sound-panel" data-ui-layer class="box sound-panel hidden"></div>
 <div id="credits-line" class="credits-line hidden">Proyecto de fan sin ánimo de lucro · Sprites: SpriteCollab (CC BY-NC 4.0) · Pokémon © Nintendo/Creatures/GAME FREAK · <a href="#" class="legal-link" data-legal>Aviso legal</a></div>
 
 <!-- ====== Novedades (cambios del juego) ====== -->
 <section id="scr-news" class="scr dim hidden">
   <div class="box news-box">
-    <div class="row between"><h2>Novedades</h2><button class="btn small ghost" id="news-close">Cerrar</button></div>
+    <div class="row between"><h2>Novedades</h2><button class="btn small ghost" id="news-close" data-ui-back>Cerrar</button></div>
     <div id="news-body" class="news-body"></div>
   </div>
 </section>
@@ -188,7 +188,7 @@
     <p class="err" id="rec-err"></p>
     <div class="row" style="gap:8px;flex-wrap:wrap">
       <button class="btn gold grow" id="rec-link" type="button">Vincular mi Gmail</button>
-      <button class="btn ghost" id="rec-later" type="button">Ahora no</button>
+      <button class="btn ghost" id="rec-later" data-ui-back type="button">Ahora no</button>
     </div>
     <p class="note center"><a href="#" id="rec-never">No volver a preguntar</a></p>
   </div>
@@ -197,7 +197,7 @@
 <!-- ====== Apoyar el proyecto (donaciones) ====== -->
 <section id="scr-support" class="scr dim hidden">
   <div class="box support">
-    <div class="row between"><h2>Apoyar el proyecto</h2><button class="btn small ghost" id="sup-close">Cerrar</button></div>
+    <div class="row between"><h2>Apoyar el proyecto</h2><button class="btn small ghost" id="sup-close" data-ui-back>Cerrar</button></div>
     <div id="sup-body"></div>
   </div>
 </section>
@@ -205,7 +205,7 @@
 <!-- ====== Ajustes ====== -->
 <section id="scr-settings" class="scr dim hidden">
   <div class="box settings">
-    <div class="row between"><h2>Ajustes</h2><button class="btn small ghost" id="set-close">Cerrar</button></div>
+    <div class="row between"><h2>Ajustes</h2><button class="btn small ghost" id="set-close" data-ui-back>Cerrar</button></div>
     <div class="tabs" id="set-tabs">
       <button class="gen-tab" data-t="sound">Sonido</button>
       <button class="gen-tab" data-t="gfx">Gráficos</button>
@@ -220,7 +220,7 @@
 <!-- ====== Aviso legal y privacidad ====== -->
 <section id="scr-legal" class="scr dim hidden">
   <div class="box legal" style="width:min(640px,100%)">
-    <div class="row between"><h2>Aviso legal</h2><button class="btn small ghost" id="legal-close">Cerrar</button></div>
+    <div class="row between"><h2>Aviso legal</h2><button class="btn small ghost" id="legal-close" data-ui-back>Cerrar</button></div>
     <h3>Proyecto de fan</h3>
     <p><b>PokéSurvivor</b> es un juego hecho por fans, <b>gratuito y sin ánimo de lucro</b>.
       Esta edición no tiene anuncios, compras ni donaciones.</p>
@@ -277,7 +277,7 @@
     }
   })();
 </script>
-<div id="tap-start" class="tapstart hidden">
+<div id="tap-start" data-ui-layer class="tapstart hidden">
   <div class="boot-in">
     <h1>PokéSurvivor</h1>
     <p>Sobrevive a las hordas con tu compañero Pokémon</p>
@@ -305,7 +305,7 @@
       <p id="nick-err" class="err"></p>
       <div class="row"><button id="nick-ok" class="btn gold grow" type="submit">Guardar apodo</button></div>
     </form>
-    <div class="row" style="margin-top:8px"><button id="nick-later" class="btn ghost grow" type="button">Ahora no</button></div>
+    <div class="row" style="margin-top:8px"><button id="nick-later" data-ui-back class="btn ghost grow" type="button">Ahora no</button></div>
   </div>
 </section>
 
@@ -328,7 +328,7 @@
 <section id="scr-lobby" class="scr dim hidden">
   <div class="box wide">
     <div class="row between"><h2>Sala</h2>
-      <div class="row"><button id="lobby-menu" class="btn small ghost">Menú</button><button id="lobby-leave" class="btn small ghost">Salir de la sala</button></div></div>
+      <div class="row"><button id="lobby-menu" data-ui-back class="btn small ghost">Menú</button><button id="lobby-leave" class="btn small ghost">Salir de la sala</button></div></div>
     <p class="sub" id="lobby-sub"></p>
     <div id="lobby-members" class="lobby-members"></div>
     <h3 id="lobby-inv-title" style="margin:14px 0 6px">Invitar amigos</h3>
@@ -361,7 +361,7 @@
 <!-- ====== Moderación del ranking (sólo la cuenta de admin, ver js/ui/mod-ui.js) ====== -->
 <section id="scr-mod" class="scr dim hidden">
   <div class="box wide">
-    <div class="row between"><h2>Moderación</h2><span class="row" style="gap:6px"><button class="btn small danger" id="mod-purge">Quitar marcas de más de 1 hora</button><button class="btn small ghost" id="mod-back">Volver</button></span></div>
+    <div class="row between"><h2>Moderación</h2><span class="row" style="gap:6px"><button class="btn small danger" id="mod-purge">Quitar marcas de más de 1 hora</button><button class="btn small ghost" id="mod-back" data-ui-back>Volver</button></span></div>
     <div class="tabs" id="mod-tabs">
       <div class="tab on" data-tab="rep">Reportes</div>
       <div class="tab" data-tab="sus">Cuentas marcadas</div>
@@ -386,17 +386,17 @@
 <!-- ====== Perfil público de un jugador ====== -->
 <section id="scr-profile" class="scr dim hidden">
   <div class="box profile-box">
-    <div class="row end"><button class="btn small ghost" id="prof-close">Cerrar</button></div>
+    <div class="row end"><button class="btn small ghost" id="prof-close" data-ui-back>Cerrar</button></div>
     <div id="prof-body"></div>
   </div>
 </section>
 
 <!-- ====== Invitación recibida ====== -->
-<div id="invite-pop" class="box invite-pop hidden">
+<div id="invite-pop" data-ui-layer class="box invite-pop hidden">
   <div id="inv-text"></div>
   <div class="row" style="margin-top:10px">
     <button id="inv-yes" class="btn gold small grow" data-sfx="confirm">Unirme</button>
-    <button id="inv-no" class="btn ghost small">No, gracias</button>
+    <button id="inv-no" data-ui-back class="btn ghost small">No, gracias</button>
   </div>
 </div>
 
@@ -428,6 +428,7 @@
           <select id="upg-mon" class="field" style="width:auto;min-width:220px"></select>
         </div>
       </div>
+      <div id="upg-actions"></div>
     </div>
     <div class="upg" id="upg-list"></div>
   </div>
@@ -460,10 +461,10 @@
   </div>
 </section>
 
-<div id="pull-fx" class="hidden">
+<div id="pull-fx" data-ui-layer class="hidden">
   <canvas id="slot" width="176" height="170" title="Clic para acelerar"></canvas>
   <div class="pull-results" id="pull-results"></div>
-  <button id="pull-close" class="btn gold hidden">Continuar</button>
+  <button id="pull-close" data-ui-back class="btn gold hidden">Continuar</button>
 </div>
 
 <!-- ====== Durante la run ====== -->
@@ -473,7 +474,7 @@
     <p class="sub pad-only" data-pad-choice="reroll"></p>
     <p class="sub keyboard-only">Elige una recompensa · <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></p>
     <div id="cards" class="cards"></div>
-    <button id="lvl-reroll" class="btn small ghost hidden" data-sfx="none" style="margin-top:10px">Cambiar opciones (<span id="lvl-rr-n">1</span>) · <kbd class="keyboard-only">R</kbd><kbd class="pad-only" data-pad-glyph="2"></kbd></button>
+    <button id="lvl-reroll" data-pad-shortcut="2" class="btn small ghost hidden" data-sfx="none" style="margin-top:10px">Cambiar opciones (<span id="lvl-rr-n">1</span>) · <kbd class="keyboard-only" data-key-action="reroll">R</kbd><kbd class="pad-only" data-pad-glyph="2"></kbd></button>
     <p id="lvl-wait" class="note hidden"></p>
   </div>
 </section>
@@ -485,7 +486,7 @@
     <p class="sub bond-hint">Los movimientos unidos se lanzan a la vez y ocupan un solo hueco</p>
     <p id="bond-sub" class="sub"></p>
     <div id="bond-cards" class="cards"></div>
-    <div class="row" style="justify-content:center"><button id="bond-back" class="btn hidden">Atrás</button></div>
+    <div class="row" style="justify-content:center"><button id="bond-back" data-ui-back class="btn hidden">Atrás</button></div>
   </div>
 </section>
 
@@ -501,13 +502,13 @@
 <section id="scr-pause" class="scr dim hidden">
   <div class="box center" style="width:min(460px,100%)">
     <h2>Pausa</h2>
-    <p class="sub kbd-hint keyboard-only"><kbd>WASD</kbd> moverse · <kbd>1</kbd>–<kbd>4</kbd> movimiento · <kbd>Q</kbd>/<kbd>E</kbd> ciclar · <kbd>Esc</kbd> pausa</p>
-    <p class="sub pad-only"><span data-pad-glyph="4"></span>/<span data-pad-glyph="5"></span> · Cambiar ataque · <span data-pad-glyph="9"></span> · Pausa</p>
+    <p class="sub kbd-hint keyboard-only"><kbd data-key-move>WASD</kbd> moverse · <kbd>1</kbd>–<kbd>4</kbd> movimiento · <kbd data-key-action="previous">Q</kbd>/<kbd data-key-action="next">E</kbd> ciclar · <kbd data-key-action="pause">Esc/P</kbd> pausa</p>
+    <p class="sub pad-only" data-pad-controls></p>
     <p class="sub touch-hint">Arrastra el dedo para moverte · toca un ataque para cambiarlo</p>
     <p id="pause-coop" class="note hidden">Partida en grupo: el juego sigue mientras estás aquí.</p>
     <div id="pause-sound" class="sound-inline"></div>
     <div class="row" style="justify-content:center">
-      <button id="btn-resume" class="btn gold">Continuar</button>
+      <button id="btn-resume" data-ui-back class="btn gold">Continuar</button>
       <button id="btn-pause-settings" class="btn">Ajustes</button>
       <button id="btn-quit" class="btn">Abandonar run</button>
     </div>
@@ -518,11 +519,11 @@
   <div class="box center" style="width:min(480px,100%)">
     <h2 id="over-title">Has caído…</h2>
     <div id="over-stats" class="stats"></div>
-    <button id="btn-again" class="btn gold">Volver al menú</button>
+    <button id="btn-again" data-ui-back class="btn gold">Volver al menú</button>
   </div>
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=c8d38b3562"></script>
+<script defer src="js/app.min.js?v=c8d6ac14fc"></script>
 </body>
 </html>

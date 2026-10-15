@@ -1,6 +1,6 @@
 {
   "name": "pokesurvivor-cn",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Simplified Chinese local and self-hosted NAS edition with dual saves, co-op and leaderboards",
   "scripts": {
@@ -13,10 +13,12 @@
     "test:reproducible": "node tools/check-repeat-build.cjs",
     "test:transaction": "node tools/verify-local-transaction.cjs",
     "start:nas": "node server/start.cjs",
-    "test:nas": "node --test tests/nas-backend.test.cjs tests/nas-rewards.test.cjs tests/coop-rift.test.cjs tests/relay-health.test.cjs tests/community-features.test.cjs tests/playability.test.cjs tests/gamepad.test.cjs",
+    "test:nas": "node --test tests/nas-backend.test.cjs tests/nas-rewards.test.cjs tests/coop-rift.test.cjs tests/relay-health.test.cjs tests/community-features.test.cjs tests/playability.test.cjs tests/gamepad.test.cjs tests/interaction.test.cjs",
     "test:nas:browser": "node tests/nas-browser.cjs",
     "backup:nas": "node server/backup.cjs",
-    "test:nas:production": "node tests/nas-production.cjs"
+    "test:nas:production": "node tests/nas-production.cjs",
+    "test:interaction": "node --test tests/interaction.test.cjs",
+    "test:interaction:browser": "node tests/interaction-browser.cjs"
   },
   "devDependencies": {
     "javascript-obfuscator": "4.1.1",

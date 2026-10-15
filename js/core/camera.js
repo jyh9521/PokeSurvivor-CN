@@ -34,6 +34,11 @@ G.Camera = {
     } else { this._sx = this._sy = 0; }
   },
 
+  damage(ratio) {
+    const amount=(0.42+Math.min(1,Math.max(0,ratio))*0.4)*(G.Settings.get('calm')?0.25:1);
+    this.shake=Math.max(this.shake,amount); // replace, never accumulate damage kicks
+  },
+
   kick(amount) {
     if (G.Settings.get('calm')) amount *= 0.25;      // "menos sacudidas"
     this.shake = Math.min(1.2, this.shake + amount);

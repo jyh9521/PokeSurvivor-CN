@@ -242,7 +242,7 @@ G.MenuUI = (() => {
     const lv = d => Object.values(s.pupg[d] || {}).reduce((a, b) => a + b, 0);
     const mons = Object.keys(s.owned).map(Number).filter(d => G.DEX_BY[d])
       .sort((a, b) => (b === s.partner) - (a === s.partner) || lv(b) - lv(a) || a - b);
-    sel.innerHTML = mons.map(d => `<option value="${d}">${G.DEX_BY[d].name}${d === s.partner ? ' (compañero)' : ''}${lv(d) ? ' · ' + lv(d) + ' niveles' : ''}</option>`).join('');
+    sel.innerHTML = mons.map(d => `<option value="${d}">${G.DEX_BY[d].name}${d === s.partner ? ' (compañero)' : ''}${lv(d) ? ' · ' + G.I18n.f('{x} niveles',lv(d)) : ''}</option>`).join('');
     sel.value = upgDex;
     sel.onchange = () => { upgDex = +sel.value; G.Audio.sfx('select'); renderUpgrades(); };
     renderUpgrades();
@@ -274,15 +274,18 @@ G.MenuUI = (() => {
           <button class="btn small ${maxed ? '' : 'gold'}" data-buy data-sfx="none" ${upgradeBusy||maxed || s.coins < cost ? 'disabled' : ''}>
           ${maxed ? 'Máx.' : `<span class="coin"></span> ${cost}`}</button></div>`;
       if (u.id === 'ban' && lvl > 0) el.querySelector('[data-ban]').onclick = () => { banOpen = !banOpen; renderUpgrades(); };
-      el.querySelector('[data-buy]').onclick = () => {
+      el.querySelector('[data-buy]').onclick = async () => {
         // Se vuelve a leer todo al pulsar (la partida puede haber cambiado desde que se dibujó).
         if(upgradeBusy)return;const sv = G.DB.save, lv = G.DB.upgradesOf(upgDex), now = lv[u.id] || 0;
         if (now >= u.max) { renderUpgrades(); return; }
         const price = G.Upgrades.cost(u.id, now);
         if (sv.coins < price) { renderUpgrades(); return; }
-        sv.coins -= price;
-        lv[u.id] = now + 1;
-        G.DB.commit(true);
+        upgradeBusy=true;
+        let result;
+        try{if(G.NAS?.enabled&&!G.DB.guest)result=await G.NAS.upgrade('buy',upgDex,u.id);
+        else{result={ok:true,...G.Upgrades.purchase(sv,upgDex,u.id)};G.DB.commit(true);}}
+        finally{upgradeBusy=false;}
+        if(!result?.ok){G.UI.toast(result?.error||G.T('Error'));renderUpgrades();return;}
         G.Audio.sfx('buy');
         G.UI.refreshCoins();
         G.UI.toast(`${mon.name} · ${u.name}: nivel ${now + 1}`);
@@ -293,10 +296,10 @@ G.MenuUI = (() => {
     }
     const actions=document.createElement('div');actions.className='row wrap';
     const buy=document.createElement('button');buy.id='upg-bulk';buy.className='btn gold';buy.textContent=G.T('Mejorar al máximo posible');
-    const refund=document.createElement('button');refund.id='upg-refund';refund.className='btn';refund.textContent=G.T('Devolver todas las mejoras');refund.disabled=upgradeBusy||!G.Upgrades.refundable(s);
+    const refund=document.createElement('button');refund.id='upg-refund';refund.className='btn danger';refund.textContent=G.T('Devolver todas las mejoras');refund.disabled=upgradeBusy||!G.Upgrades.refundable(s);
     buy.disabled=upgradeBusy||!G.Upgrades.LIST.some(u=>(levels[u.id]||0)<u.max&&s.coins>=G.Upgrades.cost(u.id,levels[u.id]||0));buy.onclick=async()=>{if(upgradeBusy)return;upgradeBusy=true;renderUpgrades();let r;if(G.NAS?.enabled&&!G.DB.guest)r=await G.NAS.upgrade('bulk',upgDex);else{r={ok:true,...G.Upgrades.bulk(s,upgDex)};G.DB.commit(true);}G.UI.toast(r.ok?G.I18n.f('Comprados {x} niveles',r.count):r.error);upgradeBusy=false;G.UI.refreshCoins();renderUpgrades();};
-    refund.onclick=async()=>{if(upgradeBusy)return;if(!(await G.Dialog.confirm(G.T('¿Devolver todas las mejoras de todos tus Pokémon? Recuperas su coste completo.'))))return;upgradeBusy=true;renderUpgrades();let r;if(G.NAS?.enabled&&!G.DB.guest)r=await G.NAS.upgrade('refund');else{r={ok:true,...G.Upgrades.refund(s)};G.DB.commit(true);}G.UI.toast(r.ok?G.I18n.f('Devueltas {x} monedas',r.coins):r.error);banOpen=false;upgradeBusy=false;G.UI.refreshCoins();renderUpgrades();};
-    actions.append(buy,refund);box.prepend(actions);
+    refund.onclick=async()=>{if(upgradeBusy)return;if(!(await G.Dialog.confirm(G.I18n.f('¿Devolver todas las mejoras? Recuperas el 50%: {x} monedas.',G.Upgrades.refundable(s)))))return;upgradeBusy=true;renderUpgrades();let r;if(G.NAS?.enabled&&!G.DB.guest)r=await G.NAS.upgrade('refund');else{r={ok:true,...G.Upgrades.refund(s)};G.DB.commit(true);}G.UI.toast(r.ok?G.I18n.f('Devueltas {x} monedas',r.coins):r.error);banOpen=false;upgradeBusy=false;G.UI.refreshCoins();renderUpgrades();};
+    actions.append(buy,refund);$('upg-actions').replaceChildren(actions);
     box.appendChild(bindPanel());
   }
 

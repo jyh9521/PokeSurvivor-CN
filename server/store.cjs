@@ -17,6 +17,13 @@ function validateSave(value,name) {
   for(const key of ['owned','shiny','pupg','stats','tickets'])if(!s[key] || typeof s[key]!=='object' || Array.isArray(s[key]))throw error(400,'Invalid '+key);
   for(const value of Object.values(s.stats))if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1e12)throw error(400,'Invalid stats');
   for(const [dex,levels]of Object.entries(s.pupg)){if(!s.owned[dex]||!levels||typeof levels!=='object'||Array.isArray(levels))throw error(400,'Invalid upgrades');for(const[id,n]of Object.entries(levels))if(!Number.isSafeInteger(n)||n<0||n>(Upgrades.BY[id]?.max||1000))throw error(400,'Invalid upgrade level');}
+  if(s.pspent!==undefined){
+    if(!s.pspent||typeof s.pspent!=='object'||Array.isArray(s.pspent))throw error(400,'Invalid upgrade spending');
+    for(const [dex,ledger]of Object.entries(s.pspent)){
+      if(!s.owned[dex]||!ledger||typeof ledger!=='object'||Array.isArray(ledger))throw error(400,'Invalid upgrade spending');
+      for(const [id,prices]of Object.entries(ledger))if(!Upgrades.BY[id]||!Array.isArray(prices)||prices.length>(s.pupg[dex]?.[id]||0)||prices.some(p=>!Number.isSafeInteger(p)||p<0||p>1000000))throw error(400,'Invalid upgrade spending');
+    }
+  }
   s.profile ||= {favs:[],title:''};s.ach ||= {};s.legends ||= {};
   if(typeof s.profile!=='object'||Array.isArray(s.profile)||!Array.isArray(s.profile.favs)||s.profile.favs.length>3||typeof s.profile.title!=='string'||s.profile.title.length>128)throw error(400,'Invalid profile');
   for(const f of s.profile.favs)if(!f||!Number.isSafeInteger(f.dex)||f.dex<1||f.dex>1100||typeof f.shiny!=='boolean')throw error(400,'Invalid favorite');

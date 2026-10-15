@@ -84,13 +84,20 @@ G.Progress = (() => {
   /** Recoge el premio de una misión terminada. */
   function claim(m, weekly = false) {
     const s = G.DB.save;
-    if (!s || m.claimed || !done(m)) return false;
+    if (!s || !m || m.claimed || !done(m) || !(weekly?s.missions?.weekly:s.missions?.daily)?.includes(m) || !G.MissionDefs.BY[m.id]) return false;
     m.claimed = true;
     grant(G.MissionDefs.BY[m.id].reward);
     s.stats.missionsDone = (s.stats.missionsDone || 0) + 1;
     event('missionDone', { daily: !weekly });
     G.DB.commit(true);
     return true;
+  }
+
+  function claimAll(){
+    const s=G.DB.save;if(!s)return 0;ensure(s);let count=0;
+    for(const [list,weekly]of [[s.missions.daily,false],[s.missions.weekly,true]])
+      for(const m of [...list])if(claim(m,weekly))count++;
+    return count;
   }
 
   /** Cambia una diaria sin terminar por otra (una vez al día). */
@@ -232,5 +239,5 @@ G.Progress = (() => {
     }, 2800);
   }
 
-  return { ensure, event, kill, claim, reroll, checkAch, titles, pending, text, done, rewardText, grant };
+  return { ensure, event, kill, claim, claimAll, reroll, checkAch, titles, pending, text, done, rewardText, grant };
 })();

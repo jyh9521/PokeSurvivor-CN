@@ -9,6 +9,10 @@ G.Input = (() => {
     left: ['keya', 'arrowleft'], right: ['keyd', 'arrowright']
   };
 
+  const bindings={pause:['escape','keyp'],previous:['keyq'],next:['keye','tab'],reroll:['keyr'],slots:[0,1,2,3].map(i=>['digit'+(i+1),'numpad'+(i+1)])};
+  const label=code=>code.replace(/^key/,'').replace(/^digit/,'').replace('escape','Esc').replace(/^arrow/,'').toUpperCase();
+  function action(name,index){return (index==null?bindings[name]:bindings[name][index]).some(k=>pressed.has(k));}
+
   function code(e) { return (e.code || e.key).toLowerCase(); }
 
   addEventListener('keydown', e => {
@@ -27,6 +31,7 @@ G.Input = (() => {
   return {
     /** Vector de movimiento del jugador (teclado o joystick táctil). */
     inject(c){pressed.add(c);},
+    bindings,action,label,moveBindings:MOVE_KEYS,
     axis() {
       const pad=G.Gamepad?.axis();if(pad&&(pad[0]||pad[1]))return pad;
       const t = G.Touch && G.Touch.vector();

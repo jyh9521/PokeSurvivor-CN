@@ -4,6 +4,16 @@
  * son los oficiales en inglés.
  */
 G.I18n.add({
+  "{x} niveles": "{x} levels",
+  "¿Devolver todas las mejoras? Recuperas el 50%: {x} monedas.": "Refund all upgrades? Recover 50% of the gold spent: {x} coins.",
+  "Todas las diarias y semanales completadas": "All completed daily and weekly missions",
+  "Recoger todos los premios": "Claim all rewards",
+  "Páginas": "Pages",
+  "Mejoras de interacción": "Interaction improvements",
+  "Golpes con sacudida breve y vibración; foco de mando visible y pestañas con LB/RB.": "Hits give brief shake and rumble; clear controller focus and LB/RB tabs.",
+  "Recoge todas las misiones completadas; menús y listas conservan el foco.": "Claim all completed missions; menus and dropdowns retain focus.",
+  "Los árboles ocultan correctamente al personaje; solo la parte oculta recibe una silueta translúcida.": "Trees occlude characters correctly; only the hidden portion receives a translucent silhouette.",
+
   // ---------------- tipos y regiones ----------------
   'Acero': 'Steel', 'Agua': 'Water', 'Bicho': 'Bug', 'Dragón': 'Dragon', 'Eléctrico': 'Electric', 'Fantasma': 'Ghost',
   'Fuego': 'Fire', 'Hada': 'Fairy', 'Hielo': 'Ice', 'Lucha': 'Fighting', 'Planta': 'Grass', 'Psíquico': 'Psychic',

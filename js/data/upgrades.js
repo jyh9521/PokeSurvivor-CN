@@ -47,8 +47,56 @@
   }
 
   function normalized(levels){const out={};for(const u of LIST)out[u.id]=Math.max(0,Math.min(u.max,Math.floor(+levels?.[u.id]||0)));return out;}
-  function bulk(save,dex){if(!save.owned[dex])throw Error('Pokémon no obtenido');const levels=normalized(save.pupg[dex]),before=save.coins;let count=0;while(true){const next=LIST.filter(u=>levels[u.id]<u.max).map(u=>({id:u.id,price:cost(u.id,levels[u.id])})).sort((a,b)=>a.price-b.price||a.id.localeCompare(b.id))[0];if(!next||next.price>save.coins)break;save.coins-=next.price;levels[next.id]++;count++;}save.pupg[dex]={...save.pupg[dex],...levels};return {count,spent:before-save.coins};}
-  function refundable(save){let total=0;for(const levels of Object.values(save.pupg||{}))for(const [id,n]of Object.entries(normalized(levels)))for(let i=0;i<n;i++)total+=cost(id,i);return total;}
-  function refund(save){const coins=refundable(save);if(!Number.isSafeInteger(coins)||save.coins+coins>1001000000)throw Error('Saldo fuera de rango');save.coins+=coins;save.pupg=Object.fromEntries(Object.entries(save.pupg).map(([dex,l])=>[dex,Object.fromEntries(Object.entries(l).filter(([id])=>!BY[id]))]).filter(([,l])=>Object.keys(l).length));save.pban={};return {coins};}
-  return { LIST, BY, cost, perks,bulk,refund,refundable };
+  // Immutable migration table for pre-ledger saves (0.5.0 prices). New purchases
+  // record the amount actually deducted, never the current price at refund time.
+  const LEGACY = {"hp":[60,80,110,150,200,270,360,490,660,890],"atk":[80,110,150,210,290,400,550,760,1050,1450],"spd":[70,100,140,190,270,380,530,740],"cd":[90,130,180,260,370,520,740,1050],"def":[80,110,160,220,310,430,600,840],"regen":[120,180,270,410,610],"magnet":[50,70,100,140,190,270],"xp":[100,140,200,290,410,580,820,1160],"coins":[120,170,250,370,530,770,1120,1620],"moves":[1500],"crit":[90,130,180,250,350,480,680,950,1330,1860],"reroll":[150,240,380,610,980],"ban":[300,570,1080]};
+  function ensureLedger(save){
+    save.pspent ||= {};
+    for(const [dex,raw] of Object.entries(save.pupg||{})){
+      const levels=normalized(raw),ledger=save.pspent[dex] ||= {};
+      for(const [id,n]of Object.entries(levels)){
+        const a=Array.isArray(ledger[id])?ledger[id].slice(0,n):[];
+        while(a.length<n)a.push(LEGACY[id][a.length]);
+        ledger[id]=a;
+      }
+    }
+    return save.pspent;
+  }
+  function purchase(save,dex,id){
+    if(!save.owned[dex]||!BY[id])throw Error('Pokémon no obtenido');
+    ensureLedger(save);const levels=normalized(save.pupg[dex]),n=levels[id],price=cost(id,n);
+    if(n>=BY[id].max||save.coins<price)return {count:0,spent:0};
+    save.coins-=price;save.pupg[dex]={...save.pupg[dex],[id]:n+1};
+    ((save.pspent[dex] ||= {})[id] ||= []).push(price);
+    return {count:1,spent:price};
+  }
+  function bulk(save,dex){
+    if(!save.owned[dex])throw Error('Pokémon no obtenido');
+    const before=save.coins;let count=0;
+    while(true){const levels=normalized(save.pupg[dex]),next=LIST.filter(u=>levels[u.id]<u.max).map(u=>({id:u.id,price:cost(u.id,levels[u.id])})).sort((a,b)=>a.price-b.price||a.id.localeCompare(b.id))[0];
+      if(!next||next.price>save.coins)break;purchase(save,dex,next.id);count++;
+    }
+    return {count,spent:before-save.coins};
+  }
+  function refundable(save,dex){
+    ensureLedger(save);let total=0;
+    for(const [d,raw]of Object.entries(save.pupg||{}))if(dex==null||String(dex)===d)
+      for(const [id,n]of Object.entries(normalized(raw)))
+        for(const price of save.pspent[d]?.[id]?.slice(0,n)||[])total+=price;
+    return Math.floor(total*.5);
+  }
+  function refund(save,dex){
+    const coins=refundable(save,dex);
+    if(!Number.isSafeInteger(coins)||save.coins+coins>1001000000)throw Error('Saldo fuera de rango');
+    save.coins+=coins;
+    for(const [d,l]of Object.entries(save.pupg))if(dex==null||String(dex)===d){
+      const unknown=Object.fromEntries(Object.entries(l).filter(([id])=>!BY[id]));
+      if(Object.keys(unknown).length)save.pupg[d]=unknown;else delete save.pupg[d];
+      delete save.pspent[d];if(save.pban)delete save.pban[d];
+    }
+    if(dex==null){save.pspent={};save.pban={};}
+    else{delete save.pspent[dex];if(save.pban)delete save.pban[dex];}
+    save.pban ||= {};return {coins};
+  }
+  return { LIST, BY, cost, perks,bulk,purchase,refund,refundable,ensureLedger };
 });

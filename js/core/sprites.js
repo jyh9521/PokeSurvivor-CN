@@ -225,6 +225,13 @@ G.Sprites = (() => {
     }
 
     /** Dibuja con los pies en (x, y). opts: { flash, alpha } */
+    bounds(x,y){
+      const m=animMeta(this.dex,this.cur,this.shiny)||animMeta(this.dex,'Idle',this.shiny),idle=animMeta(this.dex,'Idle',this.shiny),k=PX*this.scale;
+      const frames=[m,idle].filter(Boolean);if(!frames.length)return {x:x-32,y:y-64,w:64,h:64};
+      const left=Math.min(...frames.map(f=>x-f.ax*k))-4,top=Math.min(...frames.map(f=>y-f.ay*k))-4;
+      return {x:Math.floor(left),y:Math.floor(top),w:Math.ceil(Math.max(...frames.map(f=>x+(f.w-f.ax)*k))+4-left),h:Math.ceil(Math.max(...frames.map(f=>y+(f.h-f.ay)*k))+4-top)};
+    }
+
     draw(ctx, x, y, opts = {}) {
       let m = animMeta(this.dex, this.cur, this.shiny);
       let s = sheet(this.dex, this.cur, this.shiny);
@@ -248,7 +255,7 @@ G.Sprites = (() => {
       const dx = Math.round(x - m.ax * k), dy = Math.round(y - m.ay * k);
       const prev = ctx.globalAlpha;
       if (alpha < 1) ctx.globalAlpha = prev * alpha;
-      if(opts.outline){ctx.globalAlpha=prev*.9;const img=white(s.img);for(const [ox,oy]of [[-2,0],[2,0],[0,-2],[0,2]])ctx.drawImage(img,sx,sy,m.w,m.h,dx+ox,dy+oy,m.w*k,m.h*k);ctx.globalAlpha=prev*.85;}
+      if(opts.outline){ctx.globalAlpha=prev*alpha*.9;const img=white(s.img);for(const [ox,oy]of [[-2,0],[2,0],[0,-2],[0,2]])ctx.drawImage(img,sx,sy,m.w,m.h,dx+ox,dy+oy,m.w*k,m.h*k);ctx.globalAlpha=prev*alpha;}
       // Destello: blanco entero (enemigos) o medio blanco encima (tu Pokémon).
       if (!opts.flash || opts.softFlash) ctx.drawImage(s.img, sx, sy, m.w, m.h, dx, dy, m.w * k, m.h * k);
       if (opts.flash) {

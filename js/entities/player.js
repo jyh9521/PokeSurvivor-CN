@@ -236,12 +236,13 @@ G.Player = class Player {
     // Con un ataque cuerpo a cuerpo activo se recibe un 25 % menos: hay que
     // estar encima de los enemigos para pegar (iban muy por detrás).
     const close = this.activeGroup().some(m => m.kind === 'melee') ? 0.75 : 1;
+    if(!Number.isFinite(amount)||amount<=0)return;
     const d = pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
+    const hpBefore=this.hp;
     this.hp -= d;
     this.invuln = 0.45;
     this.flash = 0.14;
     G.Audio.sfx('hurt');
-    G.Camera.kick(0.28);
     G.FX.dmgText(this.x, this.y - this.bodyH - 4, '-' + Math.round(d), eff === 'super' ? '#ff3048' : eff === 'weak' ? '#c9a0a8' : '#ff6b7a', eff === 'super');
     G.FX.burst(this.x, this.y - this.bodyH * 0.5, '#ff5f6d', 6, 90);
     // Banda Focus: aguanta el golpe con 1 de vida (una vez cada 60 s).
@@ -251,6 +252,8 @@ G.Player = class Player {
       G.FX.dmgText(this.x, this.y - this.bodyH - 16, '¡Banda Focus!', '#ff9a3d', true);
       G.FX.ring(this.x, this.y, 6, 70, '#ff9a3d', 0.5, 4);
     }
+    const lost=hpBefore-Math.max(0,this.hp);
+    if(lost>0&&!this.remote){G.Camera.damage(lost/this.maxHp);G.Gamepad?.rumble(lost/this.maxHp);}
     if (this.hp <= 0) {
       this.hp = 0; this.dead = true;
       this.anim.play('Faint', { hold: true });
@@ -432,7 +435,13 @@ G.Player = class Player {
     this.anim.loop(this.walking ? 'Walk' : 'Idle', this.walking ? this.baseSpd / 110 : 1);
   }
 
-  highlight(ctx){ctx.save();this.anim.draw(ctx,this.x,this.y,{outline:true});ctx.strokeStyle='#ffdf57';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(this.x,this.y,this.r*1.5,this.r*.6,0,0,Math.PI*2);ctx.stroke();ctx.restore();}
+  highlight(ctx){this.anim.draw(ctx,this.x,this.y,{outline:true,alpha:.28});}
+
+  marker(ctx,front){
+    if(!G.Settings.get('playerOutline')||this.remote||this.dead)return;
+    ctx.save();ctx.strokeStyle='#ffdf57';ctx.lineWidth=2;ctx.beginPath();
+    ctx.ellipse(this.x,this.y,this.r*1.5,this.r*.6,0,front?0:Math.PI,front?Math.PI:Math.PI*2);ctx.stroke();ctx.restore();
+  }
 
   draw(ctx) {
     // Halo del tipo del movimiento activo, en el suelo.
@@ -456,7 +465,9 @@ G.Player = class Player {
     }
 
     const alpha = this.invuln > 0 && !this.dead ? (Math.floor(this.invuln * 18) % 2 ? 0.45 : 1) : 1;
-    this.anim.draw(ctx, this.x, this.y, { flash: this.flash > 0, softFlash: true, alpha, color: '#ffcb3d' });
+    this.marker(ctx,false);
+    this.anim.draw(ctx, this.x, this.y, { outline:G.Settings.get('playerOutline')&&!this.remote, flash: this.flash > 0, softFlash: true, alpha, color: '#ffcb3d' });
+    this.marker(ctx,true);
 
     // Arcos de buff alrededor de los pies.
     const COL = { atk: '#ff6b4d', spd: '#7fe0ff', def: '#b0b8c8', regen: '#5fe08a' };

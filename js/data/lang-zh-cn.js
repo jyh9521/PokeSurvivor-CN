@@ -2,6 +2,16 @@
  * Initially adapted from DabaoHuang/pokesurvivor PR #74; reviewed against this game.
  * Names are separately verified in lang-zh-cn-names.js. See docs/LOCALIZATION.md. */
 G.I18n.add({
+  "{x} niveles": "已强化 {x} 级",
+  "¿Devolver todas las mejoras? Recuperas el 50%: {x} monedas.": "返还所有宝可梦的全部强化？返还已投入金币的 50%，共 {x} 金币。",
+  "Todas las diarias y semanales completadas": "领取全部已完成的每日与每周任务奖励",
+  "Recoger todos los premios": "一键领取奖励",
+  "Páginas": "翻页",
+  "Mejoras de interacción": "交互体验优化",
+  "Golpes con sacudida breve y vibración; foco de mando visible y pestañas con LB/RB.": "受击时提供短促震屏与手柄振动；手柄焦点完整高亮，LB/RB 切换分页。",
+  "Recoge todas las misiones completadas; menús y listas conservan el foco.": "一键领取已完成任务奖励；菜单与下拉列表正确切换和恢复焦点。",
+  "Los árboles ocultan correctamente al personaje; solo la parte oculta recibe una silueta translúcida.": "树木按前后关系遮挡角色，仅被遮挡部分显示半透明剪影。",
+
   "Se puede jugar en chino simplificado, con nombres oficiales y páginas de ayuda traducidas.": "新增简体中文，采用官方名称，并提供完整中文帮助页面。",
   "Enjambre": "虫群",
   "Abanico de tres hojas perforantes.": "扇形射出三片可贯穿敌人的叶片。",

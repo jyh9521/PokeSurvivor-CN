@@ -12,6 +12,7 @@ G.UI = (() => {
                    'scr-nick', 'scr-friends', 'scr-lobby', 'scr-rank', 'scr-item', 'scr-goals', 'scr-bond', 'scr-mod'];
 
   function show(id, keepMenu = false) {
+    G.UIFocus?.enter($(id));
     for (const s of SCREENS) if (s !== id && !(keepMenu && s === 'scr-menu')) $(s).classList.add('hidden');
     $(id).classList.remove('hidden');
   }
@@ -160,6 +161,7 @@ G.UI = (() => {
     refreshSoundIcon();
     $('btn-sound').onclick = () => {
       const p = $('sound-panel');
+      p.onuiback=()=>p.classList.add('hidden');
       p.classList.toggle('hidden');
       if (!p.classList.contains('hidden')) soundControls(p);
     };
