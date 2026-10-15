@@ -470,9 +470,10 @@
 <section id="scr-levelup" class="scr dim hidden">
   <div class="box center">
     <h2>¡Nivel <span id="lvl-num">2</span>!</h2>
-    <p class="sub">Elige una recompensa · <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></p>
+    <p class="sub pad-only" data-pad-choice="reroll"></p>
+    <p class="sub keyboard-only">Elige una recompensa · <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></p>
     <div id="cards" class="cards"></div>
-    <button id="lvl-reroll" class="btn small ghost hidden" data-sfx="none" style="margin-top:10px">Cambiar opciones (<span id="lvl-rr-n">1</span>) · <kbd>R</kbd></button>
+    <button id="lvl-reroll" class="btn small ghost hidden" data-sfx="none" style="margin-top:10px">Cambiar opciones (<span id="lvl-rr-n">1</span>) · <kbd class="keyboard-only">R</kbd><kbd class="pad-only" data-pad-glyph="2"></kbd></button>
     <p id="lvl-wait" class="note hidden"></p>
   </div>
 </section>
@@ -480,6 +481,7 @@
 <section id="scr-bond" class="scr dim hidden">
   <div class="box center">
     <h2 class="bond-title">¡Vínculo!</h2>
+    <p class="sub pad-only" data-pad-choice="confirm"></p>
     <p class="sub bond-hint">Los movimientos unidos se lanzan a la vez y ocupan un solo hueco</p>
     <p id="bond-sub" class="sub"></p>
     <div id="bond-cards" class="cards"></div>
@@ -490,7 +492,8 @@
 <section id="scr-item" class="scr dim hidden">
   <div class="box center">
     <h2>¡Un objeto!</h2>
-    <p class="sub">Sólo puedes llevar uno · <kbd>1</kbd> <kbd>2</kbd></p>
+    <p class="sub pad-only" data-pad-choice="confirm"></p>
+    <p class="sub keyboard-only">Sólo puedes llevar uno · <kbd>1</kbd> <kbd>2</kbd></p>
     <div id="item-cards" class="cards"></div>
   </div>
 </section>
@@ -498,7 +501,8 @@
 <section id="scr-pause" class="scr dim hidden">
   <div class="box center" style="width:min(460px,100%)">
     <h2>Pausa</h2>
-    <p class="sub kbd-hint"><kbd>WASD</kbd> moverse · <kbd>1</kbd>–<kbd>4</kbd> movimiento · <kbd>Q</kbd>/<kbd>E</kbd> ciclar · <kbd>Esc</kbd> pausa</p>
+    <p class="sub kbd-hint keyboard-only"><kbd>WASD</kbd> moverse · <kbd>1</kbd>–<kbd>4</kbd> movimiento · <kbd>Q</kbd>/<kbd>E</kbd> ciclar · <kbd>Esc</kbd> pausa</p>
+    <p class="sub pad-only"><span data-pad-glyph="4"></span>/<span data-pad-glyph="5"></span> · Cambiar ataque · <span data-pad-glyph="9"></span> · Pausa</p>
     <p class="sub touch-hint">Arrastra el dedo para moverte · toca un ataque para cambiarlo</p>
     <p id="pause-coop" class="note hidden">Partida en grupo: el juego sigue mientras estás aquí.</p>
     <div id="pause-sound" class="sound-inline"></div>
@@ -519,6 +523,6 @@
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=630ec0bbce"></script>
+<script defer src="js/app.min.js?v=c8d38b3562"></script>
 </body>
 </html>

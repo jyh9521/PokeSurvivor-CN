@@ -863,3 +863,26 @@ body:has(#scr-menu:not(.hidden)):not(:has(#scr-settings:not(.hidden))) #nas-netw
 .network-signal i:nth-child(1){height:4px}.network-signal i:nth-child(2){height:8px}.network-signal i:nth-child(3){height:12px}
 [data-health=good] .network-signal{color:#5fe08a}[data-health=fair] .network-signal{color:#ffd23f}[data-health=poor] .network-signal,[data-health=offline] .network-signal{color:#ff5f6d}
 @media(pointer:coarse){.team-actions .hud-action{min-height:32px;padding:5px 7px}.hud-action kbd{display:none}}
+
+/* Controller focus and device labels preserve mouse/keyboard hints when input changes. */
+.pad-only{display:none!important}
+body[data-input=gamepad] .keyboard-only{display:none!important}
+body[data-input=gamepad] .pad-only{display:initial!important}
+body[data-input=gamepad] .pad-focus{outline:3px solid #ffd23f!important;outline-offset:3px;box-shadow:0 0 0 5px #0b1838!important}
+body[data-input=gamepad] button.pad-focus::after{content:var(--pad-confirm);display:inline-block;margin-left:6px;padding:0 4px;border:1px solid currentColor;border-radius:4px;font-size:12px}
+#game-dialog{z-index:2500}#game-dialog .field{width:100%}
+#pad-help{position:fixed;z-index:2600;bottom:max(4px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);padding:3px 10px;border:1px solid #8fa3c4;border-radius:5px;background:#0a101ce8;color:#eaf2ff;font:12px var(--font);white-space:nowrap;pointer-events:none;max-width:calc(100vw - 8px)}
+#pad-help[hidden]{display:none}
+body[data-input=gamepad] .scr{padding-bottom:36px}
+[data-pad-edit=true]{outline-color:#5fe08a!important}
+
+body[data-input=gamepad] #credits-line{bottom:34px}
+
+body[data-input=gamepad] .scr:not(#scr-menu){padding-bottom:36px}
+body[data-input=gamepad] .scr>.box{max-height:calc(100dvh - 52px);overflow:auto}
+body[data-input=gamepad] .card .key:empty{visibility:hidden}
+@media(max-height:520px){body[data-input=gamepad] .ach-pop{bottom:36px;top:auto}}
+
+/* Button glyphs must not reflow menu grids or move neighboring focus targets. */
+body[data-input=gamepad] button.pad-relative{position:relative}
+body[data-input=gamepad] button.pad-focus::after{position:absolute;right:-2px;top:-2px;margin:0;padding:0 3px;background:#0b1838;font-size:10px;line-height:15px}

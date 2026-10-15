@@ -4,7 +4,7 @@ G.TeamUI=(()=>{
   const keys={KeyR:'gather',KeyF:'help',KeyT:'danger'};
   function ping(kind){if(!G.Coop.active||G.Game.state!=='playing'||G.SettingsUI.isOpen||performance.now()-last<3000)return;if(G.Coop.ping(kind))last=performance.now();}
   function update(){if(!panel)return;panel.hidden=!G.Coop.active||G.Game.state!=='playing'||G.SettingsUI.isOpen;if(panel.hidden)return;
-    for(const b of buttons)b.disabled=performance.now()-last<3000;
+    for(const [i,b]of buttons.entries()){b.disabled=performance.now()-last<3000;const key=G.Gamepad?.using?G.Gamepad.button([0,2,3][i]):['R','F','T'][i];b.querySelector('kbd').textContent=key;b.title=b.getAttribute('aria-label')+' ('+key+')';}
     panel.style.top=(82+G.Coop.mates.filter(m=>m.connected).length*15)+'px';
     status.replaceChildren();
     for(const m of G.Coop.mates){if(!m.connected||!m.pl.dead)continue;const row=document.createElement('div');row.setAttribute('translate','no');row.textContent=m.name+' · '+G.T('Rescate')+' '+Math.round(Math.min(1,(m.pl.net?.rev||0)/G.Player.REVIVE_TIME)*100)+'%';status.appendChild(row);}

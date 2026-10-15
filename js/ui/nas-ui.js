@@ -19,7 +19,7 @@ G.NasUI=(()=>{
     nickname.append(label,input,button);box.append(nickname,panel);
     panel.querySelectorAll('[data-nas]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{
       const action=b.dataset.nas;
-      if(action==='reauth'){const p=prompt(T('Contraseña de tu cuenta de juego'));if(p){const r=await G.NAS.reauthenticate(p);if(!r.ok)throw Error(r.error);}}
+      if(action==='reauth'){const p=await G.Dialog.password(T('Contraseña de tu cuenta de juego'));if(p){const r=await G.NAS.reauthenticate(p);if(!r.ok)throw Error(r.error);}}
       if(action==='sync')await G.NAS.refreshSave();
       if(action==='browser'||action==='nas')await G.NAS.resolve(action);
       if(action==='export'){const blob=new Blob([JSON.stringify({save:G.DB.save,conflict:G.NAS.conflict},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pokesurvivor-local-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}

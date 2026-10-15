@@ -18,7 +18,7 @@ G.ModUI = (() => {
   function init() {
     $('mod-back').onclick = () => G.RankingUI.open();
     $('mod-purge').onclick = async () => {
-      if (!confirm('¿Quitar del ranking TODAS las marcas de más de 1 hora (todas las tablas)? No se puede deshacer.')) return;
+      if (!(await G.Dialog.confirm('¿Quitar del ranking TODAS las marcas de más de 1 hora (todas las tablas)? No se puede deshacer.'))) return;
       const b = $('mod-purge');
       b.disabled = true;
       try {
@@ -95,8 +95,8 @@ G.ModUI = (() => {
           await G.Ranking.removeEverywhere(g.e, mode, [], g.board);
           await G.Ranking.dismiss(g.ids);
         }, 'Marca borrada')),
-        btn('Banear', 'danger', () => {
-          if (!confirm('¿Banear a ' + g.names.join(', ') + '? No podrán volver a salir en el ranking y se borra su marca.')) return;
+        btn('Banear', 'danger', async () => {
+          if (!(await G.Dialog.confirm('¿Banear a ' + g.names.join(', ') + '? No podrán volver a salir en el ranking y se borra su marca.'))) return;
           busy(async () => {
             const uids = g.e.split('_');
             for (const u of uids) await G.Ranking.setMarked(u, true).catch(() => {});

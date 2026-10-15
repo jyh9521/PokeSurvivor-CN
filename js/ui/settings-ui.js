@@ -6,7 +6,7 @@
 G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const VERSION = '0.4.1 · 2026-10-15';
+  const VERSION = '0.5.0 · 2026-10-15';
   const REPO = G.PROJECT_REPO || 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 
@@ -88,7 +88,7 @@ G.SettingsUI = (() => {
              <button class="btn small" id="set-full">${isFull() ? 'Salir' : 'Activar'}</button></div>`
            : iosTip() ? `<div class="set-row"><div class="grow"><b>Pantalla completa</b><small>${esc(IOS_TIP)}</small></div></div>` : '');
     } else if (tab === 'ctl') {
-      box.innerHTML = section('Mando','Mando estándar: stick izquierdo mueve; A confirma, B vuelve, LB/RB cambia ataque, Start pausa. Cruceta navega menús.')+toggle('gamepad','Activar mando','Pulsa un botón para detectar el mando. Los campos de texto siguen usando teclado.')+section('En móvil o tablet')
+      box.innerHTML = section('Mando','')+'<p class=sub data-pad-controls></p>'+toggle('gamepad','Activar mando','Pulsa un botón para detectar el mando. Los campos de texto siguen usando teclado.')+section('Iconos del mando','')+'<select class=field data-pad-layout aria-label="'+esc(G.T('Iconos del mando'))+'">'+[['auto','Auto'],['xbox','Xbox'],['playstation','PlayStation'],['nintendo','Nintendo']].map(([v,n])=>'<option value="'+v+'" '+(G.Settings.get('padLayout')===v?'selected':'')+'>'+n+'</option>').join('')+'</select>'+section('En móvil o tablet')
         + `<p class="sub">Pon el dedo en cualquier parte y arrastra para moverte: el joystick aparece donde tocas. Toca un ataque de abajo para cambiarlo y el botón de arriba a la derecha para pausar. Se juega en horizontal.</p>`
         + `<div class="set-row"><div class="grow"><b>Tamaño del joystick</b><small>Cuánto hay que arrastrar el dedo.</small></div></div>`
         + choice('stick', [[0.8, 'Pequeño'], [1, 'Normal'], [1.25, 'Grande']])
@@ -146,6 +146,7 @@ G.SettingsUI = (() => {
   }
 
   function wire(box) {
+    const layout=box.querySelector('[data-pad-layout]');if(layout)layout.onchange=()=>G.Settings.set('padLayout',layout.value);
     box.querySelectorAll('.switch[data-k]').forEach(b => { b.onclick = () => { G.Settings.set(b.dataset.k, !G.Settings.get(b.dataset.k)); render(); }; });
     box.querySelectorAll('.chip[data-k]').forEach(b => {
       b.onclick = () => { const v = b.dataset.v; G.Settings.set(b.dataset.k, isNaN(+v) ? v : +v); render(); };
@@ -169,8 +170,8 @@ G.SettingsUI = (() => {
   }
 
   /** Cerrar sesión (si estás en una partida, se abandona). */
-  function leave() {
-    if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
+  async function leave() {
+    if (G.DB.guest && !(await G.Dialog.confirm('Eres invitado: se perderá todo el progreso. ¿Salir?'))) return;
     if (G.Game.state !== 'ui') G.Game.quit && G.Game.quit();
     G.Audio.music(null);
     G.DB.logout().then(r => { if (r !== false) G.Flow.toLogin(); });

@@ -125,28 +125,11 @@ G.UI = (() => {
    * las de Google la confirman en la ventana de Google al seguir.
    * Devuelve { pass } o null si se cancela.
    */
-  function confirmDelete() {
-    if (!G.DB.nameAccount) return Promise.resolve(confirm(G.T('Se borrarán tu cuenta y toda tu partida, para siempre. ¿Seguro?')) ? { pass: '' } : null);
-    return new Promise(done => {
-      const el = document.createElement('section');
-      el.className = 'scr dim';
-      el.style.zIndex = 70;
-      el.innerHTML = `<div class="box center" style="max-width:380px">
-        <h3>Borrar cuenta</h3>
-        <p class="sub">Se borrarán tu cuenta y toda tu partida, para siempre. Para confirmarlo, escribe tu contraseña.</p>
-        <input class="field" type="password" maxlength="64" autocomplete="current-password" style="width:100%">
-        <div style="display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap">
-          <button class="btn ghost" data-a="no">Cancelar</button>
-          <button class="btn danger" data-a="yes">Borrar para siempre</button>
-        </div></div>`;
-      document.body.appendChild(el);
-      const inp = el.querySelector('input');
-      const end = v => { el.remove(); done(v); };
-      el.querySelector('[data-a=no]').onclick = () => end(null);
-      el.querySelector('[data-a=yes]').onclick = () => { if (inp.value) end({ pass: inp.value }); else inp.focus(); };
-      inp.onkeydown = e => { if (e.key === 'Enter' && inp.value) end({ pass: inp.value }); if (e.key === 'Escape') end(null); };
-      setTimeout(() => inp.focus(), 50);
-    });
+  async function confirmDelete() {
+    const text='Se borrarán tu cuenta y toda tu partida, para siempre. ¿Seguro?';
+    if(!G.DB.nameAccount)return await G.Dialog.confirm(text)?{pass:''}:null;
+    const pass=await G.Dialog.password('Se borrarán tu cuenta y toda tu partida, para siempre. Para confirmarlo, escribe tu contraseña.',{title:'Borrar cuenta',danger:true});
+    return pass?{pass}:null;
   }
 
   function closeLegal() { $('scr-legal').classList.add('hidden'); }

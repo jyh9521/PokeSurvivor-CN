@@ -516,7 +516,7 @@ G.Game = (() => {
   // ---------------- teclado ----------------
 
   function handleKeys() {
-    if(G.MenuUI.upgradeBusy)return;
+    if(G.Dialog?.open||G.MenuUI.upgradeBusy)return;
     if (G.SettingsUI.isOpen) { if (G.Input.tap('escape')) G.SettingsUI.close(); return; }
     // La Sentencia de Arceus: Espacio, Intro o Esc saltan la animación (si se puede).
     if (G.Judgment.cinematic && state === 'playing') {

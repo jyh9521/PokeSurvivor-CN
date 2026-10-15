@@ -24,8 +24,8 @@ G.MenuUI = (() => {
     });
     document.querySelectorAll('[data-back]').forEach(b => { b.onclick = open; });
     G.Social.on(() => { if (G.UI.isOpen('scr-menu')) socialLine(); });
-    $('btn-logout').onclick = () => {
-      if (G.DB.guest && !confirm('Eres invitado: se perderá todo el progreso. ¿Salir?')) return;
+    $('btn-logout').onclick = async () => {
+      if (G.DB.guest && !(await G.Dialog.confirm('Eres invitado: se perderá todo el progreso. ¿Salir?'))) return;
       G.Audio.music(null);
       G.DB.logout().then(r => { if (r !== false) G.Flow.toLogin(); });
     };
@@ -295,7 +295,7 @@ G.MenuUI = (() => {
     const buy=document.createElement('button');buy.id='upg-bulk';buy.className='btn gold';buy.textContent=G.T('Mejorar al máximo posible');
     const refund=document.createElement('button');refund.id='upg-refund';refund.className='btn';refund.textContent=G.T('Devolver todas las mejoras');refund.disabled=upgradeBusy||!G.Upgrades.refundable(s);
     buy.disabled=upgradeBusy||!G.Upgrades.LIST.some(u=>(levels[u.id]||0)<u.max&&s.coins>=G.Upgrades.cost(u.id,levels[u.id]||0));buy.onclick=async()=>{if(upgradeBusy)return;upgradeBusy=true;renderUpgrades();let r;if(G.NAS?.enabled&&!G.DB.guest)r=await G.NAS.upgrade('bulk',upgDex);else{r={ok:true,...G.Upgrades.bulk(s,upgDex)};G.DB.commit(true);}G.UI.toast(r.ok?G.I18n.f('Comprados {x} niveles',r.count):r.error);upgradeBusy=false;G.UI.refreshCoins();renderUpgrades();};
-    refund.onclick=async()=>{if(upgradeBusy)return;if(!confirm(G.T('¿Devolver todas las mejoras de todos tus Pokémon? Recuperas su coste completo.')))return;upgradeBusy=true;renderUpgrades();let r;if(G.NAS?.enabled&&!G.DB.guest)r=await G.NAS.upgrade('refund');else{r={ok:true,...G.Upgrades.refund(s)};G.DB.commit(true);}G.UI.toast(r.ok?G.I18n.f('Devueltas {x} monedas',r.coins):r.error);banOpen=false;upgradeBusy=false;G.UI.refreshCoins();renderUpgrades();};
+    refund.onclick=async()=>{if(upgradeBusy)return;if(!(await G.Dialog.confirm(G.T('¿Devolver todas las mejoras de todos tus Pokémon? Recuperas su coste completo.'))))return;upgradeBusy=true;renderUpgrades();let r;if(G.NAS?.enabled&&!G.DB.guest)r=await G.NAS.upgrade('refund');else{r={ok:true,...G.Upgrades.refund(s)};G.DB.commit(true);}G.UI.toast(r.ok?G.I18n.f('Devueltas {x} monedas',r.coins):r.error);banOpen=false;upgradeBusy=false;G.UI.refreshCoins();renderUpgrades();};
     actions.append(buy,refund);box.prepend(actions);
     box.appendChild(bindPanel());
   }

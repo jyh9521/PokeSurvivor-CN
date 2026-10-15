@@ -1,4 +1,4 @@
-# 社区版 0.4.1：操作、画质和队伍管理
+# 社区版 0.5.0：操作、画质和队伍管理
 
 ## 抽卡与低配画质
 
@@ -37,18 +37,8 @@
 
 ## 手柄
 
-调研过 [GameController.js](https://github.com/alvaromontoro/gamecontroller.js/) 和 [HTML5 Gamepad Controller Library](https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library)。
-本游戏只需标准布局、菜单焦点和少量动作，采用独立的 `js/core/gamepad.js` 直接接入浏览器 [Gamepad API](https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API)，无需 CDN 或第三方运行时。
-
-- 按下并松开任意按钮识别手柄；支持浏览器 `mapping=standard` 的设备。
-- 左摇杆 / 十字键移动，摇杆死区 0.2，斜向不加速。
-- A / 下方主按钮确认；B / 右方主按钮返回；LB / RB 切换招式；Start 暂停。
-- 联机时 A 集合、X 求救、Y 危险；菜单用方向键 / 摇杆导航，可操作卡牌、复选框和下拉选项。
-- 长按按钮不重复购买；方向导航有 350 / 150 ms 的重复节流。断开、禁用或页面隐藏时清除输入，避免持续移动。
-- 文字输入框保留键盘操作。非标准布局不猜测按键；可使用平台的标准手柄映射。
-- HTTPS 下使用；浏览器首次音频解锁可能仍需要一次鼠标 / 键盘操作。
-
-自动测试使用真实游戏加可控的标准 Gamepad 数据，覆盖移动、暂停与返回；不是 Xbox / DualSense / Steam Deck 的实物验收。
+0.5.0 改为实际位置方向导航，返回和暂停分离，并接入游戏内确认弹窗、滑条、下拉框和设备按钮提示。
+完整布局、文字输入例外与复现步骤见 [GAMEPAD.md](GAMEPAD.md)。
 
 ## 一键强化与返还
 
@@ -69,7 +59,7 @@ python tools/make_zh_font.py
 npm run build
 npm test
 npm run test:nas:production
-node tools/verify-ui-polish-transaction.cjs
+node tools/verify-gamepad-transaction.cjs
 ```
 
 用户的 NAS 更新后生效，原数据目录不变：

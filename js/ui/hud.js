@@ -310,7 +310,7 @@ G.HUD = (() => {
       ctx.font = F(800, 9);
       ctx.fillStyle = fused ? BOND : on ? col : 'rgba(180,200,230,.6)';
       ctx.textAlign = 'left';
-      ctx.fillText(String(i + 1), x + 3, y + 10);
+      ctx.fillText(G.Gamepad?.using?(on?G.Gamepad.button(4)+'/'+G.Gamepad.button(5):''):String(i + 1), x + 3, y + 10);
 
       // nombre encima del activo (con un vínculo: "Ascuas +2")
       if (on) {
@@ -368,7 +368,7 @@ G.HUD = (() => {
       ctx.font = F(600, 10);
       ctx.textAlign = 'center';
       ctx.fillStyle = 'rgba(180,200,230,.55)';
-      ctx.fillText(touch ? 'Arrastra el dedo para moverte  ·  toca un ataque para cambiarlo'
+      ctx.fillText(G.Gamepad?.using?G.I18n.f('Palanca: moverse · {x}/{x}: cambiar ataque · {x}: pausa',G.Gamepad.button(4),G.Gamepad.button(5),G.Gamepad.button(9)):touch ? 'Arrastra el dedo para moverte  ·  toca un ataque para cambiarlo'
                          : 'WASD moverse  ·  1-4 / Q / E o clic en un ataque para cambiarlo  ·  Esc pausa', w / 2, h - 4);
     }
 
