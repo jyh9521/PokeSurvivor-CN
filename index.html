@@ -5,6 +5,54 @@
 <script>window.PS_DEFAULT_LANGUAGE = 'zh-CN'; window.PS_PAGES = true;</script>
 <meta charset="utf-8">
 <meta property="og:locale" content="zh_CN">
+<!-- Startup shell: inline so missing CSS or main JS cannot expose the raw login form. -->
+<style>
+html:not(.ps-started),html:not(.ps-started) body{margin:0;overflow:hidden;background:#0b1838;color:#fff}
+html:not(.ps-started) body>:not(#startup-screen){visibility:hidden!important}
+#startup-screen{box-sizing:border-box;position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;padding:24px;background:#0b1838;color:#fff;font:16px/1.6 system-ui,sans-serif}
+#startup-screen>div{box-sizing:border-box;width:min(440px,100%);padding:24px;border:3px solid #eaf2ff;border-radius:14px;background:#284987;box-shadow:inset 0 0 0 3px #5b83d6}
+#startup-screen h1{margin:0 0 16px;font-size:28px;color:#ffd23f}#startup-screen p{margin:8px 0;overflow-wrap:anywhere}
+#startup-screen button{font:inherit;padding:10px 20px;border:2px solid #fff;border-radius:8px;background:#ffd23f;color:#181306;cursor:pointer}
+#startup-screen button:focus-visible{outline:3px solid #fff;outline-offset:4px}
+#startup-screen small{display:block;margin-top:12px;color:#c7d8f7}html.ps-started #startup-screen{display:none!important}
+</style>
+<script>
+/* Device-independent startup watchdog. Copy is separate from the state machine. */
+window.PSStartup=(()=>{
+  const copy={
+    'zh-CN':{retrying:'正在重新下载必要资源，随后刷新…',resources:'正在下载游戏资源…',fonts:'正在准备字体（超时会使用备用字体）…',session:'正在读取账号与存档…',slow:'加载较慢，仍在等待：',failed:'启动未完成：',style:'界面样式加载失败',script:'游戏脚本下载失败',init:'游戏脚本初始化失败',retry:'重新加载',note:'重试不会清除账号、浏览器存档或 NAS 存档。',wait:'已等待',seconds:'秒'},
+    en:{retrying:'Refreshing required resources before reload…',resources:'Downloading game resources…',fonts:'Preparing fonts (fallback fonts on timeout)…',session:'Reading account and save…',slow:'Loading slowly; still waiting: ',failed:'Startup incomplete: ',style:'Stylesheet failed to load',script:'Game script download failed',init:'Game initialization failed',retry:'Reload',note:'Retry does not clear accounts or browser/NAS saves.',wait:'Waiting',seconds:'s'},
+    es:{retrying:'Descargando de nuevo antes de recargar…',resources:'Descargando el juego…',fonts:'Preparando fuentes (alternativas si tarda)…',session:'Leyendo cuenta y partida…',slow:'Carga lenta; esperando: ',failed:'Inicio incompleto: ',style:'No se cargaron los estilos',script:'No se descargó el juego',init:'Falló el inicio del juego',retry:'Recargar',note:'Reintentar no borra cuentas ni partidas locales o del NAS.',wait:'Espera',seconds:'s'}
+  };
+  let saved;try{saved=localStorage.getItem('ps.lang');}catch{}
+  const lang=copy[saved]?saved:/\/en(\/|$)/.test(location.pathname)?'en':/\/zh(\/|$)/.test(location.pathname)?'zh-CN':window.PS_DEFAULT_LANGUAGE||(/^es/i.test(navigator.language||'')?'es':'en'),t=copy[lang]||copy.en;
+  let state='resources',failure=null,finished=false,retrying=false,resolveStyle,styled=false;const start=Date.now();
+  const styles=new Promise(resolve=>resolveStyle=resolve);
+  function render(){const el=document.getElementById('startup-screen');if(!el||finished)return;
+    const age=Math.floor((Date.now()-start)/1000),text=el.querySelector('[data-startup-status]');
+    text.textContent=retrying?t.retrying:failure?t.failed+(t[failure]||t.init):(age>=8?t.slow:'')+t[state];
+    el.querySelector('[data-startup-time]').textContent=t.wait+' '+age+' '+t.seconds;
+    el.querySelector('[data-startup-note]').textContent=t.note;
+    const button=el.querySelector('button');button.textContent=t.retry;button.hidden=!retrying&&!failure&&age<8;button.disabled=retrying;button.onclick=retry;
+  }
+  // Refresh only public code resources. Never clear localStorage, cookies or saves.
+  async function retry(){if(retrying||finished)return;retrying=true;render();
+    const ctl=new AbortController(),limit=setTimeout(()=>ctl.abort(),8000);
+    const urls=[...document.querySelectorAll('link[data-game-style],script[src]')].map(n=>n.href||n.src);
+    try{await Promise.allSettled(urls.map(url=>fetch(url,{cache:'reload',credentials:'same-origin',signal:ctl.signal}).then(r=>r.arrayBuffer())));}finally{clearTimeout(limit);location.reload();}
+  }
+  const timer=setInterval(render,500);
+  function stage(value){if(!finished){state=copy.en[value]?value:'resources';render();}}
+  function fail(value){if(!finished){failure=copy.en[value]?value:'init';render();}}
+  function styleReady(){if(getComputedStyle(document.documentElement).getPropertyValue('--ps-style-ready').trim()!=='1'){fail('style');return;}styled=true;resolveStyle();render();}
+  function done(){if(finished||retrying||!styled||failure)return;finished=true;clearInterval(timer);document.documentElement.classList.add('ps-started');}
+  addEventListener('error',e=>{if(finished)return;const n=e.target;if(n?.matches?.('link[data-game-style]'))fail('style');else if(n?.tagName==='SCRIPT'&&n.src)fail('script');else if(e.message)fail('init');},true);
+  addEventListener('unhandledrejection',()=>fail('init'));
+  addEventListener('DOMContentLoaded',render);
+  return {styles,stage,fail,styleReady,done};
+})();
+</script>
+
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>PokéSurvivor 中文本地版</title>
 <meta name="description" content="免费的宝可梦生存游戏中文本地版；创建本地账号保存进度，访客不保存；在线功能取决于部署的后端。">
@@ -43,9 +91,14 @@
 <link rel="preload" href="assets/fonts/PixelifyPS-700.ttf" as="font" type="font/ttf" crossorigin>
 
 <!-- Datos estructurados para Google (tipo de página: videojuego gratuito) -->
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=725b31e0d9" media="print" fetchpriority="high" data-game-style onload="this.media='all';PSStartup.styleReady()" onerror="PSStartup.fail('style')">
 </head>
 <body>
+<section id="startup-screen" aria-label="启动状态"><div>
+<h1>PokéSurvivor</h1><p data-startup-status role="status" aria-live="polite">正在下载游戏资源…</p>
+<p data-startup-time></p><button type="button" hidden>重新加载</button>
+<small data-startup-note>重试不会清除账号或存档。</small><noscript>请启用 JavaScript 后刷新页面。<a href="?retry=1" style="color:white">重新加载</a></noscript>
+</div></section>
 
 <canvas id="game"></canvas>
 <!-- En móvil se juega en horizontal -->
@@ -528,6 +581,6 @@
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=c8a9a214ff"></script>
+<script defer src="js/app.min.js?v=e02dd32b66"></script>
 </body>
 </html>

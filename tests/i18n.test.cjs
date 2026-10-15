@@ -44,7 +44,7 @@ test('bootstrap and runtime choose the same supported language', () => {
     ['en', 'zh-CN', '/', 'en'], ['en', 'zh-CN', '/zh/index.html', 'en'],
     ['invalid', 'zh-CN', '/', 'en'], ['invalid', 'es-MX', '/', 'es']
   ];
-  const boot = [...source('dev.html').matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).find(s => s.includes("localStorage.getItem('ps.lang')"));
+  const boot = [...source('dev.html').matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).find(s => s.includes("querySelectorAll('#boot p')"));
   const contact = [...source('contacto/index.html').matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).find(s => s.includes("localStorage.getItem('ps.lang')"));
   for (const [saved, nav, pathname, want] of cases) {
     const c = context({ saved, nav, pathname });

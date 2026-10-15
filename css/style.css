@@ -1011,3 +1011,6 @@ body[data-input=gamepad] .btn.danger.pad-focus{background:linear-gradient(#b73b5
 .layout-panel label .field,.layout-panel label input{flex:1;min-width:0;width:0}.layout-panel .field{padding:6px;font-size:14px}
 .layout-panel .row{gap:6px;justify-content:center}.layout-panel .btn.small{font-size:13px;padding:6px 9px}
 @media(max-height:450px){.layout-panel{left:50%;top:50%;max-height:80dvh}.layout-panel .sub{display:none}}
+
+/* Startup verifies the actual stylesheet, independently of the main bundle. */
+:root{--ps-style-ready:1}

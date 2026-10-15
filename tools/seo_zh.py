@@ -140,6 +140,9 @@ def generate(e):
     dev = (root/'dev.html').read_text(encoding='utf-8')
     idx = (root/'index.html').read_text(encoding='utf-8')
     app = re.search(r'<script defer src="js/app\.min\.js\?v=[^"]+"></script>',idx)[0]
+    # All language entries use the same content-versioned stylesheet as the root.
+    css_ref = re.search(r'href="(css/style\.css[^" ]*)"', idx)[1]
+    dev = dev.replace('href="css/style.css"', 'href="'+css_ref+'"')
     a,b = dev.index('<!-- scripts:begin -->'),dev.index('<!-- scripts:end -->')+len('<!-- scripts:end -->')
     src = dev[:a]+app+dev[b:]
     src = re.sub(r'<!-- seo:(begin|end) -->\n?', '', src)

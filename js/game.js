@@ -891,11 +891,13 @@ G.Flow = {
     G.Audio.music('village');     // suena tras el primer clic (lo exige el navegador)
     G.Game.init();
     // La base de datos (nube o local) recupera la sesión anterior.
+    window.PSStartup?.stage('session');
     G.DB.ready().then(restored => {
       document.getElementById('boot').classList.add('hidden');
+      window.PSStartup?.done();
       // En otra tarea: crear el sonido para comprobarlo cuesta ~60 ms y no debe bloquear la carga.
       setTimeout(() => this.tapToStart(() => { if (restored) this.afterLogin(); else this.toLogin(); }), 0);
-    });
+    }).catch(()=>window.PSStartup?.fail('session'));
   },
   /**
    * "Pulsa para empezar": los navegadores no dejan que una web suene hasta

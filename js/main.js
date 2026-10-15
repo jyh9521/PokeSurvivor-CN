@@ -43,18 +43,22 @@
   }
 
   function boot() {
-    if (maintenance()) return;
-    if (broken()) return;
+    if (maintenance()) { window.PSStartup?.done(); return; }
+    if (broken()) { window.PSStartup?.fail('init'); return; }
     G.I18n.startDom();
+    window.PSStartup?.stage('fonts');
     // Espera a la fuente pixel para que la UI no salte al cargarla.
     const ready = document.fonts && document.fonts.load ? Promise.all([
       document.fonts.load('16px Pixelify'),
       ...(G.I18n.lang === 'zh-CN' ? [document.fonts.load('16px PSChinese', '宝可梦'), document.fonts.load('700 16px PSChinese', '宝可梦')] : [])
     ]) : Promise.resolve();
-    ready.catch(() => {}).then(() => G.Flow.boot());
+    // Font requests must not stall startup indefinitely on a weak connection.
+    let timeout;Promise.race([ready.catch(()=>{}),new Promise(resolve=>timeout=setTimeout(resolve,5000))])
+      .then(()=>{clearTimeout(timeout);G.Flow.boot();}).catch(()=>window.PSStartup?.fail('init'));
   }
-  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', boot);
-  else boot();
+  const start=()=>Promise.resolve(window.PSStartup?.styles).then(boot).catch(()=>window.PSStartup?.fail('init'));
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start);
+  else start();
 
   // Instalable como app (PWA). Sólo con http(s): abierto con doble clic (file://) no hace falta.
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {

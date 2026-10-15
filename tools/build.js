@@ -58,6 +58,8 @@ let html = dev.slice(0, i) + `<script defer src="js/app.min.js?v=${hash}"></scri
 html = html.replace(/<meta name="robots" content="noindex">\s*/, '');
 // --sin-seo: sin canonical/redes/datos estructurados ni enlaces a las páginas
 // (para publicar antes de tener el dominio pokesurvivor.com).
+const styleHash=crypto.createHash('sha1').update(fs.readFileSync(path.join(ROOT,'css/style.css'))).digest('hex').slice(0,10);
+html=html.replace('href="css/style.css"',`href="css/style.css?v=${styleHash}"`);
 const SIN_SEO = process.argv.includes('--sin-seo');
 html = SIN_SEO ? html.replace(/<!-- seo:begin -->[\s\S]*?<!-- seo:end -->\n?/g, '') : html.replace(/<!-- seo:(begin|end) -->\n?/g, '');
 html = html.replace(/<!-- dev.html: página fuente[^>]*-->/, '<!-- GENERADO desde dev.html por tools/build.js: no editar a mano (se edita dev.html). -->');

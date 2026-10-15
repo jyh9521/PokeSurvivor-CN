@@ -6,6 +6,7 @@
  * Cada línea en español y en inglés.
  */
 G.CHANGELOG = [
+  {d:'2026-10-16',title:['Inicio más claro','Clearer startup'],fix:[['Si faltan estilos o scripts, se muestra un aviso y un botón para reintentar, sin borrar la partida. Las fuentes lentas ya no bloquean el inicio.','Missing styles or scripts show a retry screen without clearing saves. Slow fonts no longer block startup.']]},
   {d:'2026-10-15',title:['Controles táctiles a tu gusto','Custom touch controls'],new:[['Coloca ataques, objeto, pausa y joystick; guarda diseños verticales y horizontales por separado. Elige joystick fijo o flotante.','Move attacks, item, pause and joystick; save portrait and landscape layouts separately. Choose fixed or floating joystick.'],['En modo ratón, la rueda cambia de ataque durante la partida.','In mouse movement mode, use the wheel to switch attacks during gameplay.']],fix:[['Los avisos grandes vuelven a quedar centrados.','Large gameplay notices are centered reliably.']]},
   {"d": "2026-10-15", "title": ["Movimiento con ratón", "Mouse movement"], "new": [["Haz clic para moverte o mantén el botón izquierdo; el movimiento manual toma el control y el clic derecho cancela.", "Click to move or hold the left button; manual movement takes over and right-click cancels."]]},
   {"d": "2026-10-15", "title": ["Juego en vertical", "Portrait play"], "new": [["Interfaz vertical con controles táctiles, menús y cartas adaptados; gira sin reiniciar la partida.", "Portrait touch controls, menus and cards; rotate without restarting the run."]]},

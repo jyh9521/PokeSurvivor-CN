@@ -1,49 +1,24 @@
-/* ============ sw.js — para poder instalar el juego como app ============
- * - Código del juego (html, js, css): primero la red, así cada actualización
- *   llega al momento; si no hay conexión, la última copia guardada.
- * - Sprites, iconos y fuente: no cambian nunca, se sirven de la caché
- *   (se van guardando según se usan: no se descarga todo de golpe).
- * - Firebase y demás servicios de fuera no se tocan.
- */
-const CODE = 'ps-cn-code-v3', ART = 'ps-cn-art-v2';
-
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CODE).then(c => c.addAll(['./', './index.html', './css/style.css', './manifest.webmanifest'])).catch(() => {}));
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => /^ps-(cn-)?(code|art)-/.test(k) && k !== CODE && k !== ART).map(k => caches.delete(k))))
-    .then(() => self.clients.claim()));
-});
-
-self.addEventListener('fetch', e => {
-  const req = e.request;
-  if (req.method !== 'GET') return;
-  const url = new URL(req.url);
-  if (url.origin !== location.origin) return;
-  // Private account/session/save responses must never enter shared page caches.
-  if (url.pathname.startsWith('/api/')) return;
-  const art = /\/assets\/(pokemon|icons|fonts)\//.test(url.pathname);
-  if (art) {
-    e.respondWith(caches.open(ART).then(async c => {
-      const hit = await c.match(req);
-      if (hit) return hit;
-      const res = await fetch(req);
-      if (res.ok) c.put(req, res.clone());
+/* Public static cache only: fingerprinted code cache-first, entry/version checks
+ * network-first, art cache-first. Never cache account/session/save endpoints. */
+const CODE='ps-cn-code-v4',ART='ps-cn-art-v2';
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CODE).then(c=>c.addAll(['./','./index.html','./manifest.webmanifest'])).catch(()=>{}));self.skipWaiting();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>/^ps-(cn-)?(code|art)-/.test(k)&&k!==CODE&&k!==ART).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+self.addEventListener('fetch',e=>{
+  const req=e.request;if(req.method!=='GET')return;const url=new URL(req.url);
+  if(url.origin!==location.origin||/^\/api(?:\/|$)/.test(url.pathname))return;
+  const art=/\/assets\/(pokemon|icons|fonts)\//.test(url.pathname),versioned=/\.(?:js|css)$/.test(url.pathname)&&/^[a-f0-9]{10}$/.test(url.searchParams.get('v')||'');
+  const valid=res=>{const type=res.headers.get('content-type')||'';return res.ok&&(req.destination==='script'?/javascript/.test(type):req.destination==='style'?/text\/css/.test(type):true);};
+  e.respondWith((async()=>{
+    const cache=await caches.open(art?ART:CODE);
+    if((art||versioned)&&req.cache!=='reload'&&req.cache!=='no-store'){const hit=await cache.match(req);if(hit)return hit;}
+    try{
+      const res=await fetch(req,art||versioned?undefined:{cache:'no-cache'});
+      if(valid(res)&&(!versioned||/immutable/.test(res.headers.get('cache-control')||''))){const copy=res.clone();e.waitUntil(cache.put(req,copy).catch(()=>{}));}
       return res;
-    }));
-    return;
-  }
-  e.respondWith(fetch(req).then(res => {
-    if (res.ok) { const copy = res.clone(); caches.open(CODE).then(c => c.put(req, copy)); }
-    return res;
-  }).catch(async () => {
-    // Sin red: la copia guardada. La página de inicio sólo sirve de respaldo
-    // al abrir la web (nunca en lugar de un script o una imagen).
-    const hit = await caches.match(req);
-    if (hit) return hit;
-    if (req.mode === 'navigate') return (await caches.match('./index.html')) || Response.error();
-    return Response.error();
-  }));
+    }catch{
+      const hit=await cache.match(req);if(hit)return hit;
+      if(req.mode==='navigate')return (await cache.match('./index.html'))||Response.error();
+      return Response.error();
+    }
+  })());
 });

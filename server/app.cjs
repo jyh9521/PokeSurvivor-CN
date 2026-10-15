@@ -2,11 +2,12 @@
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const {randomBytes}=require('node:crypto'),{WebSocketServer,WebSocket}=require('ws');
 const {isIP}=require('node:net');
+const {createStatic}=require('./static.cjs');
 const {create:createFlow}=require('../js/net/relay-flow.js');
 const Upgrades=require('../js/data/upgrades.js');
 const {createStore,error}=require('./store.cjs');
 function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',registration=true,trustProxy=false,campaigns,reconnectMs=30000}={}) {
-  let closing=false;
+  let closing=false;const serveStatic=createStatic();
   fs.mkdirSync(dataDir,{recursive:true});const store=createStore(path.join(dataDir,'pokesurvivor.sqlite'),{campaigns});
   if(publicOrigin)publicOrigin=new URL(publicOrigin).origin;
   const clients=new Map(),departures=new Map(),flows=new WeakMap(),sockets=new Map(),rooms=new Map(),invites=new Map(),runs=new Map(),limits=new Map();
@@ -110,7 +111,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
     let f=path.resolve(root,'.'+decodeURIComponent(url.pathname)),rel=path.relative(root,f).split(path.sep);
     if((f!==root&&!f.startsWith(root+path.sep))||rel.some(p=>p.startsWith('.'))||(f!==root&&!staticDirs.has(rel[0])&&!staticFiles.has(rel.join('/'))))throw error(403,'Forbidden');
     if(fs.statSync(f).isDirectory())f=path.join(f,'index.html');const real=fs.realpathSync(f);if(!real.startsWith(fs.realpathSync(root)+path.sep))throw error(403,'Forbidden');
-    res.writeHead(200,{'content-type':mime[path.extname(f)]||'application/octet-stream','cache-control':'no-cache','x-content-type-options':'nosniff'});if(req.method==='HEAD')res.end();else fs.createReadStream(f).pipe(res);
+    await serveStatic(req,res,f,mime[path.extname(f)]||'application/octet-stream',url);
   }catch(e){if(!res.headersSent)reply(res,e.status||404,{error:e.status?e.message:'Not found',...(e.current?{current:e.current}:{})});else res.destroy();}});
   const wss=new WebSocketServer({noServer:true,maxPayload:256*1024,perMessageDeflate:false});
   server.requestTimeout=15000;server.headersTimeout=10000;server.keepAliveTimeout=5000;server.maxHeadersCount=100;

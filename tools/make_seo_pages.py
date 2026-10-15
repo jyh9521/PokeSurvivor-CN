@@ -590,6 +590,9 @@ def game_en():
     dev = open(os.path.join(ROOT, 'dev.html'), encoding='utf-8').read()
     idx = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
     app = re.search(r'<script defer src="js/app\.min\.js\?v=[^"]+"></script>', idx).group(0)
+    # All language entries use the same content-versioned stylesheet as the root.
+    css_ref = re.search(r'href="(css/style\.css[^" ]*)"', idx)[1]
+    dev = dev.replace('href="css/style.css"', 'href="'+css_ref+'"')
     a, b = dev.index('<!-- scripts:begin -->'), dev.index('<!-- scripts:end -->') + len('<!-- scripts:end -->')
     src = dev[:a] + app + dev[b:]
     src = re.sub(r'<!-- seo:(begin|end) -->\n?', '', src)

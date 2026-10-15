@@ -12,3 +12,5 @@ cloudflare
 functions
 .firebase
 *.log
+
+.codex-remote-attachments
