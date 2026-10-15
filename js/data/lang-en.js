@@ -648,3 +648,7 @@ G.I18n.add({"Confirmar": "Confirm", "Iconos del mando": "Controller button label
 G.I18n.add({"Mostrar zona de impacto": "Show hurtbox", "Círculo real de contacto y proyectiles; no cambia el daño ni el tamaño.": "Actual contact/projectile circle; does not change damage or collision size.", "Anuncio del servidor": "Server announcement", "Hasta 200 caracteres, 3 envíos por minuto. Solo jugadores conectados.": "Up to 200 characters, 3 messages per minute. Currently connected players only.", "Enviar anuncio": "Send announcement", "Anuncio enviado": "Announcement sent"},"en");
 
 G.I18n.add({"Arrastra para moverte; toca un ataque para cambiarlo y la esquina superior derecha para pausar. Puedes jugar en vertical u horizontal.": "Drag to move, tap a move to switch and the top-right corner to pause. Play in portrait or landscape.", "Arrastra para moverte · toca un ataque": "Drag to move · tap to switch attacks"},"en");
+
+G.I18n.add({"Mover con clic": "Click to move", "Clic izquierdo: ir; mantener: seguir el cursor. Clic derecho o movimiento manual: cancelar.": "Left-click to move; hold to follow the cursor. Right-click or manual movement cancels.", "Destino no alcanzable": "Destination is not reachable."},"en");
+
+G.I18n.add({"Clic para moverte · mantener para seguir · clic derecho cancela": "Click to move · hold to follow · right-click to cancel"},"en");

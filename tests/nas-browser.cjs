@@ -72,7 +72,10 @@ fs.mkdirSync(OUT,{recursive:true});
     check('real peer probe traverses the NAS relay in both directions',network.peerRttMs!=null&&network.nasRttMs!=null&&network.fps>0);
     await a.locator('#nas-network-toggle').click();await a.screenshot({path:path.resolve('artifacts/relay-diagnostics/room-diagnostics.png')});await a.locator('[data-network-close]').click();
     const prior=await a.evaluate(()=>G.Coop.puppets()[0].x);
-    await b.keyboard.down('KeyD');await b.waitForTimeout(1600);await b.keyboard.up('KeyD');
+    if(process.env.PS_CLICK_MOVE==='1'){
+      const goal=await b.evaluate(()=>{const pl=G.Game.player;for(const [dx,dy]of [[120,0],[-120,0],[90,60],[-90,-60]]){const p={x:pl.x+dx,y:pl.y+dy};if(G.Path.route(pl,p))return {x:(p.x-G.Camera.left()+G.Camera._sx)*G.Camera.scale,y:(p.y-G.Camera.top()+G.Camera._sy)*G.Camera.scale};}throw Error('No mouse fixture route');});
+      await b.mouse.click(goal.x,goal.y);await b.waitForTimeout(1600);console.log('INPUT MODE: real mouse ground click on co-op guest');
+    }else{await b.keyboard.down('KeyD');await b.waitForTimeout(1600);await b.keyboard.up('KeyD');}
     check('guest movement arrives in host gameplay',Math.abs((await a.evaluate(()=>G.Coop.puppets()[0].x))-prior)>5);
     // Controlled browser-queue pressure, with genuine relay and game events underneath.
     await a.evaluate(()=>{window.__queueDescriptor=Object.getOwnPropertyDescriptor(WebSocket.prototype,'bufferedAmount');Object.defineProperty(WebSocket.prototype,'bufferedAmount',{configurable:true,get(){return 70000;}});});

@@ -119,5 +119,33 @@ G.Path = (() => {
 
   function clear() { fields.clear(); timer = 0; }
 
-  return { update, dirFor, clear };
+  // Bounded player route, independent of the enemy distance fields and their cadence.
+  // Probe the existing collision solver with disposable coordinates, never move an entity.
+  function route(from,goal) {
+    const TS=G.World.TS,tx=Math.floor(goal.x/TS),ty=Math.floor(goal.y/TS);
+    const sx=Math.floor(from.x/TS),sy=Math.floor(from.y/TS),ox=sx-R,oy=sy-R;
+    if(Math.abs(tx-sx)>R||Math.abs(ty-sy)>R)return null;
+    const fits=(x,y)=>G.World.walkable(Math.floor(x/TS),Math.floor(y/TS))&&!G.World.collide({x,y,r:from.r});
+    if(!fits(goal.x,goal.y))return null;
+    const line=(a,b)=>{const d=Math.hypot(b.x-a.x,b.y-a.y),steps=Math.max(1,Math.ceil(d/Math.max(2,Math.min(TS/4,from.r/2))));for(let i=1;i<=steps;i++)if(!fits(a.x+(b.x-a.x)*i/steps,a.y+(b.y-a.y)*i/steps))return false;return true;};
+    if(line(from,goal))return [{x:goal.x,y:goal.y}];
+    const parent=new Int32Array(N*N).fill(-1),open=new Int8Array(N*N).fill(-1),q=new Int32Array(N*N);
+    const index=(x,y)=>(y-oy)*N+x-ox,start=index(sx,sy),end=index(tx,ty);
+    const point=i=>({x:(ox+i%N+.5)*TS,y:(oy+Math.floor(i/N)+.5)*TS});
+    const pass=i=>{if(open[i]<0){const p=point(i);open[i]=fits(p.x,p.y)?1:0;}return !!open[i];};
+    let head=0,tail=0;parent[start]=start;open[start]=1;q[tail++]=start;
+    while(head<tail&&parent[end]<0){const c=q[head++],x=c%N,y=Math.floor(c/N);
+      for(const[dx,dy]of D8){const nx=x+dx,ny=y+dy;if(nx<0||nx>=N||ny<0||ny>=N)continue;const next=ny*N+nx;
+        if(parent[next]>=0||!pass(next)||(dx&&dy&&(!pass(y*N+nx)||!pass(ny*N+x))))continue;
+        if(!line(c===start?from:point(c),point(next)))continue;
+        parent[next]=c;q[tail++]=next;
+      }
+    }
+    if(parent[end]<0)return null;
+    const points=[];for(let c=end;c!==start;c=parent[c])points.push(point(c));points.reverse();
+    if(!points.length)return null;if(line(points.at(-1),goal))points.push({x:goal.x,y:goal.y});else return null;
+    // Greedy visibility smoothing keeps the path natural without cutting collisions.
+    const result=[];let current=from,i=0;while(i<points.length){let j=points.length-1;while(j>i&&!line(current,points[j]))j--;result.push(points[j]);current=points[j];i=j+1;}return result;
+  }
+  return { update, dirFor, clear, route };
 })();

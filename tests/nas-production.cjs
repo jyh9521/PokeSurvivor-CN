@@ -7,7 +7,7 @@ const {chromium}=require('playwright'),{createApp}=require('../server/app.cjs');
   try{
     await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+app.server.address().port;
     browser=await chromium.launch({headless:true,channel:'chrome'});const ctx=await browser.newContext({locale:'zh-CN',viewport:process.env.PS_PORTRAIT==='1'?{width:390,height:844}:{width:1280,height:800},hasTouch:process.env.PS_PORTRAIT==='1',isMobile:process.env.PS_PORTRAIT==='1'});
-    await ctx.addInitScript(()=>{window.__pad=null;Object.defineProperty(navigator,'getGamepads',{value:()=>window.__pad?[window.__pad]:[]});});
+    await ctx.addInitScript(()=>{window.__pad=null;window.__mouseMarkerAt=0;const arc=CanvasRenderingContext2D.prototype.arc;CanvasRenderingContext2D.prototype.arc=function(...args){if(this.strokeStyle==='#ffe680')window.__mouseMarkerAt=performance.now();return arc.apply(this,args);};Object.defineProperty(navigator,'getGamepads',{value:()=>window.__pad?[window.__pad]:[]});});
     // Service-worker routing bypasses Playwright routes, so observe every request.
     ctx.on('request',r=>{if(/^https?:/.test(r.url())&&new URL(r.url()).origin!==origin)external.push(r.url());});
     const p=await ctx.newPage();const press=async i=>{await p.evaluate(i=>window.__pad.buttons[i].pressed=true,i);await p.waitForTimeout(90);await p.evaluate(i=>window.__pad.buttons[i].pressed=false,i);await p.waitForTimeout(100);};p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept('production-nas-test'));
@@ -60,6 +60,9 @@ const {chromium}=require('playwright'),{createApp}=require('../server/app.cjs');
     await press(9);await announce('受保护对局公告');await p.locator('.announcement-lane').waitFor();
     check('protected in-run broadcast leaves pause closed and input unobstructed',!(await p.locator('#scr-pause').isVisible())&&await p.locator('#game-dialog').count()===0&&await p.locator('.announcement-lane').evaluate(el=>getComputedStyle(el).pointerEvents==='none'));
     const bx=await p.locator('.announcement-lane span').evaluate(el=>el.getBoundingClientRect().x);await p.waitForTimeout(400);check('protected broadcast travels right to left',await p.locator('.announcement-lane span').evaluate(el=>el.getBoundingClientRect().x)<bx);
+    await p.evaluate(()=>window.__pad=null);await p.waitForTimeout(180);if(await p.locator('#scr-pause').isVisible())await p.locator('#btn-resume').click();
+    let marked=false;for(const [dx,dy]of [[70,0],[-70,0],[0,70],[0,-70]]){const size=p.viewportSize(),stamp=await p.evaluate(()=>window.__mouseMarkerAt);await p.mouse.click(size.width/2+dx,size.height/2+dy);await p.waitForTimeout(100);if(await p.evaluate(t=>window.__mouseMarkerAt>t,stamp)){marked=true;break;}}
+    check('protected runtime accepts mouse ground-click intent',marked);await p.mouse.click(10,100,{button:'right'});await p.waitForTimeout(150);const stamp=await p.evaluate(()=>window.__mouseMarkerAt);await p.waitForTimeout(200);check('protected right-click removes destination marker',await p.evaluate(t=>window.__mouseMarkerAt===t,stamp));
     const local=await p.evaluate(()=>Object.entries(localStorage).filter(([k])=>k.startsWith('ps.nas.save.')).map(([,v])=>JSON.parse(v)));
     check('browser copy matches persisted NAS partner',local.length===1&&local[0].save.partner===app.store.getSave(user.id).save.partner);
     check('no third-party requests',external.length===0);check('no browser errors',errors.length===0);

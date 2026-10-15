@@ -378,7 +378,7 @@ G.HUD = (() => {
       ctx.textAlign = 'center';
       ctx.fillStyle = 'rgba(180,200,230,.55)';
       ctx.fillText(G.Gamepad?.using?G.I18n.f('Palanca: moverse · {x}/{x}: cambiar ataque · {x}: pausa',G.Gamepad.button(4),G.Gamepad.button(5),G.Gamepad.button(9)):touch ? (l.portrait?'Arrastra para moverte · toca un ataque':'Arrastra el dedo para moverte  ·  toca un ataque para cambiarlo')
-                         : 'WASD moverse  ·  1-4 / Q / E o clic en un ataque para cambiarlo  ·  Esc pausa', w / 2, h-4-(touch?G.Touch.safeArea().bottom:0),w-16);
+                         : G.Settings.get('clickMove')?'Clic para moverte · mantener para seguir · clic derecho cancela':'WASD moverse  ·  1-4 / Q / E o clic en un ataque para cambiarlo  ·  Esc pausa', w / 2, h-4-(touch?G.Touch.safeArea().bottom:0),w-16);
     }
 
     if(G.Coop.active)drawMarks(ctx,w,h,pl);

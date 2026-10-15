@@ -32,16 +32,17 @@ G.Input = (() => {
     /** Vector de movimiento del jugador (teclado o joystick táctil). */
     inject(c){pressed.add(c);},
     bindings,action,label,moveBindings:MOVE_KEYS,
-    axis() {
-      const pad=G.Gamepad?.axis();if(pad&&(pad[0]||pad[1]))return pad;
+    axis(dt=1/60) {
+      const pad=G.Gamepad?.axis();if(pad&&(pad[0]||pad[1])){G.ClickMove?.cancel();return pad;}
       const t = G.Touch && G.Touch.vector();
-      if (t && (t[0] || t[1])) return t;
+      if (t && (t[0] || t[1])) {G.ClickMove?.cancel();return t;}
       let x = 0, y = 0;
       if (MOVE_KEYS.left.some(k => down.has(k))) x -= 1;
       if (MOVE_KEYS.right.some(k => down.has(k))) x += 1;
       if (MOVE_KEYS.up.some(k => down.has(k))) y -= 1;
       if (MOVE_KEYS.down.some(k => down.has(k))) y += 1;
-      return G.U.norm(x, y);
+      if(Object.values(MOVE_KEYS).flat().some(k=>down.has(k))){G.ClickMove?.cancel();return G.U.norm(x,y);}
+      return G.ClickMove?.vector(dt)||[0,0];
     },
     held(c) { return down.has(c); },
     /** true sólo en el frame en que se pulsó. */

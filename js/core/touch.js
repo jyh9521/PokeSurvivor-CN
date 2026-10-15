@@ -59,6 +59,8 @@ G.Touch = (() => {
 
   function down(e) {
     const touchy = e.pointerType !== 'mouse';
+    if(!touchy&&e.button!==0)return;
+    if(touchy)G.ClickMove?.cancel();
     if (touchy && !active) { active = true; document.body.classList.add('touch'); }
     const b = hit(e.clientX, e.clientY);
     if (b) { e.preventDefault(); press(b); return; }
@@ -129,5 +131,5 @@ G.Touch = (() => {
   }
 
   return { init, vector, draw, clearButtons, addButton, reset, safeArea,
-           get active() { return active; }, get stick() { return stick; } };
+           overButton:(x,y)=>!!hit(x,y),get active() { return active; }, get stick() { return stick; } };
 })();

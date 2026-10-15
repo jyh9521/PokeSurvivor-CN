@@ -31,7 +31,7 @@ G.Game = (() => {
     ctx = cv.getContext('2d');
     resize();
     addEventListener('resize', resize);G.Settings.on((k)=>{if(k==='quality')resize();});
-    G.Touch.init(cv);
+    G.Touch.init(cv);G.ClickMove?.init(cv);
     // En móvil: al cambiar de app, la partida se pausa.
     document.addEventListener('visibilitychange', () => { if (document.hidden) autoPause(); });
     G.RunUI.wirePause(() => { state = 'playing'; G.UI.hideAll(); }, quitRun);
@@ -48,7 +48,7 @@ G.Game = (() => {
     cv.width = Math.round(w * dpr);
     cv.height = Math.round(h * dpr);
     G.Camera.resize(w, h, dpr);
-    G.Touch.reset(); // Resizing never leaves a captured joystick direction behind.
+    G.ClickMove?.cancel();G.Touch.reset(); // Resizing never leaves a captured joystick direction behind.
   }
 
   /** Pausa sola (sólo en solitario: en grupo los demás siguen). */
@@ -587,7 +587,7 @@ G.Game = (() => {
     if (fpsAcc >= 0.5) { fpsShown = Math.round(fpsN / fpsAcc); fpsAcc = 0; fpsN = 0; }
     frameDt = state === 'playing' ? dt : 0;
 
-    G.Gamepad?.poll();handleKeys();
+    G.Gamepad?.poll();handleKeys();G.ClickMove?.tick();
 
     if (state === 'playing') update(dt);
     else if (pl && state !== 'ui') { G.FX.update(dt * 0.25); pl.anim.update(dt * 0.25); }
@@ -715,6 +715,7 @@ G.Game = (() => {
       else it.ent?.draw(ctx);
     }
     if(state!=='ui')G.Occlusion.draw(ctx,extra.filter(Boolean),props,t,frameDt);
+    if(state!=='ui')G.ClickMove?.draw(ctx);
     if(state!=='ui'&&pl&&!pl.dead&&G.Settings.get('showHitbox')){
       ctx.save();ctx.globalAlpha=1;ctx.setLineDash([]);ctx.lineWidth=1.5;
       ctx.fillStyle='rgba(255,230,80,.15)';ctx.strokeStyle='#fff080';
