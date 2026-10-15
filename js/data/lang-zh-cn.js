@@ -2,6 +2,21 @@
  * Initially adapted from DabaoHuang/pokesurvivor PR #74; reviewed against this game.
  * Names are separately verified in lang-zh-cn-names.js. See docs/LOCALIZATION.md. */
 G.I18n.add({
+  "Vibración del mando": "手柄振动",
+  "Vibra al recibir daño real.": "实际受到伤害时振动；连接手柄后生效。",
+  "Probar vibración": "测试振动",
+  "Vibración disponible. Prueba el mando.": "已检测到振动接口，可点击“测试振动”。",
+  "Enviando vibración…": "正在发送振动指令…",
+  "El navegador completó la orden. Comprueba si el mando vibró.": "浏览器已完成振动指令；请确认手柄是否实际振动。",
+  "La vibración fue interrumpida. Prueba otra vez.": "振动指令被中断，请重新测试。",
+  "El navegador rechazó la vibración. Comprueba el modo del mando y la conexión.": "浏览器拒绝振动请求，请检查手柄模式与连接方式。",
+  "Este navegador o conexión no expone vibración. Prueba USB o modo XInput.": "当前浏览器或连接方式未提供振动接口，可尝试 USB 或 XInput 模式。",
+  "No hay mando estándar conectado. Pulsa un botón del mando.": "未检测到标准手柄，请连接后按一下手柄按键。",
+  "Activa el mando y la vibración para probar.": "请先启用手柄与手柄振动。",
+  "Listas y vibración del mando": "下拉列表与手柄振动修复",
+  "Todas las listas se abren con A, se recorren con arriba/abajo y se cancelan con B; otro clic en el selector cierra la lista.": "所有下拉列表统一支持 A 展开与确认、上下选择、B 取消；再次点击本体即可收起。",
+  "Las mejoras reservan espacio para las descripciones y los botones; la vibración incluye prueba y estado del dispositivo.": "强化说明与按钮分行布局，避免文字挤压；手柄振动增加测试入口与接口状态。",
+
   "{x} niveles": "已强化 {x} 级",
   "¿Devolver todas las mejoras? Recuperas el 50%: {x} monedas.": "返还所有宝可梦的全部强化？返还已投入金币的 50%，共 {x} 金币。",
   "Todas las diarias y semanales completadas": "领取全部已完成的每日与每周任务奖励",

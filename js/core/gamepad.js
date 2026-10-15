@@ -1,6 +1,6 @@
 /* Standard Gamepad API: spatial focus, explicit Back/Pause, device-aware hints. */
 G.Gamepad=(()=>{
-  let axis=[0,0],previous=[],active=null,repeatAt=0,lastDir='',armed=false,using=false,scopeBefore=null,editing=null;
+  let axis=[0,0],previous=[],active=null,repeatAt=0,lastDir='',armed=false,using=false,scopeBefore=null;
   let lastAxes=[0,0];
   const memory=new WeakMap(),originalKeys=new WeakMap();let cache=null,dirty=true;
   new MutationObserver(()=>dirty=true).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden','disabled','style']});window.addEventListener('resize',()=>dirty=true);
@@ -8,8 +8,7 @@ G.Gamepad=(()=>{
   const visible=el=>!!el&&!el.closest('.hidden,[hidden],[inert]')&&!!el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden';
   function layout(){const setting=G.Settings.get('padLayout');return layouts[setting]?setting:/054c|dualsense|dualshock|playstation|sony/i.test(active?.id||'')?'playstation':/057e|nintendo|joy-con|switch pro/i.test(active?.id||'')?'nintendo':'xbox';}
   const button=i=>layouts[layout()][i]||String(i);
-  function cancelEdit(){if(!editing)return;const {el,value}=editing;editing=null;delete el.dataset.padEdit;if(el.isConnected)el.value=value;}
-  function mode(value){if(using===value&&document.body.dataset.input===(value?'gamepad':'keyboard'))return;using=value;document.body.dataset.input=value?'gamepad':'keyboard';if(!value){stopRumble();cancelEdit();document.querySelectorAll('.pad-focus').forEach(el=>el.classList.remove('pad-focus'));}}
+  function mode(value){if(using===value&&document.body.dataset.input===(value?'gamepad':'keyboard'))return;using=value;document.body.dataset.input=value?'gamepad':'keyboard';if(!value){document.querySelectorAll('.pad-focus').forEach(el=>el.classList.remove('pad-focus'));}}
   window.addEventListener('wheel',()=>mode(false),{passive:true});
   window.addEventListener('keydown',()=>mode(false),true);
   window.addEventListener('pointerdown',()=>mode(false),true);
@@ -24,17 +23,17 @@ G.Gamepad=(()=>{
   function focus(el,root){if(!el)return;document.querySelectorAll('.pad-focus').forEach(n=>n.classList.remove('pad-focus'));if(el.tabIndex<0)el.tabIndex=0;if(el.tagName==='BUTTON'&&getComputedStyle(el).position==='static')el.classList.add('pad-relative');el.classList.add('pad-focus');el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',inline:'nearest'});memory.set(root,{key:identity(el),rect:el.getBoundingClientRect()});}
   function ensure(root,all){if(!root)return null;if(all.includes(document.activeElement)){if(using&&!document.activeElement.classList.contains('pad-focus'))focus(document.activeElement,root);return document.activeElement;}const restored=G.UIFocus.take(root);if(all.includes(restored)){focus(restored,root);return restored;}const saved=memory.get(root);let el=saved?.key&&all.find(n=>identity(n)===saved.key);if(!el&&saved?.rect){const c=r=>[(r.left+r.right)/2,(r.top+r.bottom)/2],p=c(saved.rect);el=all.slice().sort((a,b)=>{const x=c(a.getBoundingClientRect()),y=c(b.getBoundingClientRect());return Math.hypot(x[0]-p[0],x[1]-p[1])-Math.hypot(y[0]-p[0],y[1]-p[1]);})[0];}el=el||all[0];focus(el,root);return el;}
   function adjust(el,dir){const sign=['left','up'].includes(dir)?-1:1;
-    if(el.tagName==='SELECT'){let i=el.selectedIndex+sign;while(el.options[i]?.disabled||el.options[i]?.hidden)i+=sign;if(i<0||i>=el.options.length)return;el.selectedIndex=i;return;}
-    else {const step=Number(el.step)||1;el.value=Math.max(Number(el.min)||0,Math.min(Number(el.max)||100,Number(el.value)+sign*step));el.dispatchEvent(new Event('input',{bubbles:true}));}
+    const step=Number(el.step)||1;el.value=Math.max(Number(el.min)||0,Math.min(Number(el.max)||100,Number(el.value)+sign*step));el.dispatchEvent(new Event('input',{bubbles:true}));
     el.dispatchEvent(new Event('change',{bubbles:true}));
   }
-  function navigate(root,all,dir){const el=ensure(root,all);if(!el)return;if(editing?.el===el||el.matches('input[type=range]')&&['left','right'].includes(dir)){adjust(el,dir);return;}const found=G.PadNav.next(el.getBoundingClientRect(),all.filter(n=>n!==el).map(n=>({el:n,rect:n.getBoundingClientRect()})),dir);if(found)focus(found.el,root);}
-  function confirm(root,all){const el=ensure(root,all);if(!el)return;if(el.tagName==='SELECT'){if(editing){const changed=el.value!==editing.value;delete el.dataset.padEdit;editing=null;if(changed)el.dispatchEvent(new Event('change',{bubbles:true}));}else{editing={el,value:el.value};el.dataset.padEdit='true';}return;}if(el.matches('input:not([type=checkbox]):not([type=radio]),textarea')){el.focus();return;}el.click();}
-  function back(root){if(G.Dialog?.open){G.Dialog.cancel();return;}if(editing){cancelEdit();return;}
+  function navigate(root,all,dir){if(root===G.SelectPopup.element){G.SelectPopup.navigate(dir);return;}const el=ensure(root,all);if(!el)return;if(el.matches('input[type=range]')&&['left','right'].includes(dir)){adjust(el,dir);return;}const found=G.PadNav.next(el.getBoundingClientRect(),all.filter(n=>n!==el).map(n=>({el:n,rect:n.getBoundingClientRect()})),dir);if(found)focus(found.el,root);}
+  function confirm(root,all){const el=ensure(root,all);if(!el)return;if(el.tagName==='SELECT'){G.SelectPopup.open(el);return;}if(el.matches('input:not([type=checkbox]):not([type=radio]),textarea')){el.focus();return;}el.click();}
+  function back(root){if(G.Dialog?.open){G.Dialog.cancel();return;}
     G.UIFocus.back(root);
   }
 
   function hints(root){
+    G.SettingsUI?.refreshRumble?.();
     for(const el of document.querySelectorAll('[data-key-action]')){const keys=G.Input.bindings[el.dataset.keyAction],value=keys.map(G.Input.label).join('/');if(el.textContent!==value)el.textContent=value;}
     for(const el of document.querySelectorAll('[data-key-move]')){const value=['up','left','down','right'].map(k=>G.Input.label(G.Input.moveBindings[k][0])).join('');if(el.textContent!==value)el.textContent=value;}
     const glyphs=layouts[layout()];for(const el of document.querySelectorAll('[data-pad-controls]')){const value=G.I18n.f('Palanca: moverse · {x}: confirmar · {x}: volver · {x}/{x}: cambiar ataque · {x}: pausa',button(0),button(1),button(4),button(5),button(9));if(el.textContent!==value)el.textContent=value;}const confirmGlyph=JSON.stringify(button(0));if(document.documentElement.style.getPropertyValue('--pad-confirm')!==confirmGlyph)document.documentElement.style.setProperty('--pad-confirm',confirmGlyph);
@@ -52,7 +51,7 @@ G.Gamepad=(()=>{
     if(significant(axes)&&(changed||!significant(lastAxes))||states.some((v,i)=>v&&!previous[i]))mode(true);
     if(changed||!significant(axes))lastAxes=axes;
 
-    const root=scope(),all=targets(root);if(root!==scopeBefore){scopeBefore=root;cancelEdit();repeatAt=performance.now()+160;lastDir='';if(using)ensure(root,all);}if(editing&&!all.includes(editing.el))cancelEdit();
+    const root=scope(),all=targets(root);if(root!==scopeBefore){scopeBefore=root;repeatAt=performance.now()+160;lastDir='';if(using)ensure(root,all);}
     const playing=G.Game.state==='playing'&&!root;
     if(playing&&using){const len=Math.hypot(x,y);if(len>.2){const scale=Math.min(1,(len-.2)/.8)/len;axis=[x*scale,y*scale];}if(read(14)||read(15)||read(12)||read(13))axis=G.U.norm((read(15)?1:0)-(read(14)?1:0),(read(13)?1:0)-(read(12)?1:0));if(edge(4))G.Input.inject(G.Input.bindings.previous[0]);if(edge(5))G.Input.inject(G.Input.bindings.next[0]);if(edge(0))G.Judgment?.cinematic?G.Input.inject('enter'):G.Coop?.ping('gather');if(edge(2))G.Coop?.ping('help');if(edge(3))G.Coop?.ping('danger');}
     else if(root&&using){if(using)ensure(root,all);const dir=read(14)?'left':read(15)?'right':read(12)?'up':read(13)?'down':Math.abs(x)>.6&&Math.abs(x)>=Math.abs(y)?x<0?'left':'right':Math.abs(y)>.6?y<0?'up':'down':'';
@@ -61,13 +60,15 @@ G.Gamepad=(()=>{
     if(edge(9)&&!G.Dialog?.open){if(root?.id==='scr-pause')document.getElementById('btn-resume').click();else if(playing)G.Game.togglePause();}
     hints(scope());previous=states;
   }
-  function stopRumble(){try{const promise=active?.vibrationActuator?.reset?.();promise?.catch?.(()=>{});}catch{}}
-  function rumble(ratio){
-    if(!using||!active?.connected)return;
-    const a=active.vibrationActuator||active.hapticActuators?.[0];if(!a?.playEffect)return;
-    const strength=Math.min(.8,.25+Math.max(0,ratio)*1.5);
-    try{a.playEffect('dual-rumble',{startDelay:0,duration:Math.round(90+strength*100),weakMagnitude:strength*.6,strongMagnitude:strength}).catch?.(()=>{});}catch{}
+  function stopRumble(){G.Haptics.stop();}
+  function currentPad(){try{return Array.from(navigator.getGamepads?.()||[]).find(p=>p?.connected&&p.mapping==='standard')||null;}catch{return null;}}
+  function rumbleStatus(){const pad=currentPad();return !G.Settings.get('gamepad')||!G.Settings.get('rumble')?{code:'disabled'}:!pad?{code:'no-pad'}:!G.Haptics.supported(pad)?{code:'unsupported'}:G.Haptics.status;}
+  function rumble(ratio,test=false){
+    if(!G.Settings.get('gamepad')||!G.Settings.get('rumble')||document.hidden)return Promise.resolve(false);
+    const strength=test ? .8 :Math.min(.9,.45+Math.max(0,ratio)*1.5);
+    return G.Haptics.play(currentPad(),strength,test?350:Math.round(110+strength*100));
   }
+  G.Settings.on((key,value)=>{if(['gamepad','rumble'].includes(key)&&!value)stopRumble();});
   window.addEventListener('blur',stopRumble);document.addEventListener('visibilitychange',()=>{if(document.hidden)stopRumble();});
-  return {poll,rumble,stopRumble,button,axis:()=>axis,get using(){return using;},get connected(){return !!active;},get layout(){return layout();}};
+  return {poll,rumble,rumbleStatus,stopRumble,button,axis:()=>axis,get using(){return using;},get connected(){return !!active;},get layout(){return layout();}};
 })();

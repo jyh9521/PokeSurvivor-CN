@@ -4,6 +4,21 @@
  * son los oficiales en inglés.
  */
 G.I18n.add({
+  "Vibración del mando": "Controller vibration",
+  "Vibra al recibir daño real.": "Vibrate on actual damage while a controller is connected.",
+  "Probar vibración": "Test vibration",
+  "Vibración disponible. Prueba el mando.": "Vibration API detected. Use Test vibration.",
+  "Enviando vibración…": "Sending vibration command…",
+  "El navegador completó la orden. Comprueba si el mando vibró.": "Browser completed the command. Confirm whether the controller physically vibrated.",
+  "La vibración fue interrumpida. Prueba otra vez.": "Vibration was interrupted. Try again.",
+  "El navegador rechazó la vibración. Comprueba el modo del mando y la conexión.": "Browser rejected vibration. Check controller mode and connection.",
+  "Este navegador o conexión no expone vibración. Prueba USB o modo XInput.": "This browser or connection exposes no vibration API. Try USB or XInput mode.",
+  "No hay mando estándar conectado. Pulsa un botón del mando.": "No standard controller detected. Connect it and press a button.",
+  "Activa el mando y la vibración para probar.": "Enable the controller and vibration first.",
+  "Listas y vibración del mando": "Dropdown and controller vibration fixes",
+  "Todas las listas se abren con A, se recorren con arriba/abajo y se cancelan con B; otro clic en el selector cierra la lista.": "All dropdowns open and confirm with A, navigate up/down and cancel with B; clicking the selector again closes the list.",
+  "Las mejoras reservan espacio para las descripciones y los botones; la vibración incluye prueba y estado del dispositivo.": "Upgrade descriptions and actions have separate rows; vibration adds a test button and device status.",
+
   "{x} niveles": "{x} levels",
   "¿Devolver todas las mejoras? Recuperas el 50%: {x} monedas.": "Refund all upgrades? Recover 50% of the gold spent: {x} coins.",
   "Todas las diarias y semanales completadas": "All completed daily and weekly missions",

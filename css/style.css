@@ -904,3 +904,15 @@ body[data-input=gamepad] .pad-focus:disabled{filter:none;opacity:.5}
 @media(max-width:600px){#upg-actions{flex-basis:100%}.upg-head .stage{flex-basis:80px;width:80px;height:72px}.select-popup{font-size:16px}}
 body[data-input=gamepad] .btn.gold.pad-focus{color:#382408!important;filter:none}
 body[data-input=gamepad] .btn.danger.pad-focus{background:linear-gradient(#b73b50,#842338)!important;color:#fff!important}
+
+/* Upgrade actions get their own row; descriptions never compete with buttons. */
+.upg{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+.upg-item{grid-template-columns:40px minmax(0,1fr);grid-template-rows:auto auto;align-content:start;gap:8px 10px;min-width:0}
+.upg-item>.ic{grid-column:1;grid-row:1;align-self:center}
+.upg-item>div:nth-child(2){grid-column:2;grid-row:1;min-width:0}
+.upg-item>div:nth-child(2)>b{display:block;margin-bottom:3px}
+.upg-item>div:nth-child(2)>span{display:block;line-height:1.55;overflow-wrap:anywhere}
+.upg-item .pips{flex-wrap:wrap;row-gap:4px}
+.upg-item .upg-btns{grid-column:2;grid-row:2;display:flex;flex-wrap:wrap;justify-content:flex-end;min-width:0;gap:6px}
+.upg-item .upg-btns>.btn{max-width:100%;white-space:normal}
+[data-rumble-status]{display:block;line-height:1.5;margin-top:8px}

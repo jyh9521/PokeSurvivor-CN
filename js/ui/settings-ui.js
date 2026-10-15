@@ -6,7 +6,7 @@
 G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const VERSION = '0.6.0 · 2026-10-15';
+  const VERSION = '0.6.1 · 2026-10-15';
   const REPO = G.PROJECT_REPO || 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 
@@ -89,7 +89,7 @@ G.SettingsUI = (() => {
              <button class="btn small" id="set-full">${isFull() ? 'Salir' : 'Activar'}</button></div>`
            : iosTip() ? `<div class="set-row"><div class="grow"><b>Pantalla completa</b><small>${esc(IOS_TIP)}</small></div></div>` : '');
     } else if (tab === 'ctl') {
-      box.innerHTML = section('Mando','')+'<p class=sub data-pad-controls></p>'+toggle('gamepad','Activar mando','Pulsa un botón para detectar el mando. Los campos de texto siguen usando teclado.')+section('Iconos del mando','')+'<select class=field data-pad-layout aria-label="'+esc(G.T('Iconos del mando'))+'">'+[['auto','Auto'],['xbox','Xbox'],['playstation','PlayStation'],['nintendo','Nintendo']].map(([v,n])=>'<option value="'+v+'" '+(G.Settings.get('padLayout')===v?'selected':'')+'>'+n+'</option>').join('')+'</select>'+section('En móvil o tablet')
+      box.innerHTML = section('Mando','')+'<p class=sub data-pad-controls></p>'+toggle('gamepad','Activar mando','Pulsa un botón para detectar el mando. Los campos de texto siguen usando teclado.')+toggle('rumble','Vibración del mando','Vibra al recibir daño real.')+'<button class="btn small" data-rumble-test>'+G.T('Probar vibración')+'</button><p class=sub data-rumble-status role=status></p>'+section('Iconos del mando','')+'<select class=field data-pad-layout aria-label="'+esc(G.T('Iconos del mando'))+'">'+[['auto','Auto'],['xbox','Xbox'],['playstation','PlayStation'],['nintendo','Nintendo']].map(([v,n])=>'<option value="'+v+'" '+(G.Settings.get('padLayout')===v?'selected':'')+'>'+n+'</option>').join('')+'</select>'+section('En móvil o tablet')
         + `<p class="sub">Pon el dedo en cualquier parte y arrastra para moverte: el joystick aparece donde tocas. Toca un ataque de abajo para cambiarlo y el botón de arriba a la derecha para pausar. Se juega en horizontal.</p>`
         + `<div class="set-row"><div class="grow"><b>Tamaño del joystick</b><small>Cuánto hay que arrastrar el dedo.</small></div></div>`
         + choice('stick', [[0.8, 'Pequeño'], [1, 'Normal'], [1.25, 'Grande']])
@@ -146,7 +146,11 @@ G.SettingsUI = (() => {
          </div><p class="note" id="set-msg"></p>`;
   }
 
+  const RUMBLE_TEXT={idle:'Vibración disponible. Prueba el mando.',playing:'Enviando vibración…',complete:'El navegador completó la orden. Comprueba si el mando vibró.',preempted:'La vibración fue interrumpida. Prueba otra vez.',error:'El navegador rechazó la vibración. Comprueba el modo del mando y la conexión.',unsupported:'Este navegador o conexión no expone vibración. Prueba USB o modo XInput.', 'no-pad':'No hay mando estándar conectado. Pulsa un botón del mando.',disabled:'Activa el mando y la vibración para probar.'};
+  function refreshRumble(){const el=document.querySelector('[data-rumble-status]');if(!el)return;const value=G.T(RUMBLE_TEXT[G.Gamepad.rumbleStatus().code]||RUMBLE_TEXT.idle);if(el.textContent!==value)el.textContent=value;}
   function wire(box) {
+    const test=box.querySelector('[data-rumble-test]');if(test)test.onclick=async()=>{test.disabled=true;try{await G.Gamepad.rumble(1,true);}finally{if(test.isConnected)test.disabled=false;refreshRumble();}};
+    refreshRumble();
     const layout=box.querySelector('[data-pad-layout]');if(layout)layout.onchange=()=>G.Settings.set('padLayout',layout.value);
     box.querySelectorAll('.switch[data-k]').forEach(b => { b.onclick = () => { G.Settings.set(b.dataset.k, !G.Settings.get(b.dataset.k)); render(); }; });
     box.querySelectorAll('.chip[data-k]').forEach(b => {
@@ -178,5 +182,5 @@ G.SettingsUI = (() => {
     G.DB.logout().then(r => { if (r !== false) G.Flow.toLogin(); });
   }
 
-  return { init, open, close, get isOpen() { return isOpen(); } };
+  return { refreshRumble, init, open, close, get isOpen() { return isOpen(); } };
 })();
