@@ -49,8 +49,8 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
     return {rows:(url.searchParams.get('friends')==='1'?all.filter(r=>r.uids.some(u=>circle.has(u))):all).slice(0,50),mine:mine<0?null:{pos:mine+1,t:all[mine].t,row:all[mine]}};
   }
   const staticDirs=new Set(['assets','css','js','en','zh','guia','pokedex','legendarios','shinies','tipos','movimientos','objetos','logros','novedades','apoyar','contacto']);
-  const staticFiles=new Set(['index.html','sw.js','version.json','manifest.webmanifest','favicon.ico','robots.txt','sitemap.xml','404.html']);
-  const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.ico':'image/x-icon','.ttf':'font/ttf','.woff2':'font/woff2','.json':'application/json','.webmanifest':'application/manifest+json'};
+  const staticFiles=new Set(['index.html','sw.js','version.json','manifest.webmanifest','favicon.ico','robots.txt','sitemap.xml','404.html','LICENSE','LICENSE-NONCOMMERCIAL.md','UPSTREAM-NOTICES.md']);
+  const mime={'.md':'text/plain; charset=utf-8','.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.ico':'image/x-icon','.ttf':'font/ttf','.woff2':'font/woff2','.json':'application/json','.webmanifest':'application/manifest+json'};
   const server=http.createServer(async(req,res)=>{try{
     const url=new URL(req.url,'http://local');
     if(url.pathname.startsWith('/api/')){

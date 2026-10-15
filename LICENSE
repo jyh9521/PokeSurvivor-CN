@@ -1,7 +1,11 @@
 PokéSurvivor — licencias
 
-1) CÓDIGO (todo lo que hay en js/, css/, index.html, tools/ y la música de
-   js/data/music.js): licencia MIT.
+1) CÓDIGO: el código publicado hasta JPTER78/pokesurvivor@b297089 conserva MIT.
+   EXCEPCIÓN: las partes importadas/adaptadas desde 4de8495 (colocación de controles,
+   joystick fijo y centrado de avisos) se rigen por PolyForm Noncommercial 1.0.0.
+   Consulta UPSTREAM-NOTICES.md y LICENSE-NONCOMMERCIAL.md. Las distribuciones
+   y bundles que incluyen esas partes deben conservar esos avisos y licencia.
+   La siguiente licencia MIT no sustituye a la licencia de esas partes nuevas.
 
 MIT License
 

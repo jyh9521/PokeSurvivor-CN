@@ -3,8 +3,8 @@ const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const {spawn}=require('node:child_process');
 const ROOT=path.resolve(__dirname,'..');
 const ALLOWED=new Set(['assets','css','js','en','zh','guia','pokedex','legendarios','shinies','tipos','movimientos','objetos','logros','novedades','apoyar','contacto']);
-const FILES=new Set(['index.html','dev.html','404.html','sw.js','version.json','manifest.webmanifest','favicon.ico','robots.txt','sitemap.xml']);
-const MIME={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.ico':'image/x-icon','.ttf':'font/ttf','.woff2':'font/woff2'};
+const FILES=new Set(['index.html','dev.html','404.html','sw.js','version.json','manifest.webmanifest','favicon.ico','robots.txt','sitemap.xml','LICENSE','LICENSE-NONCOMMERCIAL.md','UPSTREAM-NOTICES.md']);
+const MIME={'.md':'text/plain; charset=utf-8','.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.ico':'image/x-icon','.ttf':'font/ttf','.woff2':'font/woff2'};
 const PORT=Number(process.env.PORT || 8765);
 const server=http.createServer((req,res)=>{
   try {

@@ -19,7 +19,7 @@
 
 ## 来源与许可
 
-- 源码：[JPTER78/pokesurvivor](https://github.com/JPTER78/pokesurvivor)，MIT。
+- 源码：[JPTER78/pokesurvivor](https://github.com/JPTER78/pokesurvivor)，基础版本 MIT；新增移植部分见 [上游许可声明](UPSTREAM-NOTICES.md)。
 - 简体中文贡献：wheart22 的 PR #88；保留贡献者署名。
 - 精灵：PMD SpriteCollab，CC BY-NC 4.0，完整艺术家名单见 `CREDITS.md`。
 - Pixelify 与 PSChinese／Noto Sans SC 字体：OFL，许可证位于 `assets/fonts/`。

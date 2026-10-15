@@ -34,4 +34,4 @@ npm run package
 
 fork 自 [JPTER78/pokesurvivor](https://github.com/JPTER78/pokesurvivor)，简体中文基于 wheart22 的 [PR #88](https://github.com/JPTER78/pokesurvivor/pull/88)，其界面草稿参考 DabaoHuang 的繁体贡献。修改仅维护于本 fork，未向上游提交。
 
-代码 MIT；SpriteCollab 精灵 CC BY-NC 4.0；字体 OFL。保留 [LICENSE](LICENSE)、[CREDITS.md](CREDITS.md) 与字体许可证。非商业同人项目，不代表宝可梦官方，无广告、付费或捐赠入口。
+基础代码 MIT；移植的触控布局、固定摇杆与提示居中代码遵循 PolyForm Noncommercial 1.0.0，见 [上游声明](UPSTREAM-NOTICES.md) 与 [完整许可证](LICENSE-NONCOMMERCIAL.md)；SpriteCollab 精灵 CC BY-NC 4.0；字体 OFL。保留 [LICENSE](LICENSE)、[CREDITS.md](CREDITS.md) 与字体许可证。非商业同人项目，不代表宝可梦官方，无广告、付费或捐赠入口。

@@ -10,7 +10,7 @@ OUT.mkdir(exist_ok=True)
 FOLDERS = ['assets', 'css', 'js', 'en', 'zh', 'guia', 'pokedex', 'legendarios',
            'shinies', 'tipos', 'movimientos', 'objetos', 'logros', 'novedades', 'apoyar', 'contacto']
 FILES = ['index.html', 'manifest.webmanifest', 'sw.js', 'version.json', 'favicon.ico',
-         'Start-Local.cmd', 'README-LOCAL.md', 'LICENSE', 'CREDITS.md', 'tools/preview.js']
+         'Start-Local.cmd', 'README-LOCAL.md', 'LICENSE', 'LICENSE-NONCOMMERCIAL.md', 'UPSTREAM-NOTICES.md', 'CREDITS.md', 'tools/preview.js']
 files = {ROOT / name for name in FILES}
 for directory in FOLDERS:
     files.update(p for p in (ROOT / directory).rglob('*') if p.is_file())

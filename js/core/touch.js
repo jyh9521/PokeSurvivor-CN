@@ -14,6 +14,14 @@ G.Touch = (() => {
 
   const R = () => 56 * (G.Settings.get('stick') || 1);
 
+  // Placement/fixed-stick behavior adapted from upstream 4de8495 (see UPSTREAM-NOTICES.md).
+  const profileKey=(w=innerWidth,h=innerHeight)=>h>w?'portrait':'landscape';
+  function stickBase(w=innerWidth,h=innerHeight,profile) {
+    const p=(profile===undefined?G.Settings.get('touchLayouts')?.[profileKey(w,h)]:profile)?.stick;
+    const valid=Array.isArray(p)&&p.length===2&&p.every(Number.isFinite),sa=safeArea(),r=R();
+    return {x:Math.max(sa.left+r+4,Math.min(w-sa.right-r-4,(valid?p[0]:.18)*w)),
+      y:Math.max(sa.top+r+4,Math.min(h-sa.bottom-r-4,(valid?p[1]:.72)*h))};
+  }
   function init(canvas) {
     cv = canvas;
     if (active) document.body.classList.add('touch');
@@ -66,7 +74,9 @@ G.Touch = (() => {
     if (b) { e.preventDefault(); press(b); return; }
     if (!touchy || stick || !G.Game || G.Game.state !== 'playing') return;
     e.preventDefault();
-    stick = { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY };
+    const fixed=G.Settings.get('stickMode')==='fixed',base=stickBase();
+    if(fixed&&Math.hypot(e.clientX-base.x,e.clientY-base.y)>R()*2.2)return;
+    stick = { id: e.pointerId, fixed, ox: fixed?base.x:e.clientX, oy: fixed?base.y:e.clientY, x: e.clientX, y: e.clientY };
     try { cv.setPointerCapture(e.pointerId); } catch (err) { /* nada */ }
   }
 
@@ -74,7 +84,7 @@ G.Touch = (() => {
     if (!stick || e.pointerId !== stick.id) return;
     stick.x = e.clientX; stick.y = e.clientY;
     const dx = stick.x - stick.ox, dy = stick.y - stick.oy, d = Math.hypot(dx, dy), r = R();
-    if (d > r) { stick.ox = stick.x - dx / d * r; stick.oy = stick.y - dy / d * r; }
+    if (!stick.fixed && d > r) { stick.ox = stick.x - dx / d * r; stick.oy = stick.y - dy / d * r; }
   }
 
   function up(e) { if (stick && e.pointerId === stick.id) stick = null; }
@@ -113,23 +123,28 @@ G.Touch = (() => {
 
   /** Dibuja el joystick (coordenadas de pantalla, CSS px). */
   function draw(ctx) {
-    if (!stick) return;
+    const idle=!stick&&active&&G.Settings.get('stickMode')==='fixed'&&G.Game?.state==='playing';
+    if(!stick&&!idle)return;
+    const base=idle?stickBase():null,shown=stick||{ox:base.x,oy:base.y,x:base.x,y:base.y};
     const r = R();
-    const dx = stick.x - stick.ox, dy = stick.y - stick.oy, d = Math.hypot(dx, dy);
-    const kx = stick.ox + (d > r ? dx / d * r : dx), ky = stick.oy + (d > r ? dy / d * r : dy);
+    const dx = shown.x - shown.ox, dy = shown.y - shown.oy, d = Math.hypot(dx, dy);
+    const kx = shown.ox + (d > r ? dx / d * r : dx), ky = shown.oy + (d > r ? dy / d * r : dy);
     ctx.save();
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = idle ? 0.22 : 0.5;
     ctx.fillStyle = 'rgba(10,20,48,.55)';
-    ctx.beginPath(); ctx.arc(stick.ox, stick.oy, r, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.arc(shown.ox, shown.oy, r, 0, 6.2832); ctx.fill();
     ctx.lineWidth = 3; ctx.strokeStyle = '#f4f8ff';
     ctx.stroke();
-    ctx.globalAlpha = 0.85;
+    ctx.globalAlpha = idle ? 0.32 : 0.85;
     ctx.fillStyle = '#ffd23f';
     ctx.beginPath(); ctx.arc(kx, ky, r * 0.42, 0, 6.2832); ctx.fill();
     ctx.lineWidth = 3; ctx.strokeStyle = '#a55f00'; ctx.stroke();
     ctx.restore();
   }
 
-  return { init, vector, draw, clearButtons, addButton, reset, safeArea,
+  addEventListener('resize',reset);
+  addEventListener('orientationchange',reset);
+  G.Settings.on(k=>{if(['stickMode','stick','touchLayouts'].includes(k))reset();});
+  return { init, vector, draw, clearButtons, addButton, reset, safeArea, stickBase, R, profileKey,
            overButton:(x,y)=>!!hit(x,y),get active() { return active; }, get stick() { return stick; } };
 })();

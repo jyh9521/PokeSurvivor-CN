@@ -6,7 +6,7 @@
 G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const VERSION = '0.7.2 · 2026-10-15';
+  const VERSION = '0.7.3 · 2026-10-15';
   const REPO = G.PROJECT_REPO || 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 
@@ -94,7 +94,11 @@ G.SettingsUI = (() => {
         + `<p class="sub">Arrastra para moverte; toca un ataque para cambiarlo y la esquina superior derecha para pausar. Puedes jugar en vertical u horizontal.</p>`
         + `<div class="set-row"><div class="grow"><b>Tamaño del joystick</b><small>Cuánto hay que arrastrar el dedo.</small></div></div>`
         + choice('stick', [[0.8, 'Pequeño'], [1, 'Normal'], [1.25, 'Grande']])
+        + choice('stickMode', [['float', 'Flotante'], ['fixed', 'Fijo']])
+        + '<button class="btn small" data-touch-layout>Colocar los botones</button>'
+        + '<p class=sub>Diseños separados para vertical y horizontal; se guardan en este navegador.</p>'
         + section('En PC')
+        + '<p class=sub>Rueda arriba: ataque anterior; rueda abajo: siguiente. Solo durante la partida en modo de movimiento con ratón.</p>'
         + toggle('clickMove','Mover con clic','Clic izquierdo: ir; mantener: seguir el cursor. Clic derecho o movimiento manual: cancelar.')
         + `<div class="keys">
              <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> o flechas</div><span>moverse</span>
@@ -113,6 +117,7 @@ G.SettingsUI = (() => {
              <li><b>Sprites:</b> PMD SpriteCollab y sus artistas (CC BY-NC 4.0).</li>
              <li><b>Datos de los Pokémon:</b> PokéAPI.</li>
              <li><b>Música y sonidos:</b> originales, generados por el propio juego.</li>
+             <li><b>Licencias:</b> <a href="LICENSE-NONCOMMERCIAL.md" target="_blank" rel="noopener">PolyForm Noncommercial 1.0.0</a> · <a href="UPSTREAM-NOTICES.md" target="_blank" rel="noopener">Copyright 2026 JPTER78</a></li>
              <li><b>Fuente:</b> Pixelify Sans (OFL).</li>
            </ul>`
         + `<div class="row wrap" style="justify-content:center;gap:8px">
@@ -151,6 +156,7 @@ G.SettingsUI = (() => {
   const RUMBLE_TEXT={idle:'Vibración disponible. Prueba el mando.',playing:'Enviando vibración…',complete:'El navegador completó la orden. Comprueba si el mando vibró.',preempted:'La vibración fue interrumpida. Prueba otra vez.',error:'El navegador rechazó la vibración. Comprueba el modo del mando y la conexión.',unsupported:'Este navegador o conexión no expone vibración. Prueba USB o modo XInput.', 'no-pad':'No hay mando estándar conectado. Pulsa un botón del mando.',disabled:'Activa el mando y la vibración para probar.'};
   function refreshRumble(){const el=document.querySelector('[data-rumble-status]');if(!el)return;const value=G.T(RUMBLE_TEXT[G.Gamepad.rumbleStatus().code]||RUMBLE_TEXT.idle);if(el.textContent!==value)el.textContent=value;}
   function wire(box) {
+    const place=box.querySelector('[data-touch-layout]');if(place)place.onclick=()=>G.LayoutUI.open();
     const test=box.querySelector('[data-rumble-test]');if(test)test.onclick=async()=>{test.disabled=true;try{await G.Gamepad.rumble(1,true);}finally{if(test.isConnected)test.disabled=false;refreshRumble();}};
     refreshRumble();
     const layout=box.querySelector('[data-pad-layout]');if(layout)layout.onchange=()=>G.Settings.set('padLayout',layout.value);

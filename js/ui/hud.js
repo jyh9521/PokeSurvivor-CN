@@ -26,7 +26,7 @@ G.HUD = (() => {
   }
 
   // One source of truth for both painted controls and their touch hit rectangles.
-  function layout(w,h,n,touch,safe={}) {
+  function layout(w,h,n,touch,safe={},custom) {
     const portrait=h>w,sa={top:0,right:0,bottom:0,left:0,...safe};
     const px=16+(portrait?sa.left:0),py=20+(portrait?sa.top:0);
     const S=portrait?Math.min(54,Math.floor((w-sa.left-sa.right-32-27)/Math.max(1,n))):54,GAP=9;
@@ -34,9 +34,17 @@ G.HUD = (() => {
     const slots=Array.from({length:n},(_,i)=>({x:sx+i*(S+GAP),y:sy,w:S,h:S}));
     const item={x:portrait?12+sa.left:sx-S-18,y:portrait?sy-S-14:sy,w:S,h:S};
     const pause={x:w-(portrait?56:52)-(portrait?sa.right:Math.min(44,sa.right)),y:12+(portrait?sa.top:Math.min(20,sa.top)),w:portrait?44:40,h:portrait?44:40};
-    return {portrait,px,py,slots,item,pause,S,GAP,sx,sy,totalW:total,healthWidth:portrait?Math.min(168,w-sa.left-sa.right-124):168,
+    // Imported placement feature: use this same geometry in the editor and hit testing.
+    // Portrait equipment remains separate; each orientation has its own local profile.
+    const profile=custom===undefined?(touch?G.Settings.get('touchLayouts')?.[portrait?'portrait':'landscape']:null):custom;
+    const fit=(k,rect)=>{const p=profile?.[k];if(!Array.isArray(p)||p.length!==2||!p.every(Number.isFinite))return;
+      rect.x=Math.max(sa.left+6,Math.min(w-sa.right-6-rect.w,p[0]*w-rect.w/2));
+      rect.y=Math.max(sa.top+10,Math.min(h-sa.bottom-6-rect.h,p[1]*h-rect.h/2));};
+    const group={x:sx,y:sy,w:total,h:S};fit('bar',group);
+    slots.forEach((r,i)=>{r.x=group.x+i*(S+GAP);r.y=group.y;});fit('item',item);fit('pause',pause);
+    return {portrait,px,py,slots,item,pause,S,GAP,sx:group.x,sy:group.y,totalW:total,healthWidth:portrait?Math.min(168,w-sa.left-sa.right-124):168,
       clockY:portrait?sa.top+96:42,metaY:portrait?sa.top+112:58,weatherY:portrait?sa.top+124:14,bossY:portrait?sa.top+158:70,
-      bondX:portrait?w-sa.right-76:sx+total+12,bondY:portrait?item.y+12:sy+S/2-12};
+      bondX:portrait?w-sa.right-76:group.x+total+12,bondY:portrait?item.y+12:group.y+S/2-12};
   }
   function draw(ctx, w, h, pl, st) {
     ctx.save();
@@ -243,6 +251,8 @@ G.HUD = (() => {
       const a = Math.min(1, ban.t * 1.6);
       ctx.save();
       ctx.globalAlpha = a;
+      // Upstream 4de8495: do not inherit the previous event marker alignment.
+      ctx.textAlign = 'center';
       ctx.font = F(800, 22);
       ctx.fillStyle = '#ffcb3d';
       ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 4;

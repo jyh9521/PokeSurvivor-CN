@@ -25,7 +25,18 @@ G.ClickMove=(()=>{
     if(!path.length){if(!held)cancel();return [0,0];}
     const point=path[0],dx=point.x-p.x,dy=point.y-p.y,d=Math.hypot(dx,dy),k=Math.min(1,d/Math.max(1,p.spd*dt));return [dx/d*k,dy/d*k];
   }
-  function init(cv){canvas=cv;cv.addEventListener('pointerdown',down);cv.addEventListener('pointermove',e=>{if(held&&e.pointerId===pointer)cursor={clientX:e.clientX,clientY:e.clientY};});cv.addEventListener('pointerup',e=>{if(e.pointerId===pointer){held=false;pointer=null;}});cv.addEventListener('pointercancel',cancel);cv.addEventListener('lostpointercapture',()=>{if(held)cancel();});
+  let wheelSum=0,wheelAt=0,wheelSwitchAt=-Infinity;
+  function wheel(e){
+    if(e.ctrlKey||e.altKey||e.shiftKey||e.metaKey||!allowed()||Math.abs(e.deltaX)>Math.abs(e.deltaY)||!e.deltaY)return;
+    // Ignore horizontal gestures / browser zoom; one action per detent with a bounded rate.
+    e.preventDefault();const t=now();if(t-wheelAt>180)wheelSum=0;wheelAt=t;
+    const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?canvas.clientHeight:1);
+    if(wheelSum&&Math.sign(wheelSum)!==Math.sign(delta))wheelSum=0;wheelSum+=delta;
+    if(Math.abs(wheelSum)<40||t-wheelSwitchAt<90)return;
+    const p=G.Game.player;if(p.slots.length<2){wheelSum=0;return;}
+    G.Input.inject(G.Input.bindings[wheelSum>0?'next':'previous'][0]);wheelSum=0;wheelSwitchAt=t;
+  }
+  function init(cv){canvas=cv;cv.addEventListener('wheel',wheel,{passive:false});cv.addEventListener('pointerdown',down);cv.addEventListener('pointermove',e=>{if(held&&e.pointerId===pointer)cursor={clientX:e.clientX,clientY:e.clientY};});cv.addEventListener('pointerup',e=>{if(e.pointerId===pointer){held=false;pointer=null;}});cv.addEventListener('pointercancel',cancel);cv.addEventListener('lostpointercapture',()=>{if(held)cancel();});
     document.addEventListener('pointerdown',e=>{if(e.target!==cv)cancel();},true);window.addEventListener('blur',cancel);document.addEventListener('visibilitychange',cancel);
     window.addEventListener('keydown',e=>{if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))cancel();});
     G.Settings.on(k=>{if(k==='clickMove')cancel();});

@@ -1000,3 +1000,14 @@ body[data-input=gamepad] .btn.danger.pad-focus{background:linear-gradient(#b73b5
   #nas-network-toggle {top:calc(env(safe-area-inset-top) + 64px);bottom:auto;}
   body:has(>#topbar:not(.hidden)) #nas-network-toggle {top:auto;bottom:calc(env(safe-area-inset-bottom) + 8px);}
 }
+/* Shared placement geometry is in HUD.layout; these are previews, not gameplay hit targets. */
+#scr-layout{z-index:180;background:rgba(7,16,38,.72);padding:0;overflow:hidden;display:block}
+#scr-layout.hidden{display:none}
+.layout-piece{position:absolute!important;touch-action:none;user-select:none;padding:2px!important;font-size:clamp(12px,3vw,17px)!important;min-width:0!important;white-space:nowrap;overflow:hidden}
+.layout-piece[data-layout-piece=stick]{border-radius:50%;opacity:.8;background:rgba(20,36,78,.8)}
+.layout-panel{animation:none;position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);width:min(350px,calc(100% - 24px));max-height:65dvh;overflow:auto;padding:12px!important;pointer-events:auto}
+.layout-panel h3{font-size:16px;margin:0 0 6px}.layout-panel .sub{font-size:12px;margin:4px 0}
+.layout-panel label{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0;white-space:nowrap}
+.layout-panel label .field,.layout-panel label input{flex:1;min-width:0;width:0}.layout-panel .field{padding:6px;font-size:14px}
+.layout-panel .row{gap:6px;justify-content:center}.layout-panel .btn.small{font-size:13px;padding:6px 9px}
+@media(max-height:450px){.layout-panel{left:50%;top:50%;max-height:80dvh}.layout-panel .sub{display:none}}
