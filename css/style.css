@@ -916,3 +916,14 @@ body[data-input=gamepad] .btn.danger.pad-focus{background:linear-gradient(#b73b5
 .upg-item .upg-btns{grid-column:2;grid-row:2;display:flex;flex-wrap:wrap;justify-content:flex-end;min-width:0;gap:6px}
 .upg-item .upg-btns>.btn{max-width:100%;white-space:normal}
 [data-rumble-status]{display:block;line-height:1.5;margin-top:8px}
+
+/* Account rows must not surrender label/action width to a full-width field. */
+.nickname-row {display:grid;grid-template-columns:max-content minmax(0,1fr) max-content;gap:12px;}
+.nickname-row label,.nickname-row .btn {white-space:nowrap;}
+.nickname-row .field {min-width:0;width:100%;}
+.announcement-controls {margin-top:12px;padding:12px;}
+.announcement-controls label {display:block;margin-bottom:8px;}
+.announcement-controls textarea {width:100%;min-width:0;resize:vertical;}
+.announcement-lane {position:fixed;top:16%;left:0;right:0;height:2em;overflow:hidden;pointer-events:none;z-index:1800;font-size:clamp(14px,2vw,22px);color:#fff3a0;text-shadow:2px 2px #142448;}
+.announcement-lane span {display:block;position:absolute;left:100%;white-space:nowrap;background:rgba(15,30,65,.65);padding:3px 12px;border-radius:6px;}
+@media(max-width:600px){.nickname-row {grid-template-columns:minmax(0,1fr) max-content;}.nickname-row label {grid-column:1/-1;}}

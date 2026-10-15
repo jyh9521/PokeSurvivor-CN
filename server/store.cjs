@@ -50,6 +50,21 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
   }
   if(!db.prepare('PRAGMA table_info(users)').all().some(c=>c.name==='nick'))db.exec('ALTER TABLE users ADD COLUMN nick TEXT');
   db.exec('PRAGMA user_version=3');
+  const nickKey=v=>v.normalize('NFKC').toLowerCase();
+  // Login names remain reserved even when their owner uses a different nickname.
+  // Legacy duplicates keep their login, password and save; only the conflicting alias is cleared.
+  db.exec('CREATE TABLE IF NOT EXISTS nickname_keys(key TEXT PRIMARY KEY,uid TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE); BEGIN IMMEDIATE');
+  try {
+    db.exec('DELETE FROM nickname_keys');
+    const users=db.prepare('SELECT id,name,nick FROM users ORDER BY rowid').all();
+    const claim=db.prepare('INSERT INTO nickname_keys VALUES(?,?)');
+    for(const u of users)claim.run(nickKey(u.name),u.id);
+    for(const u of users)if(u.nick){const key=nickKey(u.nick),owner=db.prepare('SELECT uid FROM nickname_keys WHERE key=?').get(key);
+      if(owner&&owner.uid!==u.id)db.prepare('UPDATE users SET nick=NULL WHERE id=?').run(u.id);
+      else if(!owner)claim.run(key,u.id);
+    }
+    db.exec('COMMIT');
+  }catch(e){db.exec('ROLLBACK');db.close();throw e;}
   const getUser=id=>db.prepare('SELECT id,name,nick FROM users WHERE id=?').get(id);
   const getSave=uid=>{const r=db.prepare('SELECT rev,data FROM saves WHERE uid=?').get(uid);return r?{rev:r.rev,save:JSON.parse(r.data)}:{rev:0,save:null};};
   async function credentials(name,password,register=false) {
@@ -61,7 +76,8 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
     if(register) {
       if(row)throw error(409,'账号名称已存在。');
       const id=randomBytes(16).toString('hex');
-      try{db.prepare('INSERT INTO users(id,name,lower,salt,hash) VALUES(?,?,?,?,?)').run(id,name,name.toLowerCase(),salt,hash);}catch{throw error(409,'账号名称已存在。');}
+      db.exec('BEGIN IMMEDIATE');
+      try{db.prepare('INSERT INTO users(id,name,lower,salt,hash) VALUES(?,?,?,?,?)').run(id,name,name.toLowerCase(),salt,hash);db.prepare('INSERT INTO nickname_keys VALUES(?,?)').run(nickKey(name),id);db.exec('COMMIT');}catch{db.exec('ROLLBACK');throw error(409,'账号名称或公开昵称已存在。');}
       return getUser(id);
     }
     if(!row||!timingSafeEqual(Buffer.from(hash,'hex'),Buffer.from(row.hash,'hex')))throw error(401,'账号或密码错误。');
@@ -103,7 +119,13 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
   function nickname(user,value){
     const nick=typeof value==='string'?value.trim().normalize('NFKC'):'';
     if(!/^[\p{L}\p{N}_·-]{2,16}$/u.test(nick))throw error(400,'昵称需 2–16 个汉字、字母、数字或 _·-，不能含空格。');
-    db.prepare('UPDATE users SET nick=? WHERE id=?').run(nick,user.id);return getUser(user.id);
+    db.exec('BEGIN IMMEDIATE');try {
+      const key=nickKey(nick),owner=db.prepare('SELECT uid FROM nickname_keys WHERE key=?').get(key);
+      if(owner&&owner.uid!==user.id)throw error(409,'昵称已被使用，请换一个。');
+      db.prepare('DELETE FROM nickname_keys WHERE uid=? AND key<>?').run(user.id,nickKey(getUser(user.id).name));
+      db.prepare('INSERT OR IGNORE INTO nickname_keys VALUES(?,?)').run(key,user.id);
+      db.prepare('UPDATE users SET nick=? WHERE id=?').run(nick,user.id);db.exec('COMMIT');return getUser(user.id);
+    }catch(e){db.exec('ROLLBACK');throw e;}
   }
   const pair=(a,b)=>[a,b].sort();
   function request(user,name,uid) {

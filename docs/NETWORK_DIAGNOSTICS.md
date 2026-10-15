@@ -1,3 +1,5 @@
+当前 0.7.0 的实际报告分析及直连状态字段见 [COMMUNITY_POLISH.md](COMMUNITY_POLISH.md)。
+
 # 历史记录：0.2.4 的 NAS 诊断
 
 当前 0.3.0 已增加 WebRTC 直连与 NAS 回退，请参见 [COMMUNITY_FEATURES.md](COMMUNITY_FEATURES.md)。下文保留原阶段设计；房间往返探测仍经 NAS。

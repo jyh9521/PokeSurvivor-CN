@@ -12,11 +12,11 @@ G.NasUI=(()=>{
       <button class="btn small" data-nas="sync">${T('Sincronizar ahora')}</button>
       <button class="btn small" data-nas="export">${T('Exportar copia local')}</button>
       ${G.NAS.conflict?`<p>${T('Conflicto: conserva ambas partidas')}</p><button class="btn small" data-nas="browser">${T('Usar copia del navegador')}</button> <button class="btn small" data-nas="nas">${T('Usar copia del NAS')}</button>`:''}`;
-    const nickname=document.createElement('div');nickname.className='set-row';
+    const nickname=document.createElement('div');nickname.className='set-row nickname-row';
     const label=document.createElement('label');label.textContent=T('Apodo público');label.htmlFor='nas-nickname';
     const input=document.createElement('input');input.id='nas-nickname';input.className='field';input.maxLength=32;input.value=G.NAS.user.nick||G.NAS.user.name;input.setAttribute('translate','no');input.setAttribute('autocomplete','off');
     const button=document.createElement('button');button.className='btn small';button.id='nas-nickname-save';button.textContent=T('Guardar apodo');button.onclick=async()=>{button.disabled=true;const r=await G.NAS.setNickname(input.value);button.disabled=false;G.UI.toast(r.ok?T('Apodo actualizado; tu cuenta de acceso no cambia.'):r.error);if(r.ok)G.SettingsUI.open('acc');};
-    nickname.append(label,input,button);box.append(nickname,panel);
+    nickname.append(label,input,button);box.append(nickname,panel);G.Announcements?.controls(box);
     panel.querySelectorAll('[data-nas]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{
       const action=b.dataset.nas;
       if(action==='reauth'){const p=await G.Dialog.password(T('Contraseña de tu cuenta de juego'));if(p){const r=await G.NAS.reauthenticate(p);if(!r.ok)throw Error(r.error);}}

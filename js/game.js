@@ -725,6 +725,12 @@ G.Game = (() => {
       else it.ent?.draw(ctx);
     }
     if(state!=='ui')G.Occlusion.draw(ctx,extra.filter(Boolean),props,t,frameDt);
+    if(state!=='ui'&&pl&&!pl.dead&&G.Settings.get('showHitbox')){
+      ctx.save();ctx.globalAlpha=1;ctx.setLineDash([]);ctx.lineWidth=1.5;
+      ctx.fillStyle='rgba(255,230,80,.15)';ctx.strokeStyle='#fff080';
+      ctx.beginPath();ctx.arc(pl.x,pl.y,pl.r,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(pl.x,pl.y,1.5,0,Math.PI*2);ctx.fill();ctx.restore();
+    }
   }
 
   function render() {

@@ -20,7 +20,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
   function rate(key,max=120,span=60000){const now=Date.now(),r=limits.get(key);if(!r||now-r.at>span){limits.set(key,{at:now,n:1});return;}if(++r.n>max)throw error(429,'请求过于频繁，请稍后重试。');}
   function send(uid,value){const ws=sockets.get(uid);if(ws?.readyState!==WebSocket.OPEN)return;return flows.get(ws).send(ws,value,{key:value.from||'',scope:roomFor(uid)?.id,replaceable:value.type==='relay'&&((value.data?.k==='f'&&Array.isArray(value.data.ev)&&value.data.ev.length===0)||(value.data?.k==='rtc-wire'&&value.data.lane==='state'))});}
   const roomFor=uid=>[...rooms.values()].find(r=>r.members.some(m=>m.uid===uid));
-  function social(user){const room=roomFor(user.id);return {me:{uid:user.id,name:display(user)},uid:user.id,
+  function social(user){const room=roomFor(user.id);return {me:{uid:user.id,name:display(user),canAnnounce:user.name.toLowerCase()==='jyh9521'},uid:user.id,
     friends:store.friendRows(user.id).map(f=>{const id=f.a===user.id?f.b:f.a,u=store.getUser(id),r=roomFor(id);return {uid:id,name:display(u),pid:f.a+'_'+f.b,status:f.status==='ok'?'ok':f.requester===user.id?'out':'in',online:connected(id),play:!!r&&!r.open,room:r?.id||''};}),
     invites:[...invites.values()].filter(i=>i.to===user.id&&Date.now()-i.at<180e3).map(i=>({from:i.from,name:i.name,room:i.room,at:i.at})),
     room:room?{id:room.id,host:room.host,isHost:room.host===user.id,open:room.open,epoch:room.epoch||0,members:room.members.map(m=>({...m,name:display(store.getUser(m.uid)),connected:connected(m.uid)}))}:null};}
@@ -76,6 +76,15 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
         case 'GET /api/save':return reply(res,200,store.getSave(user.id));
         case 'PUT /api/save':return reply(res,200,store.putSave(user,b.save,b.rev,b.mutation));
         case 'POST /api/nickname':{rate('nickname:'+user.id,10);const value=store.nickname(user,b.nick);const r=roomFor(user.id);if(r)r.members=r.members.map(m=>m.uid===user.id?{...m,name:display(value)}:m);notify();return reply(res,200,{user:value});}
+        case 'POST /api/announcement':{
+          if(user.name.toLowerCase()!=='jyh9521')throw error(403,'仅公告账号可发送。');
+          const text=typeof b.text==='string'?b.text.trim().normalize('NFKC'):'';
+          if(!text||[...text].length>200||/[\p{Cc}\p{Cf}]/u.test(text))throw error(400,'公告需 1–200 个字符，不能含控制字符。');
+          rate('announcement:'+user.id,3,60000);
+          const message={id:randomBytes(12).toString('hex'),text,at:Date.now()};
+          let delivered=0;for(const uid of sockets.keys())if(connected(uid)){send(uid,{type:'announcement',data:message});delivered++;}
+          return reply(res,200,{ok:true,delivered});
+        }
         case 'GET /api/social':return reply(res,200,social(user));
         case 'POST /api/friends/request':rate('friend:'+user.id,30);store.request(user,b.name,b.uid);notify();return reply(res,200,{ok:true,msg:'好友请求已发送。'});
         case 'POST /api/friends/accept':store.friendship(user,b.uid,true);notify();return reply(res,200,{ok:true,msg:'已添加好友。'});

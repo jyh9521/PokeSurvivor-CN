@@ -18,7 +18,7 @@ G.NAS = (() => {
     const peers=social.room?.isHost?social.room.members.filter(m=>m.uid!==user?.id).map(m=>m.uid):[social.room?.host];
     if(activeRoom)for(const peer of peers.filter(Boolean)){const id=health.probe(peer);if(id)relay(peer,{k:'nas-diagnostic-ping',id});}
   }
-  function metrics(){return {...direct.stats(),...health.sample({connected:socket?.readyState===1,targetHz:1/interval(),bufferedBytes:socket?.bufferedAmount||0,serverBufferedBytes:serverBuffered,coalescedFrames:flow.stats().coalesced,queuedSnapshots:flow.stats().pending,disconnects,background:document.hidden})};}
+  function metrics(){const links=direct.stats();return {...links,gameTransport:links.directPeers?(links.relayPeers?'mixed':'webrtc-direct'):'websocket-relay',probeTransport:'websocket-relay',...health.sample({connected:socket?.readyState===1,targetHz:1/interval(),bufferedBytes:socket?.bufferedAmount||0,serverBufferedBytes:serverBuffered,coalescedFrames:flow.stats().coalesced,queuedSnapshots:flow.stats().pending,disconnects,background:document.hidden})};}
   const clone=v=>JSON.parse(JSON.stringify(v));
   const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;}};
   const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true;}catch{storageOk=false;setState('storage-error');return false;}};
@@ -81,7 +81,7 @@ G.NAS = (() => {
   function connect(){if(!enabled||!user||guest)return;if(performance.now()<reconnectAt){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,Math.ceil(reconnectAt-performance.now())+25);return;}if(socket&&(socket.readyState===0||socket.readyState===1))return;
     const ws=new WebSocket((location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+'/api/ws');socket=ws;
     ws.onopen=()=>{peers.forEach(f=>f(user?.id,'relay'));available=true;serverBuffered=0;health=G.RelayHealth.create();nextProbe=0;ws.send(JSON.stringify({type:'social',client:clientId}));clearInterval(networkTimer);networkTimer=setInterval(networkTick,100);networkTick();if(pending&&!conflict)flush();};
-    ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='social')receiveSocial(m.data);
+    ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='social')receiveSocial(m.data);if(m.type==='announcement')G.Announcements?.receive(m.data);
       if(m.type==='pong'){if(health.pong('nas',m.id))serverBuffered=Math.max(0,Number(m.buffered)||0);}
       if(m.type==='relay'){
         if(m.data?.k==='nas-diagnostic-ping'){if(connectedPeer(m.from)&&typeof m.data.id==='string'&&m.data.id.length<=40&&performance.now()-(probesAnswered.get(m.from)??-Infinity)>=500){probesAnswered.set(m.from,performance.now());relay(m.from,{k:'nas-diagnostic-pong',id:m.data.id});}}
@@ -137,7 +137,7 @@ G.NAS = (() => {
   const board=(m,p,d)=>m+'_'+p+(d?'_p'+d:'');
   const ranking=(m,p,d,f=false)=>api(`ranking?mode=${m}&period=${p}&dex=${d||0}&friends=${f?1:0}`);
   G.Ranking=proxy(oldRanking,{runStarted,submitSolo:m=>submit('s',m),submitGroup:m=>submit('g',m),board,
-    top:async(m,p,d,f)=>{try{return (await ranking(m,p,d,f)).rows;}catch{return [];}},myRank:async(m,p,d)=>{try{return (await ranking(m,p,d)).mine;}catch{return null;}},
+    top:async(m,p,d,f)=>(await ranking(m,p,d,f)).rows,myRank:async(m,p,d)=>(await ranking(m,p,d)).mine,
     isAdmin:()=>false,reported:()=>reported,report:async(b,r)=>{await api('report',{id:r.id});reported.add(b+'__'+r.id);},removeMine:async()=>{}
   });
   window.addEventListener('online',()=>{if(enabled&&user){connect();refreshSave();}});
@@ -145,6 +145,6 @@ G.NAS = (() => {
   async function refreshSave(){if(!enabled||!user||guest)return false;if(pending||conflict)return flush();const version=change;try{const r=await api('save');available=true;if(change!==version||pending)return flush();if(r.save&&r.rev!==rev){rev=r.rev;assign(save,r.save);persist();}setState('ok');return true;}catch(e){setState(e.status===401?'auth-required':'offline');return false;}}
   async function setNickname(nick){try{const r=await api('nickname',{nick});user=r.user;write('ps.nas.session',user);persist();G.UI?.refreshCoins();await refresh();return {ok:true};}catch(e){return {ok:false,error:e.message,status:e.status};}}
   async function upgrade(op,dex,id){if(!(await flush())||conflict)return {ok:false,error:'请先同步存档并处理冲突。'};try{const uid=user.id,version=change;const r=await api('upgrades',{op,dex,id,rev});if(user?.id!==uid)return {ok:false,error:'账号已切换。'};if(change!==version){conflict={save:r.save,rev:r.rev};pending=true;persist();setState('conflict');return {ok:false,error:'操作期间存档发生变化，两份进度已保留，请处理同步冲突。'};}assign(save,r.save);rev=r.rev;persist();setState('ok');return {ok:true,...r.result};}catch(e){await refreshSave();return {ok:false,error:e.message,status:e.status};}}
-  return {upgrade,setNickname,networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
+  return {announce:text=>action('announcement',{text}),get canAnnounce(){return social.me?.canAnnounce===true;},upgrade,setNickname,networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
   };
 })();

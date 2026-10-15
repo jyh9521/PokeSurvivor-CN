@@ -7,9 +7,12 @@ G.RankingUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let mode = 's', period = 'w', scope = 'all', dex = null;
-  let token = 0;
+  let token = 0, silentBusy=false, quietUntil=0;
 
   function init() {
+    // A refresh must not replace a control between pointer down/up or during navigation.
+    for(const type of ['pointerdown','pointerup','wheel','keydown','focusin','input','compositionstart','compositionend'])
+      $('scr-rank').addEventListener(type,()=>{quietUntil=performance.now()+750;},{passive:true});
     const dl = $('rk-dl');
     dl.innerHTML = G.DEX.map(p => `<option value="${esc(G.T(p.name))}">`).join('');
     $('rk-poke').onchange = () => {
@@ -62,11 +65,12 @@ G.RankingUI = (() => {
 
   const fmt = t => t >= 3600 ? Math.floor(t / 3600) + ':' + G.U.mmss(t % 3600).padStart(5, '0') : G.U.mmss(t);
 
-  async function load() {
+  async function load(silent=false) {
+    if(silent&&(silentBusy||G.Dialog?.open||performance.now()<quietUntil))return;
+    if(silent)silentBusy=true;
     const my = ++token;
     const list = $('rk-list');
-    list.innerHTML = '<p class="sub">Cargando…</p>';
-    $('rk-me').innerHTML = '';
+    if(!silent){list.innerHTML = '<p class="sub">Cargando…</p>';$('rk-me').innerHTML = '';}
     let rows = [], me = null;
     try {
       [rows, me] = await Promise.all([
@@ -74,18 +78,34 @@ G.RankingUI = (() => {
         G.Social.me ? G.Ranking.myRank(mode, period, dex) : Promise.resolve(null)
       ]);
     } catch (e) {
-      if (my !== token) return;
+      if (my !== token || silent) return;
       list.innerHTML = '<p class="sub">No se pudo cargar el ranking (' + esc(e.code || e.message) + ').</p>';
       return;
-    }
-    if (my !== token) return;
-    list.innerHTML = '';
+    } finally {if(silent)silentBusy=false;}
+    if (my !== token || (silent&&(performance.now()<quietUntil||!G.UI.isOpen('scr-rank')||G.Dialog?.open||G.UI.isOpen('scr-profile')))) return;
+    const active=document.activeElement,top=list.scrollTop;
+    const focused=active?.closest('.rk-row');
+    if(silent&&focused&&list.contains(focused)&&!rows.some(r=>r.id===focused.dataset.rowKey))return;
+    const anchor=[...list.children].find(el=>el.getBoundingClientRect().bottom>list.getBoundingClientRect().top);
+    const anchorKey=anchor?.dataset.rowKey,offset=anchor?.getBoundingClientRect().top;
+    const existing=new Map([...list.children].map(el=>[el.dataset.rowKey,el]));
+    if(!silent)list.innerHTML = '';
     if (!rows.length) {
       list.innerHTML = '<p class="sub">Todavía no hay marcas aquí. ¡Sé el primero!</p>';
     }
     const uid = G.Social.uid;
     const b = G.Ranking.board(mode, period, dex), done = G.Ranking.reported();
-    rows.forEach((r, i) => list.appendChild(rowEl(r, i + 1, r.uids.includes(uid), b, done)));
+    const keep=new Set();
+    rows.forEach((r,i)=>{
+      const key=r.id,signature=JSON.stringify([r,i,done.has(b+'__'+r.id)]);let el=silent&&existing.get(key);
+      if(!el|| (el.dataset.signature!==signature&&!el.contains(active))){const next=rowEl(r,i+1,r.uids.includes(uid),b,done);if(el)el.replaceWith(next);el=next;el.dataset.signature=signature;}
+      el.dataset.rowKey=key;keep.add(el);if(list.children[i]!==el)list.insertBefore(el,list.children[i]||null);
+    });
+    if(silent){for(const el of existing.values())if(!keep.has(el))el.remove();
+      if(active?.isConnected&&document.activeElement!==active)active.focus({preventScroll:true});
+      list.scrollTop=top;const next=[...list.children].find(el=>el.dataset.rowKey===anchorKey);
+      if(next&&offset!=null)list.scrollTop+=next.getBoundingClientRect().top-offset;
+    }
 
     // La frase se monta en cada idioma (traducirla por trozos sale rara).
     if (G.I18n.lang === 'zh-CN') {
@@ -142,6 +162,6 @@ G.RankingUI = (() => {
     return el;
   }
 
-  setInterval(()=>{if(G.NAS?.enabled&&G.DB.online&&!document.hidden&&G.UI.isOpen('scr-rank')&&!G.UI.isOpen('scr-profile'))load();},10000);
-  return { init, open };
+  setInterval(()=>{if(G.NAS?.enabled&&G.DB.online&&!document.hidden&&G.UI.isOpen('scr-rank')&&!G.UI.isOpen('scr-profile'))load(true);},10000);
+  return { init, open, refresh:()=>load(true) };
 })();
