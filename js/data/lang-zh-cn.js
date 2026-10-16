@@ -2,6 +2,10 @@
  * Initially adapted from DabaoHuang/pokesurvivor PR #74; reviewed against this game.
  * Names are separately verified in lang-zh-cn-names.js. See docs/LOCALIZATION.md. */
 G.I18n.add({
+  "Presión gradual de las oleadas": "波次压力平滑调整",
+  "La vida normal recupera presión gradualmente; los nuevos tramos entran durante 20 segundos, sin saltos bruscos.": "普通怪生命逐步恢复压力；新档位用20秒平滑过渡，避免血量突然跳涨。",
+  "Los élites ganan algo de vida y se identifican correctamente en cooperativo. Los jefes reciben ajustes moderados de vida, no más daño.": "精英小幅增加生命并正确同步联机身份；首领温和增加生命，不提高伤害。",
+  "Se conservan la frecuencia de aparición, la experiencia, los límites de enemigos, el crecimiento del jugador y la protección cuerpo a cuerpo.": "保留刷怪频率、经验、敌人数上限、玩家成长与近战保护。",
   "Vibración del mando": "手柄振动",
   "Vibra al recibir daño real.": "实际受到伤害时振动；连接手柄后生效。",
   "Probar vibración": "测试振动",

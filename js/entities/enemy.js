@@ -789,6 +789,7 @@
       const e = new Enemy(def, o.x, o.y, { hp: 1, spd: 1, dmg: 1 }, o.boss);
       e.id = o.id;
       e.remote = true;
+      e.elite = !!o.elite;
       if (o.shiny) e.makeShiny();
       e.maxHp = o.hp; e.hp = o.hp;
       e.net = { x: o.x, y: o.y, vx: 0, vy: 0, age: 0, dir: 0, anim: 0, st: 0 };

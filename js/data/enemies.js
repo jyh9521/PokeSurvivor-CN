@@ -90,7 +90,7 @@ G.Enemies = (() => {
     const spdK = G.U.clamp(0.75 + baseSpd(p) / 260, 0.75, 1.3);
     const behavior = behaviorOf(p);
     const d = {
-      dex: p.dex, name: p.name, behavior,
+      dex: p.dex, name: p.name, behavior, tier: ti,
       hp: Math.round(tier.hp * hpK * (behavior === 'tank' ? 1.5 : 1)),
       spd: Math.round(tier.spd * spdK * (behavior === 'tank' ? 0.7 : 1)),
       dmg: Math.round(tier.dmg * (behavior === 'tank' ? 1.2 : 1)),
@@ -183,7 +183,7 @@ G.Enemies = (() => {
    * Los jefes ya traen su vida base creciente (1.400 ... 16.000), así que
    * escalan mucho más suave: con la curva normal el último llegaba a 168.000 PV.
    */
-  function bossScale(t) { return { hp: 1 + t / 600, dmg: 1 + t / 600, spd: 1 }; }
+  function bossScale(t) { return { hp: (1 + t / 600) * G.BattleBalance.bossHp(t), dmg: 1 + t / 600, spd: 1 }; }
 
   /** Tramo que toca en el segundo `t`. */
   function tierAt(t) { let ti = 0; TIERS.forEach((tr, i) => { if (t >= tr.from) ti = i; }); return ti; }

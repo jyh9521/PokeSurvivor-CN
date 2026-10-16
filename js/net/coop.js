@@ -174,7 +174,7 @@ G.Coop = (() => {
       if (e.dead || G.U.dist2(e.x, e.y, near.x, near.y) > r2n) continue;
       const a = ANIMS.indexOf(e.anim.cur);
       out.push([e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
-                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.staggerT > 0 ? 8 : 0) | (!G.BattleBalance.bodyContact(e)?16:0),e.anim.serial||0,Math.round((e.anim.elapsed||0)*10)/10,Math.round(e.anim.speed*100)/100,e.dex,e.bossStage||0,e.scale||1]);
+                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.staggerT > 0 ? 8 : 0) | (!G.BattleBalance.bodyContact(e)?16:0) | (e.elite?32:0),e.anim.serial||0,Math.round((e.anim.elapsed||0)*10)/10,Math.round(e.anim.speed*100)/100,e.dex,e.bossStage||0,e.scale||1]);
     }
     return out;
   }
@@ -383,6 +383,7 @@ G.Coop = (() => {
       } else { n.vx = 0; n.vy = 0; }
       n.x = a[1]; n.y = a[2]; n.age = 0; n.last = now;
       e.hp = Math.min(e.maxHp, a[3]);
+      e.elite=!!(a[6]&32);
       n.anim = a[4]; n.dir = a[5]; n.st = a[6];n.pose=Number.isSafeInteger(a[7])?[a[7],ANIMS[a[4]],a[8],a[9],a[4]>1?1:0,a[4]===6?1:0,a[4]===0?'Idle':'Walk',1,a[5]]:null;n.poseAt=now;
     }
   }
@@ -390,7 +391,7 @@ G.Coop = (() => {
   function applyHostEvent(ev) {
     switch (ev[0]) {
       case 'ne':
-        G.EnemyMgr.addRemote({ id: ev[1], dex: ev[2], x: ev[3], y: ev[4], boss: !!ev[5], shiny: !!ev[6], hp: ev[7], dmg: ev[8], beh: ev[9] });
+        G.EnemyMgr.addRemote({ id: ev[1], dex: ev[2], x: ev[3], y: ev[4], boss: !!ev[5], shiny: !!ev[6], hp: ev[7], dmg: ev[8], beh: ev[9],elite:!!ev[10] });
         break;
       case 'ed': G.EnemyMgr.removeRemote(ev[1], true); break;
       case 'eg': G.EnemyMgr.removeRemote(ev[1], false); break;
@@ -466,7 +467,7 @@ G.Coop = (() => {
   // anfitrión
   function hurtShown(e, d, color, eff=null) { emitNear(['hn', e.id, d, color, eff], e.x, e.y, hitFrom); }
   function enemyAdded(e) {
-    emit(['ne', e.id, e.dex, r1(e.x), r1(e.y), e.boss ? 1 : 0, e.shiny ? 1 : 0, Math.ceil(e.maxHp), r2(e.dmg), e.behavior]);
+    emit(['ne', e.id, e.dex, r1(e.x), r1(e.y), e.boss ? 1 : 0, e.shiny ? 1 : 0, Math.ceil(e.maxHp), r2(e.dmg), e.behavior,e.elite?1:0]);
   }
   function enemyGone(e, died) { teamStats?.forget(e.id);emit([died ? 'ed' : 'eg', e.id]); }
   function enemyShot(p, type) { emit(['es', r1(p.x), r1(p.y), r1(p.vx), r1(p.vy), r2(p.dmg), p.r, p.life, type,p.enemyId,p.enemyStage]); }

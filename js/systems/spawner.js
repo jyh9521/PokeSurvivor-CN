@@ -18,8 +18,8 @@ G.Spawner = (() => {
   // Menos Pokémon pero más fuertes (la pantalla no se satura): salen ~24% de
   // los de antes, cada uno con más vida, daño y experiencia.
   const DENSITY = 0.24, DMG_K = G.BattleBalance.CONTACT_DAMAGE, XP_K = 5.6;
-  // One bounded density adjustment; time growth belongs to Enemies.scale.
-  const hpK = () => G.BattleBalance.DENSITY_HP;
+  // Health only: spawn timing, cap, damage and XP remain independent of tuning.
+  const hpK = (t,def) => G.BattleBalance.normalHp(t)*G.BattleBalance.tierBlend(t,def.tier,G.Enemies.TIERS);
   const SHINY_RATE = 1 / 4096;
   let acc = 0, bossIdx = 0, surgeT = 32, announce = null, announceT = 0, preloadT = 0;
   let forceShiny = 0;           // para pruebas: los N próximos salen shiny
@@ -80,9 +80,9 @@ G.Spawner = (() => {
     const pt = freePoint(pl, angle == null ? Math.random() * 6.2832 : angle, isFlyer(def));
     if (!pt) return null;
     const shiny = rollShiny(def.dex);
-    const e = new G.Enemy(def, pt[0], pt[1], scaled(G.Enemies.scale(t), G.Coop.scaleHp(players.length) * hpK(t)));
+    const e = new G.Enemy(def, pt[0], pt[1], scaled(G.Enemies.scale(t), G.Coop.scaleHp(players.length) * hpK(t,def)));
     e.dmg *= DMG_K; e.xp = Math.round(e.xp * XP_K);
-    if (G.EnemyMgr.count >= CAP * ELITE_FROM) { e.maxHp = e.hp = Math.round(e.maxHp * 1.6); e.dmg *= 1.25; e.xp = Math.round(e.xp * 1.6); }
+    if (G.EnemyMgr.count >= CAP * ELITE_FROM) { e.elite=true; e.maxHp = e.hp = Math.round(e.maxHp * G.BattleBalance.ELITE_HP); e.dmg *= 1.25; e.xp = Math.round(e.xp * 1.6); }
     if (shiny) e.makeShiny();
     if (G.Events.golden) e.makeGolden();
     G.EnemyMgr.add(e);

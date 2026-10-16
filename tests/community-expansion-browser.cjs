@@ -83,6 +83,10 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
     for(const p of pages)await p.evaluate(()=>{const p=G.Game.player;p.slots=[];G.Projectiles.clear();G.Combat.clearFields();p.passives={};p.statsTaken={};p.frozen=true;p.invuln=1e6;p.maxHp=100;p.hp=100;p.regenFlat=0;p.buffs.regen.n=0;});
     const fixture=await a.evaluate(()=>{G.Spawner.update=()=>{};G.EnemyMgr.clear();const p=G.Game.player;return {x:p.x,y:p.y};});
     for(const p of pages)await p.evaluate(({x,y})=>{G.Game.player.x=x;G.Game.player.y=y;},fixture);
+    if(BATTLE){const eliteId=await a.evaluate(({x,y})=>{const e=new G.Enemy({dex:1,hp:1000,spd:0,dmg:0,xp:0,behavior:'chase'},x+80,y,{hp:1,spd:1,dmg:1});e.elite=true;G.EnemyMgr.add(e);return e.id;},fixture);
+      await pages[1].waitForFunction(id=>G.EnemyMgr.get(id)?.elite===true,eliteId);check('elite creation preserves identity on a real guest',await pages[1].evaluate(id=>G.EnemyMgr.get(id).elite,eliteId));
+      await pages[1].evaluate(id=>G.EnemyMgr.get(id).elite=false,eliteId);await pages[1].waitForFunction(id=>G.EnemyMgr.get(id)?.elite===true,eliteId);check('authoritative snapshots repair the elite bit without confusing charge protection',await pages[1].evaluate(id=>!!(G.EnemyMgr.get(id).net.st&32),eliteId));await a.evaluate(id=>G.EnemyMgr.get(id).dead=true,eliteId);
+    }
     const victimId=await a.evaluate(({x,y})=>{const e=new G.Enemy({dex:1,hp:1,spd:0,dmg:0,xp:0,behavior:'chaser'},x+35,y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},fixture);
     const guest=pages[1];await guest.waitForFunction(id=>!!G.EnemyMgr.get(id),victimId);
     const cast=await guest.evaluate(id=>{const p=G.Game.player,e=G.EnemyMgr.get(id);p.hp=20;p.x=e.x-35;p.y=e.y;p.meleeHeals=[];p.meleeGuardT=0;p.slots=[[G.Moves.instance('bite')]];G.Combat.tick(.001,p,0);p.activeMove().t=999;return {hp:p.hp,id:e.id};},victimId);
