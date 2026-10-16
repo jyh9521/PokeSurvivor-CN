@@ -121,6 +121,7 @@ JSON记录每招实际伤害/击杀/命中包、XP来源、物理/特殊/纯伤�
 
 ```powershell
 node --test tests/*.test.cjs
+node tools/audit-enemy-scaling.cjs . artifacts/balance/enemy-modified.json
 node tools/measure-combat.cjs . artifacts/balance/static-modified.json
 node tools/measure-dynamic-combat.cjs . artifacts/balance/dynamic-modified.json --all
 node tools/measure-wave-growth.cjs . artifacts/balance/waves-modified-max.json --profiles=melee,ranged,tank --seeds=1,17,101 --strong --seconds=1800
