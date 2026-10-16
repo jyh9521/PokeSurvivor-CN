@@ -18,7 +18,7 @@ const {chromium}=require('playwright'),{createApp}=require('../server/app.cjs');
     await p.locator('[data-tab="register"]').click();await p.locator('#f-user').fill('ProdAlice');await p.locator('#f-pass').fill('production-nas-test');await p.locator('#btn-auth').click();await p.locator('#scr-test').waitFor({state:'visible'});
     for(let i=0;i<30&&await p.locator('#scr-test').isVisible();i++)await p.locator('#test-a .answer').first().click();await p.locator('#res-ok').click();await p.locator('#scr-menu').waitFor({state:'visible'});
     await p.locator('[data-go="dex"]').click();await p.locator('#dex-gens [data-gen="0"]').click();
-    check('protected all-regions catalog lists 966 species with six-stat details',await p.locator('#dex-grid .cell').count()===966&&await p.locator('#dex-detail .six-stats .stat').count()===6);
+    check('protected all-regions catalog lists 966 species with six-stat details',await p.locator('#dex-grid .cell').count()===966&&await p.locator('#dex-detail .stat-radar [data-stat]').count()===6);
     await p.locator('#dex-owned').selectOption('own');check('protected acquisition filter reads real saved ownership',await p.locator('#dex-grid .cell').count()===1);await p.locator('#dex-reset').click();await p.locator('#dex-search').fill('#025');await p.waitForFunction(()=>document.querySelectorAll('#dex-grid .cell').length===1);
     check('protected exact-ID search works without exposing game runtime',await p.locator('#dex-grid .cell').getAttribute('data-dex')==='25'&&await p.evaluate(()=>typeof window.G==='undefined'));await p.locator('#scr-dex [data-back]').click();
     await p.locator('#btn-settings').click();await p.locator('#set-tabs [data-t="ctl"]').click();await p.locator('[data-touch-layout]').click();

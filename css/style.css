@@ -1047,3 +1047,13 @@ body[data-input=gamepad] .btn.danger.pad-focus{background:linear-gradient(#b73b5
 #battle-controls.compact{grid-template-columns:1fr;grid-template-rows:26px 3px 24px 24px;gap:3px;padding:6px}#battle-controls.compact .battle-choice{font-size:9px;min-height:26px}#battle-controls.compact .battle-actions{grid-column:1;grid-row:3;justify-content:center}#battle-controls.compact .btn{min-height:24px;font-size:10px}#battle-controls.compact #battle-shortcuts{grid-column:1;grid-row:4;display:grid;justify-content:start;font:9px/10px var(--font);gap:2px}#battle-controls.compact #battle-shortcuts>div{gap:2px}#battle-controls.compact #battle-shortcuts kbd{min-width:0;font:9px/10px var(--font);border-width:1px}#battle-controls.compact #battle-info{display:none}
 
 body.touch #battle-shortcuts kbd{display:inline-block!important}
+
+/* Catalog radar follows the existing blue panels and gold highlights. */
+.stat-radar{box-sizing:border-box;width:100%;max-width:360px;margin:12px auto;padding:4px;background:rgba(0,0,0,.14);border:1px solid rgba(244,248,255,.2);border-radius:10px}
+.stat-radar svg{display:block;width:100%;height:auto;overflow:hidden}
+.stat-radar .radar-grid{fill:none;stroke:var(--edge-in);stroke-width:1;opacity:.7}
+.stat-radar .radar-area{fill:var(--gold);fill-opacity:.4;stroke:var(--gold);stroke-width:2;stroke-linejoin:round}
+.stat-radar .radar-dots{fill:var(--gold)}
+.stat-radar .radar-label{fill:var(--ink);font-family:inherit;font-size:16px;font-weight:700}
+.stat-radar .radar-value{fill:var(--gold);font-size:16px}
+.stat-radar figcaption{text-align:center;color:var(--muted);font-size:12px;line-height:1.5;padding:0 4px 5px;overflow-wrap:anywhere}

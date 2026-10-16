@@ -1315,3 +1315,5 @@ G.I18n.add({"Controles compactos, repertorios y música": "构筑、音乐与联
 G.I18n.add({"Learn without switching attacks": "学习招式不再自动切换", "Learning a move keeps the current attack active; switch manually when you want.": "学习新招式后继续使用当前招式，需要时手动切换。"},"zh-CN");
 
 G.I18n.add({"Aprender sin cambiar de ataque": "学习招式不再自动切换", "Aprender un movimiento conserva el ataque activo; cambia manualmente cuando quieras.": "学习新招式后继续使用当前招式，需要时手动切换。"},"zh-CN");
+
+G.I18n.add({"Sp. Atk": "特攻", "Sp. Def": "特防", "Base stats · shared scale 0–255": "种族值 · 统一刻度 0–255", "Six-stat radar": "六维雷达图", "Radar de seis estadísticas": "六维雷达图", "Pokémon details show six stats in a radar with exact values and a shared scale.": "宝可梦详情改为六维雷达图，保留准确数值，并使用统一刻度。", "La ficha de cada Pokémon muestra sus seis estadísticas en un radar con valores exactos y una escala común.": "宝可梦详情改为六维雷达图，保留准确数值，并使用统一刻度。"},"zh-CN");

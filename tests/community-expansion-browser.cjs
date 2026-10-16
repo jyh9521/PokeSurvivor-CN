@@ -14,7 +14,7 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
     if(BATTLE){
       await a.locator('[data-go="dex"]').click();await a.locator('#dex-gens [data-gen="0"]').click();
       check('all-regions tab precedes Kanto and renders the complete 966-species catalog',await a.locator('#dex-gens button').count()===10&&await a.locator('#dex-grid .cell').count()===966);
-      check('species details display all six stats and the adapted native trait',await a.locator('#dex-detail .six-stats .stat').count()===6&&await a.locator('.trait-description').innerText().then(t=>t.includes('物种特性')&&t.includes('本作效果')));
+      check('species details display all six stats and the adapted native trait',await a.locator('#dex-detail .stat-radar [data-stat]').count()===6&&await a.locator('.trait-description').innerText().then(t=>t.includes('物种特性')&&t.includes('本作效果')));
       await a.locator('#dex-owned').selectOption('own');await a.locator('#dex-type').selectOption('fire');await a.locator('#dex-rarity').selectOption('4');await a.locator('#dex-search').fill('#006');
       await a.waitForFunction(()=>document.querySelectorAll('#dex-grid .cell').length===1);
       check('acquisition/type/rarity/search combine rather than overwrite each other',await a.locator('#dex-grid .cell').getAttribute('data-dex')==='6');
