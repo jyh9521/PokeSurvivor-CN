@@ -24,6 +24,7 @@
   class Enemy {
     constructor(def, x, y, sc, boss = false) {
       this.id = nextId++;
+      this.bornAt=G.Game?.st?.time||0;G.Telemetry?.add(G.Game?.player,"spawned");
       this.def = def;
       this.dex = def.dex;
       this.name = (G.DEX_BY[def.dex] && G.DEX_BY[def.dex].name) || def.name;
@@ -190,6 +191,7 @@
         return;
       }
       G.RunGrowth?.boss(this);
+      if(this.boss||this.elite){const t=G.Game?.player?.telemetry;if(t&&t.ttk.length<200)t.ttk.push({id:this.id,boss:this.boss,elite:!!this.elite,seconds:(G.Game?.st?.time||0)-this.bornAt});}
       // (Los legendarios de la Sentencia de Arceus sólo dan experiencia.)
       if (this.boss && !this.judge) {
         G.Camera.kick(0.9);
@@ -585,7 +587,7 @@
           dmg: this.shotDmg() * k, r: 7, life: 2.4, friendly: false, color: '#ff7a9e', mtype: type, enemyId:this.id,enemyStage:this.bossStage||0,
           vis: G.VFX.forType(type)
         });
-        if (G.Coop.isHost) G.Coop.enemyShot(shot, type);
+        if (shot&&G.Coop.isHost) G.Coop.enemyShot(shot, type);
       }
       this.anim.play('Shoot');
       G.FX.ring(this.x, this.y - G.LIFT, 4, 14, '#ff7a9e', 0.2, 2);

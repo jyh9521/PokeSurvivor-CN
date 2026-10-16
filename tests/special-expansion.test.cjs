@@ -42,7 +42,7 @@ test('two and three phase bosses change real species and completely replace atta
  const {G,enemy}=setup();for(const chain of [[92,93,94],[123,212]]){const e=enemy(20);e.def.stageChain=chain;e.boss=true;e.bossInit();e.hp=1000;G.BossStages.tick(e,.1);const kit=JSON.stringify(e.ai.melee.concat(e.ai.ranged));e.hp=300;G.BossStages.tick(e,.1);a.equal(e.dex,chain[chain.length-1]);a.equal(e.hp,300);a.notEqual(JSON.stringify(e.ai.melee.concat(e.ai.ranged)),kit);const phase=e.bossStage;e.hp=800;G.BossStages.tick(e,.1);a.equal(e.bossStage,phase,'phase never regresses');e.dead=true;e.hp=0;G.BossStages.tick(e,1);a.equal(e.hp,0,'no resurrection');}
 });
 test('phase transitions clear only that boss previous-phase hazards, not other bosses or new-phase warnings',()=>{
- const {G,enemy}=setup(),e=enemy();e.id=900;e.remote=true;e.bossStage=0;for(const [ownerId,ownerStage]of [[900,0],[900,1],[901,0]])G.Hazards.add({kind:'zone',x:0,y:0,r:20,delay:1,ownerId,ownerStage});G.BossStages.remote(e,93,1,1);a.deepEqual(Array.from(G.Hazards.all,h=>[h.ownerId,h.ownerStage]),[[900,1],[901,0]]);
+ const {G,enemy}=setup(),e=enemy();e.id=900;e.remote=true;e.bossStage=0;for(const [ownerId,ownerStage]of [[900,0],[900,1],[901,0]])G.Hazards.add({kind:'zone',x:0,y:0,r:20,delay:1,ownerId,ownerStage},true);G.BossStages.remote(e,93,1,1);a.deepEqual(Array.from(G.Hazards.all,h=>[h.ownerId,h.ownerStage]),[[900,1],[901,0]]);
 });
 test('all 27 starter encounter chains have available sprites and do not enter the legendary identity pool',()=>{
  const {G}=setup();a.equal(G.BossStages.starters().length,27);for(const chain of G.BossStages.starters()){a.equal(chain.length,3);a.ok(chain.every(d=>G.DEX_BY[d]&&!G.DEX_BY[d].leg&&G.SPRITE_META[d].a.Attack));}

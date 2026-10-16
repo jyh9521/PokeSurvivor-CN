@@ -29,7 +29,7 @@ G.Battle=(()=>{
     return Number.isFinite(amount)&&amount>0?amount*k:0;
   }
   function healLimited(p,fraction){const b=ensure(p);b.heals=b.heals.filter(h=>b.clock-h.at<1);const used=b.heals.reduce((n,h)=>n+h.f,0),f=Math.min(fraction,Math.max(0,.04-used));if(f>0){b.heals.push({at:b.clock,f});p.heal(p.maxHp*f);}}
-  function credit(p,m,dealt,killed){if(p.dead||p.remote||!Number.isFinite(dealt)||dealt<=0)return;ensure(p);p.onDealt(dealt);p.dmgDealt+=dealt;charge(p,dealt,killed);if(m.seedHeal)healLimited(p,m.seedHeal);}
+  function credit(p,m,dealt,killed){if(p.dead||p.remote||!Number.isFinite(dealt)||dealt<=0)return;ensure(p);p.onDealt(dealt);p.dmgDealt+=dealt;G.Telemetry?.damage(p,m,dealt,killed);charge(p,dealt,killed);if(m.seedHeal)healLimited(p,m.seedHeal);}
   function charge(p,dealt,killed){if(p.battle&&!p.battle.used)p.battle.energy=Math.min(100,p.battle.energy+Math.min(1,dealt*.01)+(killed?1:0));}
   function accept(p,e,amount,col,dx,dy,knock,m,eff){if(!e||e.dead||e.remote||!Number.isFinite(amount)||amount<=0)return {dealt:0,killed:false};const hp=e.hp;e.hurt(amount,col,dx,dy,knock,eff,p.uid);const dealt=Math.max(0,hp-Math.max(0,e.hp)),killed=dealt>0&&e.dead;credit(p,m,dealt,killed);return {dealt,killed};}
   function deal(p,e,amount,col,dx,dy,knock,m,eff){const value=damage(p,e,m,amount);if(!(value>0))return;if(e.remote){G.Coop.battleHit(e,value,col,dx,dy,knock,m,eff);return;}return accept(p,e,value,col,dx,dy,knock,m,eff);}
@@ -37,14 +37,14 @@ G.Battle=(()=>{
     if(pure)return Math.max(1,amount);
     amount*=G.SpecialRuntime.incoming(p,cls);
     const dodge=clamp(passive(p,'dodge')+(trait(p).key==='swift'?.05:0),0,.3);
-    if(Math.random()<dodge){G.FX.dmgText(p.x,p.y-p.bodyH,G.T('Dodged'),'#b9e6ff');return 0;}
-    if(b.block>0){b.block=0;b.counterT=2+legacyLevel(p,'revenge');G.FX.ring(p.x,p.y,8,45,'#c8e9ff',.25,2);G.FX.dmgText(p.x,p.y-p.bodyH,G.T('Blocked'),'#c8e9ff');return 0;}
+    if(Math.random()<dodge){G.Telemetry?.add(p,'dodges');G.FX.dmgText(p.x,p.y-p.bodyH,G.T('Dodged'),'#b9e6ff');return 0;}
+    if(b.block>0){G.Telemetry?.add(p,'blocks');b.block=0;b.counterT=2+legacyLevel(p,'revenge');G.FX.ring(p.x,p.y,8,45,'#c8e9ff',.25,2);G.FX.dmgText(p.x,p.y-p.bodyH,G.T('Blocked'),'#c8e9ff');return 0;}
     const s=formStats(p),armor=s[cls==='special'?4:2]+passive(p,cls==='special'?'ward':'armor');
     let reduction=1-(1-rules.armor(armor))*(1-legacyReduction);
     if(trait(p).key==='carapace'&&cls==='physical'||trait(p).key==='ward'&&cls==='special')reduction=1-(1-reduction)*.88;
     reduction=Math.min(.85,reduction);let d=Math.max(1,amount*(1-reduction));
     if(contact)d=Math.min(d,p.maxHp*G.BattleBalance.CONTACT_CAP);
-    const absorbed=Math.min(b.shield,d);b.shield-=absorbed;d-=absorbed;
+    const absorbed=Math.min(b.shield,d);b.shield-=absorbed;d-=absorbed;G.Telemetry?.add(p,'shield',absorbed);
     if(p.dex===778&&p.baseForm!=='busted'&&d>0){G.SpecialRuntime.base(p,'busted');p.trait=rules.trait(p.mon,data);visual(p);return Math.min(d,p.maxHp*.125);}
     if(trait(p).key==='sturdy'&&b.sturdyT<=0&&p.hp>=p.maxHp-.001&&d>=p.hp){d=p.hp-1;b.sturdyT=60;}
     if(d>0)b.counterT=2+legacyLevel(p,'revenge');return Math.max(0,d);

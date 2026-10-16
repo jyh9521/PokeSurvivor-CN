@@ -17,14 +17,16 @@ G.Spawner = (() => {
   const CAP = 64, ELITE_FROM = 0.85;
   // Menos Pokémon pero más fuertes (la pantalla no se satura): salen ~24% de
   // los de antes, cada uno con más vida, daño y experiencia.
-  const DENSITY = 0.24, DMG_K = G.BattleBalance.CONTACT_DAMAGE, XP_K = 5.6;
+  const DENSITY = 0.24, DMG_K = G.BattleBalance.CONTACT_DAMAGE;
   // Health only: spawn timing, cap, damage and XP remain independent of tuning.
   const hpK = (t,def) => G.BattleBalance.normalHp(t)*G.BattleBalance.tierBlend(t,def.tier,G.Enemies.TIERS);
   const SHINY_RATE = 1 / 4096;
   let acc = 0, bossIdx = 0, surgeT = 32, announce = null, announceT = 0, preloadT = 0;
+  let pressureAt=30;
   let forceShiny = 0;           // para pruebas: los N próximos salen shiny
 
   function reset() {
+    pressureAt=30;
     acc = 0; bossIdx = 0; surgeT = 32; announce = null; announceT = 0; preloadT = 0;
     G.Enemies.rollRun();
     G.Sprites.preload(G.Enemies.upcomingDex(0, 80));
@@ -81,7 +83,7 @@ G.Spawner = (() => {
     if (!pt) return null;
     const shiny = rollShiny(def.dex);
     const e = new G.Enemy(def, pt[0], pt[1], scaled(G.Enemies.scale(t), G.Coop.scaleHp(players.length) * hpK(t,def)));
-    e.dmg *= DMG_K; e.xp = Math.round(e.xp * XP_K);
+    e.dmg *= DMG_K; e.xp = Math.round(e.xp * G.BattleBalance.xpReward(t));
     if (G.EnemyMgr.count >= CAP * ELITE_FROM) { e.elite=true; e.maxHp = e.hp = Math.round(e.maxHp * G.BattleBalance.ELITE_HP); e.dmg *= 1.25; e.xp = Math.round(e.xp * 1.6); }
     if (shiny) e.makeShiny();
     if (G.Events.golden) e.makeGolden();
@@ -115,6 +117,12 @@ G.Spawner = (() => {
     // Precarga lo que va a salir en el próximo minuto.
     preloadT -= dt;
     if (preloadT <= 0) { preloadT = 10; G.Sprites.preload(G.Enemies.upcomingDex(t, 60)); }
+
+    // Authored wave suppression: one visible delayed landing, not an extra swarm.
+    // It persists if ordinary enemies are instantly cleared. Armor still applies.
+    if(t>=pressureAt){pressureAt=t+(G.BattleBalance.pressureWindow(t)?12:24);for(const p of players.filter(p=>!p.dead)){
+      G.Hazards.add({kind:'zone',x:p.x,y:p.y,r:38,delay:1.5,dmg:12*(1+t/600),type:'normal',damageClass:'special',color:'#ffb74d'});
+    }say(G.I18n?.lang==='zh-CN'?'波次压制：离开橙色落点！':'Wave pressure: leave the orange marker!',1.5);}
 
     // --- jefes ---
     const b = G.Enemies.BOSSES[bossIdx];
@@ -178,6 +186,6 @@ G.Spawner = (() => {
   /** Invitado en cooperativo: sólo corre el reloj del aviso. */
   function tickBanner(dt) { if (announceT > 0) announceT -= dt; }
 
-  return {checkpoint(s){if(!s)return {acc,bossIdx,surgeT,announce,announceT,preloadT};({acc,bossIdx,surgeT,announce,announceT,preloadT}=s);players=[];}, reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP,
+  return {checkpoint(s){if(!s)return {acc,bossIdx,surgeT,announce,announceT,preloadT,pressureAt};pressureAt=s.pressureAt??30;({acc,bossIdx,surgeT,announce,announceT,preloadT}=s);players=[];}, reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP,
            debugForceShiny(n = 1) { forceShiny = n; } };
 })();

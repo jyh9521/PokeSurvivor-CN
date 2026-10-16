@@ -320,12 +320,21 @@ G.World = (() => {
           if (d2 < min * min) {
             hit = true;
             const d = Math.sqrt(d2) || 0.01;
+            if(d2<1e-6){e.x=p.x+min+.1;continue;}
             e.x = p.x + dx / d * min; e.y = p.y + dy / d * min;
           }
         }
       }
     }
     return hit;
+  }
+
+  // Exceptional recovery only: never displace a valid player or fly through walls.
+  function ensureFree(e){
+    if(isFree(e.x,e.y,e.r,true)){e.lastFree={x:e.x,y:e.y};return false;}
+    const last=e.lastFree;if(last&&G.U.dist2(e.x,e.y,last.x,last.y)<=96**2&&isFree(last.x,last.y,e.r,true)){e.x=last.x;e.y=last.y;return true;}
+    for(let d=4;d<=96;d+=4)for(let i=0;i<16;i++){const a=i*Math.PI/8,x=e.x+Math.cos(a)*d,y=e.y+Math.sin(a)*d;if(isFree(x,y,e.r,true)){e.x=x;e.y=y;e.lastFree={x,y};return true;}}
+    return false;
   }
 
   /** ¿Choca un proyectil aquí? Devuelve 'wall', el prop sólido, o null. */
@@ -597,7 +606,7 @@ G.World = (() => {
   return {
     checkpoint(s){if(!s)return {seed,biome,arena,broken:[...broken],nextPropId,props:[...data].flatMap(([k,c])=>c.props.map(p=>({chunk:k,...p})))};reset(s.seed);biome=s.biome;arena=s.arena;for(const k of s.broken)broken.add(k);for(const p of s.props){const [cx,cy]=p.chunk.split(',').map(Number);const c=chunkData(cx,cy),old=c.props.find(o=>o.tx===p.tx&&o.ty===p.ty);if(old)Object.assign(old,p);}nextPropId=s.nextPropId;images.clear();},
     TS, CW, reset, setBiome, biomeName, liquidKind, liquidEffect, walkable,
-    kindAt, isWall, isLiquid, isFree, collide, projectileBlock, propsInCircle, nearestBreakable,
+    kindAt, isWall, isLiquid, isFree, collide, ensureFree, projectileBlock, propsInCircle, nearestBreakable,
     damageProp, breakAt, specialsNear, update,
     breakProp(p) { if (!broken.has(p.tx + ',' + p.ty)) destroyProp(p); },
     /** Arena de la grieta: { tx, ty, r } (en tiles) o null. */

@@ -256,7 +256,7 @@ G.Player = class Player {
       G.FX.ring(this.x, this.y, 6, 70, '#ff9a3d', 0.5, 4);
     }
     const lost=hpBefore-Math.max(0,this.hp);
-    if(lost>0&&!this.remote){G.Camera.damage(lost/this.maxHp);G.Gamepad?.rumble(lost/this.maxHp);}
+    if(lost>0&&!this.remote){G.Telemetry?.add(this,pure?"true":damageClass,lost);G.Camera.damage(lost/this.maxHp);G.Gamepad?.rumble(lost/this.maxHp);}
     if (this.hp <= 0) {
       this.hp = 0; this.dead = true;
       this.anim.play('Faint', { hold: true });
@@ -268,6 +268,7 @@ G.Player = class Player {
   heal(amount) {
     const before = this.hp;
     this.hp = Math.min(this.maxHp, this.hp + amount);
+    G.Telemetry?.add(this,"healed",this.hp-before);
     const got = Math.round(this.hp - before);
     if (got >= 1) G.FX.dmgText(this.x, this.y - this.bodyH - 6, '+' + got, '#5fe08a');
   }
@@ -276,6 +277,8 @@ G.Player = class Player {
 
   /** Devuelve cuántos niveles ha subido (pueden ser varios de golpe). */
   gainXp(amount) {
+    if(!Number.isFinite(amount)||amount<=0)return 0;
+    G.Telemetry?.add(this,"xpPicked",amount);G.Telemetry?.add(this,"xpGained",amount*this.xpMul);
     this.xp += amount * this.xpMul;
     let leveled = 0;
     while (this.xp >= this.xpNext) {
@@ -347,9 +350,9 @@ G.Player = class Player {
     this.svx = slide ? G.U.damp(this.svx || 0, ax * s * 1.15, 1.6, dt) : ax * s;
     this.svy = slide ? G.U.damp(this.svy || 0, ay * s * 1.15, 1.6, dt) : ay * s;
     const animX=this.x,animY=this.y;
-    this.x += this.svx * dt;
-    this.y += this.svy * dt;
-    G.World.collide(this);
+    const steps=Math.max(1,Math.ceil(Math.hypot(this.svx,this.svy)*dt/4));
+    for(let i=0;i<steps;i++){this.x+=this.svx*dt/steps;this.y+=this.svy*dt/steps;G.World.collide(this);}
+    G.World.ensureFree?.(this);
     if (this.walking) this.moveAngle = Math.atan2(ay, ax);
 
     // --- terreno líquido ---

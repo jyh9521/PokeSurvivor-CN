@@ -16,11 +16,13 @@ G.Hazards = (() => {
 
   /** h: { kind, x, y, r | angle, len, w, delay, dmg, type, color, pct?, pure?, vis? } */
   function add(h, fromNet = false) {
+    // Encounter-wide budget; judgment keeps its authored finale pattern.
+    if(!fromNet&&!h.pure){const pending=list.filter(o=>!o.hit&&!o.pure);if(pending.length>=6||pending.filter(o=>G.U.dist2(o.x,o.y,h.x,h.y)<140**2).length>=2)return null;}
     const o = Object.assign({ t: 0, hit: false, end: 0.3 }, h);
     list.push(o);
     if (!fromNet && G.Coop.isHost) {
       G.Coop.broadcast(['hz', { kind: o.kind, x: Math.round(o.x), y: Math.round(o.y), r: o.r, angle: o.angle, len: o.len, w: o.w,
-                                delay: o.delay, dmg: Math.round(o.dmg), type: o.type, color: o.color, ownerId:o.ownerId,ownerStage:o.ownerStage,pct: o.pct, pure: o.pure, vis: o.vis }]);
+                                delay: o.delay, dmg: Math.round(o.dmg), type: o.type, damageClass:o.damageClass, color: o.color, ownerId:o.ownerId,ownerStage:o.ownerStage,pct: o.pct, pure: o.pure, vis: o.vis }]);
     }
     return o;
   }
@@ -45,7 +47,7 @@ G.Hazards = (() => {
         h.hit = true;
         detonate(h);
         if (pl && !pl.dead && inside(h, pl.x, pl.y, pl.r)) {
-          pl.invuln = 0;
+          G.Telemetry?.add(pl,"hazardHits");pl.invuln = 0;
           pl.hurt(h.pct ? Math.max(h.dmg, pl.maxHp * h.pct) : h.dmg, h.type, !!h.pure, h.damageClass||'special');
         }
       }

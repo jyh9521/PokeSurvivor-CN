@@ -38,4 +38,4 @@ G.PassiveDefs=[
 ];
 
 // Six steps preserve the old three-step endpoints, including multiplicative stats.
-for(const d of G.PassiveDefs){d.legacyValue=d.value;d.value=d.stat==="cooldown"?1-Math.sqrt(1-d.value):["magnet","experience"].includes(d.stat)?Math.sqrt(1+d.value)-1:d.value/2;d.desc=["block","counter"].includes(d.stat)?(d.stat==="block"?"One block every 11/10/9/8/7/6 seconds; maximum one charge.":"Counter window +0.5 seconds and counter power +10% per level."):d.desc;}
+for(const d of G.PassiveDefs){d.legacyValue=d.value;d.value=d.stat==="cooldown"?1-Math.sqrt(1-d.value):["magnet","experience"].includes(d.stat)?Math.sqrt(1+d.value)-1:d.value/2;d.desc=["block","counter"].includes(d.stat)?(d.stat==="block"?"One block every 11/10/9/8/7/6 seconds; maximum one charge.":"Counter window +0.5 seconds and counter power +10% per level."):d.stat+" "+(d.stat==="cooldown"?"-":"+")+(["maxhp","armor","ward"].includes(d.stat)?d.value:(d.value*100).toFixed(2)+"%")+" per level; six levels preserve the old cap.";}

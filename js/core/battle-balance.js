@@ -9,6 +9,8 @@
   const normalHp=t=>DENSITY_HP*curve(t,[[0,1.05],[160,1.25],[500,1.65],[900,2],[1800,2.5]]);
   const bossHp=t=>curve(t,[[0,1.05],[180,1.05],[360,1.1],[540,1.15],[720,1.2],[900,1.25],[1800,1.35]]);
   const ELITE_HP=1.75;
+  const xpReward=t=>curve(t,[[0,4.2],[180,4.2],[600,1.4],[1800,1.4]]);
+  const pressureWindow=t=>(t>=180&&t<300)||(t>=720&&t<900)||(t>=1440&&t<1620);
   // Only newly unlocked tiers blend over 20 seconds; old-tier species are unchanged.
   function tierBlend(t,index,tiers){if(!Number.isInteger(index)||index<1||!tiers?.[index])return 1;const tr=tiers[index],x=Math.max(0,Math.min(1,(t-tr.from)/20));return tiers[index-1].hp/tr.hp+(1-tiers[index-1].hp/tr.hp)*x*x*(3-2*x);}
   // Per-target planning floors, not total multi-target DPS or simulated hit rates.
@@ -28,5 +30,5 @@
     m.dmg=+m.dmg.toFixed(3);
   }
   const bodyContact=e=>!e.judge&&(e.remote?!(e.net?.st&16):e.phase!=='dash'&&!e.jump&&!e.ai?.cast);
-  return{CONTACT_FACTOR,CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,tierBlend,FLOORS,budget,tune};
+  return{CONTACT_FACTOR,CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,tierBlend,FLOORS,budget,tune};
 });

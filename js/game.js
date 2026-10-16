@@ -676,6 +676,7 @@ G.Game = (() => {
     G.Interact.update(dt, pl);
     G.Rift.update(dt, pl, time);
     G.Judgment.update(dt, pl, time);
+    G.Telemetry?.tick(pl,dt,time);
     G.Events.update(dt, all, time);
     G.Weather.update(dt, time, pl);
     G.FX.update(dt);
