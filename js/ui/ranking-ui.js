@@ -7,12 +7,18 @@ G.RankingUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let mode = 's', period = 'w', scope = 'all', dex = null;
-  let token = 0, silentBusy=false, quietUntil=0;
+  let token = 0, silentBusy=false, quietUntil=0,challengeDate='',challengeData=null;
+  const cycle=G.ChallengeCycle.create({visible:()=>mode==='c'&&!challengeDate&&!document.hidden&&G.UI.isOpen('scr-rank'),expired:()=>load(true)});
 
   function init() {
     // A refresh must not replace a control between pointer down/up or during navigation.
     for(const type of ['pointerdown','pointerup','wheel','keydown','focusin','input','compositionstart','compositionend'])
       $('scr-rank').addEventListener(type,()=>{quietUntil=performance.now()+750;},{passive:true});
+    $('rk-date').onchange=()=>{challengeDate=$('rk-date').value;load();};
+    const shift=direction=>{if(!challengeData)return;const at=challengeData.challenge.start+direction*(period==='w'?7:1)*86400000;challengeDate=new Date(at).toISOString().slice(0,10);load();};
+    $('rk-prev').onclick=()=>shift(-1);$('rk-next').onclick=()=>shift(1);$('rk-current').onclick=()=>{challengeDate='';load();};
+    $('rk-claim').onclick=async()=>{if(!challengeData)return;const b=$('rk-claim');b.disabled=true;try{await G.NAS.claimChallenge(challengeData.challenge.period,new Date(challengeData.challenge.start).toISOString().slice(0,10));G.UI.toast(G.T('Premios guardados en NAS.'));await load();}catch(e){G.UI.toast(e.message,5000);load(true);}};
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)cycle.check();});
     const dl = $('rk-dl');
     dl.innerHTML = G.DEX.map(p => `<option value="${esc(G.T(p.name))}">`).join('');
     $('rk-poke').onchange = () => {
@@ -34,7 +40,8 @@ G.RankingUI = (() => {
     tabs(); load();
   }
 
-  function open() {
+  function open(nextMode,nextPeriod) {
+    if(nextMode==='c'){mode='c';period=nextPeriod==='w'?'w':'d';challengeDate='';}
     if (!G.SocialUI.needOnline()) return;
     G.UI.show('scr-rank', true);
     if (!G.Social.started) G.Social.start();
@@ -48,18 +55,19 @@ G.RankingUI = (() => {
       box.innerHTML = '';
       for (const [k, label] of items) {
         const b = document.createElement('button');
-        b.className = cls + (k === cur ? ' on' : '');
+        b.dataset.value=k;b.className = cls + (k === cur ? ' on' : '');
         b.innerHTML = label;
         b.onclick = () => { set(k); tabs(); load(); };
         box.appendChild(b);
       }
     };
-    mk($('rk-mode'), [['s', `<b>${G.Icons.html('user', 16)} Solo</b>`], ['g', `<b>${G.Icons.html('friends', 16)} Grupo</b>`]],
-       mode, k => { mode = k; }, 'gen-tab');
-    mk($('rk-period'), G.Ranking.PERIODS, period, k => {
-      period = k;
-      if (k !== 'a' && dex) { dex = null; $('rk-poke').value = ''; $('rk-clear').classList.add('hidden'); }
-    }, 'chip');
+    const modes=[['s', `<b>${G.Icons.html('user',16)} Solo</b>`],['g', `<b>${G.Icons.html('friends',16)} Grupo</b>`]];
+    if(G.NAS?.enabled)modes.push(['c',`<b>${G.T('Desafío')}</b>`]);
+    mk($('rk-mode'),modes,mode,k=>{mode=k;challengeDate='';cycle.stop();if(k==='c'&&!['d','w'].includes(period))period='d';},'gen-tab');
+    mk($('rk-period'),mode==='c'?G.Ranking.PERIODS.filter(([p])=>['d','w'].includes(p)):G.Ranking.PERIODS,period,k=>{
+      period=k;challengeDate='';if(k!=='a'&&dex){dex=null;$('rk-poke').value='';$('rk-clear').classList.add('hidden');}
+    },'chip');
+    $('rk-challenge-controls').classList.toggle('hidden',mode!=='c');$('rk-poke').classList.toggle('hidden',mode==='c');$('rk-clear').classList.toggle('hidden',mode==='c'||!dex);
     mk($('rk-scope'), [['all', 'Todos'], ['friends', 'Sólo amigos']], scope, k => { scope = k; }, 'chip');
   }
 
@@ -68,15 +76,26 @@ G.RankingUI = (() => {
   async function load(silent=false) {
     if(silent&&(silentBusy||G.Dialog?.open||performance.now()<quietUntil))return;
     if(silent)silentBusy=true;
-    const my = ++token;
+    const my = ++token;if(mode==='c')$('rk-claim').disabled=true;
     const list = $('rk-list');
     if(!silent){list.innerHTML = '<p class="sub">Cargando…</p>';$('rk-me').innerHTML = '';}
     let rows = [], me = null;
     try {
+      if(mode==='c'){
+        const data=await G.Ranking.challenge(period,challengeDate,scope==='friends');if(my!==token)return;
+        rows=data.rows;me=data.mine;challengeData=data;
+        const c=data.challenge,start=new Date(c.start).toISOString().slice(0,10),end=new Date(c.end-86400000).toISOString().slice(0,10);
+        if(document.activeElement!==$('rk-date'))$('rk-date').value=start;
+        $('rk-date').max=new Date(data.serverNow).toISOString().slice(0,10);$('rk-date').setAttribute('aria-label',G.T(period==='w'?'Ciclo del desafío':'Fecha del desafío'));
+        $('rk-challenge-range').textContent='UTC '+start+(period==='w'?' → '+end:'');$('rk-next').disabled=c.end>data.serverNow;
+        $('rk-claim').disabled=!data.rewards.tiers.some(t=>t.eligible&&!t.claimed);
+        if(!challengeDate)cycle.configure(c.end,data.serverNow);else cycle.stop();
+      }else{
       [rows, me] = await Promise.all([
         G.Ranking.top(mode, period, dex, scope === 'friends'),
         G.Social.me ? G.Ranking.myRank(mode, period, dex) : Promise.resolve(null)
       ]);
+      }
     } catch (e) {
       if (my !== token || silent) return;
       list.innerHTML = '<p class="sub">No se pudo cargar el ranking (' + esc(e.code || e.message) + ').</p>';
@@ -94,7 +113,7 @@ G.RankingUI = (() => {
       list.innerHTML = '<p class="sub">Todavía no hay marcas aquí. ¡Sé el primero!</p>';
     }
     const uid = G.Social.uid;
-    const b = G.Ranking.board(mode, period, dex), done = G.Ranking.reported();
+    const b = G.Ranking.board(mode, period, mode==='c'?challengeDate:dex), done = G.Ranking.reported();
     const keep=new Set();
     rows.forEach((r,i)=>{
       const key=r.id,signature=JSON.stringify([r,i,done.has(b+'__'+r.id)]);let el=silent&&existing.get(key);
@@ -106,6 +125,8 @@ G.RankingUI = (() => {
       list.scrollTop=top;const next=[...list.children].find(el=>el.dataset.rowKey===anchorKey);
       if(next&&offset!=null)list.scrollTop+=next.getBoundingClientRect().top-offset;
     }
+
+    if(mode==='c'){$('rk-me').textContent=G.T('Desafío')+' · '+$('rk-challenge-range').textContent+' · '+(me?G.T('Tu mejor puesto')+': #'+me.pos+' · '+fmt(me.t):G.T('Aún no hay resultados.'));return;}
 
     // La frase se monta en cada idioma (traducirla por trozos sale rara).
     if (G.I18n.lang === 'zh-CN') {

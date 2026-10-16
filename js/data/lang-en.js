@@ -666,3 +666,9 @@ G.I18n.add({"Directo": "Direct", "Relé NAS": "NAS relay", "Mixto": "Mixed", "Co
 G.I18n.add({"RTT directo WebRTC": "Actual WebRTC RTT"},"en");
 
 G.I18n.add({"Solo estadísticas de esta partida; tu cuenta no cambia.": "Statistics for this run only; your account is unchanged."},"en");
+
+G.I18n.add({"Desafío": "Challenge", "Fecha del desafío": "Challenge date", "Ciclo del desafío": "Challenge cycle", "Actual": "Current", "Recoger premios del desafío": "Claim challenge rewards", "Ver clasificación": "View leaderboard", "Tu mejor puesto": "Your best rank", "Recogido": "Claimed", "Listo para recoger": "Claimable", "Pendiente": "Not reached", "Primero sincroniza tu partida.": "Sync your save and resolve conflicts first.", "Premio guardado en NAS; resuelve el conflicto antes de continuar.": "Reward credited on NAS; resolve the save conflict before continuing.", "Premios guardados en NAS.": "Challenge rewards saved in browser and NAS.", "30 min; sin mejoras permanentes. Premios por hitos, una vez por cuenta y período.": "30-minute limit; no permanent upgrades. Each account can claim each milestone once per period.", "Desafío completado: premios por hitos": "Challenge ended: claim milestone rewards on the challenge page", "Juega en grupo, hasta 8": "Play together, up to 8", "Premios y clasificación de desafíos": "Challenge rewards and leaderboards", "Premios diarios y semanales por hitos, cambio automático de período y pestaña Desafío con fechas en el ranking. Las salas normales admiten ocho jugadores.": "Daily/weekly milestone rewards with one-time claims, automatic rollover and a dated Challenge tab in Rankings. Standard rooms now support eight players."},"en");
+
+G.I18n.add({"Termina la partida antes de recoger premios.": "Finish the run before claiming rewards."},"en");
+
+G.I18n.add({"Crear sala": "Create room"},"en");

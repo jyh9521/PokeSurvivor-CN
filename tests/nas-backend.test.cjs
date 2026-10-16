@@ -7,7 +7,7 @@ const seed=name=>({v:3,name,coins:500,owned:{1:{at:1,from:'starter'}},shiny:{},p
 async function fixture(t){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-nas-test-'));let app=createApp({dataDir:dir,campaigns:[],reconnectMs:100});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));let base='http://127.0.0.1:'+app.server.address().port;
   t.after(async()=>{await app.close();const p=path.resolve(dir);if(p.startsWith(path.join(path.resolve(os.tmpdir()),'ps-nas-test-')))fs.rmSync(p,{recursive:true,force:true});});
   const cookies=new Map();
-  async function call(url,b,cookie='',method=b?'POST':'GET',origin=base){if(url==='room/open'&&b?.open===false){for(const r of app.rooms.values())for(const m of r.members)if(cookies.has(m.uid))await call('room/ready',{ready:true},cookies.get(m.uid));}const r=await fetch(base+'/api/'+url,{method,headers:{...(b?{'content-type':'application/json'}:{}),cookie,origin},body:b?JSON.stringify({...b,protocol:3}):undefined});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]||cookie};}
+  async function call(url,b,cookie='',method=b?'POST':'GET',origin=base){if(url==='room/open'&&b?.open===false){for(const r of app.rooms.values())for(const m of r.members)if(cookies.has(m.uid))await call('room/ready',{ready:true},cookies.get(m.uid));}const r=await fetch(base+'/api/'+url,{method,headers:{...(b?{'content-type':'application/json'}:{}),cookie,origin},body:b?JSON.stringify({...b,protocol:4}):undefined});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]||cookie};}
   const account=async name=>{const r=await call('register',{name,password:'local-test-password'});assert.equal(r.status,200);cookies.set(r.data.user.id,r.cookie);return r;};
     return {get app(){return app;},get base(){return base;},dataDir:dir,call,account,async restart(){await app.close();app=createApp({dataDir:dir,campaigns:[],reconnectMs:100});await new Promise(r=>app.server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+app.server.address().port;}};
 }
@@ -67,13 +67,13 @@ test('leaderboard uses authenticated run and server identity, rejects replay and
   assert.equal((await f.call('ranking?mode=bad',undefined,a.cookie)).status,400);
   assert.equal((await f.call('report',{id:score.data.id},a.cookie)).status,200);
 });
-test('NAS room enforces four-player capacity',async t=>{
-  const f=await fixture(t),users=[];for(const name of ['Alice','Bob','Charlie','Dora','Evan']){const u=await f.account(name);await f.call('save',{rev:0,save:seed(name)},u.cookie,'PUT');users.push(u);}
+test('NAS room enforces eight-player capacity',async t=>{
+  const f=await fixture(t),users=[];for(const name of ['Alice','Bob','Charlie','Dora','Evan','Frank','Grace','Helen','Ivan']){const u=await f.account(name);await f.call('save',{rev:0,save:seed(name)},u.cookie,'PUT');users.push(u);}
   const host=users[0];for(const u of users.slice(1)){await f.call('friends/request',{name:u.data.user.name},host.cookie);await f.call('friends/accept',{uid:host.data.user.id},u.cookie);}
   await f.call('room/create',{},host.cookie);
-  for(const u of users.slice(1,4)){assert.equal((await f.call('invite',{uid:u.data.user.id},host.cookie)).status,200);assert.equal((await f.call('invite/accept',{uid:host.data.user.id},u.cookie)).status,200);}
-  assert.equal((await f.call('social',undefined,host.cookie)).data.room.members.length,4);
-  assert.equal((await f.call('invite',{uid:users[4].data.user.id},host.cookie)).status,409);
+  for(const u of users.slice(1,8)){assert.equal((await f.call('invite',{uid:u.data.user.id},host.cookie)).status,200);assert.equal((await f.call('invite/accept',{uid:host.data.user.id},u.cookie)).status,200);}
+  assert.equal((await f.call('social',undefined,host.cookie)).data.room.members.length,8);
+  assert.equal((await f.call('invite',{uid:users[8].data.user.id},host.cookie)).status,409);
 });
 
 test('public release disables history APIs and protects deployment files',async t=>{

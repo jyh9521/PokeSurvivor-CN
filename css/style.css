@@ -1025,3 +1025,5 @@ body[data-input=gamepad] .btn.danger.pad-focus{background:linear-gradient(#b73b5
 #scr-challenges .box{width:min(650px,94vw);max-height:88dvh;overflow:auto}#scr-challenges .row{flex-wrap:wrap}
 .save-comparison{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}.save-comparison td,.save-comparison th{padding:6px 3px;overflow-wrap:anywhere;border-bottom:1px solid #8bacf144;text-align:left}
 #nas-network-toggle{max-width:210px;width:auto}.save-comparison+ .sub{overflow-wrap:anywhere}
+
+#rk-challenge-controls{flex-wrap:wrap;gap:6px;margin:8px 0}#rk-date{width:155px;font-size:14px}#rk-challenge-controls .sub{overflow-wrap:anywhere}.rk-row .mons{flex-wrap:wrap;max-width:176px}.rk-row .mons canvas{flex-shrink:0}@media(max-width:600px){.rk-row .mons{max-width:60px}#rk-challenge-controls{font-size:12px}}

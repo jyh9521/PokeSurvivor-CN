@@ -88,7 +88,7 @@ window.PSStartup=(()=>{
 <link rel="preload" href="assets/fonts/PixelifyPS-400.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/PixelifyPS-700.ttf" as="font" type="font/ttf" crossorigin>
 <!-- Datos estructurados para Google (tipo de página: videojuego gratuito) -->
-<link rel="stylesheet" href="css/style.css?v=81a5d4217d" media="print" fetchpriority="high" data-game-style onload="this.media='all';PSStartup.styleReady()" onerror="PSStartup.fail('style')">
+<link rel="stylesheet" href="css/style.css?v=3070569257" media="print" fetchpriority="high" data-game-style onload="this.media='all';PSStartup.styleReady()" onerror="PSStartup.fail('style')">
 </head>
 <body>
 <section id="startup-screen" aria-label="启动状态"><div>
@@ -199,7 +199,7 @@ window.PSStartup=(()=>{
         <button class="menu-item" data-go="upgrades">Mejoras<small>Haz más fuerte cada run</small></button>
         <button class="menu-item" data-go="gacha">Gacha<small>9 regiones · Pokémon y shinies</small></button>
         <button class="menu-item" data-go="goals">Misiones<small id="menu-goals-sub">Misiones, logros y perfil</small></button>
-        <button class="menu-item" data-go="friends">Amigos<small id="menu-friends-sub">Juega en grupo, hasta 4</small></button>
+        <button class="menu-item" data-go="friends">Amigos<small id="menu-friends-sub">Juega en grupo, hasta 8</small></button>
         <button class="menu-item" data-go="rank">Ranking<small>Quién aguanta más</small></button>
         <button class="menu-item" data-go="settings">Ajustes<small>Sonido, gráficos, controles y cuenta</small></button>
       </div>
@@ -365,7 +365,8 @@ window.PSStartup=(()=>{
 <section id="scr-friends" class="scr dim hidden">
   <div class="box wide">
     <div class="row between"><h2>Amigos</h2>
-      <div class="row"><button id="fr-room" class="btn small gold hidden">Ir a la sala</button><button class="btn small ghost" data-back>Volver</button></div></div>
+      <div class="row"><button id="fr-create" class="btn small gold">Crear sala</button>
+      <button id="fr-room" class="btn small gold hidden">Ir a la sala</button><button class="btn small ghost" data-back>Volver</button></div></div>
     <p class="sub" id="fr-me"></p>
     <form id="fr-add" class="row" autocomplete="off">
       <input id="fr-name" class="field grow" maxlength="16" spellcheck="false" placeholder="Apodo de tu amigo">
@@ -399,6 +400,7 @@ window.PSStartup=(()=>{
     <div class="row between"><h2>Ranking <span class="sub" style="font-size:15px">· tiempo aguantado</span></h2><span class="row" style="gap:6px"><button id="rk-mod" class="btn small ghost hidden">Moderación</button><button class="btn small ghost" data-back>Volver</button></span></div>
     <div class="gen-tabs" id="rk-mode"></div>
     <div class="filters" id="rk-period"></div>
+    <div id="rk-challenge-controls" class="row hidden"><button class="btn small" id="rk-prev">←</button><input id="rk-date" class="field" type="date" aria-label="Fecha del desafío"><button class="btn small" id="rk-next">→</button><button class="btn small" id="rk-current">Actual</button><span id="rk-challenge-range" class="sub"></span><button class="btn small gold" id="rk-claim">Recoger premios del desafío</button></div>
     <div class="row rk-tools">
       <div class="filters" id="rk-scope" style="margin:0"></div>
       <input id="rk-poke" class="field" list="rk-dl" placeholder="Filtrar por Pokémon (histórico)" spellcheck="false">
@@ -577,6 +579,6 @@ window.PSStartup=(()=>{
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=1b6a336fcb"></script>
+<script defer src="js/app.min.js?v=2cb68113ea"></script>
 </body>
 </html>

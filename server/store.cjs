@@ -1,3 +1,4 @@
+const ChallengeRules=require('../js/core/challenge-rules.js');
 /* Persistent account/save module: optimistic revisions, history, no client clocks. */
 const {DatabaseSync}=require('node:sqlite');
 const Upgrades=require('../js/data/upgrades.js');
@@ -48,6 +49,7 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
     CREATE TABLE IF NOT EXISTS reward_receipts(uid TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,campaign TEXT NOT NULL,coins INTEGER NOT NULL,at INTEGER NOT NULL,PRIMARY KEY(uid,campaign));`);
   db.exec(`CREATE TABLE IF NOT EXISTS session_devices(token TEXT PRIMARY KEY REFERENCES sessions(token) ON DELETE CASCADE,label TEXT NOT NULL,created INTEGER NOT NULL,seen INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS economy_audit(uid TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,rev INTEGER NOT NULL,mutation TEXT NOT NULL,coins INTEGER NOT NULL,t1 INTEGER NOT NULL,t10 INTEGER NOT NULL,at INTEGER NOT NULL,PRIMARY KEY(uid,rev));`);
+  db.exec(`CREATE TABLE IF NOT EXISTS challenge_reward_receipts(uid TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,period TEXT NOT NULL,start INTEGER NOT NULL,tier INTEGER NOT NULL,challenge TEXT NOT NULL,coins INTEGER NOT NULL,t1 INTEGER NOT NULL,at INTEGER NOT NULL,PRIMARY KEY(uid,period,start,tier));`);
   if(!db.prepare('PRAGMA table_info(users)').all().some(c=>c.name==='lower')){
     db.exec('BEGIN IMMEDIATE');try{db.exec('ALTER TABLE users ADD COLUMN lower TEXT');for(const u of db.prepare('SELECT id,name FROM users').all())db.prepare('UPDATE users SET lower=? WHERE id=?').run(u.name.toLowerCase(),u.id);db.exec('CREATE UNIQUE INDEX users_lower ON users(lower); COMMIT');}catch(e){db.exec('ROLLBACK');db.close();throw e;}
   }
@@ -91,20 +93,21 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
     const token=randomBytes(32).toString('hex'),hash=digest(token),now=Date.now();db.prepare('INSERT INTO sessions VALUES(?,?,?)').run(hash,user.id,now+30*86400e3);db.prepare('INSERT INTO session_devices VALUES(?,?,?,?)').run(hash,String(label).slice(0,80).replace(/[\p{Cc}\p{Cf}]/gu,''),now,now);return token;
   }
   function authenticate(token) { if(!token)return null;db.prepare('UPDATE session_devices SET seen=? WHERE token=? AND seen<?').run(Date.now(),digest(token),Date.now()-60000);return db.prepare('SELECT u.id,u.name,u.nick FROM sessions s JOIN users u ON s.uid=u.id WHERE s.token=? AND s.expires>?').get(digest(token),Date.now())||null; }
-  function putSave(user,value,rev,mutation='',autoMerge=false) {
+  function putSave(user,value,rev,mutation='',autoMerge=false,inTransaction=false) {
     if(!Number.isSafeInteger(rev)||rev<0)throw error(400,'Invalid revision');
     if(mutation&&!/^[a-f0-9]{32}$/.test(mutation))throw error(400,'Invalid mutation');
     const inputHash=digest(JSON.stringify(value));let s=validateSave(value,user.name);
-    db.exec('BEGIN IMMEDIATE');
+    if(!inTransaction)db.exec('BEGIN IMMEDIATE');
     try {
       const old=getSave(user.id),done=mutation&&db.prepare('SELECT rev,hash FROM mutations WHERE uid=? AND id=?').get(user.id,mutation);
-      if(done){if(done.hash!==inputHash)throw error(400,'Mutation reused with different save');if(old.rev!==done.rev)throw error(409,'存档版本冲突，请保留并处理两份进度。',{current:old});db.exec('COMMIT');return old;}
+      if(done){if(done.hash!==inputHash)throw error(400,'Mutation reused with different save');if(old.rev!==done.rev)throw error(409,'存档版本冲突，请保留并处理两份进度。',{current:old});if(!inTransaction)db.exec('COMMIT');return old;}
       if(old.rev!==rev){
         const row=db.prepare('SELECT data FROM history WHERE uid=? AND rev=?').get(user.id,rev);
         const result=autoMerge?merge(row?JSON.parse(row.data):null,s,old.save):{conflicts:['revision']};
         if(result.conflicts.length)throw error(409,'两台设备存在并行修改；经济变化不会重复相加。',{current:{...old,differences:result.conflicts}});
         s=validateSave(result.save,user.name);rev=old.rev;
       }
+      const earned=challengeTotals(user.id);if(earned.count&&['count','coins','t1'].some(k=>s.challengeRewards?.[k]!==earned[k]))throw error(409,'挑战奖励已在服务器入账，请保留并同步两份进度。',{current:old});if(earned.count)s.challengeRewards=earned;else delete s.challengeRewards;
       const received=db.prepare('SELECT campaign AS id,coins FROM reward_receipts WHERE uid=? ORDER BY campaign').all(user.id);
       // A stale browser must reconcile the credited gift rather than overwrite it.
       if(received.some(r=>!Array.isArray(s.serverRewards)||!s.serverRewards.some(x=>x?.id===r.id)))throw error(409,'存档版本冲突，请保留并处理两份进度。',{current:old});
@@ -122,7 +125,24 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
       db.prepare('DELETE FROM history WHERE uid=? AND rev NOT IN (SELECT rev FROM history WHERE uid=? ORDER BY rev DESC LIMIT 20)').run(user.id,user.id);
       if(mutation){db.prepare('INSERT INTO mutations VALUES(?,?,?,?)').run(user.id,mutation,rev+1,inputHash);db.prepare('DELETE FROM mutations WHERE uid=? AND id NOT IN (SELECT id FROM mutations WHERE uid=? ORDER BY rev DESC LIMIT 20)').run(user.id,user.id);}
       db.prepare('INSERT INTO economy_audit VALUES(?,?,?,?,?,?,?)').run(user.id,rev+1,mutation,s.coins-(old.save?.coins||0),s.tickets.t1-(old.save?.tickets?.t1||0),s.tickets.t10-(old.save?.tickets?.t10||0),Date.now());
-      db.exec('COMMIT');return {rev:rev+1,save:s};
+      if(!inTransaction)db.exec('COMMIT');return {rev:rev+1,save:s};
+    }catch(e){if(!inTransaction)db.exec('ROLLBACK');throw e;}
+  }
+  function challengeTotals(uid){const r=db.prepare('SELECT COUNT(*) AS count,COALESCE(SUM(coins),0) AS coins,COALESCE(SUM(t1),0) AS t1 FROM challenge_reward_receipts WHERE uid=?').get(uid);return {...r};}
+  function challengeStatus(user,challenge){
+    const best=scores().filter(r=>r.mode==='c'&&r.challenge===challenge.id&&r.uids.length===1&&r.uids[0]===user.id).reduce((n,r)=>Math.max(n,r.t),0);
+    const receipts=new Set(db.prepare('SELECT tier FROM challenge_reward_receipts WHERE uid=? AND period=? AND start=?').all(user.id,challenge.period,challenge.start).map(r=>r.tier));
+    return {best,tiers:ChallengeRules.tiers(challenge.period).map(r=>({...r,eligible:best>=r.seconds,claimed:receipts.has(r.tier)}))};
+  }
+  function claimChallenge(user,challenge){
+    db.exec('BEGIN IMMEDIATE');try{
+      const old=getSave(user.id);if(!old.save)throw error(409,'请先创建游戏存档。');
+      const status=challengeStatus(user,challenge),claimed=status.tiers.filter(t=>t.eligible&&!t.claimed);
+      if(!claimed.length){db.exec('COMMIT');return {...old,claimed:[],rewards:status};}
+      const s=structuredClone(old.save);for(const tier of claimed){s.coins+=tier.coins;s.tickets.t1+=tier.t1;db.prepare('INSERT INTO challenge_reward_receipts VALUES(?,?,?,?,?,?,?,?)').run(user.id,challenge.period,challenge.start,tier.tier,challenge.id,tier.coins,tier.t1,Date.now());}
+      s.challengeRewards=challengeTotals(user.id);
+      const result=putSave(user,s,old.rev,digest('challenge:'+challenge.period+':'+challenge.start+':'+claimed.map(t=>t.tier).join(',')).slice(0,32),false,true);
+      db.exec('COMMIT');return {...result,claimed,rewards:challengeStatus(user,challenge)};
     }catch(e){db.exec('ROLLBACK');throw e;}
   }
   function nickname(user,value){
@@ -161,7 +181,7 @@ function createStore(file,{campaigns=CAMPAIGNS}={}) {
   }
   function devices(user,current){return db.prepare('SELECT s.token AS id,d.label,d.created,d.seen,s.expires FROM sessions s LEFT JOIN session_devices d ON s.token=d.token WHERE s.uid=? AND s.expires>? ORDER BY d.seen DESC').all(user.id,Date.now()).map(d=>({...d,label:d.label||'旧版浏览器',current:d.id===digest(current)}));}
   function revoke(user,current,id){if(id==='others')db.prepare('DELETE FROM sessions WHERE uid=? AND token<>?').run(user.id,digest(current));else{if(typeof id!=='string'||! /^[a-f0-9]{64}$/.test(id))throw error(400,'Invalid device');if(id===digest(current))throw error(400,'当前设备请使用登出。');db.prepare('DELETE FROM sessions WHERE uid=? AND token=?').run(user.id,id);}}
-  return {devices,revoke,sessionId:token=>digest(token),db,credentials,session,authenticate,getUser,getSave,putSave,nickname,request,friendship,friendRows,areFriends,scores,addScore,
+  return {challengeStatus,claimChallenge,devices,revoke,sessionId:token=>digest(token),db,credentials,session,authenticate,getUser,getSave,putSave,nickname,request,friendship,friendRows,areFriends,scores,addScore,
     logout(token){db.prepare('DELETE FROM sessions WHERE token=?').run(digest(token));},
     history(uid){return db.prepare('SELECT rev,at FROM history WHERE uid=? ORDER BY rev DESC LIMIT 20').all(uid);},
     restore(user,revision,current){const row=db.prepare('SELECT data FROM history WHERE uid=? AND rev=?').get(user.id,revision);if(!row)throw error(404,'历史存档不存在。');return putSave(user,JSON.parse(row.data),current);},

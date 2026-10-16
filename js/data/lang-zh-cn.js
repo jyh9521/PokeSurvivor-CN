@@ -1289,3 +1289,9 @@ G.I18n.add({"Directo": "直连", "Relé NAS": "NAS 中继", "Mixto": "混合连�
 G.I18n.add({"RTT directo WebRTC": "实际 WebRTC 直连往返"},"zh-CN");
 
 G.I18n.add({"Solo estadísticas de esta partida; tu cuenta no cambia.": "仅统计本局表现，账号进度保持不变。"},"zh-CN");
+
+G.I18n.add({"Desafío": "挑战", "Fecha del desafío": "挑战日期", "Ciclo del desafío": "挑战周期", "Actual": "本期", "Recoger premios del desafío": "领取挑战奖励", "Ver clasificación": "查看排行榜", "Tu mejor puesto": "最佳名次", "Recogido": "已领取", "Listo para recoger": "可领取", "Pendiente": "未达标", "Primero sincroniza tu partida.": "请先同步存档并处理冲突。", "Premio guardado en NAS; resuelve el conflicto antes de continuar.": "奖励已在 NAS 入账，请先处理存档冲突。", "Premios guardados en NAS.": "挑战奖励已保存到浏览器与 NAS。", "30 min; sin mejoras permanentes. Premios por hitos, una vez por cuenta y período.": "限时 30 分钟，不使用永久强化；每个账号每期每档奖励仅领取一次。", "Desafío completado: premios por hitos": "挑战已结束：达标奖励请在挑战页领取", "Juega en grupo, hasta 8": "最多 8 人一起玩", "Premios y clasificación de desafíos": "挑战奖励与排行榜", "Premios diarios y semanales por hitos, cambio automático de período y pestaña Desafío con fechas en el ranking. Las salas normales admiten ocho jugadores.": "新增每日／每周达标奖励与防重复领取、挑战页到期自动刷新，以及排行榜中的挑战日期／周期查询；普通联机房间扩展为八人。"},"zh-CN");
+
+G.I18n.add({"Termina la partida antes de recoger premios.": "请结束当前对局后领取挑战奖励。"},"zh-CN");
+
+G.I18n.add({"Crear sala": "创建房间"},"zh-CN");

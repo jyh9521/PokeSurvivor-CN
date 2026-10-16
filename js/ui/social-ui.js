@@ -63,6 +63,7 @@
         msg(r.ok ? r.msg : r.error, !r.ok);
         if (r.ok) $('fr-name').value = '';
       };
+      $('fr-create').onclick=async()=>{if(!G.NAS?.enabled)return;const r=await G.Social.createRoom();if(r.ok)G.LobbyUI.open();else G.UI.toast(r.error);};
       $('fr-room').onclick = () => G.LobbyUI.open();
       G.Social.on(() => { if (G.UI.isOpen('scr-friends')) render(); });
     }
@@ -94,7 +95,7 @@
     function render() {
       const room = G.Social.room;
       $('fr-me').innerHTML = 'Tu apodo: <b class="gold" translate="no">' + esc(G.Social.me ? G.Social.me.name : '') + '</b> · dáselo a tus amigos para que te añadan.';
-      $('fr-room').classList.toggle('hidden', !room);
+      $('fr-room').classList.toggle('hidden', !room);$('fr-create').hidden=!G.NAS?.enabled||!!room;
       const list = G.Social.friends.sort((a, b) => {
         const rank = f => f.status === 'in' ? 0 : f.status === 'ok' ? (f.online ? (f.play ? 2 : 1) : 3) : 4;
         return rank(a) - rank(b) || a.name.localeCompare(b.name);
@@ -192,7 +193,6 @@
       const room = G.Social.room;
       if (!room) return;
       const ms = room.members;
-      let experiment=$('lobby-experiment');if(!experiment){experiment=document.createElement('p');experiment.id='lobby-experiment';experiment.className='sub';$('lobby-sub').after(experiment);}experiment.textContent=room.experiment?G.T('Sala experimental de 8: sin monedas, tickets ni progreso guardado.'):'';
       $('lobby-sub').textContent = room.isHost
         ? 'Eres el anfitrión. Invita a tus amigos (hasta ' + G.Social.MAX_PLAYERS + ') y empezad cuando estéis.'
         : 'Estás en la sala de ' + ((ms.find(m => m.uid === room.host) || {}).name || '…') + '. El anfitrión empezará la partida.';

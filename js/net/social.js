@@ -23,7 +23,7 @@
  */
 G.Social = (() => {
   const VALID = /^[A-Za-z0-9_ñÑáéíóúÁÉÍÓÚ]{3,16}$/;
-  const MAX_PLAYERS = 4;
+  const MAX_PLAYERS = 8;
   const INVITE_TTL = 3 * 60 * 1000;
   // Latido de presencia: cada 30 min (era 15; antes 10). 57.000 jugadores con
   // amigos lo escribían 4 veces por hora (13-10-2026, menos gasto de Firestore).

@@ -1,3 +1,5 @@
+> 0.10.0 已加入挑战达标奖励、自动换期、日期排行榜，并将普通房直接扩为八人；最新行为见 [CHALLENGE_REWARDS.md](CHALLENGE_REWARDS.md)。以下保留前一阶段记录。
+
 > 0.9.0 更新：已增加显式选择、不保存收益的八人实验房；普通房仍四人。实现与测试入口见 [COMMUNITY_EXPANSION.md](COMMUNITY_EXPANSION.md)。下面保留扩容前的评估及后续公网性能验收门槛。
 
 # 8 / 12 人联机评估（只评估，不增加上限）

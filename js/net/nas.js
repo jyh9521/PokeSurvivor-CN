@@ -14,8 +14,8 @@ G.NAS = (() => {
   const probesAnswered=new Map();
   const flow=G.RelayFlow.create({onSent:value=>{if(value.type==='relay'&&(value.data?.k==='f'||value.data?.lane==='state'))health.tx(value.to);}});
   const quality=G.NetworkQuality.create();
-  const direct=G.DirectLink.create({batchAcks:()=>social.room?.experiment===true,signal:(to,data)=>rawRelay(to,{k:'rtc-signal',...data}),relay:rawRelay,deliver:deliver,sent:uid=>health.tx(uid),changed:(uid,mode)=>{if(mode==='overflow'){action('room/leave',{});G.UI?.toast(G.T('Demasiados eventos pendientes; vuelve a la sala.'));}else peers.forEach(f=>f(uid,social.room?.members.find(m=>m.uid===uid)?.connected===false?'reconnecting':mode));}});
-  const interval=uid=>{const directPath=direct.mode(uid)==='direct',pressure=direct.pressure(uid);return quality.interval(uid||'all',{...pressure,bufferedBytes:Math.max(pressure.bufferedBytes,directPath?0:socket?.bufferedAmount||0),serverBufferedBytes:directPath?0:serverBuffered},social.room?.experiment?10:15);};
+  const direct=G.DirectLink.create({batchAcks:()=>!!social.room,signal:(to,data)=>rawRelay(to,{k:'rtc-signal',...data}),relay:rawRelay,deliver:deliver,sent:uid=>health.tx(uid),changed:(uid,mode)=>{if(mode==='overflow'){action('room/leave',{});G.UI?.toast(G.T('Demasiados eventos pendientes; vuelve a la sala.'));}else peers.forEach(f=>f(uid,social.room?.members.find(m=>m.uid===uid)?.connected===false?'reconnecting':mode));}});
+  const interval=uid=>{const directPath=direct.mode(uid)==='direct',pressure=direct.pressure(uid);return quality.interval(uid||'all',{...pressure,bufferedBytes:Math.max(pressure.bufferedBytes,directPath?0:socket?.bufferedAmount||0),serverBufferedBytes:directPath?0:serverBuffered},social.room?10:15);};
   function networkTick(){
     direct.tick();flow.drain(socket,(_v,_key,scope)=>!!activeRoom&&scope===activeRoom);health.sweep();
     if(!socket||socket.readyState!==1||performance.now()<nextProbe)return;nextProbe=performance.now()+2000;
@@ -29,7 +29,7 @@ G.NAS = (() => {
   const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true;}catch{storageOk=false;setState('storage-error');return false;}};
   const key=()=>user?'ps.nas.save.'+user.id:'';
   const notify=()=>socialListeners.forEach(f=>{f('friends');f('invites');f('room');});
-  function receiveSocial(next){const previous=social.room;if(previous?.id!==next.room?.id||(previous?.members||[]).map(m=>m.uid).sort().join('|')!==(next.room?.members||[]).map(m=>m.uid).sort().join('|')){flow.clear();quality.clear();health.clearPeers();probesAnswered.clear();}for(const p of previous?.members||[])if(p.uid!==user?.id&&(previous.id!==next.room?.id||!next.room.members.some(m=>m.uid===p.uid)))peers.forEach(f=>f(p.uid,'closed'));social=next;flow.setLimit(social.room?.experiment?7:4);direct.sync(social.room?.id,user?.id,social.room?.host,social.room?.members||[]);notify();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,p.connected===false?'reconnecting':direct.mode(p.uid)));});}
+  function receiveSocial(next){const previous=social.room;if(previous?.id!==next.room?.id||(previous?.members||[]).map(m=>m.uid).sort().join('|')!==(next.room?.members||[]).map(m=>m.uid).sort().join('|')){flow.clear();quality.clear();health.clearPeers();probesAnswered.clear();}for(const p of previous?.members||[])if(p.uid!==user?.id&&(previous.id!==next.room?.id||!next.room.members.some(m=>m.uid===p.uid)))peers.forEach(f=>f(p.uid,'closed'));social=next;flow.setLimit(social.room?7:4);direct.sync(social.room?.id,user?.id,social.room?.host,social.room?.members||[]);notify();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,p.connected===false?'reconnecting':direct.mode(p.uid)));});}
   const setState=s=>{state=storageOk?s:'storage-error';syncListeners.forEach(f=>f(state));};
   function assign(dst,src){for(const k of Object.keys(dst))if(!(k in src))delete dst[k];for(const k in src){if(dst[k]&&src[k]&&typeof dst[k]==='object'&&typeof src[k]==='object'&&!Array.isArray(dst[k])&&!Array.isArray(src[k]))assign(dst[k],src[k]);else dst[k]=clone(src[k]);}}
   function persist(){if(!user||guest)return false;return write(key(),{user,save,rev,pending,conflict,request});}
@@ -44,7 +44,7 @@ G.NAS = (() => {
   function reconcileRewards(localSave,remoteSave){
     const remote=remoteSave?.serverRewards||[],known=new Set((localSave.serverRewards||[]).map(r=>r.id));
     for(const r of remote)if(!known.has(r.id)){localSave.coins+=r.coins;known.add(r.id);}
-    localSave.serverRewards=clone(remote);
+    localSave.serverRewards=clone(remote);const totals=remoteSave?.challengeRewards;if(totals){const old=localSave.challengeRewards||{coins:0,t1:0};localSave.coins+=Math.max(0,totals.coins-(old.coins||0));localSave.tickets.t1+=Math.max(0,totals.t1-(old.t1||0));localSave.challengeRewards=clone(totals);}
   }
   function fresh(name){local.playAsGuest();const s=clone(local.save);s.name=name;return s;}
   function load(result){deviceBusy=false;user=result.user;guest=false;const cached=read(key());rev=result.rev;
@@ -116,13 +116,13 @@ G.NAS = (() => {
     get mode(){return 'nas';},get fb(){return null;},get online(){return available&&!!user&&!guest;},get nameAccount(){return !!user;},get hasGoogle(){return false;},
     get user(){return user?.nick||user?.name||'Invitado';},get uid(){return user?.id;},get guest(){return guest;},get save(){return save;},get loggedIn(){return !!save;},get syncState(){return state;},get localReason(){return 'nas';},get storageOk(){return storageOk;}
   },['ready','onSync']);
-  async function action(route,b){try{if(route==='invite/accept'&&social.invites.find(i=>i.from===b.uid)?.experiment){if(!(await G.Dialog.confirm('Sala experimental de 8: sin monedas, tickets ni progreso guardado. ¿Entrar?')))return {ok:false,error:G.T('Cancelado')};b={...b,experimentAccepted:true};}if ((route==='room/create'||route==='room/member'||route==='room/ready') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,{...b,protocol:3});await refresh();return r;}catch(e){return {ok:false,error:e.message,status:e.status};}}
+  async function action(route,b){try{if ((route==='room/create'||route==='room/member'||route==='room/ready') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,{...b,protocol:4});await refresh();return r;}catch(e){return {ok:false,error:e.message,status:e.status};}}
   async function refresh(){if(enabled)connect();if(!enabled)return oldSocial.refreshPresence();if(!user||guest)return;try{receiveSocial(await api('social'));available=true;}catch{available=false;}}
   const profile=()=>oldSocial.profileData();
   G.Social=proxy(oldSocial,{
     start:async()=>{connect();await refresh();return user?'ok':'off';},stop:async()=>{await action('room/leave',{});},
     claimNick:n=>setNickname(n),request:n=>action('friends/request',{name:n}),requestUid:uid=>action('friends/request',{uid}),accept:uid=>action('friends/accept',{uid}),remove:uid=>action('friends/remove',{uid}),
-    createRoom:(options={})=>action('room/create',{experiment:options.experiment===true}),get MAX_PLAYERS(){return social.room?.capacity||4;},joinRoom:id=>{const invitation=social.invites.find(i=>i.room===id);return invitation?action('invite/accept',{uid:invitation.from}):Promise.resolve({ok:false,error:'邀请已失效。'});},leaveRoom:()=>action('room/leave',{}),refreshMember:()=>action('room/member',{}),setOpen:open=>action('room/open',{open}),setReady:ready=>action('room/ready',{ready}),transferHost:uid=>action('room/transfer',{uid}),
+    createRoom:()=>action('room/create',{}),get MAX_PLAYERS(){return social.room?.capacity||8;},joinRoom:id=>{const invitation=social.invites.find(i=>i.room===id);return invitation?action('invite/accept',{uid:invitation.from}):Promise.resolve({ok:false,error:'邀请已失效。'});},leaveRoom:()=>action('room/leave',{}),refreshMember:()=>action('room/member',{}),setOpen:open=>action('room/open',{open}),setReady:ready=>action('room/ready',{ready}),transferHost:uid=>action('room/transfer',{uid}),
     async invite(uid){if(!social.room){const r=await action('room/create',{});if(!r.ok)return r;}return action('invite',{uid});},
     acceptInvite:uid=>action('invite/accept',{uid}),declineInvite:uid=>action('invite/decline',{uid}),
     refreshPresence:refresh,setPlaying(){},publishProfile(){commit();},profileData:profile,
@@ -153,17 +153,25 @@ G.NAS = (() => {
   async function finishRun(){const run=await runPromise;runPromise=null;if(run)await api('run/end',{run:run.id}).catch(()=>{});}
 
   const board=(m,p,d)=>m+'_'+p+(d?'_p'+d:'');
-  const ranking=(m,p,d,f=false)=>api(`ranking?mode=${m}&period=${p}&dex=${d||0}&friends=${f?1:0}`);
+  const ranking=(m,p,d,f=false)=>api(`ranking?mode=${m}&period=${p}&${m==='c'?'date='+encodeURIComponent(d||''):'dex='+(d||0)}&friends=${f?1:0}`);
   G.Ranking=proxy(oldRanking,{runStarted,submitSolo:m=>submit('s',m),submitGroup:m=>submit('g',m),board,
-    top:async(m,p,d,f)=>(await ranking(m,p,d,f)).rows,myRank:async(m,p,d)=>(await ranking(m,p,d)).mine,
+    challenge:async(p,d,f)=>ranking('c',p,d,f),top:async(m,p,d,f)=>(await ranking(m,p,d,f)).rows,myRank:async(m,p,d)=>(await ranking(m,p,d)).mine,
     isAdmin:()=>false,reported:()=>reported,report:async(b,r)=>{await api('report',{id:r.id});reported.add(b+'__'+r.id);},removeMine:async()=>{}
   });
   window.addEventListener('online',()=>{if(enabled&&user){connect();refreshSave();}});
   document.addEventListener('visibilitychange',()=>{if(enabled&&user){if(document.visibilityState==='hidden'){if(pending)flush();}else refreshSave();}});
   async function refreshSave(){if(G.Game&&!['ui','over'].includes(G.Game.state))return !pending&&!conflict;if(!enabled||!user||guest)return false;if(pending||conflict)return flush();const version=change;try{const r=await api('save');available=true;if(change!==version||pending)return flush();if(r.save&&r.rev!==rev){rev=r.rev;assign(save,r.save);persist();}setState('ok');return true;}catch(e){setState(e.status===401?'auth-required':'offline');return false;}}
   async function setNickname(nick){try{const r=await api('nickname',{nick});user=r.user;write('ps.nas.session',user);persist();G.UI?.refreshCoins();await refresh();return {ok:true};}catch(e){return {ok:false,error:e.message,status:e.status};}}
+  async function claimChallenge(period,date){
+    if(G.RunModes?.active||G.Game&&!['ui','over'].includes(G.Game.state))throw Error(G.T('Termina la partida antes de recoger premios.'));
+    commit();if(!(await flush())||conflict)throw Error(G.T('Primero sincroniza tu partida.'));
+    const uid=user.id,version=change,r=await api('challenges/claim',{period,date});
+    if(user?.id!==uid)return {ok:false};
+    if(change!==version){conflict={save:r.save,rev:r.rev,differences:['economy']};pending=true;persist();setState('conflict');throw Error(G.T('Premio guardado en NAS; resuelve el conflicto antes de continuar.'));}
+    assign(save,r.save);rev=r.rev;request=null;pending=false;persist();setState('ok');G.UI?.refreshCoins();return r;
+  }
   async function upgrade(op,dex,id){if(!(await flush())||conflict)return {ok:false,error:'请先同步存档并处理冲突。'};try{const uid=user.id,version=change;const r=await api('upgrades',{op,dex,id,rev});if(user?.id!==uid)return {ok:false,error:'账号已切换。'};if(change!==version){conflict={save:r.save,rev:r.rev};pending=true;persist();setState('conflict');return {ok:false,error:'操作期间存档发生变化，两份进度已保留，请处理同步冲突。'};}assign(save,r.save);rev=r.rev;persist();setState('ok');return {ok:true,...r.result};}catch(e){await refreshSave();return {ok:false,error:e.message,status:e.status};}}
-  return {prepareRun,finishRun,onOperations:f=>{operationListeners.add(f);f(operations);},get operations(){return operations;},get isAdmin(){return user?.name?.toLowerCase()==='jyh9521';},
+  return {claimChallenge,prepareRun,finishRun,onOperations:f=>{operationListeners.add(f);f(operations);},get operations(){return operations;},get isAdmin(){return user?.name?.toLowerCase()==='jyh9521';},
     async devices(){return api('devices');},async revokeDevice(id,password){return api('devices/revoke',{id,password});},async takeover(password){await api('devices/takeover',{password});deviceBusy=false;connect();return refreshSave();},
     async administer(op,message,confirm){const value=await api('admin/operations',{op,message,confirm});receiveOperations(value);return value;},adminStatus:()=>api('admin/status'),
     announce:text=>action('announcement',{text}),get canAnnounce(){return social.me?.canAnnounce===true;},upgrade,setNickname,networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},get revision(){return rev;},exportCopies:()=>({format:1,recordedAt:new Date().toISOString(),browser:{rev,save:clone(save)},nas:clone(conflict),differences:G.SaveDiff.compare(save,conflict?.save)}),api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
