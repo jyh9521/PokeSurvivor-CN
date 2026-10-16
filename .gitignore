@@ -33,3 +33,7 @@ nas-data/
 *.sqlite-wal
 *.sqlite-shm
 .env
+
+**/turn.env
+**/.turn-wizard.env
+**/turn.env.backup-*

@@ -1,0 +1,3 @@
+/* Operator preflight: never prints credentials or API responses. */
+const {fromEnv}=require('../server/turn.cjs');
+(async()=>{const broker=fromEnv();if(!broker.status().configured)throw Error('TURN configuration incomplete');const value=await broker.credentials('deployment-check','deployment-check');if(!value.iceServers.length||value.expiresAt<=Date.now())throw Error('TURN credentials invalid');console.log('PASS TURN_CONFIG: Cloudflare usage guard and short-lived credential issuance; secret output=0');})().catch(e=>{console.error('TURN_CONFIG_FAILED: '+(['turn-not-configured','turn-budget-exhausted','turn-usage-unavailable','turn-provider-unavailable'].includes(e.code)?e.code:'configuration-incomplete'));process.exitCode=1;});

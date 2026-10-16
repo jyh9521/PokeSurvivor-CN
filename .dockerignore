@@ -14,3 +14,7 @@ functions
 *.log
 
 .codex-remote-attachments
+
+**/turn.env
+**/.turn-wizard.env
+**/turn.env.backup-*

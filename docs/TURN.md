@@ -1,3 +1,5 @@
+> 当前0.16.8的Cloudflare TURN兜底、免费额度保护与NAS部署以 [TURN_0168.md](TURN_0168.md) 为准；下文保留历史版本记录。
+
 # TURN de Cloudflare para el cooperativo
 
 **Por qué:** cuando dos jugadores no pueden conectarse directamente (datos móviles,

@@ -1,10 +1,10 @@
 /* Identifier-free quality classification and hysteretic per-peer snapshot pacing. */
 (function(factory){if(typeof module==='object'&&module.exports)module.exports=factory();else G.NetworkQuality=factory();})(()=>{
   function describe(m){
-    const paths=(m.peerLinks||[]).filter(p=>p.mode==='direct').map(p=>p.path?.rttMs).filter(Number.isFinite);
-    const transport=m.p2pOnly&&!m.directPeers?'connecting':m.directPeers?(m.relayPeers?'mixed':'direct'):'relay';
-    const rtt=transport==='direct'?(paths.length?Math.max(...paths):null):m.peerRttMs??m.nasRttMs??null;
-    const reason=transport==='connecting'?'reconnecting':!m.connected&&transport!=='direct'?'offline':m.reconnectingPeers?'reconnecting':Math.max(m.bufferedBytes||0,m.serverBufferedBytes||0,m.directBufferedBytes||0)>=32768||m.oldestEventMs>=1600?'queue':m.fps!=null&&m.fps<35&&!m.background?'fps':rtt!=null&&rtt>=250?'latency':'stable';
+    const paths=(m.peerLinks||[]).filter(p=>['direct','turn'].includes(p.mode)).map(p=>p.path?.rttMs).filter(Number.isFinite);
+    const transport=m.turnPeers?(m.directPeers?'mixed':'turn'):m.p2pOnly&&!m.directPeers?((m.peerLinks||[]).some(p=>p.mode==='failed')?'failed':'connecting'):m.directPeers?(m.relayPeers?'mixed':'direct'):'relay';
+    const rtt=['failed','connecting'].includes(transport)?null:['direct','turn','mixed'].includes(transport)?(paths.length?Math.max(...paths):null):m.peerRttMs??m.nasRttMs??null;
+    const reason=['failed','connecting'].includes(transport)?'reconnecting':!m.connected&&!['direct','turn','mixed'].includes(transport)?'offline':m.reconnectingPeers?'reconnecting':Math.max(m.bufferedBytes||0,m.serverBufferedBytes||0,m.directBufferedBytes||0)>=32768||m.oldestEventMs>=1600?'queue':m.fps!=null&&m.fps<35&&!m.background?'fps':rtt!=null&&rtt>=250?'latency':'stable';
     return {transport,rttMs:rtt,reason,level:['offline','reconnecting'].includes(reason)?'offline':reason==='stable'?'good':'fair'};
   }
   function create({now=()=>performance.now()}={}){

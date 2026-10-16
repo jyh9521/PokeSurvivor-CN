@@ -1,3 +1,4 @@
+const {fromEnv}=require('./turn.cjs');
 const Rules=require('../js/core/challenge-rules.js');
 const {createOperations}=require('./operations.cjs');
 /* Same-origin NAS HTTP + authenticated WebSocket relay. No Firebase SDK. */
@@ -8,7 +9,7 @@ const {createStatic}=require('./static.cjs');
 const {create:createFlow}=require('../js/net/relay-flow.js');
 const Upgrades=require('../js/data/upgrades.js');
 const {createStore,error}=require('./store.cjs');
-function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',registration=true,trustProxy=false,campaigns,reconnectMs=30000,clock=()=>Date.now()}={}) {
+function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',registration=true,trustProxy=false,campaigns,reconnectMs=30000,clock=()=>Date.now(),turnProvider=fromEnv()}={}) {
   let closing=false;const serveStatic=createStatic();
   fs.mkdirSync(dataDir,{recursive:true});const store=createStore(path.join(dataDir,'pokesurvivor.sqlite'),{campaigns});
   if(publicOrigin)publicOrigin=new URL(publicOrigin).origin;
@@ -74,7 +75,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
     const url=new URL(req.url,'http://local');
     if(url.pathname.startsWith('/api/')){
       if(!validOrigin(req))throw error(403,'Origin mismatch');rate('http:'+clientIP(req),600);
-      if(req.method==='GET'&&url.pathname==='/api/config')return reply(res,200,{backend:'nas',version:1,registration,protocol:13,operations:operations.read()});
+      if(req.method==='GET'&&url.pathname==='/api/config')return reply(res,200,{backend:'nas',version:1,registration,protocol:14,operations:operations.read()});
       if(req.method==='GET'&&url.pathname==='/api/operations')return reply(res,200,operations.read());
       if(req.method==='GET'&&url.pathname==='/api/health')return reply(res,200,{ok:true,draining:operations.read().draining,activeRuns:runs.size,activeRooms:[...rooms.values()].filter(r=>!r.open&&r.phase!=='finished').length,ready:operationStatus().ready});
       if(['POST','PUT','DELETE'].includes(req.method)&&!String(req.headers['content-type']).startsWith('application/json'))throw error(415,'JSON required');
@@ -87,10 +88,12 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
       }
       const user=userOf(req);if(!user)throw error(401,'请重新登录 NAS 账号。');
       const route=req.method+' '+url.pathname;
+      if(route==='POST /api/rtc/turn'){const r=roomFor(user.id),ws=sockets.get(user.id);if(!r||b.room!==r.id||!connected(user.id)||ws.session!==store.sessionId(token(req)))throw error(403,'仅当前房间在线会话可申请连接凭证。');rate('turn:'+user.id,12,60000);try{return reply(res,200,await turnProvider.credentials(user.id,r.id,{refresh:b.refresh===true}));}catch(e){const code=['turn-not-configured','turn-usage-unavailable','turn-budget-exhausted','turn-provider-unavailable'].includes(e.code)?e.code:'turn-provider-unavailable';return reply(res,503,{error:'TURN 备用连接暂不可用。',code});}}
+      if(route==='GET /api/rtc/status')return reply(res,200,turnProvider.status());
       if(['PUT /api/save','POST /api/upgrades'].includes(route)&&([...runs.values()].some(r=>r.uid===user.id&&r.challenge)||(roomFor(user.id)?.experiment&&!roomFor(user.id)?.open&&roomFor(user.id)?.phase!=='finished')))throw error(409,'隔离挑战或实验对局不写入普通存档。');
       const owner=sockets.get(user.id);if(['PUT /api/save','POST /api/upgrades','POST /api/run','POST /api/challenges/claim'].includes(route)&&owner?.readyState===WebSocket.OPEN&&owner.session!==store.sessionId(token(req))&&((roomFor(user.id)?.open===false&&roomFor(user.id)?.phase!=='finished')||[...runs.values()].some(r=>r.uid===user.id)))throw error(423,'另一个设备正在对局；请结束该对局或在设备管理中接管。');
 
-      if(['POST /api/room/create','POST /api/room/member','POST /api/invite/accept'].includes(route)&&b.protocol!==13)throw error(409,'请刷新到最新版再开始联机。');
+      if(['POST /api/room/create','POST /api/room/member','POST /api/invite/accept'].includes(route)&&b.protocol!==14)throw error(409,'请刷新到最新版再开始联机。');
       switch(route){
         case 'GET /api/challenges':{const challenge=selectedChallenge(url.searchParams.get('period')||'d',url.searchParams.get('date'));return reply(res,200,{challenge,rewards:store.challengeStatus(user,challenge),serverNow:clock()});}
         case 'GET /api/challenges/ranking':return reply(res,200,challengeRankings(user,url));
@@ -156,7 +159,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
       if((msg.epoch||0)<(r.epoch||0))return;if((msg.epoch||0)!==(r.epoch||0))throw error(403,'Invalid room epoch');
       if(user.id!==r.host&&msg.to!==r.host&&!(msg.data.k==='rtc-signal'&&r.transfer&&clock()-r.transfer.at<20000&&(user.id===r.transfer.to||msg.to===r.transfer.to)))throw error(403,'Guests only send to host');
       if(!r.members.some(m=>m.uid===msg.to))throw error(403,'Peer outside room');
-      if(msg.data.k==='rtc-signal'){rate('signal:'+user.id,120,10000);const s=msg.data;if(typeof s.attempt!=='string'||s.attempt.length>64||!['offer','answer','candidate'].includes(s.kind)||((s.kind==='offer'||s.kind==='answer')&&(typeof s.sdp!=='string'||s.sdp.length>20000))||(s.kind==='offer'&&user.id!==r.host&&user.id!==r.transfer?.to)||(s.kind==='answer'&&(user.id===r.host||user.id===r.transfer?.to&&msg.to!==r.host))||(s.kind==='candidate'&&(!s.candidate||typeof s.candidate.candidate!=='string'||s.candidate.candidate.length>2048)))throw error(400,'Invalid signalling');}
+      if(msg.data.k==='rtc-signal'){rate('signal:'+user.id,120,10000);const s=msg.data;if(typeof s.attempt!=='string'||s.attempt.length>64||!['offer','answer','candidate','retry'].includes(s.kind)||((s.kind==='offer'||s.kind==='answer')&&(typeof s.sdp!=='string'||s.sdp.length>20000))||s.transport!==undefined&&!['direct','turn'].includes(s.transport)||(s.kind==='offer'&&user.id!==r.host&&user.id!==r.transfer?.to)||(s.kind==='answer'&&(user.id===r.host||user.id===r.transfer?.to&&msg.to!==r.host))||(s.kind==='candidate'&&(!s.candidate||typeof s.candidate.candidate!=='string'||s.candidate.candidate.length>2048)))throw error(400,'Invalid signalling');}
       if(!['rtc-signal','start'].includes(msg.data.k))throw error(403,'Gameplay requires P2P; NAS is signalling only');
       if(msg.data.k==='start'){if(user.id!==r.host||r.open||r.members.length<2||r.phase==='finished')throw error(403,'Invalid start');if(operations.read().draining&&r.phase!=='running')guardStart();msg.data={k:'start',seed:Math.floor(Number(msg.data.seed)||0),host:r.host,members:r.members,experiment:r.experiment===true};}
       send(msg.to,{type:'relay',from:user.id,data:msg.data});
@@ -164,7 +167,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
     ws.on('close',()=>{if(sockets.get(user.id)!==ws)return;sockets.delete(user.id);const lostRoom=roomFor(user.id);if(lostRoom?.open)lostRoom.members.forEach(m=>m.ready=false);if(closing)return;if(roomFor(user.id))departures.set(user.id,setTimeout(()=>{departures.delete(user.id);if(!connected(user.id)){leave(user.id);clients.delete(user.id);}},reconnectMs));else if(!roomFor(user.id))clients.delete(user.id);notify();});
   });
   const drainTimer=setInterval(()=>{for(const[uid,ws]of sockets)flows.get(ws)?.drain(ws,(_v,from,scope)=>{const room=roomFor(uid);return !!room&&room.id===scope&&room.members.some(m=>m.uid===from);});},50);drainTimer.unref();
-  const timer=setInterval(()=>{for(const ws of sockets.values()){if(!ws.alive){ws.terminate();continue;}ws.alive=false;ws.ping();}for(const[k,r]of runs)if(clock()-r.at>7500e3||(!connected(r.uid)&&clock()-(r.seen||r.at)>90000))runs.delete(k);for(const[k,i]of invites)if(clock()-i.at>180e3)invites.delete(k);for(const[k,r]of limits)if(clock()-r.at>3600e3)limits.delete(k);},30000);timer.unref();
+  const timer=setInterval(()=>{turnProvider.prune?.();for(const ws of sockets.values()){if(!ws.alive){ws.terminate();continue;}ws.alive=false;ws.ping();}for(const[k,r]of runs)if(clock()-r.at>7500e3||(!connected(r.uid)&&clock()-(r.seen||r.at)>90000))runs.delete(k);for(const[k,i]of invites)if(clock()-i.at>180e3)invites.delete(k);for(const[k,r]of limits)if(clock()-r.at>3600e3)limits.delete(k);},30000);timer.unref();
   return {server,store,rooms,operationStatus,async close(){closing=true;clearInterval(timer);clearInterval(drainTimer);for(const t of departures.values())clearTimeout(t);departures.clear();for(const ws of sockets.values())ws.terminate();await new Promise(r=>server.close(r));await new Promise(r=>wss.close(r));store.close();}};
 }
 module.exports={createApp};

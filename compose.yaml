@@ -12,6 +12,12 @@ services:
       PUBLIC_ORIGIN: "${PUBLIC_ORIGIN:-}"
       TRUST_PROXY: "${TRUST_PROXY:-true}"
       REGISTRATION: "${REGISTRATION:-true}"
+      CF_TURN_KEY_ID: "${CF_TURN_KEY_ID:-}"
+      CF_TURN_KEY_API_TOKEN: "${CF_TURN_KEY_API_TOKEN:-}"
+      CF_ACCOUNT_ID: "${CF_ACCOUNT_ID:-}"
+      CF_ANALYTICS_TOKEN: "${CF_ANALYTICS_TOKEN:-}"
+      CF_TURN_CAP_GB: "${CF_TURN_CAP_GB:-100}"
+      CF_TURN_OTHER_USAGE_GB: "${CF_TURN_OTHER_USAGE_GB:-0}"
     security_opt:
       - no-new-privileges:true
     cap_drop:

@@ -129,6 +129,7 @@
         if (G.UI.isOpen('scr-lobby')) render();
       });
       G.Net.onPeer(() => { if (G.UI.isOpen('scr-lobby')) render(); });
+      setInterval(()=>{if(G.NAS?.enabled&&G.UI.isOpen('scr-lobby'))render();},1000);
     }
 
     function open() {
@@ -146,7 +147,7 @@
       if (m.uid === room.host) return 'Anfitrión';
       if (!room.isHost) return m.uid === G.Social.uid ? 'Tú' : 'En la sala';
       const mode = G.Net.mode(m.uid);
-      return mode === 'direct' ? 'Conectado' : mode === 'relay' ? 'Conectado (por servidor)' : mode === 'failed' ? 'No se pudo conectar (reintentando…)' : 'Conectando…';
+      return mode === 'direct' ? (G.Net.route?.(m.uid)==='turn'?'已连接（Cloudflare TURN）':'Conectado') : mode === 'relay' ? 'Conectado (por servidor)' : mode === 'failed' ? 'No se pudo conectar (reintentando…)' : 'Conectando…';
     }
 
     function render() {
@@ -190,6 +191,11 @@
       inv.classList.toggle('hidden', !canInvite);
       if(canInvite){inv.replaceChildren();const button=document.createElement('button');button.className='btn gold hall-invite';button.id='lobby-open-hall';button.textContent=G.T('Open hall and invite players');button.onclick=()=>G.FriendsUI.open();inv.append(button);}
 
+      let recovery=$('lobby-network-recovery');if(!recovery){recovery=document.createElement('div');recovery.id='lobby-network-recovery';recovery.setAttribute('role','status');$('lobby-note').after(recovery);}
+      if(G.NAS?.enabled){const targets=ms.filter(m=>m.uid!==G.Net.uid&&(room.isHost||m.uid===room.host)).map(m=>({m,info:G.Net.linkInfo?.(m.uid)})).filter(o=>o.info&&o.info.mode!=='direct'),key=room.id+targets.map(({m,info})=>m.uid+info.phase+info.reason+info.mode).join('|');
+        if(recovery.dataset.state!==key){recovery.dataset.state=key;recovery.replaceChildren();for(const {m,info}of targets){const text=document.createElement('p');text.dataset.rtcStatus=m.uid;recovery.append(text);if(info.mode==='failed'){const retry=document.createElement('button');retry.id='rtc-retry-'+m.uid;retry.className='btn gold';retry.dataset.rtcRetry=m.uid;retry.textContent=G.T('Retry connection');retry.onclick=()=>{G.Net.retry(m.uid);render();};recovery.append(retry);}}if(targets.some(o=>o.info.mode==='failed')){const all=document.createElement('button');all.id='lobby-retry-all';all.className='btn gold';all.textContent=G.T('Retry all connections');all.onclick=()=>{G.Net.retry();render();};recovery.append(all);}}
+        for(const {m,info}of targets){const text=[...recovery.querySelectorAll('[data-rtc-status]')].find(n=>n.dataset.rtcStatus===m.uid);if(text)text.textContent=m.name+'：'+G.T('Connection '+info.phase)+(info.remainingMs?' · '+Math.ceil(info.remainingMs/1000)+'s':'')+' · '+G.T('Connection '+info.reason);}}
+
       const btn = $('lobby-start');
       btn.classList.toggle('hidden', !room.isHost);
       const connecting = ms.some(m => m.uid !== room.host && G.Net.mode(m.uid) === 'connecting');
@@ -200,14 +206,14 @@
       btn.textContent = 'Empezar partida (' + ms.length + '/' + G.Social.MAX_PLAYERS + ')';
       $('lobby-note').textContent = !room.isHost ? 'Cuando el anfitrión empiece, entraréis todos a la vez.'
         : ms.length < 2 ? G.T('Invite at least one teammate from the hall.')
-        : failed ? 'No se puede conectar con algún amigo: su red (o la tuya) no deja jugar en grupo. Probad con otra wifi o datos móviles; se reintenta solo.'
+        : failed ? G.T('Connection failed. Retry, transfer the lobby host or leave; no NAS gameplay relay is used.')
         : !allReady?'Todos deben prepararse antes de empezar.': connecting ? G.T('Connecting teammates…') : 'La partida empieza para todos a la vez.';
     }
 
     async function start() {
       const room = G.Social.room;
       if (!room || !room.isHost || room.members.length < 2) return;
-      if(G.NAS?.enabled&&room.members.some(m=>m.uid!==room.host&&G.Net.mode(m.uid)!=='direct')){G.UI.toast('等待所有玩家建立 P2P 直连后再开始。',5000);return;}
+      if(G.NAS?.enabled&&room.members.some(m=>m.uid!==room.host&&G.Net.mode(m.uid)!=='direct')){G.UI.toast('等待所有玩家建立 WebRTC 直连或 TURN 备用连接后再开始。',5000);return;}
       const cfg = {
         k: 'start', seed: Math.floor(Math.random() * 1e6), host: room.host,
         members: room.members.map(m => ({ uid: m.uid, name: m.name, dex: m.dex, shiny: !!m.shiny }))

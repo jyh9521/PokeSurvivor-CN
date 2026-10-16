@@ -1,0 +1,290 @@
+{
+  "baseline": "4366d82e6a41f379f01885883281fc82573de788",
+  "protocol": 14,
+  "saveSchema": 3,
+  "providerActivation": "User Cloudflare credentials not supplied; live account activation and public NAT acceptance not claimed",
+  "turnImplementationTested": "real Coturn 4.10.0 / Chrome, UDP and TCP, broker API contract isolated",
+  "turn-udp-browser.json": {
+    "checks": [
+      "failed direct ICE automatically connects every peer through real TURN",
+      "selected ICE pairs prove relay candidates, not relabelled direct links",
+      "TURN-connected peers enter the existing authoritative combat",
+      "explicit retry restores TURN and delivers pending events exactly once",
+      "live authority handoff succeeds through TURN",
+      "new TURN host resumes the same combat clock",
+      "NAS transports signalling and start only, including retries/checkpoints",
+      "diagnostics truthfully report independent TURN transport",
+      "browser errors absent"
+    ],
+    "errors": [],
+    "transport": "udp",
+    "players": 3,
+    "nasKinds": [
+      "rtc-signal",
+      "start"
+    ],
+    "metrics": {
+      "transport": "webrtc-turn",
+      "gameTransport": "webrtc-turn",
+      "directPeers": 0,
+      "turnPeers": 2,
+      "peerLinks": [
+        {
+          "mode": "turn",
+          "phase": "connected",
+          "stage": "turn",
+          "renewReason": null,
+          "remainingMs": 0,
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 4,
+          "incomingEvents": 0,
+          "ackRttMs": 2.5,
+          "error": null,
+          "path": {
+            "rttMs": 1,
+            "localType": "relay",
+            "remoteType": "relay",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "turn",
+          "phase": "connected",
+          "stage": "turn",
+          "renewReason": null,
+          "remainingMs": 0,
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 2,
+          "incomingEvents": 0,
+          "ackRttMs": 2,
+          "error": null,
+          "path": {
+            "rttMs": 1,
+            "localType": "relay",
+            "remoteType": "relay",
+            "protocol": "udp"
+          }
+        }
+      ],
+      "connectedPeers": 2,
+      "relayPeers": 0,
+      "targetHz": 15,
+      "sendHz": 17.5,
+      "receiveHz": 17.5,
+      "pendingEvents": 0
+    }
+  },
+  "turn-tcp-browser.json": {
+    "checks": [
+      "failed direct ICE automatically connects every peer through real TURN",
+      "selected ICE pairs prove relay candidates, not relabelled direct links",
+      "TURN-connected peers enter the existing authoritative combat",
+      "explicit retry restores TURN and delivers pending events exactly once",
+      "live authority handoff succeeds through TURN",
+      "new TURN host resumes the same combat clock",
+      "NAS transports signalling and start only, including retries/checkpoints",
+      "diagnostics truthfully report independent TURN transport",
+      "browser errors absent"
+    ],
+    "errors": [],
+    "transport": "tcp",
+    "players": 3,
+    "nasKinds": [
+      "rtc-signal",
+      "start"
+    ],
+    "metrics": {
+      "transport": "webrtc-turn",
+      "gameTransport": "webrtc-turn",
+      "directPeers": 0,
+      "turnPeers": 2,
+      "peerLinks": [
+        {
+          "mode": "turn",
+          "phase": "connected",
+          "stage": "turn",
+          "renewReason": null,
+          "remainingMs": 0,
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 4,
+          "incomingEvents": 0,
+          "ackRttMs": 2.800000011920929,
+          "error": null,
+          "path": {
+            "rttMs": 1,
+            "localType": "relay",
+            "remoteType": "relay",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "turn",
+          "phase": "connected",
+          "stage": "turn",
+          "renewReason": null,
+          "remainingMs": 0,
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 2,
+          "incomingEvents": 0,
+          "ackRttMs": 2,
+          "error": null,
+          "path": null
+        }
+      ],
+      "connectedPeers": 2,
+      "relayPeers": 0,
+      "targetHz": 25,
+      "sendHz": 20,
+      "receiveHz": 18,
+      "pendingEvents": 0
+    }
+  },
+  "turn-mixed-udp-browser.json": {
+    "checks": [
+      "failed direct ICE automatically connects every peer through real TURN",
+      "selected ICE pairs prove relay candidates, not relabelled direct links",
+      "TURN-connected peers enter the existing authoritative combat",
+      "explicit retry restores TURN and delivers pending events exactly once",
+      "live authority handoff succeeds through TURN",
+      "new TURN host resumes the same combat clock",
+      "NAS transports signalling and start only, including retries/checkpoints",
+      "diagnostics truthfully report independent TURN transport",
+      "browser errors absent"
+    ],
+    "errors": [],
+    "transport": "mixed-udp",
+    "players": 3,
+    "nasKinds": [
+      "rtc-signal",
+      "start"
+    ],
+    "metrics": {
+      "transport": "webrtc-mixed",
+      "gameTransport": "webrtc-mixed",
+      "directPeers": 1,
+      "turnPeers": 1,
+      "peerLinks": [
+        {
+          "mode": "direct",
+          "phase": "connected",
+          "stage": "direct",
+          "renewReason": null,
+          "remainingMs": 0,
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 3,
+          "incomingEvents": 0,
+          "ackRttMs": 2.5,
+          "error": null,
+          "path": {
+            "rttMs": 1,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "turn",
+          "phase": "connected",
+          "stage": "turn",
+          "renewReason": null,
+          "remainingMs": 0,
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 2,
+          "incomingEvents": 0,
+          "ackRttMs": 2.199999988079071,
+          "error": null,
+          "path": {
+            "rttMs": 1,
+            "localType": "relay",
+            "remoteType": "relay",
+            "protocol": "udp"
+          }
+        }
+      ],
+      "connectedPeers": 2,
+      "relayPeers": 0,
+      "targetHz": 25,
+      "sendHz": 20.5,
+      "receiveHz": 18,
+      "pendingEvents": 0
+    }
+  },
+  "turn-failure-turn-budget-exhausted.json": {
+    "checks": [
+      "unavailable fallback reaches a finite failed state on every browser",
+      "lobby offers visible retry and existing leave controls instead of endless waiting",
+      "retry button and keyboard/controller focus survive countdown rendering",
+      "failed connection does not spin forever issuing new offers",
+      "failure reason is actionable and provider errors reveal no credentials",
+      "one manual retry recovers all peers including formerly terminal guests",
+      "failure and recovery still send zero gameplay through NAS",
+      "all browser exceptions absent"
+    ],
+    "errors": [],
+    "attempts": [
+      1,
+      1
+    ],
+    "metrics": {
+      "transport": null,
+      "gameTransport": null,
+      "directPeers": null,
+      "turnPeers": null,
+      "peerLinks": null,
+      "connectedPeers": null,
+      "relayPeers": null,
+      "targetHz": null,
+      "sendHz": null,
+      "receiveHz": null,
+      "pendingEvents": null
+    }
+  },
+  "protected-coop-browser.json": {
+    "checks": 21,
+    "errors": [],
+    "runtimePrivate": true,
+    "transport": "real local WebRTC TURN",
+    "productionManifest": {
+      "v": "8e428571c8",
+      "at": "2026-10-17T00:00:00.000Z"
+    },
+    "metrics": {
+      "transport": null,
+      "gameTransport": null,
+      "directPeers": null,
+      "turnPeers": null,
+      "peerLinks": null,
+      "connectedPeers": null,
+      "relayPeers": null,
+      "targetHz": null,
+      "sendHz": null,
+      "receiveHz": null,
+      "pendingEvents": null
+    }
+  },
+  "package": {
+    "file": "PokeSurvivor-CN-local-0.1.0.zip",
+    "bytes": 145953700,
+    "sha256": "f84c48ab28f4c0e48e23a3102c25ddab03dfe73c4b786dfb7b3216dabd406fb2",
+    "files": 24100,
+    "upstream": "537440510dcdadf8ed711ec3dea7ae795533a662",
+    "simplifiedChinese": "a23065deefa1dd4d23557c7b10f6d8d99af42dbc"
+  },
+  "version": {
+    "v": "8e428571c8",
+    "at": "2026-10-17T00:00:00.000Z"
+  },
+  "sourceSha256": "a749189fd696cf77c9aabe01d2de9d3325b33a45946fba240aced944cd32a1d3"
+}

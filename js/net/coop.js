@@ -79,7 +79,7 @@ G.Coop = (() => {
       const chunks=Math.ceil(text.length/8000);for(let i=0;i<chunks;i++)await control(uid,{k:'handoff-chunk',nonce,index:i,total:chunks,text:text.slice(i*8000,(i+1)*8000)});
       await until(()=>handoff?.ready===true);
       // After the receipt, only the NAS-authenticated epoch may switch authority.
-      const result=await G.NAS.api('room/transfer',{uid,nonce,protocol:13});return result;
+      const result=await G.NAS.api('room/transfer',{uid,nonce,protocol:14});return result;
     }catch(e){
       // A timed-out HTTP reply may already have committed; refresh before aborting.
       await G.Social.refreshPresence();if(G.Social.room?.host===uid)return {ok:true};

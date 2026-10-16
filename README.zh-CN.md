@@ -2,7 +2,11 @@
 
 见 [主说明](README.md)、[游玩说明](README-LOCAL.md) 和 [本地发行维护](docs/LOCAL_EDITION.md)。
 
-## 当前 0.16.7：原版生命成长与 P2P 主机
+## 当前 0.16.8：Cloudflare TURN 备用连接
+
+玩家直连失败后使用独立Cloudflare TURN，NAS仍只做后端。大厅有等待时限、失败原因、手动重试和退出入口。无需VPS或Worker；请按 [设置向导](docs/TURN_0168.md) 在NAS录入你自己的Cloudflare密钥。
+
+## 历史 0.16.7：原版生命成长与 P2P 主机
 
 生命强化每次＋20并恢复20点，无等级上限。NAS 联机战斗只走 WebRTC，暂停菜单支持主动转移运行中的主机；旧中继说明为历史记录。详见 [当前规则及验证](docs/HOST_P2P_0167.md)。
 
