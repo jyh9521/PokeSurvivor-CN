@@ -148,3 +148,18 @@ licencia en `assets/fonts/OFL.txt`). El juego usa una versión modificada,
 
 Pokémon es propiedad de Nintendo, Creatures Inc. y GAME FREAK.
 Este es un proyecto de fan sin ánimo de lucro.
+
+
+## Mega form animations (0.12.0)
+
+The 44 additional animated forms are separate SpriteCollab animation sets under
+the same CC BY-NC 4.0 asset terms. Original per-form artist credits and source
+locations are retained in [the public form credit manifest](assets/pokemon/mega-credits.json).
+Build-time geometry and source-file hashes are recorded in
+`tools/localization/mega-art.json`. Ordinary and shiny species assets are unchanged.
+Forms without an available complete animation set retain species animation and
+use a procedural transformation aura; this does not change their battle stats.
+
+Six-stat, ability and learnset inputs come from PokeAPI revision
+`81d20919845b6a445969b9265aab5cec6b04cece`; input hashes are recorded in
+`tools/localization/battle-inputs.json`.

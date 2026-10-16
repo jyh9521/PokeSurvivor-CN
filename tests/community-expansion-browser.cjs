@@ -2,15 +2,34 @@
  * Controlled combat inputs do not represent public-network/device acceptance. */
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {chromium}=require('playwright'),{createApp}=require('../server/app.cjs');
-const RELAY=process.env.PS_RELAY_ONLY==='1',MELEE=process.env.PS_MELEE==='1';
-const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,MELEE?'artifacts/melee-rebalance':'artifacts/challenge-rewards',RELAY?'relay':'mixed');fs.mkdirSync(OUT,{recursive:true});
+const RELAY=process.env.PS_RELAY_ONLY==='1',MELEE=process.env.PS_MELEE==='1',BATTLE=process.env.PS_BATTLE==='1';
+const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/battle-overhaul':MELEE?'artifacts/melee-rebalance':'artifacts/challenge-rewards',RELAY?'relay':'mixed');fs.mkdirSync(OUT,{recursive:true});
 (async()=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-expansion-browser-')),root=path.join(dir,'web');fs.mkdirSync(root);for(const n of ['js','css','assets'])fs.cpSync(path.join(ROOT,n),path.join(root,n),{recursive:true});for(const n of ['sw.js','version.json','manifest.webmanifest'])fs.copyFileSync(path.join(ROOT,n),path.join(root,n));fs.copyFileSync(path.join(ROOT,'dev.html'),path.join(root,'index.html'));
   let clockOffset=0;const app=createApp({dataDir:dir,root,campaigns:[],clock:()=>Date.now()+clockOffset});let browser;const checks=[],errors=[];const check=(n,v)=>{assert.ok(v,n);checks.push(n);console.log('PASS',n);};
   try{await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+app.server.address().port;browser=await chromium.launch({channel:'chrome',headless:true,args:['--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows']});
     const source=fs.readFileSync(path.join(ROOT,'js/core/db.js'),'utf8'),users=[],pages=[];
-    for(let i=0;i<8;i++){const name='Expansion'+i,u=await app.store.credentials(name,'test-password',true),s=vm.runInNewContext('const VERSION=3,START_COINS=500;'+source.slice(source.indexOf('  function newSave('),source.indexOf('  /** Rellena'))+'\nnewSave("'+name+'")');s.partner=1;s.owned={1:{}};s.pupg={1:{hp:2}};app.store.putSave(u,s,0);users.push(u);}
+    for(let i=0;i<8;i++){const name='Expansion'+i,u=await app.store.credentials(name,'test-password',true),s=vm.runInNewContext('const VERSION=3,START_COINS=500;'+source.slice(source.indexOf('  function newSave('),source.indexOf('  /** Rellena'))+'\nnewSave("'+name+'")');const dex=BATTLE?6:1;s.partner=dex;s.owned={[dex]:{}};s.pupg={[dex]:{hp:2}};app.store.putSave(u,s,0);users.push(u);}
     async function open(u,i){const c=await browser.newContext({locale:'zh-CN',viewport:i===0?{width:390,height:844}:{width:900,height:650},serviceWorkers:'block'});await c.addCookies([{name:'ps_nas',value:app.store.session(u,'Expansion fixture'),url:origin,httpOnly:true,sameSite:'Strict'}]);await c.addInitScript(({rtc})=>{const W=WebSocket;window.WebSocket=class extends W{constructor(...args){super(...args);(window.__fixtureSockets||=[]).push(this);}};if(!rtc)window.RTCPeerConnection=undefined;else{const P=RTCPeerConnection;window.RTCPeerConnection=class extends P{constructor(){super({iceServers:[]});}};}},{rtc:!RELAY&&i<4});const p=await c.newPage();p.on('pageerror',e=>errors.push(e.stack));await p.goto(origin);await p.waitForFunction(()=>G.NAS.enabled&&document.getElementById('boot').classList.contains('hidden'));if(await p.locator('#tap-start').isVisible())await p.locator('#tap-start').click();await p.locator('#scr-menu').waitFor({state:'visible'});return p;}
     const a=await open(users[0],0);pages.push(a);
+    if(BATTLE){
+      await a.locator('[data-go="dex"]').click();await a.locator('#dex-gens [data-gen="0"]').click();
+      check('all-regions tab precedes Kanto and renders the complete 966-species catalog',await a.locator('#dex-gens button').count()===10&&await a.locator('#dex-grid .cell').count()===966);
+      check('species details display all six stats and the adapted native trait',await a.locator('#dex-detail .six-stats .stat').count()===6&&await a.locator('.trait-description').innerText().then(t=>t.includes('物种特性')&&t.includes('本作效果')));
+      await a.locator('#dex-owned').selectOption('own');await a.locator('#dex-type').selectOption('fire');await a.locator('#dex-rarity').selectOption('4');await a.locator('#dex-search').fill('#006');
+      await a.waitForFunction(()=>document.querySelectorAll('#dex-grid .cell').length===1);
+      check('acquisition/type/rarity/search combine rather than overwrite each other',await a.locator('#dex-grid .cell').getAttribute('data-dex')==='6');
+      await a.locator('#dex-reset').click();await a.locator('#dex-search').fill('皮卡丘');await a.waitForFunction(()=>document.querySelectorAll('#dex-grid .cell').length===1);
+      check('Chinese name search finds an unowned species without changing ownership',await a.locator('#dex-grid .cell').getAttribute('data-dex')==='25'&&await a.evaluate(()=>!G.DB.save.owned[25]));
+      await a.locator('#dex-search').fill('Johto');await a.waitForFunction(()=>document.querySelectorAll('#dex-grid .cell').length===100);
+      check('all-field search includes English region names',await a.locator('#dex-grid .cell').count()===100);
+      await a.locator('#dex-type').selectOption('fire');await a.locator('#dex-search').fill('关都');await a.waitForFunction(()=>{const cells=[...document.querySelectorAll('#dex-grid .cell')];return cells.length>0&&cells.every(c=>{const p=G.DEX_BY[c.dataset.dex];return p.gen===1&&p.types.includes('fire');});});
+      check('multilingual region queries combine with the type selector',await a.evaluate(()=>[...document.querySelectorAll('#dex-grid .cell')].every(c=>{const p=G.DEX_BY[c.dataset.dex];return p.gen===1&&p.types.includes('fire');})));
+      await a.locator('#dex-search').fill('<script>not-a-pokemon</script>');await a.waitForFunction(()=>document.querySelectorAll('#dex-grid .cell').length===0);
+      check('search renders literal user input without injecting HTML',await a.locator('#dex-grid script').count()===0);
+      await a.locator('#dex-reset').click();await a.setViewportSize({width:1280,height:800});await a.screenshot({animations:'disabled',path:path.join(OUT,'catalog-desktop.png')});await a.setViewportSize({width:390,height:844});await a.screenshot({animations:'disabled',path:path.join(OUT,'catalog-portrait.png')});
+      check('portrait catalog search stays inside the viewport',await a.locator('#dex-search').boundingBox().then(b=>b.x>=0&&b.x+b.width<=390));
+      await a.locator('#scr-dex [data-back]').click();
+    }
     await a.locator('#menu-challenges').click();await a.locator('[data-challenge-start]').waitFor({state:'visible'});await a.waitForFunction(()=>!document.querySelector('[data-challenge-start]').disabled);
     check('Chinese challenge UI shows fixed rules and separate leaderboard',await a.locator('[data-challenge-info]').innerText().then(s=>s.includes('UTC')&&s.includes('每档奖励')));
     await a.screenshot({animations:'disabled',path:path.join(OUT,'challenge-portrait.png')});
@@ -82,12 +101,45 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,MELEE?'artifacts/mele
     check('shared stagger expires even after eight-player pressure',await a.evaluate(id=>!(G.EnemyMgr.get(id).staggerT>0),controlId));
     await a.screenshot({animations:'disabled',path:path.join(OUT,'melee-eight-player.png')});
     }
+    if(BATTLE){
+      for(const p of pages)await p.evaluate(()=>{const p=G.Game.player;p.slots=[];G.Combat.clearFields();G.Battle.init(p);});
+      await a.evaluate(()=>{const p=G.Game.player;let card;for(let i=0;i<100&&!card;i++)card=G.LevelUp.offer(p).find(c=>c.type==='passive');if(!card)throw Error('No passive offers');window.__passiveCard=card.key;G.RunUI.showLevelUp(2,[card],c=>{c.apply(p);G.RunUI.closeLevelUp();});});
+      await a.locator('#cards .card').click();
+      check('a real level-up card learns a passive without taking an attack slot',await a.evaluate(()=>Object.keys(G.Game.player.passives).length===1&&G.Game.player.slots.length===0));
+      const defense=await a.evaluate(()=>{const p=G.Game.player;p.passives={};for(const id of ['harden','light-screen','protect','iron-defense'])G.Battle.learn(p,id);G.Battle.tick(p,0);p.invuln=0;p.battle.block=1;p.battle.shield=0;p.hp=60;const random=Math.random;Math.random=()=>.99;try{p.hurt(20);const blocked=p.hp;p.invuln=0;p.hurt(20);return {blocked,hp:p.hp,learned:Object.keys(p.passives).length,fifth:G.Battle.learn(p,'calm-mind')};}finally{Math.random=random;p.invuln=1e6;}});
+      check('live block negates one hit, armor reduces the next, and passive slots are bounded',defense.blocked===60&&defense.hp<60&&defense.hp>40&&defense.learned===4&&!defense.fifth);
+      const fieldTarget=await a.evaluate(uid=>{const q=G.Coop.mate(uid).pl,e=new G.Enemy({dex:1,hp:10000,spd:0,dmg:0,xp:0,behavior:'chaser'},q.x+40,q.y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},users[2].id);
+      await pages[2].waitForFunction(id=>!!G.EnemyMgr.get(id),fieldTarget);
+      await pages[2].evaluate(id=>{const p=G.Game.player,e=G.EnemyMgr.get(id);p.target=e;p.aim=Math.atan2(e.y-p.y,e.x-p.x);p.slots=[[G.Moves.instance('surf')]];G.Combat.tick(.001,p,0);p.activeMove().t=999;},fieldTarget);
+      await a.waitForFunction(id=>G.EnemyMgr.get(id)?.hp<10000,fieldTarget,{timeout:10000});
+      check('a real guest moving wave damages the authoritative enemy through a confirmed receipt',await pages[2].evaluate(()=>G.Game.player.dmgDealt>0));
+      const beforeMark=await a.evaluate(id=>G.EnemyMgr.get(id).hp,fieldTarget);
+      await pages[2].evaluate(id=>{const p=G.Game.player,e=G.EnemyMgr.get(id);p.target=e;p.slots=[[G.Moves.instance('earth-power')]];G.Combat.tick(.001,p,0);p.activeMove().t=999;},fieldTarget);
+      await a.waitForFunction(({id,hp})=>G.EnemyMgr.get(id)?.hp<hp,{id:fieldTarget,hp:beforeMark},{timeout:10000});
+      check('guest delayed marks detonate at the selected target and settle through the room authority',true);
+      await pages[2].evaluate(()=>{G.Game.player.slots=[];G.Combat.clearFields();});
+      await a.evaluate(()=>G.Game.player.battle.energy=100);await a.locator('#battle-form').selectOption('mega');await a.locator('#battle-activate').click();
+      await pages[1].waitForFunction(uid=>G.Coop.mate(uid)?.pl.battle.form==='mega',users[0].id,{timeout:10000});
+      check('Mega activates through the actual button and synchronizes form and passives to peers',await pages[1].evaluate(uid=>Object.keys(G.Coop.mate(uid).pl.passives).length===4,users[0].id));
+      check('Mega uses audited alternate animation where available and does not replace species identity',await a.evaluate(()=>{const p=G.Game.player;return p.dex===6&&p.anim.dex===G.BattleDex.species[6].mega[0].id&&p.battle.remaining>0;}));
+      const beforeMax=await pages[1].evaluate(()=>{const p=G.Game.player;p.battle.energy=100;window.__preMax={hp:p.hp,max:p.maxHp,r:p.r};return window.__preMax;});
+      await pages[1].locator('#battle-form').selectOption('max');await pages[1].locator('#battle-activate').click();await a.waitForFunction(uid=>G.Coop.mate(uid)?.pl.battle.form==='max',users[1].id,{timeout:10000});
+      check('Dynamax grows the actual sprite and HP but leaves collision radius unchanged',await pages[1].evaluate(()=>{const p=G.Game.player;return p.maxHp>window.__preMax.max&&p.r===window.__preMax.r&&p.anim.scale>1.5;}));
+      const zTarget=await a.evaluate(uid=>{const q=G.Coop.mate(uid).pl,e=new G.Enemy({dex:1,hp:500,spd:0,dmg:0,xp:0,behavior:'chaser'},q.x+25,q.y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},users[2].id);
+      await pages[2].waitForFunction(id=>!!G.EnemyMgr.get(id),zTarget);await pages[2].evaluate(()=>G.Game.player.battle.energy=100);await pages[2].locator('#battle-form').selectOption('z');await pages[2].locator('#battle-activate').click();await a.waitForFunction(id=>G.EnemyMgr.get(id)?.hp<500,zTarget,{timeout:10000});
+      check('guest Z-Move deals real host-authoritative damage and refuses another special form',await pages[2].evaluate(()=>G.Game.player.battle.used&&!G.Battle.activate(G.Game.player,'max')));
+      await a.screenshot({animations:'disabled',path:path.join(OUT,'mega-eight-player.png')});await pages[1].screenshot({animations:'disabled',path:path.join(OUT,'dynamax-eight-player.png')});
+      await a.evaluate(()=>G.Battle.tick(G.Game.player,31));await pages[1].evaluate(()=>G.Battle.tick(G.Game.player,21));
+      await pages[2].waitForFunction(uid=>!G.Coop.mate(uid).pl.battle.form,users[0].id,{timeout:10000});await a.waitForFunction(uid=>!G.Coop.mate(uid).pl.battle.form,users[1].id,{timeout:10000});
+      check('temporary forms expire on every peer and restore base HP without a toggle heal',await pages[1].evaluate(()=>{const p=G.Game.player;return p.maxHp===window.__preMax.max&&Math.abs(p.hp-window.__preMax.hp)<.01&&!p.battle.form;}));
+      check('form and passive state never enters the persistent wallet/save schema',users.every(u=>{const s=app.store.getSave(u.id).save;return !s.battle&&!s.passives&&!s.form;}));
+    }
     const last=pages[7];await last.evaluate(()=>{window.__testRoom=G.Social.room.id;window.__testRun=G.Game.st.time;});await last.context().setOffline(true);await last.evaluate(()=>window.__fixtureSockets.at(-1).close());await a.waitForFunction(()=>G.NAS.networkMetrics().reconnectingPeers>=1,null,{timeout:10000}).catch(async e=>{console.log('RECONNECT_DEBUG',JSON.stringify({host:await a.evaluate(()=>({metrics:G.NAS.networkMetrics(),members:G.Social.room?.members,state:G.Game.state})),last:await last.evaluate(()=>({state:G.Game.state,sockets:window.__fixtureSockets.map(s=>s.readyState)})),errors}));throw e;});await last.context().setOffline(false);await last.waitForFunction(()=>G.Social.room?.members.length===8&&G.NAS.networkMetrics().connected,{},{timeout:20000});
     check('same browser reconnects into the same normal room',await last.evaluate(()=>G.Social.room.id===window.__testRoom));
     await a.evaluate(()=>G.Game.quit());for(const p of pages)if(await p.evaluate(()=>G.Game.state!=='over'))await p.evaluate(()=>G.Game.quit());
     await a.waitForFunction(()=>!G.NAS.pending);for(const p of pages)await p.evaluate(()=>G.NAS.flush());
     check('normal eight-player settlement saves real rewards for all members',users.every((u,i)=>app.store.getSave(u.id).rev>snapshots[i].rev&&app.store.getSave(u.id).save.stats.runs===snapshots[i].save.stats.runs+1));
     check('normal eight-player results enter existing group leaderboard',(await a.evaluate(()=>G.NAS.api('ranking?mode=g'))).rows.some(r=>r.uids.length===8));
-    check('all tested pages remain free of runtime errors',errors.length===0);fs.writeFileSync(path.join(OUT,'browser-results.json'),JSON.stringify({checks,errors,relayOnly:RELAY,metrics},null,2));console.log((MELEE?'PASS MELEE_EIGHT_BROWSER: ':'PASS COMMUNITY_EXPANSION_BROWSER: ')+checks.length+' checks; errors=0');
+    check('all tested pages remain free of runtime errors',errors.length===0);fs.writeFileSync(path.join(OUT,'browser-results.json'),JSON.stringify({checks,errors,relayOnly:RELAY,metrics,sourceHashes:BATTLE?Object.fromEntries([...fs.readFileSync(path.join(root,'index.html'),'utf8').matchAll(/<script[^>]*src="(js\/[^"]+\.js)"/g)].map(m=>[m[1],require('node:crypto').createHash('sha256').update(fs.readFileSync(path.join(root,m[1]))).digest('hex')])):undefined},null,2));console.log((BATTLE?'PASS BATTLE_EIGHT_BROWSER: ':MELEE?'PASS MELEE_EIGHT_BROWSER: ':'PASS COMMUNITY_EXPANSION_BROWSER: ')+checks.length+' checks; errors=0');
   }finally{if(browser)await browser.close();await app.close();fs.rmSync(dir,{recursive:true,force:true});}
 })().catch(e=>{console.error(e);process.exitCode=1;});

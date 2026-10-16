@@ -34,7 +34,7 @@ def generate(e):
     ]
     body = f'''<article class="doc"><h1>PokéSurvivor 游戏攻略</h1>
 <p class="lead">选择一只宝可梦作为伙伴，在无限地图中移动，躲避野生宝可梦的围攻。伙伴会自动使用当前招式攻击，你负责走位、升级和选择组合。</p>{cta(pid)}
-<h2>操作方法</h2><ul>
+<h2>六维与构筑</h2><p>物攻与特攻分别影响对应招式，物防与特防分别抵抗对应伤害。每只宝可梦使用家族技能池与本作适配的物种特性。主动攻击与四个独立被动槽位分开；反击和替身学会后自动支援。</p><p>通过时间和有效伤害积累特殊能量。每局选择一次：符合条件的超级进化持续30秒，极巨化持续20秒，或一次Z招式爆发。使用 C／右摇杆按下切换选择，V／左摇杆按下发动，手机可点击按钮。</p><h2>操作方法</h2><ul>
 <li><b>电脑：</b>使用 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或方向键移动；使用 <kbd>1</kbd>–<kbd>4</kbd>、<kbd>Q</kbd>/<kbd>E</kbd> 或点击图标切换招式；使用 <kbd>Esc</kbd>/<kbd>P</kbd> 暂停。</li>
 <li><b>手机和平板：</b>竖屏或横屏，在屏幕任意位置拖动移动，点击招式切换，右上角按钮暂停。</li>
 <li>拾取经验值升级，每次从三张卡牌中选择新招式、招式升级或能力强化。</li></ul>
@@ -87,15 +87,17 @@ def generate(e):
     write(pid,'PokéSurvivor 属性相克表与天气效果','查看本作 18 种属性的相克倍率及天气效果：×1.6、×0.6、×0.3，双属性上限 ×2.4。',body)
 
     pid = 'moves'
-    kinds = {'projectile':'投射物','melee':'近战','beam':'光束','orbit':'环绕','nova':'爆发','aura':'光环','buff':'能力强化','boomerang':'回旋','chain':'连锁','mine':'地雷','meteor':'陨石','turret':'炮台','dash':'冲刺','trail':'轨迹','cone':'扇形'}
+    kinds = {'projectile':'投射物','melee':'近战','beam':'光束','orbit':'环绕','nova':'爆发','aura':'光环','buff':'能力强化','boomerang':'回旋','chain':'连锁','mine':'地雷','meteor':'陨石','turret':'炮台','dash':'冲刺','trail':'轨迹','cone':'扇形','wave':'推进波','mark':'延迟印记','counter':'自动反击','decoy':'替身诱饵'}
     rows = []
     for t in types:
         for m in [m for m in D['moves'] if m['type'] == t]:
             evo = m['evo']
             ev = f'<b>{esc(z(evo["name"],"move"))}</b><small>需要：{esc(z(evo["needs"]))} · {esc(z(evo["text"]))}</small>' if evo else '—'
             rows.append(f'<tr><td><b>{esc(z(m["name"],"move"))}</b></td><td>{badge(t)}</td><td>{kinds[m["kind"]]}</td><td>{esc(z(m["desc"]))}</td><td class="evo">{ev}</td></tr>')
+    passive_rows=''.join(f'<tr><td>{esc(z(p["name"]))}</td><td>{esc(z(p["desc"]))}</td></tr>' for p in D.get('passives',[]))
     nm, nevo = len(D['moves']), sum(bool(m['evo']) for m in D['moves'])
     body = f'<article class="doc wide"><h1>招式与招式进化</h1><p class="lead">共有 {nm} 种基础招式，覆盖 18 种属性。伙伴自动使用当前招式攻击，升级时选择卡牌学习或强化招式。{nevo} 种招式可进化：达到满级并取得所需能力强化后，会出现进化卡牌。名称沿用官方译名，效果说明以本作机制为准。“虫群”为本作原创进化名称。</p><div class="tablewrap"><table class="list"><thead><tr><th>招式</th><th>属性</th><th>攻击方式</th><th>效果</th><th>进化</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>{cta(pid,"尝试不同招式")}</article>'
+    body=body.replace('</article>',f'<h2>独立被动招式</h2><p>四个槽位，每项最多三级，不占主动招式位。防御、闪避、格挡与恢复各有不同用途。</p><table class="list"><tbody>{passive_rows}</tbody></table></article>')
     write(pid,f'PokéSurvivor 招式：{nm} 种基础招式及进化',f'查看 {nm} 种基础招式的名称、属性、效果和进化条件。',body)
 
     pid = 'items'

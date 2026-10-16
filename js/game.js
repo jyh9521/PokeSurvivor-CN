@@ -282,6 +282,7 @@ G.Game = (() => {
 
   function endRun(dead = true) {
     if (state === 'over' || !pl) return;
+    G.Battle?.endForm(pl);
     const coop = !!pl.uid;                    // sólo las partidas en grupo le ponen uid
     const wasHost = !!pl.coopHost;
     const team = coop ? G.Coop.members.slice() : [];
@@ -663,12 +664,13 @@ G.Game = (() => {
     const all = everyone();
     if (!coop || G.Coop.isHost) { G.Path.update(dt, all); G.Spawner.update(dt, all, time); }
     else G.Spawner.tickBanner(dt);
-    G.EnemyMgr.update(dt, all);
+    G.EnemyMgr.update(dt, G.Combat.decoys?[...all,...G.Combat.decoys()]:all);
     G.EnemyMgr.rebuildGrid();
     G.Combat.tick(dt, pl, time);
     G.Projectiles.update(dt, pl, G.EnemyMgr.all());
     G.Combat.resolve(dt, pl, time);
     G.Combat.updateFields(dt);
+    G.SkillVFX?.update(dt);
     G.Pickups.update(dt, all, onCollect);
     G.Hazards.update(dt);
     G.Interact.update(dt, pl);
@@ -752,6 +754,7 @@ G.Game = (() => {
     G.Projectiles.draw(ctx);
     G.Combat.drawAirFields(ctx);
     G.FX.draw(ctx);
+    G.SkillVFX?.draw(ctx);
     G.Judgment.drawAir(ctx);
     ctx.restore();
 

@@ -27,7 +27,7 @@ docs/CONTACTOS_CREADORES.md
 artifacts/
 
 # NAS database and secrets stay outside Git
-data/
+/data/
 nas-data/
 *.sqlite
 *.sqlite-wal

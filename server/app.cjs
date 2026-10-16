@@ -71,7 +71,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
     const url=new URL(req.url,'http://local');
     if(url.pathname.startsWith('/api/')){
       if(!validOrigin(req))throw error(403,'Origin mismatch');rate('http:'+clientIP(req),600);
-      if(req.method==='GET'&&url.pathname==='/api/config')return reply(res,200,{backend:'nas',version:1,registration,protocol:4,operations:operations.read()});
+      if(req.method==='GET'&&url.pathname==='/api/config')return reply(res,200,{backend:'nas',version:1,registration,protocol:5,operations:operations.read()});
       if(req.method==='GET'&&url.pathname==='/api/operations')return reply(res,200,operations.read());
       if(req.method==='GET'&&url.pathname==='/api/health')return reply(res,200,{ok:true,draining:operations.read().draining,activeRuns:runs.size,activeRooms:[...rooms.values()].filter(r=>!r.open&&r.phase!=='finished').length,ready:operationStatus().ready});
       if(['POST','PUT','DELETE'].includes(req.method)&&!String(req.headers['content-type']).startsWith('application/json'))throw error(415,'JSON required');
@@ -87,7 +87,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
       if(['PUT /api/save','POST /api/upgrades'].includes(route)&&([...runs.values()].some(r=>r.uid===user.id&&r.challenge)||(roomFor(user.id)?.experiment&&!roomFor(user.id)?.open&&roomFor(user.id)?.phase!=='finished')))throw error(409,'隔离挑战或实验对局不写入普通存档。');
       const owner=sockets.get(user.id);if(['PUT /api/save','POST /api/upgrades','POST /api/run','POST /api/challenges/claim'].includes(route)&&owner?.readyState===WebSocket.OPEN&&owner.session!==store.sessionId(token(req))&&((roomFor(user.id)?.open===false&&roomFor(user.id)?.phase!=='finished')||[...runs.values()].some(r=>r.uid===user.id)))throw error(423,'另一个设备正在对局；请结束该对局或在设备管理中接管。');
 
-      if(['POST /api/room/create','POST /api/room/member','POST /api/invite/accept'].includes(route)&&b.protocol!==4)throw error(409,'请刷新到最新版再开始联机。');
+      if(['POST /api/room/create','POST /api/room/member','POST /api/invite/accept'].includes(route)&&b.protocol!==5)throw error(409,'请刷新到最新版再开始联机。');
       switch(route){
         case 'GET /api/challenges':{const challenge=selectedChallenge(url.searchParams.get('period')||'d',url.searchParams.get('date'));return reply(res,200,{challenge,rewards:store.challengeStatus(user,challenge),serverNow:clock()});}
         case 'GET /api/challenges/ranking':return reply(res,200,challengeRankings(user,url));

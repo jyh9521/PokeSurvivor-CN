@@ -435,6 +435,17 @@
     }
   }
 
+  RAW.push({id:'z-burst',name:'Z-Move',desc:'One decisive burst per run.',type:'normal',kind:'mark',cd:999,dmg:90,radius:220,delay:0,specialOnly:true});
+  for (const extra of G.BattleMoves || []) {
+    const names=G.BattleDex?.moveNames?.[extra.id];
+    const descriptions={wave:'A moving wave hits each enemy once.',mark:'Marks the ground, then detonates after a delay.',counter:'Automatically counterattack after taking damage or blocking.',decoy:'An automatic decoy distracts enemies and bursts after its lifetime.',beam:'A powerful long-range beam.',projectile:'Rapid penetrating seeds.',dash:'Dash through nearby enemies.'};
+    const def={...extra,name:names?.['7']||extra.id,desc:descriptions[extra.kind]},index=RAW.findIndex(m=>m.id===extra.id);if(index<0)RAW.push(def);else RAW[index]=def;
+  }
+  LADDERS.wave=[{t:'+40% daño',m:{dmg:1.4}},{t:'+25% alcance',m:{width:1.25,life:1.25}},{t:'-25% recarga',m:{cd:.75}},{t:'+50% daño',m:{dmg:1.5}}];
+  LADDERS.mark=[{t:'+40% daño',m:{dmg:1.4}},{t:'+25% alcance',m:{radius:1.25}},{t:'-25% recarga',m:{cd:.75}},{t:'+50% daño',m:{dmg:1.5}}];
+  LADDERS.counter=LADDERS.melee;LADDERS.decoy=LADDERS.mark;
+  for(const m of RAW)if(G.BattleRules)m.damageClass=G.BattleRules.classify(m,G.BattleDex);
+
   // Pool de movimientos por tipo. El pool `normal` lo tienen todos.
   const POOL = {};
   for (const m of RAW) (POOL[m.type] = POOL[m.type] || []).push(m.id);
@@ -448,6 +459,7 @@
 
   /** Movimientos que este Pokémon puede aprender (sus tipos + normal). */
   function poolFor(mon) {
+    const rebuilt=G.BattleRules?.pool(mon,G.BattleDex,BY_ID);if(rebuilt)return rebuilt;
     const ids = new Set(POOL.normal);
     for (const t of mon.types) for (const id of (POOL[t] || [])) ids.add(id);
     return [...ids];
@@ -498,6 +510,7 @@
     dark: 'bite', normal: 'tackle'
   };
   function startFor(mon) {
+    if(G.BattleRules){const pool=poolFor(mon);const old=mon.start||START[mon.types[0]];return pool.includes(old)?old:pool.find(id=>mon.types.includes(BY_ID[id].type))||pool[0]||'tackle';}
     if (mon.start && BY_ID[mon.start]) return mon.start;
     for (const t of mon.types) if (START[t]) return START[t];
     return 'tackle';
@@ -560,6 +573,9 @@
     trail:      { t: '×1,8 daño, charcos más grandes y duraderos', m: { dmg: 1.8, radius: 1.25, dur: 1.3 } },
     cone:       { t: '×1,7 daño, +4 disparos y +1 perforación', m: { dmg: 1.7, count: 4, pierce: 1 } }
   };
+
+  Object.assign(EVO_MODS,{wave:EVO_MODS.aura,mark:EVO_MODS.aura,counter:EVO_MODS.melee,decoy:EVO_MODS.aura});
+  for(const m of G.BattleMoves||[]){const def=BY_ID[m.id];EVO[m.id]=[def.name+' +',def.damageClass==='physical'?'atk':'cd'];}
 
   /** ¿Puede evolucionar ya? → { name, needs, needName, text, ready } o null */
   function evoInfo(m, statsTaken) {

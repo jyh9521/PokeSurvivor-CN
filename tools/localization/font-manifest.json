@@ -1,18 +1,18 @@
 {
   "source": "Noto Sans SC / notofonts/noto-cjk",
-  "characters": 1739,
+  "characters": 1827,
   "fonts": [
     {
       "weight": 400,
-      "file": "PSChinese-400-9eac376ffd.woff2",
-      "sha256": "9eac376ffdda3c712c69040508a9aaea8a9d78e7e03da9423200d482187b7431",
-      "bytes": 331568
+      "file": "PSChinese-400-05aa2ac2c1.woff2",
+      "sha256": "05aa2ac2c16e26fe67c06fc50480fffa82418ce0afc412c0bd6d8b9dc91fd470",
+      "bytes": 349692
     },
     {
       "weight": 700,
-      "file": "PSChinese-700-743402a5d5.woff2",
-      "sha256": "743402a5d59b7b64378793f66c009d56bcbe4fc43da29960006f219dfe675142",
-      "bytes": 339480
+      "file": "PSChinese-700-9b95e58644.woff2",
+      "sha256": "9b95e58644e3bcfc98208a27953059609feb911269fc90ea42675f85cc3bed76",
+      "bytes": 357836
     }
   ]
 }

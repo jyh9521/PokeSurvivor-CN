@@ -428,6 +428,9 @@ KIND = {'es': {'projectile': 'Proyectil', 'melee': 'Cuerpo a cuerpo', 'beam': 'R
         'en': {'projectile': 'Projectile', 'melee': 'Melee', 'beam': 'Beam', 'orbit': 'Orbit', 'nova': 'Burst', 'aura': 'Aura', 'buff': 'Buff',
                'boomerang': 'Boomerang', 'chain': 'Chain', 'mine': 'Mines', 'meteor': 'Meteors', 'turret': 'Turret', 'dash': 'Dash',
                'trail': 'Trail', 'cone': 'Spray'}}
+KIND['es'].update({'wave':'Ola móvil','mark':'Marca diferida','counter':'Contraataque automático','decoy':'Señuelo'})
+KIND['en'].update({'wave':'Moving wave','mark':'Delayed mark','counter':'Automatic counter','decoy':'Decoy'})
+
 def moves_page(lang):
     pid = 'moves'
     rows = []
@@ -454,6 +457,10 @@ def moves_page(lang):
                  f'(Power, Vigor, Reflexes…) and a golden evolution card will appear.</p>')
         title, desc, c = f'PokéSurvivor moves: all {nm} attacks and their evolutions', f'All {nm} PokéSurvivor moves by type, what each one does and what it evolves into (Ember → Fire Blast, Bubble → Surf…).', 'Try them: play free'
     body = f'<article class="doc wide"><h1>{h1}</h1>{intro}<div class="tablewrap"><table class="list"><thead><tr>{th}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>{cta(pid, lang, c)}</article>'
+    passive_rows=''.join(f'<tr><td>{esc(L(lang,p["name"]))}</td><td>{esc(L(lang,p["desc"]))}</td></tr>' for p in D.get('passives',[]))
+    heading='Independent passive moves' if lang=='en' else 'Movimientos pasivos independientes'
+    description=('4 independent slots, 3 levels per passive. C or R3 chooses a special; V or L3 activates it. One special per run: Mega 30s / Dynamax 20s / one Z burst.' if lang=='en' else '4 huecos independientes y 3 niveles por pasivo. C o R3 elige; V o L3 activa. Una elección por partida: Mega 30 s / Dinamax 20 s / un movimiento Z.')
+    body=body.replace('</article>',f'<h2>{heading}</h2><p>{description}</p><table class="list"><tbody>{passive_rows}</tbody></table></article>')
     write(pid, lang, page(pid, lang, title, desc, body, {'@context': 'https://schema.org', '@graph': [crumbs(pid, lang, h1)]}))
 
 # ================= objetos =================

@@ -1,0 +1,560 @@
+{
+  "10034": {
+    "dex": 6,
+    "form": "Mega_X",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0006/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2021-11-04 23:42:49.305726\tKEVIN0ITACHI\tCUR\tPMDCollab_1\tWalk,Attack,Shoot,SpAttack,Sleep,Hurt,Idle,Swing,Double,Hop,Charge,Rotate,Cringe\n2026-03-22 18:33:18.762140\t<@!350050109741858829>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Swing,Double,Rotate,Hop,Cringe\n2026-03-29 23:00:48.129950\t<@!479925530129596426>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Swing,Double,Rotate,Hop,Cringe\n",
+    "trackerCredit": {
+      "primary": "KEVIN0ITACHI",
+      "secondary": [
+        "<@!350050109741858829>",
+        "<@!479925530129596426>"
+      ],
+      "total": 3
+    }
+  },
+  "10037": {
+    "dex": 65,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0065/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-12-21 22:41:02.694768\t<@!653416391201783856>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,SpAttack,Swing,Double,Rotate,Hop\n2024-12-27 20:16:05.477251\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tIdle,Walk,Attack,Charge,Shoot,SpAttack,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!653416391201783856>",
+      "secondary": [
+        "<@!544245909639397378>"
+      ],
+      "total": 2
+    }
+  },
+  "10038": {
+    "dex": 94,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0094/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-09-30 22:42:15.037570\t<@!653416391201783856>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Charge,Twirl,Swing,Double,Rotate\n2024-10-22 02:17:17.065530\t<@!237286997645983744>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Charge,Swing,Double,Rotate\n2024-12-21 22:32:40.814474\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Lick,Twirl,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!653416391201783856>",
+      "secondary": [
+        "<@!237286997645983744>",
+        "<@!544245909639397378>"
+      ],
+      "total": 3
+    }
+  },
+  "10039": {
+    "dex": 115,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0115/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-05-11 15:25:35.069290\t<@!157796074457661440>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,SpAttack,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!157796074457661440>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10042": {
+    "dex": 142,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0142/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-11-15 18:56:52.716945\t<@!330751862590406656>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Swing,Double,Rotate,Hop,Hover\n",
+    "trackerCredit": {
+      "primary": "<@!330751862590406656>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10044": {
+    "dex": 150,
+    "form": "Mega_Y",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0150/0002",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2021-01-26 00:31:23.245153\t<@!702275233125630042>\tCUR\tPMDCollab_1\tAttack,Charge,Double,Hop,Hurt,Idle,Pose,Rotate,Shoot,Sleep,Swing,Walk\n2021-10-11 02:41:52.936504\t<@!702275233125630042>\tCUR\tPMDCollab_1\tAttack,Charge,Double,Hop,Idle,Pose,Rotate,Shoot,Walk\n",
+    "trackerCredit": {
+      "primary": "<@!702275233125630042>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10048": {
+    "dex": 229,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0229/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2021-11-03 10:57:45.255498\t<@!276369635304275968>\tCUR\tPMDCollab_1\tWalk,Attack,Strike,Shoot,Dance,Shake,Sleep,Hurt,Idle,Swing,Double,Hop,Charge,Rotate,Injured,Special0,Fainted\n",
+    "trackerCredit": {
+      "primary": "<@!276369635304275968>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10049": {
+    "dex": 248,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0248/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2025-11-09 04:13:31.835683\t<@!702275233125630042>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!702275233125630042>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10051": {
+    "dex": 282,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0282/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2022-08-08 13:03:15.832469\t<@!544245909639397378>\tCUR\tPMDCollab_1\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Appeal,SpAttack,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!544245909639397378>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10052": {
+    "dex": 303,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0303/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2025-05-13 05:18:40.673894\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Bite,Twirl,Swing,Double,Rotate,Hop,EventSleep,Wake,Eat,Tumble,Pose,Pull,Pain,Float,DeepBreath,Nod,Sit,LookUp,Sink,Trip,Laying,LeapForth,Head,Cringe,LostBalance,TumbleBack,HitGround,Faint\n",
+    "trackerCredit": {
+      "primary": "<@!544245909639397378>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10054": {
+    "dex": 308,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0308/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2025-08-24 03:06:06.558431\t<@!702275233125630042>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Punch,SpAttack,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!702275233125630042>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10055": {
+    "dex": 310,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0310/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-07-27 05:10:06.697140\t<@!276369635304275968>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Shock,Swing,Double,Rotate,Hop,QuickStrike,Cringe\n",
+    "trackerCredit": {
+      "primary": "<@!276369635304275968>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10056": {
+    "dex": 354,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0354/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2022-10-21 23:43:32.715751\t<@!544245909639397378>\tCUR\tPMDCollab_1\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,SpAttack,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!544245909639397378>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10057": {
+    "dex": 359,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0359/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2021-11-28 16:00:27.251906\t<@!237286997645983744>\tCUR\tPMDCollab_1\tWalk,Attack,Sleep,Hurt,Idle,Swing,Double,Hop,Charge,Rotate\n",
+    "trackerCredit": {
+      "primary": "<@!237286997645983744>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10059": {
+    "dex": 448,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0448/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-12-04 02:53:03.211208\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Strike,SpAttack,RearUp,Swing,Double,Rotate,Hop,QuickStrike\n2024-12-22 17:19:58.807592\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tAttack\n2025-03-30 19:04:45.150996\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tStrike\n",
+    "trackerCredit": {
+      "primary": "<@!544245909639397378>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10062": {
+    "dex": 380,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0380/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2025-07-06 16:11:50.850656\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Rumble,SpAttack,RearUp,Swing,Double,Rotate,Hop,Cringe\n2025-07-13 18:49:14.260548\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tHurt,Charge,Shoot,RearUp,Swing,Double,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10063": {
+    "dex": 381,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0381/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2025-07-06 15:58:29.601778\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Rumble,SpAttack,RearUp,Swing,Double,Rotate,Hop,Cringe\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10065": {
+    "dex": 254,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0254/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2023-12-05 01:40:12.080440\t<@!356635814668664832>\tCUR\tPMDCollab_2\tIdle,Walk,Rotate\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10066": {
+    "dex": 302,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0302/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-02-25 22:19:30.353099\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,SpAttack,Swing,Double,Rotate,Hop,Cringe\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10067": {
+    "dex": 334,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0334/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2025-10-05 01:36:50.721905\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Swing,Double,Rotate,Hop,Hover\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10068": {
+    "dex": 475,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0475/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2021-07-06 16:15:07.678946\t<@!702275233125630042>\tCUR\tPMDCollab_1\tWalk,Attack,Strike,Shoot,RearUp,Sleep,Hurt,Idle,Swing,Double,Hop,Charge,Rotate\n",
+    "trackerCredit": {
+      "primary": "<@!702275233125630042>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10070": {
+    "dex": 319,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0319/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-05-27 04:06:48.143184\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tIdle,Walk,Attack,Double,Rotate\n",
+    "trackerCredit": {
+      "primary": "<@!544245909639397378>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10071": {
+    "dex": 80,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0080/0002",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2025-11-15 20:48:40.856505\t<@!229131140903075840>\tCUR\tCC_BY-NC_4\tIdle,Walk,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop,Special1\n2025-11-16 00:18:30.298051\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop,Special1\n",
+    "trackerCredit": {
+      "primary": "<@!229131140903075840>",
+      "secondary": [
+        "<@!356635814668664832>"
+      ],
+      "total": 2
+    }
+  },
+  "10072": {
+    "dex": 208,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0208/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-06-21 18:28:05.222321\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Appeal,Dance,Emit,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!544245909639397378>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10074": {
+    "dex": 362,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0362/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-12-21 21:50:25.709445\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Bite,Twirl,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!544245909639397378>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10075": {
+    "dex": 719,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0719/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2024-07-02 14:56:18.178010\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!544245909639397378>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10079": {
+    "dex": 384,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0384/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2022-12-07 22:03:09.429206\t<@!276369635304275968>\tCUR\tPMDCollab_1\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Swing,Double,Rotate,Hop\n2022-12-09 04:20:38.462915\t<@!276369635304275968>\tCUR\tPMDCollab_1\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!276369635304275968>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10087": {
+    "dex": 323,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0323/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2023-11-06 03:29:34.095387\t<@!330751862590406656>\tCUR\tPMDCollab_2\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Swing,Double,Rotate,Hop\n2023-11-08 21:27:42.819953\t<@!330751862590406656>\tCUR\tPMDCollab_2\tIdle,Walk,Attack,Shoot,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!330751862590406656>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10088": {
+    "dex": 428,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0428/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2021-07-01 02:05:51.826544\t<@!702275233125630042>\tCUR\tPMDCollab_1\tWalk,Attack,QuickStrike,Shoot,Appeal,Sleep,Hurt,Idle,Swing,Double,Hop,Charge,Rotate,Fainted,StandingUp,Pose,Jump,Special1\n",
+    "trackerCredit": {
+      "primary": "<@!702275233125630042>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10284": {
+    "dex": 227,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0227/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-04-08 05:16:00.317858\t<@!225949425292410880>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n2026-06-05 19:55:19.402648\t<@!225949425292410880>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!225949425292410880>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10287": {
+    "dex": 530,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0530/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-05-13 16:43:16.384094\t<@!608107243329814529>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n2026-05-13 18:31:14.149517\t<@!229131140903075840>\tCUR\tCC_BY-NC_4\tIdle,Walk,Attack,Shoot,Strike,Twirl,Swing,Rotate,Hop\n2026-05-13 18:31:20.108489\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n2026-05-14 00:06:16.198759\t<@!229131140903075840>\tCUR\tCC_BY-NC_4\tRotate\n",
+    "trackerCredit": {
+      "primary": "<@!229131140903075840>",
+      "secondary": [
+        "<@!608107243329814529>",
+        "<@!272761782269902848>"
+      ],
+      "total": 3
+    }
+  },
+  "10289": {
+    "dex": 560,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0560/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-05-27 00:02:54.433804\t<@!608107243329814529>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Attack,Swing,Double,Rotate\n2026-05-27 01:11:24.015813\t<@!229131140903075840>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Attack,Swing,Double,Rotate\n2026-05-27 01:27:59.967964\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Attack,Swing,Double,Rotate\n",
+    "trackerCredit": {
+      "primary": "<@!608107243329814529>",
+      "secondary": [
+        "<@!229131140903075840>",
+        "<@!356635814668664832>"
+      ],
+      "total": 3
+    }
+  },
+  "10290": {
+    "dex": 604,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0604/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-07-28 00:37:20.033998\t<@!276369635304275968>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,RearUp,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!276369635304275968>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10296": {
+    "dex": 670,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0670/0006",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-05-19 05:58:47.940434\t<@!608107243329814529>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n2026-05-19 07:23:05.866113\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n2026-05-20 15:06:46.605313\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Twirl,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!608107243329814529>",
+      "secondary": [
+        "<@!272761782269902848>"
+      ],
+      "total": 2
+    }
+  },
+  "10299": {
+    "dex": 691,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0691/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-05-13 16:51:58.913450\t<@!608107243329814529>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n2026-05-13 18:31:26.329756\t<@!229131140903075840>\tCUR\tCC_BY-NC_4\tIdle,Walk,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n2026-05-13 18:31:32.747247\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n2026-05-14 00:06:50.809826\t<@!229131140903075840>\tCUR\tCC_BY-NC_4\tSwing\n2026-05-27 20:53:06.407746\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Swing,Double,Rotate,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!229131140903075840>",
+      "secondary": [
+        "<@!608107243329814529>",
+        "<@!272761782269902848>"
+      ],
+      "total": 3
+    }
+  },
+  "10300": {
+    "dex": 701,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0701/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-05-11 20:18:51.911581\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Swing,Double,Rotate\n2026-05-11 20:19:51.329226\t<@!229131140903075840>\tCUR\tCC_BY-NC_4\tWalk\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [
+        "<@!229131140903075840>"
+      ],
+      "total": 2
+    }
+  },
+  "10301": {
+    "dex": 718,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0718/0005",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-07-08 13:20:25.858731\t<@!608107243329814529>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,SpAttack,Swing,Double,Rotate,Hop\n2026-08-02 14:08:29.702876\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,SpAttack,Swing,Double,Rotate,Hop\n2026-08-09 22:31:20.678713\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tCharge,Shoot,SpAttack\n2026-09-23 04:48:14.983131\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tHurt,Attack,Charge,Shoot,SpAttack\n",
+    "trackerCredit": {
+      "primary": "<@!608107243329814529>",
+      "secondary": [
+        "<@!272761782269902848>"
+      ],
+      "total": 2
+    }
+  },
+  "10302": {
+    "dex": 780,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0780/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-06-19 06:05:54.395903\t<@!608107243329814529>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,RearUp,Swing,Double,Rotate,Hop\n2026-06-19 06:39:28.314399\t<@!229131140903075840>\tCUR\tCC_BY-NC_4\tAttack,Hop,Idle,RearUp,Rotate,Shoot,Swing,Walk,Strike\n2026-06-19 07:12:33.049117\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,RearUp,Swing,Double,Rotate,Hop\n2026-08-01 17:09:55.983049\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tAttack,Shoot,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!608107243329814529>",
+      "secondary": [
+        "<@!229131140903075840>",
+        "<@!272761782269902848>"
+      ],
+      "total": 3
+    }
+  },
+  "10306": {
+    "dex": 358,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0358/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2025-12-12 14:42:48.919177\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Rotate\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10312": {
+    "dex": 491,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0491/0002",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-08-02 13:15:02.975208\t<@!225949425292410880>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Swing,Double,Rotate,Hop\n2026-08-04 06:45:47.399854\t<@!225949425292410880>\tCUR\tCC_BY-NC_4\tShoot\n2026-08-04 06:45:55.719069\t<@!225949425292410880>\tCUR\tCC_BY-NC_4\tShoot\n",
+    "trackerCredit": {
+      "primary": "<@!225949425292410880>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10319": {
+    "dex": 807,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0807/0001",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-06-19 06:28:37.717317\t<@!608107243329814529>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Strike,SpAttack,RearUp,Swing,Double,Rotate,Hop,QuickStrike,Cringe\n2026-06-19 07:12:26.215046\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Strike,SpAttack,RearUp,Swing,Double,Rotate,Hop,QuickStrike,Cringe\n2026-07-10 18:34:39.523323\t<@!272761782269902848>\tCUR\tCC_BY-NC_4\tWalk,Attack,RearUp,Hop,QuickStrike\n",
+    "trackerCredit": {
+      "primary": "<@!608107243329814529>",
+      "secondary": [
+        "<@!272761782269902848>"
+      ],
+      "total": 2
+    }
+  },
+  "10322": {
+    "dex": 978,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0978/0003",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-08-01 04:25:06.409339\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,SpAttack,RearUp,Swing,Double,Rotate,Hop\n2026-08-07 18:06:02.775716\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tHurt,Charge,Shoot,RearUp,Double,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10323": {
+    "dex": 978,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0978/0003",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-08-01 04:25:06.409339\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,SpAttack,RearUp,Swing,Double,Rotate,Hop\n2026-08-07 18:06:02.775716\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tHurt,Charge,Shoot,RearUp,Double,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [],
+      "total": 1
+    }
+  },
+  "10324": {
+    "dex": 978,
+    "form": "Mega",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0978/0003",
+    "license": "CC BY-NC 4.0; existing SpriteCollab asset terms",
+    "credit": "2026-08-01 04:25:06.409339\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,SpAttack,RearUp,Swing,Double,Rotate,Hop\n2026-08-07 18:06:02.775716\t<@!356635814668664832>\tCUR\tCC_BY-NC_4\tHurt,Charge,Shoot,RearUp,Double,Hop\n",
+    "trackerCredit": {
+      "primary": "<@!356635814668664832>",
+      "secondary": [],
+      "total": 1
+    }
+  }
+}

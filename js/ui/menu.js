@@ -2,7 +2,8 @@
 G.MenuUI = (() => {
   const $ = G.UI.$;
   const GEN_NAMES = ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Teselia', 'Kalos', 'Alola', 'Galar', 'Paldea'];
-  let dexFilter = 'all', dexGen = 1, dexSel = null;
+  let dexGen=0,dexSel=null,dexOwned='all',dexType='all',dexRarity='all',dexQuery='',dexObserver=null;
+  const searchCache=new Map();
 
   function init() {
     const ICON = { play: 'ball', dex: 'book', upgrades: 'up', gacha: 'ball4', goals: 'medal3', friends: 'friends', rank: 'trophy', settings: 'gear' };
@@ -105,36 +106,33 @@ G.MenuUI = (() => {
   function openDex() {
     G.UI.show('scr-dex', true);
     const s = G.DB.save;
-    if (dexSel == null) { dexSel = s.partner; dexGen = G.DEX_BY[s.partner].gen; }
+    if(dexSel==null)dexSel=s.partner;
     const owned = Object.keys(s.owned).filter(d => G.DEX_BY[d]).length;
     $('dex-total').textContent = `${owned} / ${G.DEX.length}`;
 
     // Pestañas de generación, con cuántos tienes de cada una.
     const tabs = $('dex-gens');
     tabs.innerHTML = '';
+    const all=document.createElement('button');all.className='gen-tab'+(dexGen===0?' on':'');all.dataset.gen='0';all.innerHTML='<b>'+G.T('Todos')+'</b><small>'+owned+'/'+G.DEX.length+'</small>';all.onclick=()=>{dexGen=0;openDex();};tabs.appendChild(all);
     GEN_NAMES.forEach((name, i) => {
       const g = i + 1;
       const total = G.DEX.filter(p => p.gen === g).length;
       const have = G.DEX.filter(p => p.gen === g && s.owned[p.dex]).length;
       const b = document.createElement('button');
-      b.className = 'gen-tab' + (g === dexGen ? ' on' : '');
+      b.className = 'gen-tab' + (g === dexGen ? ' on' : '');b.dataset.gen=String(g);
       b.innerHTML = `<b>${name}</b><small>${have}/${total}</small>`;
       b.onclick = () => { dexGen = g; openDex(); };
       tabs.appendChild(b);
     });
 
-    const F = [['all', 'Todos'], ['own', 'Tengo'], ['miss', 'Me faltan'], ['shiny', 'Shiny'],
-               ['5', 5], ['4', 4], ['3', 3], ['2', 2], ['1', 1]];
-    const fb = $('dex-filters');
-    fb.innerHTML = '';
-    for (const [k, label] of F) {
-      const c = document.createElement('button');
-      c.className = 'chip' + (k === dexFilter ? ' on' : '');
-      c.innerHTML = k === 'shiny' ? G.Icons.html('shiny', 12) + ' Shiny'
-                  : typeof label === 'number' ? G.Icons.rarity(label, 12) + ' ' + G.Gacha.RARITY_NAME[label] : label;
-      c.onclick = () => { dexFilter = k; openDex(); };
-      fb.appendChild(c);
-    }
+    const fb=$('dex-filters');fb.replaceChildren();
+    const reset=document.createElement('button');reset.className='chip';reset.id='dex-reset';reset.textContent=G.T('Todos');reset.onclick=()=>{dexOwned=dexType=dexRarity='all';dexQuery='';openDex();};fb.appendChild(reset);
+    function filter(id,title,options,value,change){const label=document.createElement('label');label.className='dex-filter-label';const name=document.createElement('span');name.textContent=G.T(title);label.appendChild(name);const select=document.createElement('select');select.id=id;select.setAttribute('aria-label',G.T(title));for(const [v,n]of options){const o=document.createElement('option');o.value=v;o.textContent=G.T(n);select.appendChild(o);}select.value=value;select.onchange=()=>{change(select.value);renderGrid();};label.appendChild(select);fb.appendChild(label);}
+    filter('dex-owned','Acquisition',[['all','Todos'],['own','Tengo'],['miss','Me faltan']],dexOwned,v=>dexOwned=v);
+    filter('dex-type','Type',[['all','Todos'],...Object.keys(G.U.TYPE_COLOR).filter(t=>t!=='aura').map(t=>[t,G.U.TYPE_NAME[t]])],dexType,v=>dexType=v);
+    filter('dex-rarity','Rarity',[['all','Todos'],['shiny','Shiny'],...[5,4,3,2,1].map(r=>[String(r),G.Gacha.RARITY_NAME[r]])],dexRarity,v=>dexRarity=v);
+    const search=document.createElement('input');search.id='dex-search';search.type='search';search.maxLength=180;search.placeholder=G.T('Search all Pokémon fields');search.setAttribute('aria-label',G.T('Search all Pokémon fields'));search.value=dexQuery;let timer;search.oninput=()=>{dexQuery=search.value;clearTimeout(timer);timer=setTimeout(renderGrid,90);};fb.appendChild(search);
+    const count=document.createElement('span');count.id='dex-results';count.className='sub';count.setAttribute('aria-live','polite');fb.appendChild(count);
     renderGrid();
     showDetail(dexSel);
   }
@@ -142,22 +140,23 @@ G.MenuUI = (() => {
   function renderGrid() {
     const s = G.DB.save;
     const grid = $('dex-grid');
-    grid.innerHTML = '';
+    dexObserver?.disconnect();grid.innerHTML='';
+    dexObserver=typeof IntersectionObserver==='function'?new IntersectionObserver(entries=>{for(const e of entries)if(e.isIntersecting){e.target._loadDex?.();dexObserver.unobserve(e.target);}},{rootMargin:'160px'}):null;
+    let visible=0;
     for (const p of G.DEX) {
-      if (p.gen !== dexGen) continue;
-      const own = !!s.owned[p.dex], sh = !!(s.shiny && s.shiny[p.dex]);
-      if (dexFilter === 'own' && !own) continue;
-      if (dexFilter === 'miss' && own) continue;
-      if (dexFilter === 'shiny' && !sh) continue;
-      if (/^\d$/.test(dexFilter) && p.rarity !== +dexFilter) continue;
-
+      const own=!!s.owned[p.dex],sh=!!s.shiny?.[p.dex];
+      if(!searchCache.has(p.dex)){const extra=[G.T(p.name),...p.types.map(t=>G.T(G.U.TYPE_NAME[t])),G.T(G.Gacha.RARITY_NAME[p.rarity]),...G.Moves.poolFor(p).map(id=>G.T(G.Moves.BY_ID[id].name,'move'))].join(' ');searchCache.set(p.dex,G.BattleRules.searchText(p,G.BattleDex,extra));}
+      const text=searchCache.get(p.dex)+' '+G.T(own?'Tengo':'Me faltan')+(sh?' shiny '+G.T('Shiny'):'');
+      if(!G.BattleRules.matches(p,s,{gen:dexGen,owned:dexOwned,type:dexType,rarity:dexRarity,query:dexQuery},text))continue;
+      visible++;
       const cell = document.createElement('div');
+      cell.dataset.dex=String(p.dex);
       cell.className = 'cell' + (own ? '' : ' locked') + (p.dex === dexSel ? ' on' : '');
       cell.insertAdjacentHTML('beforeend', `<span class="no">${String(p.dex).padStart(3, '0')}</span>`);
       if (p.dex === s.partner) cell.insertAdjacentHTML('beforeend', `<span class="badge-r" title="Compañero">${G.Icons.html('crown', 14)}</span>`);
       else if (sh) cell.insertAdjacentHTML('beforeend', `<span class="badge-r" title="Tienes su shiny">${G.Icons.html('shiny', 12)}</span>`);
       const useShiny = sh && p.dex === s.partner && s.partnerShiny;
-      cell.appendChild(G.UI.spriteCanvas(p.dex, 92, 80, { scale: 2, silhouette: !own, shadow: own, shiny: useShiny }));
+      const canvas=document.createElement('canvas');canvas.width=92;canvas.height=80;canvas._loadDex=()=>{G.UI.sprite(canvas,p.dex,{scale:2,silhouette:!own,shadow:own,shiny:useShiny});canvas._loadDex=null;};cell.appendChild(canvas);if(dexObserver)dexObserver.observe(canvas);else canvas._loadDex();
       cell.insertAdjacentHTML('beforeend', `<b>${own ? p.name : '???'}</b>${G.UI.stars(p.rarity, 9)}`);
       cell.onclick = () => {
         dexSel = p.dex;
@@ -167,6 +166,7 @@ G.MenuUI = (() => {
       };
       grid.appendChild(cell);
     }
+    $('dex-results').textContent=visible+' / '+G.DEX.length;
     if (!grid.children.length) grid.innerHTML = '<p class="sub" style="grid-column:1/-1">Ninguno con este filtro.</p>';
   }
 
@@ -183,7 +183,9 @@ G.MenuUI = (() => {
     else if (isPartner && dex !== showDetail.last) viewShiny = !!s.partnerShiny;
     showDetail.last = dex;
 
-    const max = { hp: 183, atk: 1.55, spd: 137 };
+    const max={hp:183,atk:1.55,spd:137};
+    const stats=G.BattleRules.stats(p,G.BattleDex),trait=G.BattleRules.trait(p,G.BattleDex);
+    const statNames=['HP','Attack','Defense','Special Attack','Special Defense','Speed'];
     const bar = (label, v, m, txt) =>
       `<div class="stat"><span>${label}</span><div class="bar"><i style="width:${Math.min(100, v / m * 100)}%"></i></div><span>${txt}</span></div>`;
     const usingThis = isPartner && (!hasSh || !!s.partnerShiny === viewShiny);
@@ -201,9 +203,9 @@ G.MenuUI = (() => {
         <div style="margin:6px 0">${own ? G.UI.typeChips(p.types) : ''}</div>
       </div>
       ${own ? `
-        ${bar('Vida', p.hp, max.hp, p.hp)}
-        ${bar('Ataque', p.atk, max.atk, '×' + p.atk.toFixed(2))}
-        ${bar('Velocidad', p.spd, max.spd, p.spd)}
+        <section class="six-stats">${stats.map((v,i)=>bar(G.T(statNames[i]),v,255,v)).join('')}</section>
+        <p class="trait-description"><b>${G.T('Species trait')}: ${trait.source?.[G.I18n.lang==='zh-CN'?'zh':G.I18n.lang==='es'?'es':'en']||G.T(trait.title)}</b><br>${G.T('Survivor adaptation')}: ${G.T(trait.desc)}</p>
+        <p class="sub">${G.T('Battle role')}: ${G.T(G.BattleRules.role(p,G.BattleDex))} · ${G.T('Special forms')}: ${G.BattleDex.species[p.dex]?.mega.length?'Mega / ':''}Z / ${G.T('Dynamax')}</p>
         <p style="font-size:14px;margin:10px 0 4px">Empieza con <b class="gold">${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move')}</b></p>
         <p class="move-icons" title="Movimientos que puede aprender">
           ${G.Moves.poolFor(p).map(id => `<span title="${G.T(G.Moves.BY_ID[id].name, 'move')}">${G.Icons.html('move:' + id, 16)}</span>`).join('')}</p>

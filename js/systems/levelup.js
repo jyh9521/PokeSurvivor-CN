@@ -37,7 +37,7 @@ G.LevelUp = (() => {
       // llenar los 4 huecos con ellos deja la run sin salida.
       const buffs = pl.moves.filter(m => m.kind === 'buff').length;
       const pool = G.Moves.poolFor(pl.mon).filter(id =>
-        !pl.hasMove(id) && !(pl.banned && pl.banned.has(id)) && !(buffs >= 2 && G.Moves.BY_ID[id].kind === 'buff'));
+        G.Moves.BY_ID[id].kind!=='buff' && !pl.hasMove(id) && !(pl.banned && pl.banned.has(id)) && !(buffs >= 2 && G.Moves.BY_ID[id].kind === 'buff'));
       for (const id of G.U.pickN(pool, 6)) {
         const d = G.Moves.BY_ID[id];
         out.push({
@@ -83,6 +83,10 @@ G.LevelUp = (() => {
       });
     }
 
+    // Passive moves have their own four slots and never steal attack slots.
+    if(G.Battle)for(const d of G.PassiveDefs){const n=pl.passives?.[d.id]||0;if(n>=3||!n&&Object.keys(pl.passives||{}).length>=4)continue;
+      out.push({w:n?7:6,type:'passive',key:'passive:'+d.id,icon:'shield',color:'#83dcff',tag:G.T('Passive')+' '+(n+1)+'/3',title:G.T(d.name),desc:G.T(d.desc),apply:p=>G.Battle.learn(p,d.id)});
+    }
     // --- stats ---
     // Las que desbloquean una evolución salen siempre y con aviso.
     // Cada mejora tiene un tope de veces (`max`): en partidas muy largas se

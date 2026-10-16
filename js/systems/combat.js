@@ -22,21 +22,23 @@ G.Combat = (() => {
   function tick(dt, pl, now) {
     if (pl.dead) return;
     // Vínculos: todos los movimientos del hueco activo, cada uno con su recarga.
-    for (const m of pl.activeGroup()) tickMove(dt, pl, m, now);
+    const group=pl.activeGroup();for(const m of group)tickMove(dt,pl,m,now);
+    for(const m of pl.moves||[])if(m.autoSupport&&!group.includes(m))tickMove(dt,pl,m,now);
   }
 
   function tickMove(dt, pl, m, now) {
+    if (m.kind==='counter'&&!(pl.battle?.counterT>0)){m.t=0;return;}
     if (m.kind === 'orbit') { orbit(pl, m, dt, now); return; }
 
     m.t -= dt;
     if (m.t > 0) return;
     // Los ataques que necesitan blanco esperan a tenerlo (no gastes animación al aire).
-    if (m.kind === 'melee') {
+    if (m.kind === 'melee'||m.kind==='counter') {
       const target = meleeTarget(pl, m);
       if (target) { pl.target = target; pl.aim = Math.atan2(target.y - pl.y, target.x - pl.x); }
       else { m.t = 0.05; return; }
     }
-    if (m.kind !== 'melee' && needsTarget(m) && !(pl.target && G.U.dist(pl.x, pl.y, pl.target.x, pl.target.y) <= reach(m))) {
+    if (m.kind !== 'melee' && m.kind!=='counter' && needsTarget(m) && !(pl.target && G.U.dist(pl.x, pl.y, pl.target.x, pl.target.y) <= reach(m))) {
       m.t = 0.05;
       return;
     }
@@ -48,10 +50,15 @@ G.Combat = (() => {
     m.castAt = performance.now();
 
     run(pl, m);
+    if(m.kind==='counter'&&pl.battle)pl.battle.counterT=0;
   }
 
   function run(pl, m) {
+    if(pl.battle?.form==='max')m={...m,radius:(m.radius||60)*1.35,width:(m.width||20)*1.35,size:(m.size||5)*1.2};
+    G.SkillVFX?.cast(pl,m,ghost);
     switch (m.kind) {
+      case 'wave': case 'mark': case 'decoy': fieldMove(pl,m); break;
+      case 'counter': melee(pl,{...m,kind:'melee'}); break;
       case 'projectile': fireProjectiles(pl, m); break;
       case 'melee':      melee(pl, m); break;
       case 'beam':       beam(pl, m); break;
@@ -69,9 +76,12 @@ G.Combat = (() => {
     }
   }
 
-  const TARGETED = ['melee', 'beam', 'projectile', 'boomerang', 'chain', 'meteor', 'dash', 'cone'];
+  const TARGETED = ['melee', 'beam', 'projectile', 'boomerang', 'chain', 'meteor', 'dash', 'cone', 'counter', 'wave', 'mark'];
   function needsTarget(m) { return TARGETED.includes(m.kind); }
   function reach(m) {
+    if(m.kind==='counter')return m.radius;
+    if(m.kind==='wave')return m.speed*m.life;
+    if(m.kind==='mark')return 340;
     if (m.kind === 'melee') return m.radius;
     if (m.kind === 'beam') return m.radius + 20;
     if (m.kind === 'boomerang') return m.radius + 40;
@@ -83,7 +93,7 @@ G.Combat = (() => {
   }
 
   function payload(m) {
-    return { burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, knock: m.knock || 0, mtype: m.type };
+    return { burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, knock: m.knock || 0, mtype: m.type, moveId: m.id, damageClass:m.damageClass };
   }
 
   /** Tabla de tipos × clima para un ataque de tipo `type` contra `e`. */
@@ -160,6 +170,7 @@ G.Combat = (() => {
     pl.meleeGuardT = 0.6;
     if (m.haste) { pl.meleeHasteT = 0.6; pl.meleeHaste = m.haste; }
     pl.onDealt(dealt); pl.dmgDealt += dealt;
+    G.Battle?.charge(pl,dealt,killed);
     if (killed && m.killHeal) {
       // Rolling one-second window, shared by all bite skills and both combo hits.
       const now = performance.now();
@@ -176,7 +187,8 @@ G.Combat = (() => {
     const before = e.hp;
     const bonus = m.eliteBonus && (e.boss || elite(e)) ? m.eliteBonus : 1;
     const shred = e.meleeShredT > 0 ? 1.15 : 1;
-    e.hurt(dmg * bonus * shred, col, dx, dy, 0, eff, pl.uid);
+    const scaled=G.Battle?G.Battle.damage(pl,e,m,dmg):dmg;
+    e.hurt(scaled * bonus * shred, col, dx, dy, 0, eff, pl.uid);
     const dealt = Math.max(0, before-Math.max(0,e.hp)), killed = dealt > 0 && e.dead;
     if (dealt > 0) {
       if (!e.dead) {
@@ -320,6 +332,24 @@ G.Combat = (() => {
     if (!ghost) G.Camera.kick(0.05);
   }
 
+  function fieldMove(pl,m){
+    const target=pl.target,aim=pl.aim;
+    if(m.kind==='decoy')for(const f of fields)if(f.owner===pl&&f.kind==='decoy')f.gone=true;
+    const f={kind:m.kind,owner:pl,ghost,m,col:G.U.TYPE_COLOR[m.type],vis:G.VFX.forMove(m),x:pl.x,y:pl.y,t:0,r:m.radius||60,dmg:m.dmg*pl.atk,aim,hits:new Set(),life:m.kind==='mark'?m.delay:m.kind==='decoy'?m.dur:m.life};
+    if(m.kind==='mark'&&target){f.x=target.x;f.y=target.y;}
+    if(m.kind==='decoy'){f.x+=Math.cos(aim)*55;f.y+=Math.sin(aim)*55;f.decoy={x:f.x,y:f.y,r:12,level:pl.level,mon:pl.mon,types:pl.mon.types,dead:false,_vx:0,_vy:0};}
+    fields.push(f);
+    const same=fields.filter(f=>f.owner===pl&&['wave','mark','decoy'].includes(f.kind));for(const f of same.slice(0,Math.max(0,same.length-10)))f.gone=true;
+  }
+  function special(pl,kind,visualOnly=false){
+    if(kind!=='z')return;
+    G.SkillVFX?.form(pl,'z');if(visualOnly)return;
+    const active=pl.activeMove(),m={...G.Moves.BY_ID['z-burst'],type:G.Battle?.types(pl)?.[0]||pl.mon.types[0],damageClass:active?.damageClass||'special'};
+    for(const e of G.EnemyMgr.queryCircle(pl.x,pl.y,220))hit(pl,e,m.dmg*pl.atk,G.U.TYPE_COLOR[m.type],e.x-pl.x,e.y-pl.y,0,m);
+  }
+  function authorizeDecoy(owner){for(const f of fields)if(f.owner===owner&&f.kind==='decoy'&&!f.gone)f.authority=true;}
+  function decoys(){return fields.filter(f=>f.kind==='decoy'&&(!f.ghost||f.authority)&&!f.gone&&f.t<f.life&&!f.owner.dead).map(f=>f.decoy);}
+
   /** Minas: se quedan en el suelo y estallan cuando un enemigo las pisa. */
   function mines(pl, m) {
     const col = G.U.TYPE_COLOR[m.type], vis = G.VFX.forMove(m);
@@ -437,6 +467,16 @@ G.Combat = (() => {
     for (let i = fields.length - 1; i >= 0; i--) {
       const f = fields[i];
       f.t += dt;
+      if(['wave','mark','decoy'].includes(f.kind)){
+        if(f.gone||!f.owner||f.owner.dead){fields.splice(i,1);continue;}
+        if(f.kind==='wave'){
+          const ox=f.x,oy=f.y;f.x+=Math.cos(f.aim)*f.m.speed*dt;f.y+=Math.sin(f.aim)*f.m.speed*dt;
+          if(G.World.isWall(f.x,f.y)){fields.splice(i,1);continue;}
+          if(!f.ghost)for(const e of G.EnemyMgr.queryCircle((ox+f.x)/2,(oy+f.y)/2,Math.hypot(f.x-ox,f.y-oy)/2+f.m.width/2))if(!f.hits.has(e.id)&&segDist2(ox,oy,f.x,f.y,e.x,e.y)<=(f.m.width/2+e.r)**2){f.hits.add(e.id);hit(f.owner,e,f.dmg,f.col,Math.cos(f.aim),Math.sin(f.aim),f.m.knock||0,f.m);}
+          if(f.t>=f.life||G.World.isWall(f.x,f.y))fields.splice(i,1);
+        }else if(f.t>=f.life){G.FX.ring(f.x,f.y,5,f.r,f.col,.35,3);if(!f.ghost)for(const e of G.EnemyMgr.queryCircle(f.x,f.y,f.r))hit(f.owner,e,f.dmg,f.col,e.x-f.x,e.y-f.y,f.m.knock||0,f.m);fields.splice(i,1);}
+        continue;
+      }
       if (f.gone || !f.owner || (f.life && f.t >= f.life && f.kind !== 'mine')) { fields.splice(i, 1); continue; }
       if (f.kind === 'mine') {
         const armed = f.t >= f.arm;
@@ -489,7 +529,13 @@ G.Combat = (() => {
     for (const f of fields) {
       if (!G.Camera.sees(f.x, f.y, 60)) continue;
       ctx.save();
-      if (f.kind === 'patch') {
+      if(['wave','mark','decoy'].includes(f.kind)){
+        ctx.globalAlpha=f.ghost?.2:.5;ctx.strokeStyle=f.col;ctx.lineWidth=2;ctx.beginPath();
+        if(f.kind==='wave'){ctx.translate(f.x,f.y);ctx.rotate(f.aim);for(let line=-1;line<=1;line++){for(let y=-f.m.width/2;y<=f.m.width/2;y+=5){const x=Math.sin(y*.13+f.t*8)*5+line*5;if(y===-f.m.width/2)ctx.moveTo(x,y);else ctx.lineTo(x,y);}}}
+        else if(f.kind==='decoy'){ctx.fillStyle='#78d88b';ctx.fillRect(f.x-10,f.y-20,20,20);ctx.fillRect(f.x-13,f.y-27,7,10);ctx.fillRect(f.x+6,f.y-27,7,10);ctx.fillStyle='#182936';ctx.fillRect(f.x-6,f.y-16,3,3);ctx.fillRect(f.x+3,f.y-16,3,3);}
+        else{ctx.ellipse(f.x,f.y,f.r,f.r*.6,0,0,Math.PI*2);ctx.moveTo(f.x-8,f.y);ctx.lineTo(f.x+8,f.y);ctx.moveTo(f.x,f.y-8);ctx.lineTo(f.x,f.y+8);}
+        ctx.stroke();
+      } else if (f.kind === 'patch') {
         const a = Math.min(1, (f.life - f.t) * 2, f.t * 6);
         ctx.globalAlpha = 0.32 * a;
         ctx.fillStyle = f.col;
@@ -538,7 +584,7 @@ G.Combat = (() => {
     }
   }
 
-  function clearFields(owner) { fields = owner ? fields.filter(f => f.owner !== owner) : []; meleeBursts = owner ? meleeBursts.filter(b => b.pl !== owner) : []; }
+  function clearFields(owner) { if(!owner)G.SkillVFX?.clear();fields = owner ? fields.filter(f => f.owner !== owner) : []; meleeBursts = owner ? meleeBursts.filter(b => b.pl !== owner) : []; }
 
   function orbit(pl, m, dt, now, isGhost = false) {
     const col = G.U.TYPE_COLOR[m.type];
@@ -559,7 +605,7 @@ G.Combat = (() => {
         dmg: m.dmg * pl.atk,
         oa: (i / want) * 6.2832, orad: m.radius, ospeed: m.speed,
         rehit: Math.max(0.12, m.cd),
-        knock: m.knock || 0, burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, mtype: m.type
+        knock: m.knock || 0, burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, mtype: m.type, moveId:m.id, damageClass:m.damageClass
       });
     }
     const live = G.Projectiles.all().filter(mine);
@@ -577,17 +623,19 @@ G.Combat = (() => {
   }
 
   /** Repite el ataque de un compañero sólo para verlo (sin daño). */
-  function ghostCast(pl, id, lvl, aim, evolved, pose) {
+  function ghostCast(pl, id, lvl, aim, evolved, pose, target) {
     const def = G.Moves.BY_ID[id];
     if (!def || def.kind === 'orbit') return;
     const m = G.Moves.instance(id, lvl);
     if (evolved) G.Moves.evolve(m);
     pl.aim = aim;
+    const previousTarget=pl.target;
+    if(Array.isArray(target)&&Number.isFinite(target[0])&&Number.isFinite(target[1]))pl.target={x:target[0],y:target[1],id:target[2]||-1,bodyH:target[3]||20,r:10};
     ghost = true;
     try {
       pl.cast(m,pose);
       run(pl, m);
-    } finally { ghost = false; }
+    } finally { ghost = false;pl.target=previousTarget; }
   }
 
   /** Orbes de un compañero que tiene activo un movimiento de órbita (sólo visual). */
@@ -599,15 +647,15 @@ G.Combat = (() => {
 
   // Golpe crítico (Mejoras → Golpe Crítico): x1,5 de daño, número naranja y grande.
   const CRIT_MUL = 1.5;
-  const isCrit = pl => !ghost && pl.critChance > 0 && Math.random() < pl.critChance;
+  const isCrit = pl => !ghost && Math.random() < (G.Battle?G.Battle.crit(pl):pl.critChance||0);
 
   function hit(pl, e, dmg, col, dx, dy, knock, m) {
     const k = typeK(m.type, e);
     const crit = isCrit(pl);
     dmg *= k * (crit ? CRIT_MUL : 1);
-    e.hurt(dmg, col, dx, dy, knock, crit ? 'crit' : G.Types.label(G.Types.mult(m.type, e.types)),pl.uid);
-    if (!ghost) pl.onDealt(dmg);
-    pl.dmgDealt += dmg;
+    const eff=crit?'crit':G.Types.label(G.Types.mult(m.type,e.types));
+    if(G.Battle)G.Battle.deal(pl,e,dmg,col,dx,dy,knock,m,eff);
+    else{e.hurt(dmg,col,dx,dy,knock,eff,pl.uid);if(!ghost)pl.onDealt(dmg);pl.dmgDealt+=dmg;}
     if (m.burn) e.applyBurn(m.burn);
     if (m.poison) e.applyPoison(m.poison);
     if (m.slow) e.applySlow(m.slow);
@@ -638,7 +686,7 @@ G.Combat = (() => {
           continue;
         }
         if (G.U.dist2(p.x, p.y, pl.x, pl.y) < (p.r + pl.r) * (p.r + pl.r)) {
-          pl.hurt(p.dmg, p.mtype);
+          pl.hurt(p.dmg, p.mtype, false, p.damageClass||'special');
           G.FX.burst(p.x, p.y - G.LIFT, p.color, 7, 110);
           projectiles.splice(i, 1);
         }
@@ -712,11 +760,11 @@ G.Combat = (() => {
 
         const crit = isCrit(pl);
         const k = (p.mtype ? typeK(p.mtype, e) : 1) * (crit ? CRIT_MUL : 1);
-        e.hurt(p.dmg * k, p.color, p.vx || (e.x - pl.x), p.vy || (e.y - pl.y), p.knock,
-               crit ? 'crit' : p.mtype ? G.Types.label(G.Types.mult(p.mtype, e.types)) : null,pl.uid);
+        const eff=crit?'crit':p.mtype?G.Types.label(G.Types.mult(p.mtype,e.types)):null;
+        if(G.Battle)G.Battle.deal(pl,e,p.dmg*k,p.color,p.vx||(e.x-pl.x),p.vy||(e.y-pl.y),p.knock,G.Moves.BY_ID[p.moveId]||{id:p.moveId,type:p.mtype,kind:'projectile',damageClass:p.damageClass,dmg:p.dmg},eff);
+        else e.hurt(p.dmg*k,p.color,p.vx||(e.x-pl.x),p.vy||(e.y-pl.y),p.knock,eff,pl.uid);
         if (Math.random() < 0.5) G.FX.sp('impact', p.vis ? p.vis.pal : 'normal', e.x, e.y - e.bodyH * 0.5, { life: 0.12, scale: 1 });
-        pl.dmgDealt += p.dmg * k;
-        pl.onDealt(p.dmg * k);
+        if(!G.Battle){pl.dmgDealt += p.dmg*k;pl.onDealt(p.dmg*k);}
         if (p.burn) e.applyBurn(p.burn);
         if (p.poison) e.applyPoison(p.poison);
         if (p.slow) e.applySlow(p.slow);
@@ -746,6 +794,6 @@ G.Combat = (() => {
     }
   }
 
-  return { meleeTarget, meleeInRange, meleeContains, acceptMeleeHit, meleeBenefits, tick, resolve, ghostCast, ghostOrbit, updateFields, drawGroundFields, drawAirFields, clearFields,
+  return { authorizeDecoy,special,decoys,meleeTarget, meleeInRange, meleeContains, acceptMeleeHit, meleeBenefits, tick, resolve, ghostCast, ghostOrbit, updateFields, drawGroundFields, drawAirFields, clearFields,
            get fieldCount() { return fields.length; } };
 })();

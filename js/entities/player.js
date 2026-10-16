@@ -73,6 +73,7 @@ G.Player = class Player {
     this.sashT = -999;         // última vez que salvó la Banda Focus
     this.meleeGuardT=0; this.meleeHasteT=0; this.meleeHaste=0; this.meleeHeals=[];
     this.bellHeal = 0;         // curación pendiente del Cascabel Concha
+    G.Battle?.init(this);
     this.statsTaken = {};      // mejoras de stat cogidas (condición de evolución)
   }
 
@@ -92,7 +93,7 @@ G.Player = class Player {
     const s = this.baseSpd * (this.meleeHasteT > 0 ? 1 + this.meleeHaste : 1) * this.spdMul * (1 + this.buffs.spd.n * this.buffs.spd.amount) * (this.slowT > 0 ? 0.5 : 1);
     const w = G.Weather.speedFor(this.mon.types);
     const slow = this.inLiquid ? G.World.liquidEffect(this.mon.types).slow || 1 : 1;
-    return s * slow * w;
+    return s * slow * w * (G.Battle?.speed(this)||1);
   }
   get reduction() { return Math.min(0.8, this.dmgReduce + this.buffs.def.n * this.buffs.def.amount); }
   get regen() { return this.regenFlat + this.buffs.regen.n * this.buffs.regen.amount; }
@@ -205,7 +206,7 @@ G.Player = class Player {
     if (this.hasItem('lifeorb') && m.kind !== 'orbit' && m.kind !== 'trail' && !this.remote) {
       this.hp = Math.max(1, this.hp - Math.max(1, this.maxHp * 0.01));
     }
-    const anim = G.Sprites.actionFor(this.dex,m,this.shiny);
+    const anim = G.Sprites.actionFor(this.anim.dex||this.dex,m,this.shiny);
     // Las familias nuevas suenan como la parecida de las de siempre.
     const SND = { boomerang: 'projectile', chain: 'beam', mine: 'nova', meteor: 'nova', turret: 'buff', dash: 'melee', trail: 'aura', cone: 'projectile' };
     // El rastro no suena a cada charco (sería un zumbido constante).
@@ -224,11 +225,11 @@ G.Player = class Player {
    * @param type  tipo del ataque (tabla de tipos y clima); sin tipo, daño tal cual
    * @param pure  daño que no baja con la defensa ni el cuerpo a cuerpo (Arceus)
    */
-  hurt(amount, type = null, pure = false) {
+  hurt(amount, type = null, pure = false, damageClass = 'physical') {
     if (this.invuln > 0 || this.dead) return;
     let eff = null;
     if (type) {
-      const k = G.Types.mult(type, this.mon.types);
+      const k = G.Types.mult(type, G.Battle?.types(this)||this.mon.types);
       eff = G.Types.label(k);
       amount *= k * G.Weather.mult(type);
     }
@@ -236,7 +237,8 @@ G.Player = class Player {
     // estar encima de los enemigos para pegar (iban muy por detrás).
     const close = this.meleeGuardT > 0 || this.activeGroup().some(m => m.kind === 'melee') ? 0.75 : 1;
     if(!Number.isFinite(amount)||amount<=0)return;
-    const d = pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
+    const d = G.Battle?G.Battle.defend(this,amount,pure,damageClass,1-(1-this.reduction)*close):pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
+    if(!(d>0))return;
     const hpBefore=this.hp;
     this.hp -= d;
     this.invuln = 0.45;
@@ -316,6 +318,7 @@ G.Player = class Player {
   // ---------------- ciclo ----------------
   update(dt) {
     this.anim.update(dt);
+    G.Battle?.tick(this,dt);
     if (this.dead) return;
     if (this.invuln > 0) this.invuln -= dt;
     if (this.flash > 0) this.flash -= dt;
@@ -418,6 +421,7 @@ G.Player = class Player {
     if (G.U.dist2(this.x, this.y, n.x, n.y) > 300 * 300) { this.x = n.x; this.y = n.y; }
     else { this.x = G.U.damp(this.x, n.x, 14, dt); this.y = G.U.damp(this.y, n.y, 14, dt); }
     if (n.hp < this.hp - 0.5 && !n.dead) this.flash = 0.14;
+    G.Battle?.ingest(this,n.battle);
     this.hp = n.hp; this.maxHp = n.maxHp;
     this.magnet = n.mag || this.magnet;
     this.reviveT = n.rev || 0;
@@ -449,6 +453,7 @@ G.Player = class Player {
   }
 
   draw(ctx) {
+    G.SkillVFX?.drawPlayer(ctx,this);
     // Halo del tipo del movimiento activo, en el suelo.
     const m = this.activeMove();
     if (m && !this.dead) {
