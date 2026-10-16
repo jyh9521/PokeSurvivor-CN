@@ -80,4 +80,4 @@ for entry,lang,locale in [('index.html','zh-CN','zh_CN'),('en/index.html','en','
         assert target.exists(),f'{entry}: {href}'
 manifest=json.loads((ROOT/'manifest.webmanifest').read_text(encoding='utf-8'))
 assert manifest['lang']=='zh-CN'
-print(f'PASS: {len(pages)} Chinese pages, {count} local references, 966 official names, two font faces, bundle fingerprints')
+print(f'PASS: {len(pages)} Chinese pages, {count} local references, 975 official names, two font faces, bundle fingerprints')

@@ -15,6 +15,6 @@ test('radar includes six exact values, accessible name and escaped translations 
  const html=Radar.html([45,49,49,65,65,45],s=>s==='HP'?'<script>HP</script>':s);
  a.equal((html.match(/data-stat=/g)||[]).length,6);a.ok(html.includes('role="img"'));a.ok(html.includes('aria-label='));a.ok(html.includes('0–255'));a.ok(html.includes('&lt;script&gt;HP&lt;/script&gt;'));a.ok(!html.includes('<script>'));a.ok(!html.includes('onclick'));
 });
-test('all 966 catalog entries produce six finite points without changing their base stats',()=>{
+test('all 975 catalog entries produce six finite points without changing their base stats',()=>{
  const {G}=require('./battle-fixture.cjs')();for(const p of G.DEX){const stats=G.BattleRules.stats(p,G.BattleDex),before=[...stats],g=Radar.geometry(stats);a.deepEqual(Array.from(stats),before);a.equal(g.axes.length,6);a.ok(g.axes.every(ax=>ax.point.every(Number.isFinite)));}
 });

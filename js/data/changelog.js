@@ -6,6 +6,7 @@
  * Cada línea en español y en inglés.
  */
 G.CHANGELOG = [
+  {d:'2026-10-16',title:['Nueve compañeros recuperados','Nine recovered partners'],new:[['Nueve Pokémon con animaciones reales, repertorios propios, estadísticas y variantes de aspecto identificadas.','Nine Pokémon with real animations, curated move pools, base stats and clearly labeled sprite variants.']]},
   {d:'2026-10-16',title:['Radar de seis estadísticas','Six-stat radar'],chg:[['La ficha de cada Pokémon muestra sus seis estadísticas en un radar con valores exactos y una escala común.','Pokémon details show six stats in a radar with exact values and a shared scale.']]},
   { d: '2026-10-16', title: ['Aprender sin cambiar de ataque', 'Learn without switching attacks'], chg: [['Aprender un movimiento conserva el ataque activo; cambia manualmente cuando quieras.', 'Learning a move keeps the current attack active; switch manually when you want.']] },
   {"d": "2026-10-16", "title": ["Controles compactos, repertorios y música", "Compact controls, learnsets and music"], "new": [["Controles especiales más pequeños y editables en móvil, ataques iniciales acordes a sus estadísticas, clasificación física/especial, banner mixto y música CC0 aleatoria opcional.", "Smaller editable touch special controls, stat-matched starting moves, physical/special labels, mixed-region gacha and optional random CC0 music."]], "fix": [["Ancho estable de cartas en móvil y confirmaciones de red sin esperar el temporizador.", "Stable mobile upgrade cards and network acknowledgements without timer waits."]]},

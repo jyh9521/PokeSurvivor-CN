@@ -167,3 +167,7 @@ Six-stat, ability and learnset inputs come from PokeAPI revision
 ## Additional original music
 
 Nine selected loops from **33 Free Chiptune Loops**, by **hyperpixel**, licensed **CC0 1.0 Universal**. Source: https://hyperpixel.itch.io/33-free-chiptune-loops . Original titles, source URLs, byte counts and SHA-256 values are in `assets/music/credits.json`; license notice is in `assets/music/LICENSE.txt`. These are original instrumental chiptune loops, not Nintendo soundtrack recordings. Reimport with `python tools/fetch-bgm.py`.
+
+## Additional catalog sprites (0.14.0)
+
+Nine added species use the same pinned SpriteCollab library. Nested form and shiny-folder artists are credited in [the additional catalog credits](assets/pokemon/CATALOG-CREDITS.md); source paths and hashes are recorded in `tools/localization/catalog-assets.json`.

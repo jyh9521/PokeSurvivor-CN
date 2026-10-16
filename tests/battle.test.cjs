@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),crypto=require('node:crypto'),scene=require('./battle-fixture.cjs');
 
-test('all 966 species have six real stats, native abilities, learned moves and a 12-18 attack pool',()=>{
- const {G}=scene();assert.equal(G.DEX.length,966);assert.equal(new Set(G.Moves.ALL.map(m=>m.id)).size,G.Moves.ALL.length);
+test('all 975 species have six real stats, native abilities, learned moves and a 12-18 attack pool',()=>{
+ const {G}=scene();assert.equal(G.DEX.length,975);assert.equal(new Set(G.Moves.ALL.map(m=>m.id)).size,G.Moves.ALL.length);
  for(const mon of G.DEX){const d=G.BattleDex.species[mon.dex];assert.equal(d.stats.length,6);assert.ok(d.stats.every(v=>Number.isInteger(v)&&v>0));assert.ok(d.ability.id&&d.ability.zh);const pool=G.Moves.poolFor(mon);assert.ok(pool.length>=12&&pool.length<=18,mon.dex);assert.ok(pool.every(id=>G.Moves.BY_ID[id].kind!=='buff'&&!G.Moves.BY_ID[id].specialOnly));}
  assert.deepEqual(Array.from(G.BattleDex.species[143].stats),[160,110,65,65,110,30]);assert.deepEqual(Array.from(G.BattleDex.species[242].stats),[255,10,10,75,135,55]);assert.equal(G.BattleDex.species[208].stats[2],200);
  assert.notDeepEqual(Array.from(G.Moves.poolFor(G.DEX_BY[143])),Array.from(G.Moves.poolFor(G.DEX_BY[242])));

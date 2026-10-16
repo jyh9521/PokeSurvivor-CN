@@ -83,7 +83,7 @@ test('all species, moves, evolutions, items and release notes are translated', (
   c.load('js/core/util.js');
   for (const f of ['pokedex', 'moves', 'items', 'changelog']) c.load(`js/data/${f}.js`);
   const T = c.G.T, han = /\p{Script=Han}/u;
-  assert.equal(c.G.DEX.length, 966);
+  assert.equal(c.G.DEX.length, 975);
   for (const p of c.G.DEX) assert.ok(han.test(T(p.name)), p.name);
   for (const m of Object.values(c.G.Moves.BY_ID)) {
     assert.ok(han.test(T(m.name, 'move')), m.name);

@@ -61,14 +61,17 @@ for r in rows('pokemon_forms.csv'):
     if r['is_mega'] != '1': continue
     pid=int(r['pokemon_id']);dex=int(pokemon[pid]['species_id'])
     mega.setdefault(dex,[]).append({'id':pid,'name':r['form_identifier'],'stats':[stats[pid][i] for i in range(1,7)],'types':types.get(pid,[]),'ability':{'id':abilities.get(primary.get(pid),''),'en':ability_names.get(primary.get(pid),{}).get('9',''),'es':ability_names.get(primary.get(pid),{}).get('7',''),'zh':ability_names.get(primary.get(pid),{}).get('12','')}})
-dexes = [int(d) for d in re.findall(r'"dex":(\d+)', (ROOT/'js/data/pokedex.js').read_text(encoding='utf-8'))]
+catalog = [json.loads(m[1]) for m in re.finditer(r'^\s*(\{"dex".*\}),?$', (ROOT/'js/data/pokedex.js').read_text(encoding='utf-8'), re.M)]
+entries = {p['dex']: p for p in catalog}
+dexes = list(entries)
 out = {}
 for dex in dexes:
-    aid=primary[dex]; names=ability_names[aid]
-    out[dex]={'stats':[stats[dex][i] for i in range(1,7)],'name':pokemon[dex]['identifier'],
-              'family':int(species[dex]['evolution_chain_id']), 'height':int(pokemon[dex]['height']), 'weight':int(pokemon[dex]['weight']),
+    pid=entries[dex].get('battleId',dex)
+    aid=primary[pid]; names=ability_names[aid]
+    out[dex]={'stats':[stats[pid][i] for i in range(1,7)],'name':pokemon[pid]['identifier'],
+              'family':int(species[dex]['evolution_chain_id']), 'height':int(pokemon[pid]['height']), 'weight':int(pokemon[pid]['weight']),
               'ability':{'id':abilities[aid],'en':names.get('9',abilities[aid]),'es':names.get('7',names.get('9','')),'zh':names.get('12',names.get('9',''))},
-              'learned':sorted(learned.get(dex,set())), 'mega':mega.get(dex,[])}
+              'learned':sorted(learned.get(pid,set()) or learned.get(dex,set())), 'mega':mega.get(dex,[])}
 data={'species':out,'moveClasses':{r['identifier']:['status','physical','special'][int(r['damage_class_id'])-1] for r in moves.values()},'moveNames':{k:v for k,v in move_names.items() if k in implemented}}
 for canonical,legacy in aliases.items(): data['moveClasses'][legacy]=data['moveClasses'][canonical]
 data['legacyAliases']=aliases

@@ -2282,3 +2282,6 @@ G.I18n.add({
   "1019": "蜜集大蛇",
   "1024": "太乐巴戈斯"
 }, 'zh-CN', 'pokemon');
+/* catalog-expansion names */
+G.I18n.add({"Jellicent":"胖嘟嘟","Pyroar":"火炎狮","Sirfetch’d":"葱游兵","Falinks":"列阵兵","Toedscool":"原野水母","Gimmighoul":"索财灵","Ting-Lu":"古鼎鹿","Miraidon":"密勒顿","Pecharunt":"桃歹郎"}, "zh-CN");
+G.I18n.add({"593":"胖嘟嘟","668":"火炎狮","865":"葱游兵","870":"列阵兵","948":"原野水母","999":"索财灵","1003":"古鼎鹿","1008":"密勒顿","1025":"桃歹郎"}, "zh-CN", "pokemon");

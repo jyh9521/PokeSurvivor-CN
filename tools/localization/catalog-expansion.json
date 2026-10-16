@@ -1,0 +1,205 @@
+{
+  "revision": "afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d",
+  "previousCount": 966,
+  "scope": "National species 1-1025; only real Idle/Walk/attack assets; no portrait stand-ins",
+  "additions": [
+    {
+      "dex": 593,
+      "path": "0593",
+      "shiny": "0593/0000/0001",
+      "battleId": 593,
+      "spriteForm": "",
+      "skillPool": [
+        "water-gun",
+        "bubble-beam",
+        "whirlpool",
+        "surf",
+        "hydro-pump",
+        "shadow-ball",
+        "hex",
+        "night-shade",
+        "ice-beam",
+        "icy-wind",
+        "giga-drain",
+        "substitute"
+      ],
+      "opening": "water-gun"
+    },
+    {
+      "dex": 668,
+      "path": "0668/0000/0000/0002",
+      "shiny": "0668/0000/0001/0002",
+      "battleId": 668,
+      "spriteForm": "Female sprite",
+      "skillPool": [
+        "ember",
+        "flamethrower",
+        "fire-spin",
+        "heat-wave",
+        "hyper-voice",
+        "hyper-beam",
+        "dark-pulse",
+        "will-o-wisp",
+        "aerial-ace",
+        "quick-attack",
+        "body-slam",
+        "substitute"
+      ],
+      "opening": "ember"
+    },
+    {
+      "dex": 865,
+      "path": "0865",
+      "shiny": "0865/0000/0001",
+      "battleId": 865,
+      "spriteForm": "",
+      "skillPool": [
+        "karate-chop",
+        "aerial-ace",
+        "wing-attack",
+        "metal-claw",
+        "psycho-cut",
+        "leaf-storm",
+        "quick-attack",
+        "body-slam",
+        "counter",
+        "rock-slide",
+        "poison-sting",
+        "shadow-sneak"
+      ],
+      "opening": "karate-chop"
+    },
+    {
+      "dex": 870,
+      "path": "0870/0002",
+      "shiny": "0870/0002/0001",
+      "battleId": 870,
+      "spriteForm": "Brass sprite",
+      "skillPool": [
+        "karate-chop",
+        "aura-sphere",
+        "counter",
+        "body-slam",
+        "rock-slide",
+        "bulldoze",
+        "metal-claw",
+        "aerial-ace",
+        "quick-attack",
+        "tackle",
+        "meteor-mash",
+        "stealth-rock"
+      ],
+      "opening": "karate-chop"
+    },
+    {
+      "dex": 948,
+      "path": "0948",
+      "shiny": "0948/0000/0001",
+      "battleId": 948,
+      "spriteForm": "",
+      "skillPool": [
+        "mud-shot",
+        "earth-power",
+        "bulldoze",
+        "giga-drain",
+        "leech-seed",
+        "bullet-seed",
+        "razor-leaf",
+        "leaf-storm",
+        "sludge",
+        "toxic",
+        "toxic-spikes",
+        "hex"
+      ],
+      "opening": "mud-shot"
+    },
+    {
+      "dex": 999,
+      "path": "0999/0001",
+      "shiny": "0999/0001/0001",
+      "battleId": 10263,
+      "spriteForm": "Roaming form",
+      "skillPool": [
+        "night-shade",
+        "shadow-ball",
+        "hex",
+        "shadow-sneak",
+        "confusion",
+        "psychic",
+        "dark-pulse",
+        "psybeam",
+        "substitute",
+        "hyper-beam",
+        "rock-throw",
+        "tackle"
+      ],
+      "opening": "shadow-ball"
+    },
+    {
+      "dex": 1003,
+      "path": "1003/0001",
+      "shiny": null,
+      "battleId": 1003,
+      "spriteForm": "Temporary sprite",
+      "skillPool": [
+        "bulldoze",
+        "earth-power",
+        "rock-throw",
+        "rock-slide",
+        "stealth-rock",
+        "spikes",
+        "bite",
+        "dark-pulse",
+        "body-slam",
+        "counter",
+        "mud-shot",
+        "hyper-beam"
+      ],
+      "opening": "bulldoze"
+    },
+    {
+      "dex": 1008,
+      "path": "1008/0001",
+      "shiny": "1008/0001/0001",
+      "battleId": 10268,
+      "spriteForm": "Low-Power Mode sprite",
+      "skillPool": [
+        "thunder-shock",
+        "thunderbolt",
+        "discharge",
+        "dragon-rage",
+        "dragon-pulse",
+        "flash-cannon",
+        "hyper-beam",
+        "aura-sphere",
+        "psybeam",
+        "air-slash",
+        "quick-attack",
+        "body-slam"
+      ],
+      "opening": "thunder-shock"
+    },
+    {
+      "dex": 1025,
+      "path": "1025",
+      "shiny": "1025/0000/0001",
+      "battleId": 1025,
+      "spriteForm": "",
+      "skillPool": [
+        "sludge",
+        "toxic",
+        "toxic-spikes",
+        "poison-sting",
+        "shadow-ball",
+        "hex",
+        "night-shade",
+        "shadow-sneak",
+        "dark-pulse",
+        "giga-drain",
+        "substitute",
+        "psychic"
+      ],
+      "opening": "sludge"
+    }
+  ]
+}

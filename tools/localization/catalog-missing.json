@@ -1,0 +1,389 @@
+{
+  "scope": "National species 1-1025",
+  "spriteRevision": "afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d",
+  "remaining": 50,
+  "missing": [
+    {
+      "dex": 514,
+      "en": "Simisear",
+      "zh": "爆香猿",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 516,
+      "en": "Simipour",
+      "zh": "冷水猿",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 520,
+      "en": "Tranquill",
+      "zh": "咕咕鸽",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 522,
+      "en": "Blitzle",
+      "zh": "斑斑马",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 523,
+      "en": "Zebstrika",
+      "zh": "雷电斑马",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 538,
+      "en": "Throh",
+      "zh": "投摔鬼",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 558,
+      "en": "Crustle",
+      "zh": "岩殿居蟹",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 564,
+      "en": "Tirtouga",
+      "zh": "原盖海龟",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 565,
+      "en": "Carracosta",
+      "zh": "肋骨海龟",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 591,
+      "en": "Amoonguss",
+      "zh": "败露球菇",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 592,
+      "en": "Frillish",
+      "zh": "轻飘飘",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 616,
+      "en": "Shelmet",
+      "zh": "小嘴蜗",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 618,
+      "en": "Stunfisk",
+      "zh": "泥巴鱼",
+      "availableActions": [
+        "Idle",
+        "Rotate"
+      ],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 626,
+      "en": "Bouffalant",
+      "zh": "爆炸头水牛",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 683,
+      "en": "Aromatisse",
+      "zh": "芳香精",
+      "availableActions": [
+        "Idle",
+        "Rotate"
+      ],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 732,
+      "en": "Trumbeak",
+      "zh": "喇叭啄鸟",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 733,
+      "en": "Toucannon",
+      "zh": "铳嘴大鸟",
+      "availableActions": [
+        "Idle",
+        "Rotate"
+      ],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 735,
+      "en": "Gumshoos",
+      "zh": "猫鼬探长",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 756,
+      "en": "Shiinotic",
+      "zh": "灯罩夜菇",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 765,
+      "en": "Oranguru",
+      "zh": "智挥猩",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 837,
+      "en": "Rolycoly",
+      "zh": "小炭仔",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 838,
+      "en": "Carkol",
+      "zh": "大炭车",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 839,
+      "en": "Coalossal",
+      "zh": "巨炭山",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 866,
+      "en": "Mr_Rime",
+      "zh": "踏冰人偶",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 878,
+      "en": "Cufant",
+      "zh": "铜象",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 879,
+      "en": "Copperajah",
+      "zh": "大王铜象",
+      "availableActions": [
+        "Walk",
+        "Idle",
+        "Rotate"
+      ],
+      "reason": "no-real-attack"
+    },
+    {
+      "dex": 893,
+      "en": "Zarude",
+      "zh": "萨戮德",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 929,
+      "en": "Dolliv",
+      "zh": "奥利纽",
+      "availableActions": [
+        "Idle",
+        "Rotate"
+      ],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 931,
+      "en": "Squawkabilly",
+      "zh": "怒鹦哥",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 942,
+      "en": "Maschiff",
+      "zh": "偶叫獒",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 943,
+      "en": "Mabosstiff",
+      "zh": "獒教父",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 944,
+      "en": "Shroodle",
+      "zh": "滋汁鼹",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 945,
+      "en": "Grafaiai",
+      "zh": "涂标客",
+      "availableActions": [
+        "Idle",
+        "Rotate"
+      ],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 947,
+      "en": "Brambleghast",
+      "zh": "怖纳噬草",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 949,
+      "en": "Toedscruel",
+      "zh": "陆地水母",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 950,
+      "en": "Klawf",
+      "zh": "毛崖蟹",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 954,
+      "en": "Rabsca",
+      "zh": "虫甲圣",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 956,
+      "en": "Espathra",
+      "zh": "超能艳鸵",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 962,
+      "en": "Bombirdier",
+      "zh": "下石鸟",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 973,
+      "en": "Flamigo",
+      "zh": "缠红鹤",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 986,
+      "en": "Brute_Bonnet",
+      "zh": "猛恶菇",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 990,
+      "en": "Iron_Treads",
+      "zh": "铁辙迹",
+      "availableActions": [
+        "Sleep",
+        "Idle",
+        "Rotate"
+      ],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 993,
+      "en": "Iron_Jugulis",
+      "zh": "铁脖颈",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 1001,
+      "en": "Wo_Chien",
+      "zh": "古简蜗",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 1002,
+      "en": "Chien_Pao",
+      "zh": "古剑豹",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 1014,
+      "en": "Okidogi",
+      "zh": "够赞狗",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 1020,
+      "en": "Gouging_Fire",
+      "zh": "破空焰",
+      "availableActions": [
+        "Idle",
+        "Rotate"
+      ],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 1021,
+      "en": "Raging_Bolt",
+      "zh": "猛雷鼓",
+      "availableActions": [
+        "Idle",
+        "Swing",
+        "Double",
+        "Rotate",
+        "Sleep"
+      ],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 1022,
+      "en": "Iron_Boulder",
+      "zh": "铁磐岩",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    },
+    {
+      "dex": 1023,
+      "en": "Iron_Crown",
+      "zh": "铁头壳",
+      "availableActions": [],
+      "reason": "missing-walk-or-sprite"
+    }
+  ]
+}

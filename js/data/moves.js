@@ -512,6 +512,7 @@
   function startFor(mon) {
     if(G.BattleRules){const pool=poolFor(mon),stats=G.BattleRules.stats(mon,G.BattleDex),bias=stats[3]>stats[1]*1.15?'special':stats[1]>stats[3]*1.15?'physical':null,old=mon.start||START[mon.types[0]],native=new Set(G.BattleDex.species[mon.dex]?.learned||[]);
       const basic=pool.filter(id=>!['counter','decoy','buff'].includes(BY_ID[id].kind)&&!BY_ID[id].specialOnly),score=id=>{const m=BY_ID[id];return (bias&&m.damageClass===bias?100:0)+(mon.types.includes(m.type)?40:0)+(native.has(id)?18:0)+(id===old?5:0)+Math.max(0,3-m.cd)*6-Math.max(0,m.cd-3)*15;};
+      if(basic.includes(mon.opening)&&(!bias||BY_ID[mon.opening].damageClass===bias))return mon.opening;
       return basic.sort((a,b)=>score(b)-score(a)||a.localeCompare(b))[0]||pool[0]||'tackle';}
     if (mon.start && BY_ID[mon.start]) return mon.start;
     for (const t of mon.types) if (START[t]) return START[t];

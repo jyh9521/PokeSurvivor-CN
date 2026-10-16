@@ -24,6 +24,7 @@
     return {key,...TRAITS[key],source:data?.species?.[mon.dex]?.ability,adapted:!groups[key].includes(id)};
   }
   function pool(mon,data,defs){const entry=data?.species?.[mon.dex];if(!entry)return null;
+    if(Array.isArray(mon.skillPool))return [...new Set(mon.skillPool)].filter(id=>defs[id]&&defs[id].kind!=='buff'&&!defs[id].specialOnly).slice(0,18);
     const family=Object.values(data.species).filter(s=>s.family===entry.family),native=new Set(entry.learned),learned=new Set(family.flatMap(s=>s.learned));
     const priority=id=>native.has(id)?0:learned.has(id)?1:2;
     const ids=[...learned,...(ROLES[role(mon,data)]||[]),'tackle','quick-attack','hyper-voice'];
