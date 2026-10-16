@@ -1,7 +1,7 @@
 /* NAS account controls live outside the generic settings renderer. */
 G.NasUI=(()=>{
   const T=s=>G.T(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const states={ok:'Guardado en navegador y NAS',pending:'Pendiente de sincronizar con NAS',syncing:'Sincronizando con NAS',offline:'Sin conexión: copia local conservada',conflict:'Conflicto: conserva ambas partidas', 'auth-required':'Vuelve a entrar para sincronizar', 'storage-error':'El navegador no pudo guardar la copia'};
+  const states={'device-busy':'Otra sesión controla la partida. Revisa tus dispositivos.',ok:'Guardado en navegador y NAS',pending:'Pendiente de sincronizar con NAS',syncing:'Sincronizando con NAS',offline:'Sin conexión: copia local conservada',conflict:'Conflicto: conserva ambas partidas', 'auth-required':'Vuelve a entrar para sincronizar', 'storage-error':'El navegador no pudo guardar la copia'};
   function update(){const el=document.getElementById('nas-state');if(el)el.textContent=T(states[G.DB.syncState]||G.DB.syncState);const reauth=document.querySelector('#nas-panel [data-nas="reauth"]');if(reauth)reauth.hidden=G.DB.syncState!=='auth-required';}
   G.DB.onSync(update);
   function render(box){if(!G.NAS?.enabled||G.DB.guest||!G.NAS.user)return;
@@ -11,12 +11,13 @@ G.NasUI=(()=>{
       <button class="btn small" data-nas="reauth" ${G.DB.syncState==='auth-required'?'':'hidden'}>${T('Revalidar cuenta de juego')}</button>
       <button class="btn small" data-nas="sync">${T('Sincronizar ahora')}</button>
       <button class="btn small" data-nas="export">${T('Exportar copia local')}</button>
-      ${G.NAS.conflict?`<p>${T('Conflicto: conserva ambas partidas')}</p><button class="btn small" data-nas="browser">${T('Usar copia del navegador')}</button> <button class="btn small" data-nas="nas">${T('Usar copia del NAS')}</button>`:''}`;
+      ${G.NAS.conflict?`<p>${T('Conflicto: conserva ambas partidas')} · ${esc((G.NAS.conflict.differences||[]).map(k=>T(k==='economy'?'Monedas, tickets o recompensas':k==='base-expired'?'Copia base caducada':k)).join(' / '))}</p><button class="btn small" data-nas="browser">${T('Usar copia del navegador')}</button> <button class="btn small" data-nas="nas">${T('Usar copia del NAS')}</button>`:''}`;
+    if(G.NAS.conflict?.save){const difference=document.createElement('p'),a=G.DB.save,b=G.NAS.conflict.save;difference.className='sub';difference.textContent=T('Navegador / NAS')+' · '+T('Monedas')+': '+a.coins+' / '+b.coins+' · '+T('Tickets')+': '+a.tickets.t1+','+a.tickets.t10+' / '+b.tickets.t1+','+b.tickets.t10+' · '+T('Colección')+': '+Object.keys(a.owned).length+' / '+Object.keys(b.owned).length;panel.append(difference);}
     const nickname=document.createElement('div');nickname.className='set-row nickname-row';
     const label=document.createElement('label');label.textContent=T('Apodo público');label.htmlFor='nas-nickname';
     const input=document.createElement('input');input.id='nas-nickname';input.className='field';input.maxLength=32;input.value=G.NAS.user.nick||G.NAS.user.name;input.setAttribute('translate','no');input.setAttribute('autocomplete','off');
     const button=document.createElement('button');button.className='btn small';button.id='nas-nickname-save';button.textContent=T('Guardar apodo');button.onclick=async()=>{button.disabled=true;const r=await G.NAS.setNickname(input.value);button.disabled=false;G.UI.toast(r.ok?T('Apodo actualizado; tu cuenta de acceso no cambia.'):r.error);if(r.ok)G.SettingsUI.open('acc');};
-    nickname.append(label,input,button);box.append(nickname,panel);G.Announcements?.controls(box);
+    nickname.append(label,input,button);box.append(nickname,panel);G.ServerControls?.render(box);G.Announcements?.controls(box);
     panel.querySelectorAll('[data-nas]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{
       const action=b.dataset.nas;
       if(action==='reauth'){const p=await G.Dialog.password(T('Contraseña de tu cuenta de juego'));if(p){const r=await G.NAS.reauthenticate(p);if(!r.ok)throw Error(r.error);}}

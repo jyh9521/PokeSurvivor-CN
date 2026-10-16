@@ -23,7 +23,7 @@
     function channel(p,dc){p.dc=dc;dc.onopen=()=>{if(links.get(p.uid)!==p||p.dc!==dc)return;clearTimeout(p.timer);p.reason='connected';changed(p.uid,'direct');};
       dc.onmessage=e=>{if(p.dc!==dc||links.get(p.uid)!==p)return;try{receive(p.uid,JSON.parse(e.data));}catch{}};
       dc.onclose=()=>{if(p.dc===dc)fallback(p);};dc.onerror=()=>{if(p.dc===dc)fallback(p);};}
-    function setup(p,attempt){discard(p);p.attempts=(p.attempts||0)+1;p.reason='connecting';p.attempt=attempt;p.candidates=[];const pc=p.pc=new Peer({iceServers});
+    function setup(p,attempt){discard(p);p.attempts=(p.attempts||0)+1;p.reason='connecting';p.path=null;p.attempt=attempt;p.candidates=[];const pc=p.pc=new Peer({iceServers});
       pc.onicecandidate=e=>{if(p.pc===pc&&e.candidate)signal(p.uid,{attempt,kind:'candidate',candidate:e.candidate.toJSON()});};
       pc.ondatachannel=e=>{if(p.pc===pc&&e.channel.label==='game')channel(p,e.channel);else e.channel.close();};
       pc.onconnectionstatechange=()=>{if(p.pc===pc&&['failed','disconnected','closed'].includes(pc.connectionState))fallback(p,'connection-'+pc.connectionState);};
@@ -41,9 +41,13 @@
     function send(uid,data){const p=links.get(uid);if(!p||data.k!=='f')return relay(uid,data);if(p.overflow)return false;
       if(data.ev?.length){if(p.pending.size>=256){p.overflow=true;changed(uid,'overflow');return false;}const packet={k:'rtc-wire',room,lane:'event',seq:++p.eventSeq,data:{k:'f',ev:data.ev}};p.pending.set(packet.seq,{packet,at:now()});wire(p,packet);}
       const snapshot={...data,ev:[]};return wire(p,{k:'rtc-wire',room,lane:'state',seq:++p.stateSeq,data:snapshot});}
-    function tick(){for(const p of links.values()){for(const e of p.pending.values())if(now()-e.at>=800){relay(p.uid,e.packet);e.at=now();}if(p.online)offer(p);}}
+    async function inspect(p){const pc=p.pc;if(!pc||p.inspecting||now()<(p.inspectAt||0))return;p.inspecting=true;p.inspectAt=now()+2000;
+      try{const values=await pc.getStats();if(p.pc!==pc)return;let pair;values.forEach(s=>{if(s.type==='transport'&&s.selectedCandidatePairId)pair=values.get(s.selectedCandidatePairId);});if(!pair)values.forEach(s=>{if(s.type==='candidate-pair'&&s.state==='succeeded'&&s.nominated)pair=s;});
+        if(pair){const local=values.get(pair.localCandidateId),remote=values.get(pair.remoteCandidateId);p.path={rttMs:Number.isFinite(pair.currentRoundTripTime)?Math.round(pair.currentRoundTripTime*1000):null,localType:local?.candidateType||'unknown',remoteType:remote?.candidateType||'unknown',protocol:local?.protocol||'unknown'};}
+      }catch{}finally{p.inspecting=false;}}
+    function tick(){for(const p of links.values()){inspect(p);for(const e of p.pending.values())if(now()-e.at>=800){relay(p.uid,e.packet);e.at=now();}if(p.online)offer(p);}}
     return {sync,send,receive,signal:accept,tick,reset,mode:uid=>links.get(uid)?.dc?.readyState==='open'?'direct':'relay',
-      stats:()=>({webrtcAvailable:!!Peer,peerLinks:[...links.values()].map(p=>({mode:p.dc?.readyState==='open'?'direct':'relay',connection:p.pc?.connectionState||'closed',ice:p.pc?.iceConnectionState||'closed',reason:p.reason||(!Peer?'unavailable':'waiting'),attempts:p.attempts||0})),directPeers:[...links.values()].filter(p=>p.dc?.readyState==='open').length,relayPeers:[...links.values()].filter(p=>p.dc?.readyState!=='open').length,pendingEvents:[...links.values()].reduce((n,p)=>n+p.pending.size,0)})};
+      stats:()=>({webrtcAvailable:!!Peer,peerLinks:[...links.values()].map(p=>({mode:p.dc?.readyState==='open'?'direct':'relay',connection:p.pc?.connectionState||'closed',ice:p.pc?.iceConnectionState||'closed',reason:p.reason||(!Peer?'unavailable':'waiting'),attempts:p.attempts||0,path:p.dc?.readyState==='open'?p.path||null:null})),directPeers:[...links.values()].filter(p=>p.dc?.readyState==='open').length,relayPeers:[...links.values()].filter(p=>p.dc?.readyState!=='open').length,pendingEvents:[...links.values()].reduce((n,p)=>n+p.pending.size,0)})};
   }
   return {create};
 });

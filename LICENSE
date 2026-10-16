@@ -1,7 +1,7 @@
 PokéSurvivor — licencias
 
 1) CÓDIGO: el código publicado hasta JPTER78/pokesurvivor@b297089 conserva MIT.
-   EXCEPCIÓN: las partes importadas/adaptadas desde 4de8495 (colocación de controles,
+   EXCEPCIÓN: las partes importadas/adaptadas desde 4de8495, bd7f3dd y 5bbc3b2 (sincronización, actualización urgente, colocación de controles,
    joystick fijo y centrado de avisos) se rigen por PolyForm Noncommercial 1.0.0.
    Consulta UPSTREAM-NOTICES.md y LICENSE-NONCOMMERCIAL.md. Las distribuciones
    y bundles que incluyen esas partes deben conservar esos avisos y licencia.

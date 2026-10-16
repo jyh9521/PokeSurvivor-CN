@@ -75,7 +75,14 @@ G.Game = (() => {
   // ---------------- run ----------------
 
   /** @param coop  { seed, host, members } para una partida en grupo */
-  function startRun(coop = null) {
+  let starting=false;
+  async function startRun(coop = null) {
+    if(starting)return;starting=true;
+    try{if(G.NAS?.enabled&&!(await G.NAS.prepareRun(coop))){if(coop&&G.Social.room?.isHost)await G.Social.setOpen(true);return;}
+      beginRun(coop);
+    }finally{starting=false;}
+  }
+  function beginRun(coop = null) {
     holdBy = []; awayBy = null;
     openItem = null; laterItems.length = 0;
     const save = G.DB.save;
@@ -276,6 +283,7 @@ G.Game = (() => {
     const coop = !!pl.uid;                    // sólo las partidas en grupo le ponen uid
     const wasHost = !!pl.coopHost;
     const team = coop ? G.Coop.members.slice() : [];
+    const teamStats=coop?G.Coop.teamStats:[];
     if (G.Coop.active) G.Coop.end();
     if (coop) G.Social.setPlaying(false);
     state = 'over';
@@ -314,11 +322,12 @@ G.Game = (() => {
     // Si la partida se ha tocado (ver clean()), no sube al ranking (sin avisar); lo demás, sí.
     const ok = clean();
     if (ok && !coop) G.Ranking.submitSolo(Object.assign(mark, { dex: pl.dex, shiny: pl.shiny }));
-    else if (ok && wasHost) G.Ranking.submitGroup(Object.assign(mark, { members: team }));
+    else if (ok && wasHost) G.Ranking.submitGroup(Object.assign(mark, { members: team,teamStats }));
 
+    if(!ok||(!wasHost&&coop))G.NAS?.finishRun();
     G.RunUI.showOver({
       dead, time, level: pl.level, kills: pl.kills, bosses: pl.bosses, coins, record, t1: pl.t1, t10: pl.t10, judge,
-      moves: pl.moves, caught,
+      moves: pl.moves, caught,team,teamStats,
       breakdown: Object.entries(parts).filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join(' · ') +
                  (mul > 1 ? ` · ×${mul.toFixed(2)} Fortuna` : '')
     }, () => { pl = null; G.Flow.afterRun(); });
@@ -673,7 +682,7 @@ G.Game = (() => {
     const helpers = G.Coop.puppets().filter(p => !p.dead && G.U.dist2(p.x,p.y,pl.x,pl.y)<56*56).length;
     const helper=helpers>0;
     pl.reviveT = helper ? (pl.reviveT || 0) + dt*(1+0.5*Math.max(0,helpers-1)) : Math.max(0, (pl.reviveT || 0) - dt * 0.5);
-    if (pl.reviveT >= G.Player.REVIVE_TIME) pl.revive(0.5);
+    if (pl.reviveT >= G.Player.REVIVE_TIME){G.Coop.rescued(pl.uid);pl.revive(0.5);}
   }
 
   /** Anfitrión: si caéis todos, se acaba (tras ver caer al último). */
@@ -930,6 +939,7 @@ G.Flow = {
     if (G.Game.state !== 'ui') G.Game.toUI();
     G.Audio.music('village');
     G.MenuUI.open();
+    G.NAS?.refreshSave().then(ok=>{if(ok&&G.Game.state==='ui'&&G.UI.isOpen('scr-menu'))G.MenuUI.open();});
     G.LoginUI.offerRecovery();
   },
   /** Al cerrar el resumen: a la sala si sigues en una, si no al menú. */

@@ -97,7 +97,7 @@
     }
 
     /** @param eff  'super' | 'weak' | null (tabla de tipos, sólo para enseñarlo) */
-    hurt(amount, color = '#fff', dirX = 0, dirY = 0, knock = 0, eff = null) {
+    hurt(amount, color = '#fff', dirX = 0, dirY = 0, knock = 0, eff = null, source = null) {
       if (this.dead) return;
       const d = Math.max(1, Math.round(amount));
       // Copia de un enemigo del anfitrión: el golpe se le manda a él, que es
@@ -115,7 +115,9 @@
         if (a >= d) { G.FX.dmgText(this.x, this.y - this.bodyH - 4, d, '#9fd8ff'); this.flash = 0.05; return; }
         amount = d - a;
       }
+      const effective=Math.min(this.hp,Math.max(1,Math.round(amount)));
       this.hp -= Math.max(1, Math.round(amount));
+      G.Coop.noteDamage?.(this,source,effective,this.hp<=0);
       G.Judgment.noteDmg(amount, this);
       this.showHurt(d, color, dirX, dirY, eff);
       if (knock > 0 && !this.boss) {

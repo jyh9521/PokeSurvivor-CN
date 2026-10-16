@@ -1,11 +1,15 @@
 /* NAS adapters at the existing DB/Social/Net/Ranking seams; static/file stays local. */
 G.NAS = (() => {
+  performance.setResourceTimingBufferSize?.(1000);
   const local=G.DB,oldSocial=G.Social,oldNet=G.Net,oldRanking=G.Ranking;
   const clientId=[...crypto.getRandomValues(new Uint8Array(16))].map(n=>n.toString(16).padStart(2,'0')).join('');
   let enabled=false,available=false,user=null,save=null,rev=0,pending=false,conflict=null,guest=false;
   let reconnectAt=0,reconnectTimer=null,socket=null,social={friends:[],invites:[],room:null},activeRoom=null,change=0,flushing=null,retry=0,request=null;
   const syncListeners=new Set(),socialListeners=new Set(),messages=new Set(),peers=new Set();
   let state='local',storageOk=true,networkTimer=null,nextProbe=0,serverBuffered=0,disconnects=0;
+  let operations={draining:false},deviceBusy=false;
+  const operationListeners=new Set();
+  function receiveOperations(value){operations=value;operationListeners.forEach(f=>f(value));G.Updater?.emergency(value.emergency);}
   let health=G.RelayHealth.create();
   const probesAnswered=new Map();
   const flow=G.RelayFlow.create({onSent:value=>{if(value.type==='relay'&&(value.data?.k==='f'||value.data?.lane==='state'))health.tx(value.to);}});
@@ -18,7 +22,7 @@ G.NAS = (() => {
     const peers=social.room?.isHost?social.room.members.filter(m=>m.uid!==user?.id).map(m=>m.uid):[social.room?.host];
     if(activeRoom)for(const peer of peers.filter(Boolean)){const id=health.probe(peer);if(id)relay(peer,{k:'nas-diagnostic-ping',id});}
   }
-  function metrics(){const links=direct.stats();return {...links,gameTransport:links.directPeers?(links.relayPeers?'mixed':'webrtc-direct'):'websocket-relay',probeTransport:'websocket-relay',...health.sample({connected:socket?.readyState===1,targetHz:1/interval(),bufferedBytes:socket?.bufferedAmount||0,serverBufferedBytes:serverBuffered,coalescedFrames:flow.stats().coalesced,queuedSnapshots:flow.stats().pending,disconnects,background:document.hidden})};}
+  function metrics(){const links=direct.stats();const entries=performance.getEntriesByType('resource').filter(r=>{try{const u=new URL(r.name);return u.origin===location.origin&&/^\/(css|js|assets)\//.test(u.pathname);}catch{return false;}});const resources=[...entries.filter(r=>/\.(?:js|css|woff2?|ttf)(?:[?#]|$)/.test(r.name)).slice(-48),...entries.filter(r=>! /\.(?:js|css|woff2?|ttf)(?:[?#]|$)/.test(r.name)).slice(-16)].map(r=>({kind:r.initiatorType,resource:new URL(r.name).pathname.split('/').at(-1),durationMs:Math.round(r.duration),ttfbMs:Math.max(0,Math.round(r.responseStart-r.requestStart)),transferBytes:r.transferSize,encodedBytes:r.encodedBodySize,decodedBytes:r.decodedBodySize,protocol:r.nextHopProtocol,compressed:r.encodedBodySize>0&&r.decodedBodySize>r.encodedBodySize,cached:r.transferSize===0&&r.decodedBodySize>0}));return {...links,startupResources:resources,gameTransport:links.directPeers?(links.relayPeers?'mixed':'webrtc-direct'):'websocket-relay',probeTransport:'websocket-relay',...health.sample({connected:socket?.readyState===1,targetHz:1/interval(),bufferedBytes:socket?.bufferedAmount||0,serverBufferedBytes:serverBuffered,coalescedFrames:flow.stats().coalesced,queuedSnapshots:flow.stats().pending,disconnects,background:document.hidden})};}
   const clone=v=>JSON.parse(JSON.stringify(v));
   const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;}};
   const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true;}catch{storageOk=false;setState('storage-error');return false;}};
@@ -42,16 +46,16 @@ G.NAS = (() => {
     localSave.serverRewards=clone(remote);
   }
   function fresh(name){local.playAsGuest();const s=clone(local.save);s.name=name;return s;}
-  function load(result){user=result.user;guest=false;const cached=read(key());rev=result.rev;
+  function load(result){deviceBusy=false;user=result.user;guest=false;const cached=read(key());rev=result.rev;
     request=cached?.request||null;
-    if(cached?.pending){save=cached.save;pending=true;rev=cached.rev;if(cached.rev!==result.rev&&!request)conflict={rev:result.rev,save:result.save};else conflict=cached.conflict;}
+    if(cached?.pending){save=cached.save;pending=true;rev=cached.rev;conflict=cached.conflict||null;}
     else {save=result.save||fresh(user.name);pending=!result.save;conflict=null;}
     write('ps.nas.session',user);persist();setState(conflict?'conflict':pending?'pending':'ok');connect();if(pending&&!conflict)flush();
   }
   function enable(){enabled=true;G.LOCAL_ONLY=false;document.title=G.T('PokéSurvivor · NAS autohospedado');document.getElementById('f-pass').minLength=8;document.querySelectorAll('#scr-menu [data-go="friends"],#scr-menu [data-go="rank"]').forEach(b=>b.classList.remove('hidden'));}
   async function ready(){const restored=await local.ready();if(G.NAS_DISCOVERY!==true||!/^https?:$/.test(location.protocol))return restored;
     const cachedUser=read('ps.nas.session');
-    try{const cfg=await api('config');if(cfg.backend!=='nas')return restored;enable();write('ps.nas.backend',{origin:location.origin});
+    try{const cfg=await api('config');if(cfg.backend!=='nas')return restored;enable();receiveOperations(cfg.operations||{draining:false});write('ps.nas.backend',{origin:location.origin});
       try{const result=await api('session');available=true;load(result);return true;}catch(e){if(e.status!==401)throw e;available=true;user=null;save=null;return false;}
     }catch{
       const previous=read('ps.nas.backend');if(previous?.origin===location.origin&&cachedUser){const cached=read('ps.nas.save.'+cachedUser.id);if(cached?.save){enable();user=cachedUser;save=cached.save;rev=cached.rev;pending=!!cached.pending;conflict=cached.conflict;request=cached.request||null;setState('offline');return true;}}
@@ -59,15 +63,15 @@ G.NAS = (() => {
     }
   }
   async function auth(name,password,register){if(!enabled)return (register?local.register:local.login)(name,password);
-    try{const result=await api(register?'register':'login',{name,password});available=true;load(result);return {ok:true,isNew:!save.partner};}catch(e){return {ok:false,error:e.message,status:e.status};}}
+    try{const result=await api(register?'register':'login',{name,password});available=true;const previous=socket;socket=null;previous?.close();load(result);return {ok:true,isNew:!save.partner};}catch(e){return {ok:false,error:e.message,status:e.status};}}
   async function flush(){if(!enabled||!user||guest||!pending||conflict)return !pending;if(flushing)return flushing;
     flushing=(async()=>{setState('syncing');let turns=0;
       try{while(pending&&!conflict&&++turns<=3){const version=change;
-          if(!request){const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);request={rev,save:clone(save),mutation:[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('')};persist();}
+          if(!request){const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);request={rev,save:clone(save),autoMerge:true,mutation:[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('')};persist();}
           const snapshot=clone(request.save),result=await api('save',request,'PUT');request=null;available=true;rev=result.rev;
-          if(change===version && JSON.stringify(save)===JSON.stringify(snapshot)){assign(save,result.save);pending=false;}else reconcileRewards(save,result.save);persist();}
-        setState(pending?'pending':'ok');return !pending;
-      }catch(e){available=!!e.status&&e.status!==401;if(e.status===409){conflict=e.current;setState('conflict');}else setState(e.status===401?'auth-required':'offline');persist();return false;}
+          if(change===version && JSON.stringify(save)===JSON.stringify(snapshot)){assign(save,result.save);pending=false;}else {const rebased=G.SaveMerge.merge(snapshot,save,result.save);if(rebased.conflicts.length){conflict={...result,differences:rebased.conflicts};pending=true;}else{assign(save,rebased.save);pending=JSON.stringify(save)!==JSON.stringify(result.save);}}persist();}
+        setState(conflict?'conflict':pending?'pending':'ok');return !pending;
+      }catch(e){available=!!e.status&&e.status!==401;if(e.status===409){conflict=e.current;setState('conflict');}else if(e.status===423){deviceBusy=true;setState('device-busy');}else setState(e.status===401?'auth-required':'offline');persist();return false;}
       finally{flushing=null;if(pending&&!conflict){clearTimeout(retry);retry=setTimeout(flush,5000);}}
     })();return flushing;
   }
@@ -78,10 +82,10 @@ G.NAS = (() => {
   async function logout(){if(!enabled)return local.logout();await flush();if(pending||conflict){G.UI?.toast('还有未同步进度，请先处理存档同步。',4000);return false;}
     try{await api('logout',{});}catch{}clearTimeout(retry);user=null;save=null;guest=false;socket?.close();socket=null;social={friends:[],invites:[],room:null};activeRoom=null;
     try{localStorage.removeItem('ps.nas.session');}catch{}setState('local');notify();return true;}
-  function connect(){if(!enabled||!user||guest)return;if(performance.now()<reconnectAt){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,Math.ceil(reconnectAt-performance.now())+25);return;}if(socket&&(socket.readyState===0||socket.readyState===1))return;
+  function connect(){if(deviceBusy)return;if(!enabled||!user||guest)return;if(performance.now()<reconnectAt){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,Math.ceil(reconnectAt-performance.now())+25);return;}if(socket&&(socket.readyState===0||socket.readyState===1))return;
     const ws=new WebSocket((location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+'/api/ws');socket=ws;
-    ws.onopen=()=>{peers.forEach(f=>f(user?.id,'relay'));available=true;serverBuffered=0;health=G.RelayHealth.create();nextProbe=0;ws.send(JSON.stringify({type:'social',client:clientId}));clearInterval(networkTimer);networkTimer=setInterval(networkTick,100);networkTick();if(pending&&!conflict)flush();};
-    ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='social')receiveSocial(m.data);if(m.type==='announcement')G.Announcements?.receive(m.data);
+    ws.onopen=()=>{deviceBusy=false;peers.forEach(f=>f(user?.id,'relay'));available=true;serverBuffered=0;health=G.RelayHealth.create();nextProbe=0;ws.send(JSON.stringify({type:'social',client:clientId}));clearInterval(networkTimer);networkTimer=setInterval(networkTick,100);networkTick();if(pending&&!conflict)flush();};
+    ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='social')receiveSocial(m.data);if(m.type==='operations')receiveOperations(m.data);if(m.type==='announcement')G.Announcements?.receive(m.data);
       if(m.type==='pong'){if(health.pong('nas',m.id))serverBuffered=Math.max(0,Number(m.buffered)||0);}
       if(m.type==='relay'){
         if(m.data?.k==='nas-diagnostic-ping'){if(connectedPeer(m.from)&&typeof m.data.id==='string'&&m.data.id.length<=40&&performance.now()-(probesAnswered.get(m.from)??-Infinity)>=500){probesAnswered.set(m.from,performance.now());relay(m.from,{k:'nas-diagnostic-pong',id:m.data.id});}}
@@ -89,8 +93,8 @@ G.NAS = (() => {
         else if(m.data?.k==='rtc-signal')direct.signal(m.from,m.data);else if(m.data?.k==='rtc-wire')direct.receive(m.from,m.data);else deliver(m.from,m.data);
       }if(m.type==='room-closed'){receiveSocial({...social,room:null});activeRoom=null;}}
       catch(e){console.warn('[NAS]',e.message);}};
-    ws.onclose=e=>{if(socket!==ws)return;clearInterval(networkTimer);networkTimer=null;flow.clear();serverBuffered=0;disconnects++;socket=null;reconnectAt=performance.now()+3000;available=e.code===4001;if(e.code===4001){direct.reset();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,'closed'));});social.room=null;activeRoom=null;}else{peers.forEach(f=>f(user?.id,'reconnecting'));direct.sync(social.room?.id,user?.id,social.room?.host,(social.room?.members||[]).map(m=>({...m,connected:false})));}notify();
-      if(e.code!==4001&&user&&!guest){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,3025);}};
+    ws.onclose=e=>{if(socket!==ws)return;if([4001,4002,4003].includes(e.code)){deviceBusy=true;G.UI?.toast(G.T(e.code===4003?'La sesión fue revocada.':'Otra sesión controla la partida. Revisa tus dispositivos.'),6000);setState(e.code===4003?'auth-required':'device-busy');}clearInterval(networkTimer);networkTimer=null;flow.clear();serverBuffered=0;disconnects++;socket=null;reconnectAt=performance.now()+3000;available=e.code===4001;if([4001,4002,4003].includes(e.code)){direct.reset();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,'closed'));});social.room=null;activeRoom=null;}else{peers.forEach(f=>f(user?.id,'reconnecting'));direct.sync(social.room?.id,user?.id,social.room?.host,(social.room?.members||[]).map(m=>({...m,connected:false})));}notify();
+      if(!deviceBusy&&user&&!guest){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,3025);}};
   }
   function proxy(original,overrides,always=[]){return new Proxy(original,{get(target,p){return (enabled||always.includes(p))&&p in overrides?Reflect.get(overrides,p):Reflect.get(target,p);}});}
   G.DB=proxy(local,{
@@ -132,8 +136,16 @@ G.NAS = (() => {
   },['on','off','onPeer']);
   function connectedPeer(uid){return socket?.readyState===1&&social.room?.members.some(m=>m.uid===uid);}
   let runPromise=null;const reported=new Set();
-  function runStarted(mode){runPromise=api('run',{mode}).catch(()=>null);}
-  async function submit(mode,mark){const run=await runPromise;if(!run)return;try{await api('score',{mode,mark,run:run.id});}catch(e){G.UI?.toast('NAS 排行榜：'+e.message,3000);}}
+  function runStarted(mode){if(!runPromise)runPromise=api('run',{mode}).catch(()=>null);}
+  async function submit(mode,mark){const run=await runPromise;runPromise=null;if(!run)return;try{await api('score',{mode,mark,run:run.id});}catch(e){G.UI?.toast('NAS 排行榜：'+e.message,3000);}finally{await api('run/end',{run:run.id}).catch(()=>{});}}
+  async function prepareRun(coop){if(!enabled||guest)return true;if(runPromise)return true;
+    if(deviceBusy){G.UI.toast(G.T('Otra sesión controla la partida. Revisa tus dispositivos.'));return false;}
+    if(!(await refreshSave())||pending||conflict){if(!coop&&state==='offline'&&!conflict&&!operations.draining)return true;return false;}
+    try{receiveOperations(await api('operations'));if(operations.draining)throw Error('服务器维护排空中，暂不开始新局。');
+      if(!coop||coop.host===user.id){const value=await api('run',{mode:coop?'g':'s'});runPromise=Promise.resolve(value);}return true;
+    }catch(e){G.UI.toast(e.message,5000);return false;}}
+  async function finishRun(){const run=await runPromise;runPromise=null;if(run)await api('run/end',{run:run.id}).catch(()=>{});}
+
   const board=(m,p,d)=>m+'_'+p+(d?'_p'+d:'');
   const ranking=(m,p,d,f=false)=>api(`ranking?mode=${m}&period=${p}&dex=${d||0}&friends=${f?1:0}`);
   G.Ranking=proxy(oldRanking,{runStarted,submitSolo:m=>submit('s',m),submitGroup:m=>submit('g',m),board,
@@ -142,9 +154,12 @@ G.NAS = (() => {
   });
   window.addEventListener('online',()=>{if(enabled&&user){connect();refreshSave();}});
   document.addEventListener('visibilitychange',()=>{if(enabled&&user){if(document.visibilityState==='hidden'){if(pending)flush();}else refreshSave();}});
-  async function refreshSave(){if(!enabled||!user||guest)return false;if(pending||conflict)return flush();const version=change;try{const r=await api('save');available=true;if(change!==version||pending)return flush();if(r.save&&r.rev!==rev){rev=r.rev;assign(save,r.save);persist();}setState('ok');return true;}catch(e){setState(e.status===401?'auth-required':'offline');return false;}}
+  async function refreshSave(){if(G.Game&&!['ui','over'].includes(G.Game.state))return !pending&&!conflict;if(!enabled||!user||guest)return false;if(pending||conflict)return flush();const version=change;try{const r=await api('save');available=true;if(change!==version||pending)return flush();if(r.save&&r.rev!==rev){rev=r.rev;assign(save,r.save);persist();}setState('ok');return true;}catch(e){setState(e.status===401?'auth-required':'offline');return false;}}
   async function setNickname(nick){try{const r=await api('nickname',{nick});user=r.user;write('ps.nas.session',user);persist();G.UI?.refreshCoins();await refresh();return {ok:true};}catch(e){return {ok:false,error:e.message,status:e.status};}}
   async function upgrade(op,dex,id){if(!(await flush())||conflict)return {ok:false,error:'请先同步存档并处理冲突。'};try{const uid=user.id,version=change;const r=await api('upgrades',{op,dex,id,rev});if(user?.id!==uid)return {ok:false,error:'账号已切换。'};if(change!==version){conflict={save:r.save,rev:r.rev};pending=true;persist();setState('conflict');return {ok:false,error:'操作期间存档发生变化，两份进度已保留，请处理同步冲突。'};}assign(save,r.save);rev=r.rev;persist();setState('ok');return {ok:true,...r.result};}catch(e){await refreshSave();return {ok:false,error:e.message,status:e.status};}}
-  return {announce:text=>action('announcement',{text}),get canAnnounce(){return social.me?.canAnnounce===true;},upgrade,setNickname,networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
+  return {prepareRun,finishRun,onOperations:f=>{operationListeners.add(f);f(operations);},get operations(){return operations;},get isAdmin(){return user?.name?.toLowerCase()==='jyh9521';},
+    async devices(){return api('devices');},async revokeDevice(id,password){return api('devices/revoke',{id,password});},async takeover(password){await api('devices/takeover',{password});deviceBusy=false;connect();return refreshSave();},
+    async administer(op,message,confirm){const value=await api('admin/operations',{op,message,confirm});receiveOperations(value);return value;},adminStatus:()=>api('admin/status'),
+    announce:text=>action('announcement',{text}),get canAnnounce(){return social.me?.canAnnounce===true;},upgrade,setNickname,networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
   };
 })();

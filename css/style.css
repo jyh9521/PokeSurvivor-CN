@@ -1014,3 +1014,8 @@ body[data-input=gamepad] .btn.danger.pad-focus{background:linear-gradient(#b73b5
 
 /* Startup verifies the actual stylesheet, independently of the main bundle. */
 :root{--ps-style-ready:1}
+
+/* Responsive account/device administration; never a gameplay input layer. */
+.server-controls{padding:12px;margin-top:12px}.server-controls>.btn{margin:4px}.device-row{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #ffffff30}.device-row span{min-width:0;overflow-wrap:anywhere;font-size:12px}.device-row .btn{flex-shrink:0}.maintenance-banner{position:fixed;bottom:env(safe-area-inset-bottom,0px);left:0;right:0;padding:5px 12px;background:#17243bea;color:#ffdf6e;text-align:center;font:12px system-ui;z-index:90;pointer-events:none;max-height:3.5em;overflow:hidden}.team-result{grid-column:1/-1}.team-result table{width:100%;font-size:12px;table-layout:fixed}.team-result th,.team-result td{overflow-wrap:anywhere;padding:4px;text-align:center}
+
+.team-result table{line-height:1.6;border-collapse:collapse}.team-result th:first-child,.team-result td:first-child{width:30%}

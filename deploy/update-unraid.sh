@@ -6,7 +6,7 @@ DATA="${DATA_PATH:-/mnt/user/appdata/pokesurvivor-cn/data}"
 NAME=pokesurvivor-cn
 STAMP=$(date +%Y%m%d-%H%M%S)
 BACKUP="$NAME-backup-$STAMP"
-IMAGE=pokesurvivor-cn-nas:0.7.4
+IMAGE=pokesurvivor-cn-nas:0.8.0
 # Refuse to accidentally use a new empty data directory.
 test -d "$DATA"
 ACTUAL=$(docker inspect --format '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Source}}{{end}}{{end}}' "$NAME")
@@ -16,8 +16,11 @@ if [ "$ACTUAL" != "$DATA" ]; then
 fi
 # Build first: a build failure leaves the running game untouched.
 docker build -t "$IMAGE" .
+# New backends must be explicitly drained first. Older releases have no gate.
+# Run this inside the old container: no admin cookie/password on the command line.
+docker exec "$NAME" node -e 'fetch("http://127.0.0.1:2333/api/health").then(r=>{if(!r.ok)throw Error("Health failed");return r.json()}).then(h=>{if("activeRuns" in h&&(!h.draining||!h.ready)){console.error("Enable maintenance in game settings and wait until ready. No container changes made.");process.exit(2)}}).catch(e=>{console.error(e.message);process.exit(1)})'
 # Consistent SQLite backup while the old container is still running.
-docker exec "$NAME" node server/backup.cjs "/data/backups/pre-0.7.4-$STAMP.sqlite"
+docker exec "$NAME" node server/backup.cjs "/data/backups/pre-0.8.0-$STAMP.sqlite"
 docker stop "$NAME"
 docker rename "$NAME" "$BACKUP"
 restore_container() {
@@ -41,5 +44,5 @@ for attempt in 1 2 3 4 5 6; do
   sleep 5
 done
 if [ "$READY" != true ]; then restore_container; exit 1; fi
-printf '\nUpdated. Previous container: %s\nDatabase backup: %s/backups/pre-0.7.4-%s.sqlite\n' "$BACKUP" "$DATA" "$STAMP"
+printf '\nUpdated. Previous container: %s\nDatabase backup: %s/backups/pre-0.8.0-%s.sqlite\n' "$BACKUP" "$DATA" "$STAMP"
 docker logs --tail 30 "$NAME"

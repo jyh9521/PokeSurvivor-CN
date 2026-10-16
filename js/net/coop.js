@@ -51,7 +51,7 @@ G.Coop = (() => {
   // y la última que has elegido (invitado). Y el último "quién elige" aplicado.
   let levelSeq = 0, levelNow = 1, seenSeq = 0, doneSeq = 0, lastHo = '';
   const STALL_MS = 2500;
-  let members = [];
+  let members = [];let teamStats=null;
   const reconnecting=new Set(),marks=new Map();let pingAt=-Infinity;
 
   // ---------------- escalado de dificultad ----------------
@@ -72,7 +72,7 @@ G.Coop = (() => {
     host = me === hostUid;
     local = pl;
     api = cb;
-    members = cfg.members;
+    members = cfg.members;teamStats=G.TeamStats.create(members);
     mates.clear();
     outEv = []; flushT = 0; waiting = new Set(); holds = new Set();
     hostAway = false; stalled = false; lastHostAt = performance.now();
@@ -100,7 +100,7 @@ G.Coop = (() => {
     if (!active) return;
     if (host) {
       // Si se va el anfitrión, la partida termina para todos.
-      emit(['ov', Object.assign(api.summary ? api.summary() : {}, { why: 'host' })]);
+      emit(['ov', Object.assign(api.summary ? api.summary() : {}, { why: 'host',teamStats:teamStats?.snapshot() })]);
       flushAll();
     } else {
       outEv.push(['bye']);
@@ -185,7 +185,7 @@ G.Coop = (() => {
     }
     const ev = m.q; m.q = [];
     const f = { k: 'f', t: r2(st.time), lv: st.level, xp: r2(st.xp), xn: st.xpNext, ki: st.kills, bo: st.bosses, co: st.coins, tk: [st.t1, st.t10],
-                p, e: enemyList(m.pl), ev };
+                p, e: enemyList(m.pl), ev, ts:teamStats?.snapshot() };
     const ja = G.Judgment.netState();       // Arceus en la Sentencia
     if (ja) f.ja = ja;
     // Siempre: quién está eligiendo y, si hay cartas de nivel, cuáles (ver arriba).
@@ -262,6 +262,7 @@ G.Coop = (() => {
   function onClientFrame(from, msg) {
     const m = mates.get(from);
     if (!m || !m.connected) return;
+    if(msg.p&&m.pl.net?.dead&&!readState(msg.p).dead)rescued(from);
     if (msg.p) {m.lastAt=performance.now();if(reconnecting.delete(from))updateAway();m.state = msg.p; m.pl.net = readState(msg.p); m.xpMul = m.pl.net.xpMul || 1; reconcile(from, m.pl.net); }
     for (const ev of msg.ev || []) {
       switch (ev[0]) {
@@ -269,7 +270,7 @@ G.Coop = (() => {
           const e = G.EnemyMgr.get(ev[1]);
           if (!e || e.dead || e.remote) break;
           hitFrom = from;
-          e.hurt(ev[2], ev[3], ev[4], ev[5], ev[6]);
+          e.hurt(ev[2], ev[3], ev[4], ev[5], ev[6],null,from);
           hitFrom = null;
           break;
         }
@@ -323,6 +324,7 @@ G.Coop = (() => {
   function onHostFrame(msg) {
     lastHostAt = performance.now();
     if (stalled) { stalled = false; updateAway(); }
+    if(msg.ts)teamStats?.ingest(msg.ts);
     for (const ev of msg.ev || []) applyHostEvent(ev);
     if(msg.t===undefined)return;
     hostAway=!!msg.aw;updateAway();
@@ -389,7 +391,7 @@ G.Coop = (() => {
       case 'hp': lastHo = (ev[1] || []).join('|'); api.hold && api.hold(ev[1]); break;
       case 'ha': hostAway = !!ev[1]; updateAway(); break;
       case 'sh': api.shiny(ev[1]); break;
-      case 'ov': { const cb = api.over; const d = ev[1]; end(); cb(d); break; }
+      case 'ov': { const cb = api.over; const d = ev[1];if(d.teamStats)teamStats?.ingest(d.teamStats);end(); cb(d); break; }
       case 'rift': case 'riftx': case 'arena': case 'aw': case 'al': G.Rift.onEvent(ev); break;
       case 'jd': case 'jk': G.Judgment.onEvent(ev); break;
       case 'wx': G.Weather.onEvent(ev); break;
@@ -417,7 +419,7 @@ G.Coop = (() => {
   function enemyAdded(e) {
     emit(['ne', e.id, e.dex, r1(e.x), r1(e.y), e.boss ? 1 : 0, e.shiny ? 1 : 0, Math.ceil(e.maxHp), r2(e.dmg), e.behavior]);
   }
-  function enemyGone(e, died) { emit([died ? 'ed' : 'eg', e.id]); }
+  function enemyGone(e, died) { teamStats?.forget(e.id);emit([died ? 'ed' : 'eg', e.id]); }
   function enemyShot(p, type) { emit(['es', r1(p.x), r1(p.y), r1(p.vx), r1(p.vy), r2(p.dmg), p.r, p.life, type]); }
   function pickupAdded(o) { emit(['pk', o.id, o.kind, r1(o.x), r1(o.y), o.value]); }
   function pickupGone(id) { emit(['pc', id]); }
@@ -502,6 +504,7 @@ G.Coop = (() => {
 
   /** Anfitrión: se acabó para todos. */
   function over(data) {
+    data.teamStats=teamStats?.snapshot();
     emit(['ov', data]);
     flushAll();
     end();
@@ -510,7 +513,9 @@ G.Coop = (() => {
   function acceptMark(uid,kind,x,y){const p=uid===me?local:mates.get(uid)?.pl;if(!p||!['gather','help','danger'].includes(kind)||!Number.isFinite(x)||!Number.isFinite(y)||G.U.dist2(p.x,p.y,x,y)>160*160)return;const last=marks.get(uid);if(last&&performance.now()-last.at<2500)return;marks.set(uid,{uid,kind,x,y,at:performance.now()});emit(['mark',uid,kind,x,y]);}
   function ping(kind='gather'){if(!active||performance.now()-pingAt<3000)return false;pingAt=performance.now();if(host)acceptMark(me,kind,r1(local.x),r1(local.y));else{outEv.push(['mark',kind,r1(local.x),r1(local.y)]);flushClient(true);}return true;}
 
+  function rescued(victim){if(!active||!host)return;const v=victim===me?local:mates.get(victim)?.pl;if(!v)return;teamStats?.rescue(players().filter(p=>p&&p.uid!==victim&&!p.dead&&G.U.dist2(p.x,p.y,v.x,v.y)<56*56).map(p=>p.uid));}
   return {
+    rescued,noteDamage(e,uid,damage,killed){if(active&&host)teamStats?.hit(e.id,uid,damage,killed);},get teamStats(){return teamStats?.snapshot()||[];},
     ping,get marks(){return [...marks.values()].filter(m=>performance.now()-m.at<8000);},
     ANIMS, COLORS, begin, end, leave, tick, players, puppets, xpFactor, scaleRate, scaleHp,
     cast, hit, status, hurtShown, enemyAdded, enemyGone, enemyShot, pickupAdded, pickupGone, say,

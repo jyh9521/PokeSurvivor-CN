@@ -267,6 +267,7 @@
       const opened = await G.Social.setOpen(false);
       if (opened && opened.ok === false) { G.UI.toast(opened.error); return; }
       const current=G.Social.room;if(G.NAS?.enabled&&current){cfg.host=current.host;cfg.members=current.members;}
+      if(G.NAS?.enabled&&!(await G.NAS.prepareRun(cfg))){await G.Social.setOpen(true);return;}
       G.Net.broadcast(cfg);
       G.Flow.startCoop(cfg);
     }

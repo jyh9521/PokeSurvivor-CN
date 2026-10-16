@@ -125,6 +125,8 @@ G.RunUI = (() => {
         <p>¿Te está gustando PokéSurvivor? Lo hago yo solo y los servidores cuestan dinero. Si quieres, puedes ayudarme a mantenerlo en línea.</p>
         <a class="btn small gold" href="${G.Funding.url}" target="_blank" rel="noopener">${G.Icons.html('heart', 14)} Apoyar en Ko-fi</a>
       </div>` : ''}`;
+    if(r.teamStats?.length){const box=document.createElement('div');box.className='team-result';const title=document.createElement('h3');title.textContent=G.T('Estadísticas del equipo');box.append(title);const table=document.createElement('table'),header=document.createElement('tr');for(const key of ['Jugador','Daño directo','Derrotados','Asistencias','Rescates']){const th=document.createElement('th');th.textContent=G.T(key);header.append(th);}table.append(header);
+      for(const row of r.teamStats){const tr=document.createElement('tr');for(const value of [(r.team||[]).find(m=>m.uid===row.uid)?.name||'—',row.damage,row.kills,row.assists,row.rescues]){const td=document.createElement('td');td.textContent=String(value);td.setAttribute('translate','no');tr.append(td);}table.append(tr);}box.append(table);const note=document.createElement('p');note.className='sub';note.textContent=G.T('Observado por el anfitrión. No incluye daño ambiental o periódico sin autor; no modifica recompensas.');box.append(note);$('over-stats').append(box);}
     const ask = $('over-ask');
     if (ask) ask.querySelector('.x').onclick = () => ask.remove();
     $('btn-again').onclick = onBack;

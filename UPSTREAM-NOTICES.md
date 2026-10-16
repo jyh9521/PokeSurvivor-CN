@@ -23,3 +23,20 @@ Third-party assets retain their separate existing licenses and credits.
 
 The mobile editor is based on the upstream placement feature; the official-cloud
 hostname guard and unrelated upstream changes were not imported.
+
+## Multi-device and emergency-update adaptations (0.8.0)
+
+The multi-device synchronization approach from upstream `bd7f3dd` and the
+emergency-update concept from `5bbc3b2` were reviewed and adapted for the NAS
+backend. These adapted portions retain PolyForm Noncommercial 1.0.0 and the
+Required Notice above in source and distributions.
+
+- `js/core/save-merge.js`, `server/save-merge.cjs`, `server/store.cjs` and
+  `js/net/nas.js`: trusted NAS revision bases and atomic economy audit instead
+  of Firebase per-device balances; parallel economic edits remain conflicts.
+- `js/core/updater.js`, `server/operations.cjs`, `server/app.cjs` and
+  `js/ui/server-controls.js`: authenticated admin emergency signal, cancellable
+  countdown, normal run settlement and confirmed save flush before reload.
+
+No upstream Firebase blocking functions, official TURN removal or unconditional
+forced-reload behavior were imported. Existing NAS relay fallback remains.

@@ -46,10 +46,30 @@ G.Updater = (() => {
     return true;
   }
 
+  const loadedAt=Date.now();
+  let emergencyId=null,emergencyTimer=null;
+  function emergency(value){
+    if(!value){clearTimeout(emergencyTimer);emergencyId=null;return;}
+    if(typeof value.id!=='string'||!Number.isFinite(value.deadline)||value.deadline<loadedAt)return;
+    const storage='ps.emergency.'+value.id;try{if(sessionStorage.getItem(storage))return;}catch{}
+    if(emergencyId===value.id)return;clearTimeout(emergencyTimer);emergencyId=value.id;
+    const tick=async()=>{
+      if(emergencyId!==value.id)return;
+      const seconds=Math.max(0,Math.ceil((value.deadline-Date.now())/1000));
+      G.UI?.toast(G.T('Actualización urgente: {x} s').replace('{x}',seconds),1500);
+      if(seconds){emergencyTimer=setTimeout(tick,1000);return;}
+      if(G.Game&&!['ui','over'].includes(G.Game.state))G.Game.quit();
+      if(G.NAS?.enabled){const ok=await G.NAS.flush();if(!ok||G.NAS.pending||G.NAS.conflict){G.UI.toast(G.T('Actualización pendiente: sincroniza o exporta tu partida.'),5000);emergencyTimer=setTimeout(tick,5000);return;}}
+      if(emergencyId!==value.id)return;
+      try{sessionStorage.setItem(storage,'1');}catch{}
+      location.reload();
+    };tick();
+  }
   async function reload() {
     // Que lo guardado suba a la nube antes de recargar (como mucho 6 s).
     const dirty = G.DB.syncState && G.DB.syncState !== 'ok' && G.DB.syncState !== 'local';
     if (dirty) { try { await Promise.race([G.DB.flush(), new Promise(r => setTimeout(r, 6000))]); } catch (e) { /* queda en este navegador */ } }
+    if(G.NAS?.enabled&&(G.NAS.pending||G.NAS.conflict)){counting=false;G.UI.toast(G.T('Actualización pendiente: sincroniza o exporta tu partida.'),5000);return;}
     location.reload();
   }
 
@@ -79,5 +99,5 @@ G.Updater = (() => {
     setTimeout(check, 30000);
   }
 
-  return { init, check, get pending() { return pending; }, get version() { return mine; } };
+  return { init, check, emergency, get pending() { return pending; }, get version() { return mine; } };
 })();

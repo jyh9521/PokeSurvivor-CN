@@ -35,3 +35,7 @@ NAS 不再冒用付费低速中继标志。正常目标频率是 15 Hz（约每 
 npm run test:nas 检查回声鉴权、队列合并/顺序、房间边界、硬限制、单调时钟 RTT、超时和有界槽位，并保留原有存档/福利/联机回归。npm run test:nas:browser 测量真实两浏览器通过 NAS 的数据帧率与往返探测，再检查原联机和裂隙修复。npm run test:nas:production 检查保护包、诊断导出隐私及手机布局。
 
 本地受控浏览器测试不代表已完成国内到日本的公网验收。更新命令仍使用 deploy/update-unraid.sh，保留原 /data；请先结束当前对局，并让所有玩家刷新到新版本。
+
+## 格式 2（0.8.0）
+
+新增实际 WebRTC candidate-pair 的 RTT、候选类型和传输协议，及公开静态资源的首字节、下载体积与压缩/缓存迹象。NAS 探针 RTT 与实际直连 RTT 分开，不再用队友探针解释本机到 NAS 的线路。导出不含 IP、SDP、账号、房间、令牌或存档；性能条目不含源站与 query。完整字段与测量边界见 [服务器管理说明](SERVER_MANAGEMENT.md)。
