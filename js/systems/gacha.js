@@ -32,6 +32,7 @@ G.Gacha = (() => {
   const RARITY_COLOR = { 1: '#9fb1c9', 2: '#5fe08a', 3: '#4fb4ff', 4: '#c47bff', 5: '#ffcb3d' };
 
   const BANNERS = [
+    {gen:0,name:'Mixed regions',color:['#214662','#483379','#153665']},
     { gen: 1, name: 'Kanto',   color: ['#3a1d6e', '#1b2f78', '#0f4d6e'] },
     { gen: 2, name: 'Johto',   color: ['#5a2a1a', '#7a3d1f', '#2d4a6e'] },
     { gen: 3, name: 'Hoenn',   color: ['#0f4d6e', '#1b6a5a', '#2a3d78'] },
@@ -43,7 +44,7 @@ G.Gacha = (() => {
     { gen: 9, name: 'Paldea',  color: ['#6a2a1a', '#4a1a5a', '#1a4a6a'] }
   ];
 
-  function inBanner(p, gen) { return p.gen === gen && !!G.SPRITE_META[p.dex]; }
+  function inBanner(p, gen) { return (gen===0||p.gen === gen) && !!G.SPRITE_META[p.dex]; }
 
   /** Pokémon de una rareza en un banner. */
   function pool(rarity, gen) { return G.DEX.filter(p => inBanner(p, gen) && p.rarity === rarity); }

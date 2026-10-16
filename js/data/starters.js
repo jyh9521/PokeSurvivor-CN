@@ -42,7 +42,7 @@ for (const s of G.STARTERS) G.STARTER_BY[s.dex] = s;
 /** Movimiento inicial de cualquier Pokémon (starter o del gacha). */
 G.startMoveOf = dex => {
   const s = G.STARTER_BY[dex];
-  return s ? s.start : G.Moves.startFor(G.DEX_BY[dex]);
+  return G.Moves.startFor(s?{...G.DEX_BY[dex],start:s.start}:G.DEX_BY[dex]);
 };
 
 /** Descripción corta de cada rasgo, para la pantalla de resultado. */

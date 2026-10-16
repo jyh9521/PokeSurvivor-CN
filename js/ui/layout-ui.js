@@ -5,14 +5,14 @@
  */
 G.LayoutUI=(()=>{
   let el=null,draft=null,mode='float',selected='bar',dragging=null;
-  const keys=['bar','item','pause','stick'];
-  const names={bar:'Ataques',item:'Objeto',pause:'Pausa',stick:'Joystick'};
+  const keys=['bar','item','pause','stick','battle'];
+  const names={bar:'Ataques',item:'Objeto',pause:'Pausa',stick:'Joystick',battle:'Special forms'};
   const clone=x=>JSON.parse(JSON.stringify(x||{}));
   const key=()=>G.Touch.profileKey();
   const profile=()=>draft[key()]||{};
   function geometry(){
     const l=G.HUD.layout(innerWidth,innerHeight,4,true,G.Touch.safeArea(),profile()),b=G.Touch.stickBase(innerWidth,innerHeight,profile()),r=G.Touch.R();
-    return {bar:{x:l.slots[0].x,y:l.slots[0].y,w:l.totalW,h:l.S},item:l.item,pause:l.pause,stick:{x:b.x-r,y:b.y-r,w:r*2,h:r*2}};
+    return {battle:G.BattleUI.geometry(innerWidth,innerHeight,profile(),true,G.Touch.safeArea()),bar:{x:l.slots[0].x,y:l.slots[0].y,w:l.totalW,h:l.S},item:l.item,pause:l.pause,stick:{x:b.x-r,y:b.y-r,w:r*2,h:r*2}};
   }
   function position(k,x,y){
     draft[key()]||={};draft[key()][k]=[Math.max(0,Math.min(1,x/innerWidth)),Math.max(0,Math.min(1,y/innerHeight))];

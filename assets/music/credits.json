@@ -1,0 +1,79 @@
+{
+  "author": "hyperpixel",
+  "license": "CC0-1.0",
+  "source": "https://hyperpixel.itch.io/33-free-chiptune-loops",
+  "tracks": [
+    {
+      "title": "02 Knight dawn town",
+      "file": "assets/music/02.ogg",
+      "sha256": "aa2fe26980674d6736e5829799fac496a247114f9a2daba5e90aff1020694508",
+      "bytes": 193767,
+      "source": "https://html-classic.itch.zone/html/13984483/equalized_ogg/02%20Knight%20dawn%20town.ogg",
+      "group": "menu"
+    },
+    {
+      "title": "08 Knight day town",
+      "file": "assets/music/08.ogg",
+      "sha256": "56ca00842d8e96620d21d65bf036224f8dca6bcee9b7edbdf2a322fea0351ca9",
+      "bytes": 187700,
+      "source": "https://html-classic.itch.zone/html/13984483/equalized_ogg/08%20Knight%20day%20town.ogg",
+      "group": "menu"
+    },
+    {
+      "title": "19 Party day encampment",
+      "file": "assets/music/19.ogg",
+      "sha256": "9f34fdbb3a90b807065e7b98147cef34babe016e4422df2f198f2e7422d0d0bb",
+      "bytes": 350344,
+      "source": "https://html-classic.itch.zone/html/13984483/equalized_ogg/19%20Party%20day%20encampment.ogg",
+      "group": "menu"
+    },
+    {
+      "title": "04 Knight morning road",
+      "file": "assets/music/04.ogg",
+      "sha256": "f739cd323e935f697e4d040e76af1d2bbbb42bfb3e299d77cc2cb0b3663c2789",
+      "bytes": 193260,
+      "source": "https://html-classic.itch.zone/html/13984483/equalized_ogg/04%20Knight%20morning%20road.ogg",
+      "group": "battle"
+    },
+    {
+      "title": "06 Knight morning hills",
+      "file": "assets/music/06.ogg",
+      "sha256": "43cc820328374aba8dd233d3c6bb47eb08e16df0edb7e601cfb98128634a40e2",
+      "bytes": 200221,
+      "source": "https://html-classic.itch.zone/html/13984483/equalized_ogg/06%20Knight%20morning%20hills.ogg",
+      "group": "battle"
+    },
+    {
+      "title": "21 Party day forest",
+      "file": "assets/music/21.ogg",
+      "sha256": "53b7e2db37f176c3865bbcf5780e07def4119592880488054ebe109026c86096",
+      "bytes": 274909,
+      "source": "https://html-classic.itch.zone/html/13984483/equalized_ogg/21%20Party%20day%20forest.ogg",
+      "group": "battle"
+    },
+    {
+      "title": "28 Robot morning training",
+      "file": "assets/music/28.ogg",
+      "sha256": "7398b2a7f794d45120767f42b878e3990674639995dd3aa3775450e7d403e0af",
+      "bytes": 303382,
+      "source": "https://html-classic.itch.zone/html/13984483/equalized_ogg/28%20Robot%20morning%20training.ogg",
+      "group": "battle"
+    },
+    {
+      "title": "17 Knight midnight castle",
+      "file": "assets/music/17.ogg",
+      "sha256": "8e66dbef91c650f5debfa52f819ffc6aa32bd82e49a76f88d555a300d5c6cd65",
+      "bytes": 193940,
+      "source": "https://html-classic.itch.zone/html/13984483/equalized_ogg/17%20Knight%20midnight%20castle.ogg",
+      "group": "boss"
+    },
+    {
+      "title": "33 Robot night alert",
+      "file": "assets/music/33.ogg",
+      "sha256": "cd2e83fc32c14bdae0fc3209a1e3175b9bbe9f6e823fdbcff380d2993231138a",
+      "bytes": 295437,
+      "source": "https://html-classic.itch.zone/html/13984483/equalized_ogg/33%20Robot%20night%20alert.ogg",
+      "group": "boss"
+    }
+  ]
+}

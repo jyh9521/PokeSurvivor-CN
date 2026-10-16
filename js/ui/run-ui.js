@@ -51,7 +51,7 @@ G.RunUI = (() => {
       if (c.type === 'evo') el.classList.add('evo');
       el.innerHTML =
         `<div class="ico" style="background:${c.color}33">${G.Icons.html(c.icon, 32)}</div>
-         <div class="txt"><div class="nm">${c.title} ${tag}</div><div class="ds">${c.desc}</div></div>
+         <div class="txt"><div class="nm">${c.title} ${tag}</div><div class="ds">${c.desc}</div>${c.moveId&&G.Moves.BY_ID[c.moveId]?'<div class=move-class>'+G.T(G.Moves.BY_ID[c.moveId].damageClass==='physical'?'Physical · scales with Attack':'Special · scales with Special Attack')+'</div>':''}</div>
          <div class="key">${i + 1}</div>`;
       el.dataset.sfx = 'none';             // el juego pone su propio sonido al elegir
       el.onclick = () => pick(i);

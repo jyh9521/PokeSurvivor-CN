@@ -4,7 +4,7 @@
 G.GachaUI = (() => {
   const $ = G.UI.$;
   let busy = false;
-  let gen = 1;
+  let gen = 0;
 
   function init() {
     $('gacha-skip').checked=!!G.Settings.get('skipGacha');$('gacha-skip').onchange=e=>G.Settings.set('skipGacha',e.target.checked);
@@ -18,7 +18,7 @@ G.GachaUI = (() => {
       const t = document.createElement('button');
       t.className = 'gen-tab';
       t.dataset.gen = b.gen;
-      t.innerHTML = `<b>${b.name}</b><small>Gen ${b.gen}</small>`;
+      t.innerHTML = `<b>${b.name}</b><small>${b.gen===0?G.T('All regions'):'Gen '+b.gen}</small>`;
       t.onclick = () => { gen = b.gen; refresh(); };
       tabs.appendChild(t);
     });
@@ -31,10 +31,10 @@ G.GachaUI = (() => {
 
   function refresh() {
     const s = G.DB.save;
-    const banner = G.Gacha.BANNERS[gen - 1];
+    const banner = G.Gacha.BANNERS.find(b=>b.gen===gen);
     document.querySelectorAll('#gacha-gens .gen-tab').forEach(t => t.classList.toggle('on', +t.dataset.gen === gen));
 
-    const all = G.DEX.filter(p => p.gen === gen);
+    const all = G.DEX.filter(p => gen===0||p.gen === gen);
     const owned = all.filter(p => s.owned[p.dex]).length;
     const shinies = all.filter(p => s.shiny && s.shiny[p.dex]).length;
     const [c1, c2, c3] = banner.color;
@@ -42,8 +42,8 @@ G.GachaUI = (() => {
       `radial-gradient(circle at 80% 30%, rgba(255,210,63,.3), transparent 45%),
        radial-gradient(circle at 15% 80%, rgba(196,123,255,.3), transparent 50%),
        linear-gradient(135deg, ${c1}, ${c2} 55%, ${c3})`;
-    $('banner-title').textContent = banner.name + ' Misterioso';
-    $('banner-desc').textContent = `Los ${all.length} Pokémon de la generación ${gen}. ¡Los legendarios esperan!`;
+    $('banner-title').textContent = gen===0?G.T('Mixed regions'):banner.name + ' Misterioso';
+    $('banner-desc').textContent = gen===0?G.T('All regions share this pool; mixed pity is separate.'):`Los ${all.length} Pokémon de la generación ${gen}. ¡Los legendarios esperan!`;
     $('gacha-owned').innerHTML = `Tienes ${owned} de ${all.length}` +
       (shinies ? ` · ${G.Icons.html('shiny', 12)} ${shinies} shiny` : '');
 
@@ -54,7 +54,7 @@ G.GachaUI = (() => {
     }
 
     const pity = (s.pity && s.pity[gen]) || 0;
-    $('gacha-pity').textContent = `Tiradas sin legendaria en ${banner.name}: ${pity} / ${G.Gacha.PITY_5}`;
+    $('gacha-pity').textContent = gen===0?G.I18n.f('Mixed pity: {x} / {x}',pity,G.Gacha.PITY_5):`Tiradas sin legendaria en ${banner.name}: ${pity} / ${G.Gacha.PITY_5}`;
 
     $('gacha-rates').innerHTML = '<h3>Probabilidades</h3>' + G.Gacha.RATES.slice().reverse().map(([r, w]) => `
       <div><span style="color:${G.Gacha.RARITY_COLOR[r]}">${G.UI.stars(r, 10)} ${G.Gacha.RARITY_NAME[r]}</span>

@@ -206,7 +206,7 @@ G.MenuUI = (() => {
         <section class="six-stats">${stats.map((v,i)=>bar(G.T(statNames[i]),v,255,v)).join('')}</section>
         <p class="trait-description"><b>${G.T('Species trait')}: ${trait.source?.[G.I18n.lang==='zh-CN'?'zh':G.I18n.lang==='es'?'es':'en']||G.T(trait.title)}</b><br>${G.T('Survivor adaptation')}: ${G.T(trait.desc)}</p>
         <p class="sub">${G.T('Battle role')}: ${G.T(G.BattleRules.role(p,G.BattleDex))} · ${G.T('Special forms')}: ${G.BattleDex.species[p.dex]?.mega.length?'Mega / ':''}Z / ${G.T('Dynamax')}</p>
-        <p style="font-size:14px;margin:10px 0 4px">Empieza con <b class="gold">${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move')}</b></p>
+        <p style="font-size:14px;margin:10px 0 4px">Empieza con <b class="gold">${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move')}</b><br><small>${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].damageClass==='physical'?'Physical · scales with Attack':'Special · scales with Special Attack')}</small></p>
         <p class="move-icons" title="Movimientos que puede aprender">
           ${G.Moves.poolFor(p).map(id => `<span title="${G.T(G.Moves.BY_ID[id].name, 'move')}">${G.Icons.html('move:' + id, 16)}</span>`).join('')}</p>
         ${usingThis

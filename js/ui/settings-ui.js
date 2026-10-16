@@ -6,7 +6,7 @@
 G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const VERSION = '0.7.4 · 2026-10-16';
+  const VERSION = (G.APP_VERSION||'development')+' · 2026-10-16';
   const REPO = G.PROJECT_REPO || 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 
@@ -71,7 +71,7 @@ G.SettingsUI = (() => {
     const box = $('set-body');
     box.scrollTop = 0;
     if (tab === 'sound') {
-      box.innerHTML = section('Sonido') + '<div id="set-sound" class="sound-inline"></div>';
+      box.innerHTML = section('Sonido') + toggle('randomBgm',G.T('Random BGM'),G.T('Shuffle local menu and battle music; off restores the original soundtrack.')) + '<div id="set-sound" class="sound-inline"></div>';
       G.UI.soundControls($('set-sound'));
     } else if (tab === 'gfx') {
       const auto = ['baja', 'media', 'alta'][G.Settings.autoLevel];

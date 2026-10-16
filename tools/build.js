@@ -22,6 +22,8 @@ const files = [...block.matchAll(/<script[^>]*src="(js\/[^"]+\.js)"/g)].map(m =>
 
 // Une los archivos en orden; cada uno separado por ';' por si alguno no acaba en punto y coma.
 let joined = files.map(f => `/* ${f} */\n` + fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n;\n');
+// Published diagnostics follow the package version, never a stale handwritten label.
+joined=joined.replace(/G\.APP_VERSION\s*=\s*["'][^"']+["'];/, 'G.APP_VERSION = '+JSON.stringify(require('../package.json').version)+';');
 // Anti-trampas: en la versión publicada el juego va ENCERRADO en una función:
 // G deja de existir en la consola del navegador (F12), y con él los atajos para
 // hacerse invencible, saltar el reloj, etc. (dev.html sigue igual, para programar).

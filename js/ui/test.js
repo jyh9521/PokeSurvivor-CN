@@ -70,8 +70,8 @@ G.TestUI = (() => {
         grid.querySelectorAll('.cell').forEach(c => c.classList.remove('on'));
         cell.classList.add('on');
         picked = s.dex;
-        const mv = G.Moves.BY_ID[s.start];
-        $('starter-info').innerHTML = `${G.UI.typeChips(mon.types)} ${G.Icons.html('move:' + s.start, 16)} ${G.T(mv.name, 'move')} · ${s.traits.join(', ')}`;
+        const mv = G.Moves.BY_ID[G.startMoveOf(s.dex)];
+        $('starter-info').innerHTML = `${G.UI.typeChips(mon.types)} ${G.Icons.html('move:' + G.startMoveOf(s.dex), 16)} ${G.T(mv.name, 'move')} · ${s.traits.join(', ')}`;
         $('starter-ok').disabled = false;
       };
       if (result && s.dex === result.dex) { picked = s.dex; $('starter-ok').disabled = false; }

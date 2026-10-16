@@ -163,3 +163,7 @@ use a procedural transformation aura; this does not change their battle stats.
 Six-stat, ability and learnset inputs come from PokeAPI revision
 `81d20919845b6a445969b9265aab5cec6b04cece`; input hashes are recorded in
 `tools/localization/battle-inputs.json`.
+
+## Additional original music
+
+Nine selected loops from **33 Free Chiptune Loops**, by **hyperpixel**, licensed **CC0 1.0 Universal**. Source: https://hyperpixel.itch.io/33-free-chiptune-loops . Original titles, source URLs, byte counts and SHA-256 values are in `assets/music/credits.json`; license notice is in `assets/music/LICENSE.txt`. These are original instrumental chiptune loops, not Nintendo soundtrack recordings. Reimport with `python tools/fetch-bgm.py`.
