@@ -680,3 +680,7 @@ G.I18n.add({"Acquisition": "Acquisition", "Type": "Type", "Rarity": "Rarity", "S
 G.I18n.add({"Choose one special per run: Mega 30s, Dynamax 20s, or one Z burst.": "Choose one special per run: Mega 30s, Dynamax 20s, or one Z burst."},"en");
 
 G.I18n.add({"Automatically counterattack after taking damage or blocking.": "Automatically counterattack after taking damage or blocking.", "An automatic decoy distracts enemies and bursts after its lifetime.": "An automatic decoy distracts enemies and bursts after its lifetime."},"en");
+
+G.I18n.add({"Controles especiales de combate": "Special battle controls", "Botones directos para Mega, Z y Dinamax con el estilo del juego. Elegir ya no retiene las flechas ni abre un menú durante el combate.": "Game-styled direct buttons for Mega, Z and Dynamax. Selection no longer captures arrow keys or opens a menu during combat."},"en");
+
+G.I18n.add({"Switch special": "Switch special"},"en");

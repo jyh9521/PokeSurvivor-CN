@@ -1303,3 +1303,7 @@ G.I18n.add({"Acquisition": "获取状态", "Type": "属性", "Rarity": "稀有�
 G.I18n.add({"Choose one special per run: Mega 30s, Dynamax 20s, or one Z burst.": "每局仅可选择一次特殊强化：超级进化30秒、极巨化20秒，或一次Z招式爆发。"},"zh-CN");
 
 G.I18n.add({"Automatically counterattack after taking damage or blocking.": "受伤或格挡后自动反击；学会后无需切换到本招式。", "An automatic decoy distracts enemies and bursts after its lifetime.": "学会后自动放出吸引敌人的替身，持续结束时爆发范围伤害。"},"zh-CN");
+
+G.I18n.add({"Controles especiales de combate": "特殊强化操作优化", "Special battle controls": "特殊强化操作优化", "Botones directos para Mega, Z y Dinamax con el estilo del juego. Elegir ya no retiene las flechas ni abre un menú durante el combate.": "特殊强化改为蓝色游戏风格按钮，可直接选择；点击后释放焦点，上下方向键继续移动角色，不再打开选择菜单。", "Game-styled direct buttons for Mega, Z and Dynamax. Selection no longer captures arrow keys or opens a menu during combat.": "特殊强化改为蓝色游戏风格按钮，可直接选择；点击后释放焦点，上下方向键继续移动角色，不再打开选择菜单。"},"zh-CN");
+
+G.I18n.add({"Switch special": "切换招式"},"zh-CN");

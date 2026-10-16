@@ -118,15 +118,15 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
       await a.waitForFunction(({id,hp})=>G.EnemyMgr.get(id)?.hp<hp,{id:fieldTarget,hp:beforeMark},{timeout:10000});
       check('guest delayed marks detonate at the selected target and settle through the room authority',true);
       await pages[2].evaluate(()=>{G.Game.player.slots=[];G.Combat.clearFields();});
-      await a.evaluate(()=>G.Game.player.battle.energy=100);await a.locator('#battle-form').selectOption('mega');await a.locator('#battle-activate').click();
+      await a.evaluate(()=>G.Game.player.battle.energy=100);await a.locator('[data-battle-choice="mega"]').click();await a.locator('#battle-activate').click();
       await pages[1].waitForFunction(uid=>G.Coop.mate(uid)?.pl.battle.form==='mega',users[0].id,{timeout:10000});
       check('Mega activates through the actual button and synchronizes form and passives to peers',await pages[1].evaluate(uid=>Object.keys(G.Coop.mate(uid).pl.passives).length===4,users[0].id));
       check('Mega uses audited alternate animation where available and does not replace species identity',await a.evaluate(()=>{const p=G.Game.player;return p.dex===6&&p.anim.dex===G.BattleDex.species[6].mega[0].id&&p.battle.remaining>0;}));
       const beforeMax=await pages[1].evaluate(()=>{const p=G.Game.player;p.battle.energy=100;window.__preMax={hp:p.hp,max:p.maxHp,r:p.r};return window.__preMax;});
-      await pages[1].locator('#battle-form').selectOption('max');await pages[1].locator('#battle-activate').click();await a.waitForFunction(uid=>G.Coop.mate(uid)?.pl.battle.form==='max',users[1].id,{timeout:10000});
+      await pages[1].locator('[data-battle-choice="max"]').click();await pages[1].locator('#battle-activate').click();await a.waitForFunction(uid=>G.Coop.mate(uid)?.pl.battle.form==='max',users[1].id,{timeout:10000});
       check('Dynamax grows the actual sprite and HP but leaves collision radius unchanged',await pages[1].evaluate(()=>{const p=G.Game.player;return p.maxHp>window.__preMax.max&&p.r===window.__preMax.r&&p.anim.scale>1.5;}));
       const zTarget=await a.evaluate(uid=>{const q=G.Coop.mate(uid).pl,e=new G.Enemy({dex:1,hp:500,spd:0,dmg:0,xp:0,behavior:'chaser'},q.x+25,q.y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},users[2].id);
-      await pages[2].waitForFunction(id=>!!G.EnemyMgr.get(id),zTarget);await pages[2].evaluate(()=>G.Game.player.battle.energy=100);await pages[2].locator('#battle-form').selectOption('z');await pages[2].locator('#battle-activate').click();await a.waitForFunction(id=>G.EnemyMgr.get(id)?.hp<500,zTarget,{timeout:10000});
+      await pages[2].waitForFunction(id=>!!G.EnemyMgr.get(id),zTarget);await pages[2].evaluate(()=>G.Game.player.battle.energy=100);await pages[2].locator('[data-battle-choice="z"]').click();await pages[2].locator('#battle-activate').click();await a.waitForFunction(id=>G.EnemyMgr.get(id)?.hp<500,zTarget,{timeout:10000});
       check('guest Z-Move deals real host-authoritative damage and refuses another special form',await pages[2].evaluate(()=>G.Game.player.battle.used&&!G.Battle.activate(G.Game.player,'max')));
       await a.screenshot({animations:'disabled',path:path.join(OUT,'mega-eight-player.png')});await pages[1].screenshot({animations:'disabled',path:path.join(OUT,'dynamax-eight-player.png')});
       await a.evaluate(()=>G.Battle.tick(G.Game.player,31));await pages[1].evaluate(()=>G.Battle.tick(G.Game.player,21));
