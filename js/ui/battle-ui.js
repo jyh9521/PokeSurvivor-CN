@@ -23,14 +23,14 @@ G.BattleUI=(()=>{
     info.textContent=[choice==='z'&&z?G.T(z.name):b.form==='mega'?G.SpecialRuntime.traitsText(p):G.T(G.Battle.trait(p).title),...Object.entries(p.passives).map(([id,n])=>G.T(G.PassiveDefs.find(d=>d.id===id).name)+' '+n+'/'+(Number.isFinite(G.Battle.maxLevel(id))?G.Battle.maxLevel(id):'∞'))].join(' · ');info.title=info.textContent;
     renderGrowth(mastery,p,false);
   }
-  function renderGrowth(box,p,inPause){
+  function renderGrowth(box,p,inPause,allowed=()=>false){
     const growth=G.RunGrowth.state(p),targets=G.RunGrowth.targets(p),key=JSON.stringify([growth,p.moves.map(m=>[m.instanceId,m.lvl,m.evolved,m.mastery,m.training]),inPause]);if(box.dataset.growthKey===key)return;box.dataset.growthKey=key;box.replaceChildren();box.hidden=!inPause&&!growth.points;
-    if(!inPause){const title=document.createElement('summary');title.textContent=G.T('Mastery points')+' '+growth.points+' · '+growth.spent+'/6 · '+G.T(targets.length?'Pause to allocate mastery':'Awaiting evolution')+' · Esc / Start';box.append(title);const open=document.createElement('button');open.className='btn small gold';open.textContent=G.T('Open growth and mastery');open.onclick=()=>G.Game.togglePause();box.append(open);return;}
+    if(!inPause){const title=document.createElement('summary');title.textContent=G.T('Mastery points')+' '+growth.points+' · '+growth.spent+'/6 · '+G.T(targets.length?'Allocate at level-up or rift settlement':'Awaiting evolution');box.append(title);return;}
     const heading=document.createElement('h3');heading.textContent=G.T('Mastery points')+' '+growth.points+' · '+growth.spent+'/6';box.append(heading);
     const note=document.createElement('p');note.className='sub';note.textContent=G.T('Bosses and cleared rifts grant points. Select an evolved move below: each point adds 3%, maximum three per move and six per run.');box.append(note);
-    for(const m of p.moves){const target=targets.find(t=>t.instanceId===m.instanceId),b=document.createElement('button');b.className='btn growth-move';b.dataset.masteryInstance=m.instanceId;b.disabled=!target||!growth.points||p.dead;const ev=G.Moves.evoInfo(m,p.statsTaken,p.level);b.textContent=G.T('Group')+' '+(p.slots.findIndex(g=>g.includes(m))+1)+' · '+G.T(m.name,'move')+' · '+G.Moves.powerText(m)+' · '+G.T('Mastery')+' '+(m.mastery||0)+'/3'+(!m.evolved?' · '+G.T(m.lvl<m.def.maxLvl?'Upgrade to maximum first':ev?.ready?'Evolution available at next level':'Needs passive or player level 12'):'');b.onclick=()=>{if(!G.UI.isOpen('scr-pause'))return;const before=m.dmg;if(G.RunGrowth.spend(p,m.instanceId)){G.Audio.sfx('confirm');G.UI.toast(G.T('Mastery applied')+' '+Math.round(before*100)/100+' → '+Math.round(m.dmg*100)/100);renderGrowth(box,p,true);update();}};box.append(b);}
+    for(const m of p.moves){const target=targets.find(t=>t.instanceId===m.instanceId),b=document.createElement('button');b.className='btn growth-move';b.dataset.masteryInstance=m.instanceId;b.disabled=!target||!growth.points||p.dead||!allowed();const ev=G.Moves.evoInfo(m,p.statsTaken,p.level);b.textContent=G.T('Group')+' '+(p.slots.findIndex(g=>g.includes(m))+1)+' · '+G.T(m.name,'move')+' · '+G.Moves.powerText(m)+' · '+G.T('Mastery')+' '+(m.mastery||0)+'/3'+(!m.evolved?' · '+G.T(m.lvl<m.def.maxLvl?'Upgrade to maximum first':ev?.ready?'Evolution available at next level':'Needs passive or player level 12'):'');b.onclick=()=>{if(!allowed())return;const before=m.dmg;if(G.RunGrowth.spend(p,m.instanceId)){G.Audio.sfx('confirm');G.UI.toast(G.T('Mastery applied')+' '+Math.round(before*100)/100+' → '+Math.round(m.dmg*100)/100);renderGrowth(box,p,true,allowed);update();}};box.append(b);}
   }
-  function pauseGrowth(){const screen=document.querySelector('#scr-pause .box')||document.getElementById('scr-pause');let box=document.getElementById('pause-growth');if(!box){box=document.createElement('section');box.id='pause-growth';screen.append(box);}if(G.Game.player)renderGrowth(box,G.Game.player,true);
+  function pauseGrowth(){const screen=document.querySelector('#scr-pause .box')||document.getElementById('scr-pause');let box=document.getElementById('pause-growth');if(!box){box=document.createElement('section');box.id='pause-growth';screen.append(box);}if(G.Game.player)renderGrowth(box,G.Game.player,true,()=>!G.Coop.active&&G.UI.isOpen('scr-pause'));
 
   }
   addEventListener('load',()=>{panel=document.createElement('section');panel.id='battle-controls';panel.hidden=true;panel.setAttribute('aria-label',G.T('Special forms'));
@@ -41,5 +41,5 @@ G.BattleUI=(()=>{
     panel.addEventListener('pointerdown',e=>{if(e.target.closest('button')&&e.button===0)e.preventDefault();});setInterval(update,100);
   });
   addEventListener('keydown',e=>{if(panel?.contains(e.target)&&/^Arrow/.test(e.key))releaseFocus();if(!e.repeat&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){if(e.code==='KeyV')activate();if(e.code==='KeyC')cycle();}});
-  return {activate,cycle,update,geometry,pauseGrowth};
+  return {activate,cycle,update,geometry,pauseGrowth,renderGrowth};
 })();

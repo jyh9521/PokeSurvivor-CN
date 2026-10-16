@@ -2,6 +2,7 @@
  * Initially adapted from DabaoHuang/pokesurvivor PR #74; reviewed against this game.
  * Names are separately verified in lang-zh-cn-names.js. See docs/LOCALIZATION.md. */
 G.I18n.add({
+ 'NAS connection':'NAS连接','Allocate at level-up or rift settlement':'升级或裂隙结算时分配','Continue · keep unspent mastery':'继续 · 保留未用精通点',
   "Boss exhausted: counterattack during the golden opening!": "首领出现疲劳：抓住金色破绽反击！",
   "When passive slots block evolution, trade one reroll and a level reward to retrain a passive from level one.": "被动槽位锁住进化前置时，可以消耗1次重抽和本次升级奖励，放弃一项被动并从1级重修。",
   "Evolution retraining": "进化前置重修",

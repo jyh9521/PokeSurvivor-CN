@@ -109,7 +109,7 @@ G.Game = (() => {
     G.World.reset(coop ? coop.seed : G.RunModes?.active?.seed ?? Math.floor(Math.random() * 1e6));
     biome=G.RunModes?.active?.biome||0;
     G.World.setBiome(biome, true);
-    time = 0; pendingLevels = 0;
+    time = 0; pendingLevels = 0;masteryPending=false;
     runReal = performance.now(); tampered = false;
 
     pl = new G.Player(G.SpecialRuntime.mon(mon, save.partnerForms?.[mon.dex]), perks, !!save.partnerShiny && G.DB.ownsShiny(mon.dex));
@@ -433,6 +433,13 @@ G.Game = (() => {
    */
   let openItem = null;           // { cur, next, take } elección de objeto sin terminar
   const laterItems = [];         // objetos recogidos con las cartas de nivel abiertas
+  let masteryPending=false;
+  function offerMastery(){masteryPending=true;}
+  function maybeMastery(){if(!masteryPending||!pl||pl.dead||G.Rift.inArena||!['playing','held'].includes(state)||['scr-bond','scr-item','scr-levelup','scr-pause'].some(G.UI.isOpen))return;
+    masteryPending=false;if(!G.RunGrowth.state(pl).points)return;
+    state='choice';if(G.Coop.active)G.Coop.holdStart();
+    G.RunUI.showMastery(()=>{G.RunUI.closeLevelUp();if(state==='choice')state=holdBy.length||awayBy?'held':'playing';if(G.Coop.active)G.Coop.holdEnd();afterLevelUp();});
+  }
   function afterLevelUp() {
     if (state !== 'playing' && state !== 'held') return;
     if (openItem && !G.UI.isOpen('scr-item')) {
@@ -611,6 +618,7 @@ G.Game = (() => {
 
     G.Gamepad?.poll();handleKeys();G.ClickMove?.tick();
 
+    maybeMastery();
     if (state === 'playing') update(dt);
     else if (pl && state !== 'ui') { G.FX.update(dt * 0.25); pl.anim.update(dt * 0.25); }
     // La red se atiende siempre (también con las cartas de nivel abiertas).
@@ -892,7 +900,7 @@ G.Game = (() => {
   })();
 
   return {
-    init, startRun, everyone, levelXp, flash, offerBond,
+    init, startRun, everyone, levelXp, flash, offerBond,offerMastery,
     /** Para pruebas: salta el reloj de la run. */
     debugTime(t) { tampered = true; time = t; },
     /** Para grabar vídeos: cámara lenta (0,5 = mitad de velocidad). */
