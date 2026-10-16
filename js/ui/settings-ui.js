@@ -6,7 +6,7 @@
 G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const VERSION = (G.APP_VERSION||'development')+' · 2026-10-16';
+  const VERSION = (G.APP_VERSION||'development')+' · 2026-10-17';
   const REPO = G.PROJECT_REPO || 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 
@@ -81,6 +81,7 @@ G.SettingsUI = (() => {
              `<button class="chip ${G.I18n.lang === v ? 'on' : ''}" data-lang="${v}">${l}</button>`).join('')}</div>`
         + section('Calidad', 'Cuántos efectos y partículas se dibujan. <b>Auto</b> la baja sola si el juego va a tirones (ahora: ' + auto + ').')
         + choice('quality', [['auto', 'Auto'], ['high', 'Alta'], ['mid', 'Media'], ['low', 'Baja'], ['potato', 'Equipo modesto']])
+        + section(G.T('Friendly projectile opacity'),G.T('Hostile warning zones always stay fully visible. Cyan dashed shapes belong to your team.')) + '<b>'+G.T('Your attacks')+'</b>'+choice('ownShotOpacity',[[.2,'20%'],[.55,'55%'],[1,'100%']])+'<b>'+G.T('Ally attacks')+'</b>'+choice('allyShotOpacity',[[.2,'20%'],[.4,'40%'],[.7,'70%'],[1,'100%']])
         + section('Pantalla')
         + toggle('showHitbox','Mostrar zona de impacto','Círculo real de contacto y proyectiles; no cambia el daño ni el tamaño.')
           + toggle('playerOutline','Resaltar tu personaje','Contorno visible incluso detrás de árboles y enemigos.')

@@ -91,14 +91,7 @@ G.MenuUI = (() => {
     const room = G.Social.room;
     const play = document.querySelector('#scr-menu [data-go=play] small');
     if (play) play.textContent = room ? 'Volver a tu sala (' + room.members.length + '/' + G.Social.MAX_PLAYERS + ')' : 'Entra en la mazmorra';
-    const fr = G.Social.friends;
-    const on = fr.filter(f => f.status === 'ok' && f.online).length;
-    const req = fr.filter(f => f.status === 'in').length;
-    const parts = [];
-    if (on) parts.push(on + ' en línea');
-    if (req) parts.push(req + (req === 1 ? ' solicitud' : ' solicitudes'));
-    $('menu-friends-sub').textContent = parts.length ? parts.join(' · ') : 'Juega en grupo, hasta 4';
-    $('menu-friends-sub').classList.toggle('gold', req > 0);
+    const online=(G.Social.players||[]).filter(p=>p.uid!==G.Social.uid);$('menu-friends-sub').textContent=G.T('Online players')+' '+online.length+' · '+G.T('Invite to party');$('menu-friends-sub').classList.toggle('gold',online.some(p=>!p.play));
   }
 
   // ---------------- colección ----------------

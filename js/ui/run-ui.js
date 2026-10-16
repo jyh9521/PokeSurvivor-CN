@@ -46,13 +46,13 @@ G.RunUI = (() => {
       el.className = 'card'+(c.disabled?' unavailable':'');el.dataset.category=c.category||'';if(c.disabled){el.setAttribute('aria-disabled','true');el.tabIndex=-1;}
       const tag = c.type === 'new'
         ? `<span class="tag-chip" style="background:${c.color}">Nuevo · ${c.tag}</span>`
-        : c.type === 'up' || c.type === 'evo'
+        : c.type === 'up' || c.type === 'evo' || c.type === 'training'
           ? `<span class="tag-chip" style="background:${c.color}">${c.tag}</span>`
           : `<span class="tag-chip" style="background:${c.color === '#ffd23f' ? '#ffd23f' : '#9fb1c9'}">${c.tag}</span>`;
       if (c.type === 'evo') el.classList.add('evo');
       el.innerHTML =
         `<div class="ico" style="background:${c.color}33">${G.Icons.html(c.icon, 32)}</div>
-         <div class="txt">${c.categoryLabel?'<div class="reward-category">'+c.categoryLabel+'</div>':''}<div class="nm">${c.title} ${tag}</div><div class="ds">${c.desc}</div>${c.moveId&&G.Moves.BY_ID[c.moveId]?'<div class=move-class>'+G.T(G.Moves.BY_ID[c.moveId].damageClass==='physical'?'Physical · scales with Attack':'Special · scales with Special Attack')+'</div>':''}</div>
+         <div class="txt">${c.categoryLabel?'<div class="reward-category">'+c.categoryLabel+'</div>':''}<div class="nm">${c.title} ${tag}</div><div class="ds">${c.desc}</div>${c.moveId&&G.Moves.BY_ID[c.moveId]?'<div class=move-power>'+G.Moves.powerText(G.Game.player.moves.find(m=>m.instanceId===c.instanceId)||G.Moves.instance(c.moveId))+'</div><div class=move-class>'+G.T(G.Moves.BY_ID[c.moveId].damageClass==='physical'?'Physical · scales with Attack':'Special · scales with Special Attack')+'</div>':''}</div>
          <div class="key">${i + 1}</div>`;
       el.dataset.sfx = 'none';             // el juego pone su propio sonido al elegir
       el.onclick = () => pick(i);
@@ -228,7 +228,7 @@ G.RunUI = (() => {
     G.UI.soundControls($('pause-sound'));
     $('pause-coop').classList.toggle('hidden', !coop);
     $('btn-quit').textContent = coop ? 'Salir de la partida' : 'Abandonar run';
-    G.UI.show('scr-pause');
+    G.BattleUI?.pauseGrowth(); G.UI.show('scr-pause');
     $('btn-resume').focus({preventScroll:true});
   }
 

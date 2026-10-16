@@ -116,7 +116,7 @@ G.NAS = (() => {
     get mode(){return 'nas';},get fb(){return null;},get online(){return available&&!!user&&!guest;},get nameAccount(){return !!user;},get hasGoogle(){return false;},
     get user(){return user?.nick||user?.name||'Invitado';},get uid(){return user?.id;},get guest(){return guest;},get save(){return save;},get loggedIn(){return !!save;},get syncState(){return state;},get localReason(){return 'nas';},get storageOk(){return storageOk;}
   },['ready','onSync']);
-  async function action(route,b){try{if ((route==='room/create'||route==='room/member'||route==='room/ready') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,{...b,protocol:11});await refresh();return r;}catch(e){return {ok:false,error:e.message,status:e.status};}}
+  async function action(route,b){try{if ((route==='room/create'||route==='room/member'||route==='room/ready') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,{...b,protocol:12});await refresh();return r;}catch(e){return {ok:false,error:e.message,status:e.status};}}
   async function refresh(){if(enabled)connect();if(!enabled)return oldSocial.refreshPresence();if(!user||guest)return;try{receiveSocial(await api('social'));available=true;}catch{available=false;}}
   const profile=()=>oldSocial.profileData();
   G.Social=proxy(oldSocial,{
@@ -128,7 +128,7 @@ G.NAS = (() => {
     refreshPresence:refresh,setPlaying(){},publishProfile(){commit();},profileData:profile,
     getProfile:async uid=>{try{return (await api('profile?uid='+encodeURIComponent(uid))).profile;}catch{return null;}},
     on(fn){socialListeners.add(fn);oldSocial.on(fn);},off(fn){socialListeners.delete(fn);oldSocial.off(fn);},
-    get me(){return user?{uid:user.id,name:user.nick||user.name}:null;},get uid(){return user?.id;},get started(){return !!user;},get friends(){return social.friends;},get invites(){return social.invites;},get room(){return social.room;}
+    get me(){return user?{uid:user.id,name:user.nick||user.name}:null;},get uid(){return user?.id;},get started(){return !!user;},get players(){return social.players||[];},get friends(){return social.friends;},get invites(){return social.invites;},get room(){return social.room;}
   },['on','off']);
   function deliver(from,data){if(data?.k==='f'&&data.p)health.rx(from);messages.forEach(f=>f(from,data));}
   function relay(to,data){if(activeRoom)return direct.send(to,data);}

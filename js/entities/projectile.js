@@ -113,6 +113,7 @@ G.Projectiles = (() => {
     // Sombras primero, todas juntas.
     ctx.fillStyle = 'rgba(0,0,0,.25)';
     for (const p of list) {
+      if(p.friendly&&G.Settings.fx===0)continue;if(!G.Camera.sees(p.x,p.y,40))continue;
       ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 0.9, p.r * 0.38, 0, 0, 6.2832); ctx.fill();
     }
     // Los disparos enemigos llevan un aro rojo en el suelo: "esto te hace daño".
@@ -122,6 +123,7 @@ G.Projectiles = (() => {
       ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 1.5, p.r * 0.6, 0, 0, 6.2832); ctx.fill();
     }
     for (const p of list) {
+      if(!G.Camera.sees(p.x,p.y,60))continue;
       const v = p.vis || G.VFX.forType('normal');
       const shape = v.proj;
       const a = p.orb ? 1 : Math.min(1, (p.life - p.t) * 4);
@@ -129,7 +131,7 @@ G.Projectiles = (() => {
       if (G.VFX.isDir(shape)) angle = p.orb ? p.oa + Math.PI / 2 : Math.atan2(p.vy, p.vx);
       else if (G.VFX.spins(shape)) angle = p.t * 9;
       G.VFX.draw(ctx, shape, v.pal, p.x, p.y - L, {
-        angle, alpha: a, scale: p.r >= 8 ? 1.5 : 1,
+        angle, alpha: a*(p.friendly?(G.Settings.get(p.ghost||p.owner?.remote?'allyShotOpacity':'ownShotOpacity')??.55):1), scale: p.r >= 8 ? 1.5 : 1,
         frame: Math.floor(p.t * 12)
       });
     }

@@ -22,13 +22,13 @@ G.Spawner = (() => {
   const hpK = (t,def) => G.BattleBalance.normalHp(t)*G.BattleBalance.tierBlend(t,def.tier,G.Enemies.TIERS);
   const SHINY_RATE = 1 / 4096;
   let acc = 0, bossIdx = 0, surgeT = 32, announce = null, announceT = 0, preloadT = 0;
-  let pressureAt=30,releaseAt=-30,recovering=false;
+  let pressureAt=20,releaseAt=-30,recovering=false;
   const dueling=()=>!G.Rift?.inArena&&!G.Judgment?.active&&G.EnemyMgr.all().some(e=>e.boss&&!e.legend&&!e.judge&&!e.dead);
   const capacity=()=>G.Rift?.inArena||G.Judgment?.active?CAP:dueling()?Math.min(32,12+4*Math.max(1,players.length)):G.BattleBalance.recoveryWindow(G.Game?.st?.time||0)?Math.min(48,24+4*Math.max(0,players.length-1)):CAP-1;
   let forceShiny = 0;           // para pruebas: los N próximos salen shiny
 
   function reset() {
-    pressureAt=30;releaseAt=-30;recovering=false;players=[];
+    pressureAt=20;releaseAt=-30;recovering=false;players=[];
     acc = 0; bossIdx = 0; surgeT = 32; announce = null; announceT = 0; preloadT = 0;
     G.Enemies.rollRun();
     G.Sprites.preload(G.Enemies.upcomingDex(0, 80));
@@ -130,8 +130,8 @@ G.Spawner = (() => {
     recovering=recovery;
     // Authored wave suppression: one visible delayed landing, not an extra swarm.
     // It persists if ordinary enemies are instantly cleared. Armor still applies.
-    if(t>=pressureAt){pressureAt=t+(G.BattleBalance.pressureWindow(t)?12:24);for(const p of players.filter(p=>!p.dead)){
-      G.Hazards.add({kind:'zone',x:p.x,y:p.y,r:38,delay:1.5,dmg:12*(1+t/600),type:'normal',damageClass:'special',color:'#ffb74d'});
+    if(t>=pressureAt){pressureAt=t+(G.BattleBalance.pressureWindow(t)?8:16);for(const p of players.filter(p=>!p.dead)){
+      G.Hazards.add({kind:'zone',x:p.x,y:p.y,r:68,delay:1.8,dmg:12*(1+t/600),type:'normal',damageClass:'special',color:'#ffb74d'});
     }say(G.T('Wave pressure: leave the orange marker!'),1.5);}
 
     // --- jefes ---

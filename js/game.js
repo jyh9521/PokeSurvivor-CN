@@ -43,7 +43,7 @@ G.Game = (() => {
   function resize() {
     // Resolución interna como mucho ×1,5: en pantallas ×2 dibujar el doble de
     // píxeles era de lo que más costaba, y con el pixel art no se nota.
-    dpr = G.Settings.get('quality')==='potato'?1:Math.min(1.5,window.devicePixelRatio||1);
+    dpr = G.Settings.fx===0?(G.Settings.get('quality')==='potato'?.6:.75):Math.min(1.5,window.devicePixelRatio||1);
     w = cv.clientWidth; h = cv.clientHeight;
     cv.width = Math.round(w * dpr);
     cv.height = Math.round(h * dpr);
@@ -84,6 +84,7 @@ G.Game = (() => {
     }finally{starting=false;}
   }
   function beginRun(coop = null) {
+    hudAt=-Infinity;
     holdBy = []; awayBy = null;
     openItem = null; laterItems.length = 0;
     G.RunModes?.activate(coop);
@@ -712,8 +713,8 @@ G.Game = (() => {
     const t = performance.now() / 1000;
     G.World.drawGround(ctx, cam);
     G.World.drawLiquid(ctx, cam, t);
-    G.Hazards.draw(ctx);
     G.Combat.drawGroundFields(ctx);
+    G.Hazards.draw(ctx); // Hostile cues always above translucent friendly fields.
     G.Pickups.draw(ctx);
 
     // Todo lo que tiene "pies" se ordena por Y: objetos, enemigos, jugador.
@@ -743,6 +744,7 @@ G.Game = (() => {
     }
   }
 
+  let hudCanvas=null,hudAt=-Infinity;
   function render() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
@@ -763,14 +765,14 @@ G.Game = (() => {
     G.World.drawVignette(ctx, w, h);
     // Niebla: la viñeta se cierra un poco (sin tapar el centro).
     const fog = G.Weather.vignette;
-    if (fog > 0) {
+    if (fog > 0 && G.Settings.fx>0) {
       const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.32, w / 2, h / 2, Math.max(w, h) * 0.62);
       g.addColorStop(0, 'rgba(200,205,220,0)');
       g.addColorStop(1, `rgba(200,205,220,${0.45 * fog})`);
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     }
-    if (!G.Judgment.cinematic) G.HUD.draw(ctx, w, h, pl, st);
+    if (!G.Judgment.cinematic){if(G.Settings.fx>0)G.HUD.draw(ctx,w,h,pl,st);else{const now=performance.now();if(!hudCanvas)hudCanvas=document.createElement('canvas');if(hudCanvas.width!==cv.width||hudCanvas.height!==cv.height){hudCanvas.width=cv.width;hudCanvas.height=cv.height;hudAt=-Infinity;}if(now-hudAt>=50){const hc=hudCanvas.getContext('2d');hc.setTransform(dpr,0,0,dpr,0,0);hc.clearRect(0,0,w,h);G.HUD.draw(hc,w,h,pl,st);hudAt=now;}ctx.drawImage(hudCanvas,0,0,w,h);}}
     G.Judgment.drawOverlay(ctx, w, h);
     G.Touch.draw(ctx);
     if (G.Settings.get('fps')) {

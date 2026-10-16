@@ -585,12 +585,12 @@
 
   /** ¿Puede evolucionar ya? → { name, needs, needName, text, ready } o null */
   const focusedEvolution=m=>m.kind==='projectile'&&(m.def.count||1)===1&&!m.def.homing;
-  function evoInfo(m, statsTaken) {
+  function evoInfo(m, statsTaken, level = 1) {
     const e = EVO[m.id];
     if (!e || m.evolved || m.lvl < m.def.maxLvl || !EVO_MODS[m.kind]) return null;
     const [name, needs] = e;
     return { name, needs, needName: NEED_NAME[needs], text: focusedEvolution(m)?G.T('Focused evolution: x3.6 damage, +2 shots and +2 pierce; damage still decays through targets.'):EVO_MODS[m.kind].t,
-             ready: !!(statsTaken && statsTaken[needs]) };
+             ready: !!(statsTaken && statsTaken[needs]) || level >= 12, experience: !(statsTaken && statsTaken[needs]) && level >= 12 };
   }
 
   /** Evoluciona una instancia (cambia nombre y potencia; sigue siendo del mismo tipo). */
@@ -613,6 +613,7 @@
     m.masteryBase ||= m.dmg;m.mastery=(m.mastery||0)+1;m.dmg=m.masteryBase*(1+.03*m.mastery);return true;
   }
 
-  G.Moves = { master, ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,
+  function powerText(m){const value=Math.round((m.dmg||0)*(1+.05*Math.min(12,m.training||0))*100)/100;return G.T('Power')+' '+value+' · '+G.T('Cooldown')+' '+Math.round((m.cd||0)*100)/100+'s'+((m.count||1)>1?' · '+G.T('Projectiles')+' '+m.count:'')+' · '+G.T('Per hit, before player stats and enemy defenses');}
+  G.Moves = { powerText, master, ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,
               EVO, NEED_NAME, evoInfo, evolve };
 })();

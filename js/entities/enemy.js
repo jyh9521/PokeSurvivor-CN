@@ -474,7 +474,11 @@
         ai.modeT = (ai.mode === 'far') === (ai.farLike > 0.5) ? G.U.rand(7, 9) : G.U.rand(4, 5);
         ai.side = -ai.side;
       }
-      let vx = dx * spd * k * 1.1, vy = dy * spd * k * 1.1;
+      // Rally only outside the visible duel: a slow boss must not get stranded
+      // behind fleeing support packs beyond the 800-unit pursuit range. No new
+      // damage, teleport or tracking landing; near-player speed is unchanged.
+      const rally=!this.legend&&!this.judge&&dist>500?Math.min(3,dist/250):1;
+      let vx = dx * spd * k * 1.1*rally, vy = dy * spd * k * 1.1*rally;
       const [ddx, ddy] = G.U.norm(pl.x - this.x, pl.y - this.y);
       if (ai.mode === 'far') {
         if (dist < 170) { vx = -ddx * spd; vy = -ddy * spd; }

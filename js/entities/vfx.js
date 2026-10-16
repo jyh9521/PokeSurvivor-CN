@@ -287,10 +287,13 @@ G.VFX = (() => {
   }
 
   /** Dibuja centrado en (x, y). opts: angle, scale (1 = píxel de juego), frame, alpha. */
+  const rotated=new Map();
   function draw(ctx, shape, pal, x, y, o = {}) {
     const S = SHAPES[shape] || SHAPES.ball;
     const cv = sprite(shape, pal, o.frame || 0);
     const k = PX * (o.scale || 1);
+    if(G.Settings.fx===0){const angle=Math.round((o.angle||0)/(Math.PI/8)),key=[shape,pal,(o.frame||0)%frames(shape),k,angle].join('|');let img=rotated.get(key);if(!img){img=document.createElement('canvas');img.width=img.height=Math.ceil(Math.hypot(S.w,S.h)*k)+4;const c=img.getContext('2d');c.imageSmoothingEnabled=false;c.translate(img.width/2,img.height/2);c.rotate(angle*Math.PI/8);c.drawImage(cv,-S.w*k/2,-S.h*k/2,S.w*k,S.h*k);if(rotated.size>=256)rotated.delete(rotated.keys().next().value);rotated.set(key,img);}const before=ctx.globalAlpha;if(o.alpha!=null)ctx.globalAlpha*=o.alpha;ctx.drawImage(img,Math.round(x-img.width/2),Math.round(y-img.height/2));ctx.globalAlpha=before;return;}
+
     ctx.save();
     if (o.alpha != null && o.alpha < 1) ctx.globalAlpha *= o.alpha;
     ctx.imageSmoothingEnabled = false;

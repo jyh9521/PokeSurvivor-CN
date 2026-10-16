@@ -467,6 +467,7 @@ G.World = (() => {
 
   /** Brillos animados sobre el agua / burbujas de la lava (y del veneno y la electricidad). */
   function drawLiquid(ctx, cam, t) {
+    if(G.Settings.fx===0)return; // cosmetic shimmer only; terrain and collision stay intact.
     const B = G.Tiles.BIOMES[biome];
     const lava = B.liquid === 'lava' || B.liquid === 'poison' || B.liquid === 'spark';
     ctx.fillStyle = B.foam;
@@ -596,6 +597,7 @@ G.World = (() => {
 
   /** Viñeta en coordenadas de pantalla. */
   function drawVignette(ctx, w, h) {
+    if(G.Settings.fx===0)return;
     const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.34, w / 2, h / 2, Math.max(w, h) * 0.78);
     g.addColorStop(0, 'rgba(0,0,0,0)');
     g.addColorStop(1, 'rgba(0,0,0,.5)');

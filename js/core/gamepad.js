@@ -33,7 +33,8 @@ G.Gamepad=(()=>{
     G.UIFocus.back(root);
   }
 
-  function hints(root){
+  let hintAt=0,hintRoot;
+  function hints(root){const now=performance.now();if(root===hintRoot&&now<hintAt)return;hintRoot=root;hintAt=now+100;
     G.SettingsUI?.refreshRumble?.();
     for(const el of document.querySelectorAll('[data-key-action]')){const keys=G.Input.bindings[el.dataset.keyAction],value=keys.map(G.Input.label).join('/');if(el.textContent!==value)el.textContent=value;}
     for(const el of document.querySelectorAll('[data-key-move]')){const value=['up','left','down','right'].map(k=>G.Input.label(G.Input.moveBindings[k][0])).join('');if(el.textContent!==value)el.textContent=value;}

@@ -9,7 +9,7 @@
 G.FX = (() => {
   const PX = G.Sprites.PX;
   // Topes según la calidad (Ajustes → Gráficos): bajo, medio, alto.
-  const CAP_PARTS = [350, 800, 1400], CAP_SPRITES = [110, 210, 320], CAP_TEXTS = [25, 45, 70], DENS = [0.35, 0.65, 1];
+  const CAP_PARTS = [90, 600, 1400], CAP_SPRITES = [28, 160, 320], CAP_TEXTS = [8, 30, 70], DENS = [0.15, 0.5, 1];
   const q = () => G.Settings.fx;
   let parts = [], sprites = [], texts = [], rings = [], slashes = [], beams = [];
 

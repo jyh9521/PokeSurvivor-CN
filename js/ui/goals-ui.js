@@ -273,8 +273,9 @@
         <h3>Medallas <span class="sub">${b.medals || 0}</span></h3>
         <div class="prof-medals" id="prof-medals"></div>`;
       if(G.NAS?.enabled&&d.uid){
-        const status=document.createElement('p');status.textContent=G.T(d.online?'En línea':'Desconectado');body.appendChild(status);
-        if(d.uid!==G.Social.uid){const button=document.createElement('button');button.className='btn small';button.id='profile-friend-request';const f=G.Social.friends.find(f=>f.uid===d.uid);button.textContent=G.T(f?.status==='ok'?'Ya es tu amigo':f?.status==='in'?'Aceptar solicitud':f?.status==='out'?'Solicitud enviada':'Solicitar amistad');button.disabled=f?.status==='ok'||f?.status==='out';button.onclick=async()=>{button.disabled=true;const r=await(f?.status==='in'?G.Social.accept(d.uid):G.Social.requestUid(d.uid));G.UI.toast(r.error||r.msg||G.T('Solicitud enviada'));if(r.ok)show(d.uid);else button.disabled=false;};body.appendChild(button);}
+        const status=document.createElement('p');status.textContent=(d.play?'■ '+G.T('Jugando'):G.T(d.online?'En línea':'Desconectado'));body.appendChild(status);
+        if(d.uid!==G.Social.uid){const button=document.createElement('button');button.className='btn gold hall-invite';button.id='profile-invite';button.textContent=G.T('Invite to party');button.disabled=!d.online||d.play||G.Social.room?.open===false;button.onclick=async()=>{const result=await G.Social.invite(d.uid);G.UI.toast(result.msg||result.error);};body.appendChild(button);}
+
       }
       const favs = $('prof-favs');
       for (const f of (d.favs || []).slice(0, 3)) {

@@ -23,8 +23,9 @@ G.UIFocus=(()=>{
     }
     for(const el of states.keys())if(!el.isConnected||!el.matches(selector)){restoreLayer(el);states.delete(el);}
   }
-  function top(){sync();if(G.Dialog?.element)return G.Dialog.element;
-    return [...states].filter(([,s])=>s.on).sort(([a,x],[b,y])=>z(b)-z(a)||(a.contains(b)?1:b.contains(a)?-1:y.order-x.order))[0]?.[0]||null;
+  let topDirty=true,topValue=null;new MutationObserver(()=>topDirty=true).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden','style','inert','data-ui-layer']});addEventListener('resize',()=>topDirty=true);
+  function top(){if(!topDirty&&!G.Dialog?.element)return topValue;topDirty=false;sync();if(G.Dialog?.element)return G.Dialog.element;
+    return topValue=[...states].filter(([,s])=>s.on).sort(([a,x],[b,y])=>z(b)-z(a)||(a.contains(b)?1:b.contains(a)?-1:y.order-x.order))[0]?.[0]||null;
   }
   function enter(el){sync();if(!visible(el)){const origin=document.activeElement;if(origin&&origin!==document.body)lastAction=snapshot(origin);}}
   function take(root){const el=preferred.get(root);preferred.delete(root);return el;}

@@ -13,7 +13,7 @@
  */
 G.Settings = (() => {
   const KEY = 'ps.settings';
-  const DEF = { randomBgm:false, stickMode:"float", touchLayouts:null, clickMove:true, quality: 'auto', dmgNumbers: true, calm: false, fps: false, stick: 1, skipGacha:false, showHitbox:false, playerOutline:true, gamepad:true, rumble:true, padLayout:'auto', padBindings:null };
+  const DEF = { randomBgm:false, stickMode:"float", touchLayouts:null, clickMove:true, ownShotOpacity:.55, allyShotOpacity:.4, quality: 'auto', dmgNumbers: true, calm: false, fps: false, stick: 1, skipGacha:false, showHitbox:false, playerOutline:true, gamepad:true, rumble:true, padLayout:'auto', padBindings:null };
   let s = Object.assign({}, DEF);
   try { Object.assign(s, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* nada */ }
   const fns = new Set();
@@ -25,7 +25,7 @@ G.Settings = (() => {
 
   function save() { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* nada */ } }
   function get(k) { return s[k]; }
-  function set(k, v) { s[k] = v;if(k==='quality'&&v==='potato'){s.dmgNumbers=false;s.calm=true;} save(); fns.forEach(fn => { try { fn(k, v); } catch (e) { /* nada */ } }); }
+  function set(k, v) { if(['ownShotOpacity','allyShotOpacity'].includes(k))v=[.2,.4,.55,.7,1].includes(+v)?+v:.55;s[k] = v;if(k==='quality'&&v==='potato'){s.dmgNumbers=false;s.calm=true;} save(); fns.forEach(fn => { try { fn(k, v); } catch (e) { /* nada */ } }); }
 
   /** Lo llama el bucle del juego en cada fotograma (sólo durante la partida). */
   function sample(dt) {
@@ -36,8 +36,8 @@ G.Settings = (() => {
     acc = 0; frames = 0;
     // 3 s seguidos por debajo de 45 FPS: baja un nivel; 8 s por encima de 57: sube.
     if (fps < 45) { slowT++; fastT = 0; } else if (fps > 57) { fastT++; slowT = 0; } else { slowT = fastT = 0; }
-    if (slowT >= 3 && autoLevel > 0) { autoLevel--; slowT = 0; }
-    if (fastT >= 8 && autoLevel < (touchy ? 1 : 2)) { autoLevel++; fastT = 0; }
+    if (slowT >= 3 && autoLevel > 0) { autoLevel--; slowT = 0;fns.forEach(fn=>fn('quality',s.quality)); }
+    if (fastT >= 8 && autoLevel < (touchy ? 1 : 2)) { autoLevel++; fastT = 0;fns.forEach(fn=>fn('quality',s.quality)); }
   }
 
   return {

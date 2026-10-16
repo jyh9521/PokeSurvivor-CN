@@ -98,7 +98,7 @@ G.Combat = (() => {
   }
 
   function payload(m) {
-    return { burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, knock: m.knock || 0, mtype: m.type, moveId: m.id, damageClass:m.damageClass, moveData:{id:m.id,type:m.type,kind:m.kind,damageClass:m.damageClass,ignoreArmor:m.ignoreArmor,skinBoost:m.skinBoost,stealShield:m.stealShield,dmg:m.dmg} };
+    return { burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, knock: m.knock || 0, mtype: m.type, moveId: m.id, damageClass:m.damageClass, moveData:{training:Math.min(12,m.training||0),instanceId:m.instanceId,id:m.id,type:m.type,kind:m.kind,damageClass:m.damageClass,ignoreArmor:m.ignoreArmor,skinBoost:m.skinBoost,stealShield:m.stealShield,dmg:m.dmg} };
   }
 
   /** Tabla de tipos × clima para un ataque de tipo `type` contra `e`. */
@@ -577,41 +577,42 @@ G.Combat = (() => {
     const now = performance.now() / 1000;
     for (const f of fields) {
       if (!G.Camera.sees(f.x, f.y, 60)) continue;
-      ctx.save();
+      const opacity=G.Settings.get(f.ghost?'allyShotOpacity':'ownShotOpacity')??.55;ctx.save();
       if(['wave','mark','decoy'].includes(f.kind)){
-        ctx.globalAlpha=f.ghost?.2:.5;ctx.strokeStyle=f.col;ctx.lineWidth=2;ctx.beginPath();
+        ctx.globalAlpha=(f.ghost?.2:.5)*opacity;ctx.strokeStyle=f.col;ctx.lineWidth=2;ctx.beginPath();
         if(f.kind==='wave'){ctx.translate(f.x,f.y);ctx.rotate(f.aim);for(let line=-1;line<=1;line++){for(let y=-f.m.width/2;y<=f.m.width/2;y+=5){const x=Math.sin(y*.13+f.t*8)*5+line*5;if(y===-f.m.width/2)ctx.moveTo(x,y);else ctx.lineTo(x,y);}}}
         else if(f.kind==='decoy'){ctx.fillStyle='#78d88b';ctx.fillRect(f.x-10,f.y-20,20,20);ctx.fillRect(f.x-13,f.y-27,7,10);ctx.fillRect(f.x+6,f.y-27,7,10);ctx.fillStyle='#182936';ctx.fillRect(f.x-6,f.y-16,3,3);ctx.fillRect(f.x+3,f.y-16,3,3);}
         else{ctx.ellipse(f.x,f.y,f.r,f.r*.6,0,0,Math.PI*2);ctx.moveTo(f.x-8,f.y);ctx.lineTo(f.x+8,f.y);ctx.moveTo(f.x,f.y-8);ctx.lineTo(f.x,f.y+8);}
         ctx.stroke();
       } else if (f.kind === 'patch') {
         const a = Math.min(1, (f.life - f.t) * 2, f.t * 6);
-        ctx.globalAlpha = 0.32 * a;
+        ctx.globalAlpha = (0.32 * a)*opacity;
         ctx.fillStyle = f.col;
         ctx.beginPath(); ctx.ellipse(f.x, f.y, f.r, f.r * 0.62, 0, 0, 6.2832); ctx.fill();
-        ctx.globalAlpha = 0.5 * a;
+        ctx.globalAlpha = (0.5 * a)*opacity;
         ctx.strokeStyle = f.col; ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.ellipse(f.x, f.y, f.r * 0.8, f.r * 0.5, 0, 0, 6.2832); ctx.stroke();
       } else if (f.kind === 'mine') {
         const armed = f.t >= f.arm, blink = armed && Math.sin(now * 8 + f.x) > 0.3;
-        ctx.globalAlpha = 0.18;
+        ctx.globalAlpha = (0.18)*opacity;
         ctx.fillStyle = f.col;
         ctx.beginPath(); ctx.ellipse(f.x, f.y, f.r * 0.45, f.r * 0.28, 0, 0, 6.2832); ctx.fill();
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = (1)*opacity;
         G.VFX.draw(ctx, f.vis.proj, f.vis.pal, f.x, f.y - 4, { scale: 1, alpha: blink ? 1 : 0.75, frame: 0 });
       } else if (f.kind === 'meteor') {
         const k = G.U.clamp(f.t / f.fall, 0, 1);
-        ctx.globalAlpha = 0.2 + k * 0.3;
+        ctx.globalAlpha = (0.2 + k * 0.3)*opacity;
         ctx.fillStyle = '#000';
         ctx.beginPath(); ctx.ellipse(f.x, f.y, f.r * (0.3 + k * 0.7), f.r * 0.6 * (0.3 + k * 0.7), 0, 0, 6.2832); ctx.fill();
-        ctx.globalAlpha = 0.6;
+        ctx.globalAlpha = (0.6)*opacity;
         ctx.strokeStyle = f.col; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
         ctx.beginPath(); ctx.ellipse(f.x, f.y, f.r, f.r * 0.6, 0, 0, 6.2832); ctx.stroke();
       } else if (f.kind === 'turret') {
-        ctx.globalAlpha = 0.3;
+        ctx.globalAlpha = (0.3)*opacity;
         ctx.fillStyle = '#000';
         ctx.beginPath(); ctx.ellipse(f.x, f.y, 11, 4.5, 0, 0, 6.2832); ctx.fill();
       }
+      ctx.globalAlpha=opacity;ctx.strokeStyle='#55eaff';ctx.lineWidth=2;ctx.setLineDash([8,5]);if(['patch','mine','meteor','mark'].includes(f.kind)){ctx.beginPath();ctx.ellipse(f.x,f.y,f.r,f.r*.62,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(f.x,f.y-7);ctx.lineTo(f.x-5,f.y+3);ctx.lineTo(f.x+5,f.y+3);ctx.closePath();ctx.stroke();}
       ctx.restore();
     }
   }
@@ -621,14 +622,15 @@ G.Combat = (() => {
     const now = performance.now() / 1000;
     for (const f of fields) {
       if (!G.Camera.sees(f.x, f.y, 200)) continue;
+      const opacity=G.Settings.get(f.ghost?'allyShotOpacity':'ownShotOpacity')??.55;
       if (f.kind === 'meteor' && f.t > 0) {
         const k = G.U.clamp(f.t / f.fall, 0, 1);
         G.VFX.draw(ctx, f.vis.proj, f.vis.pal, f.lob?f.sx+(f.x-f.sx)*k:f.x+(1-k)*40, f.lob?f.sy+(f.y-f.sy)*k-90*Math.sin(k*Math.PI)-6:f.y-(1-k)*170-6,
-                   { scale: 1.5, angle: Math.atan2(170, -40), frame: Math.floor(now * 12) });
+                   { alpha:opacity, scale: 1.5, angle: Math.atan2(170, -40), frame: Math.floor(now * 12) });
       } else if (f.kind === 'turret') {
         const fade = Math.min(1, (f.life - f.t) * 2, f.t * 5);
         const bob = Math.sin(now * 4 + f.x) * 2 - (f.kick > 0 ? 2 : 0);
-        G.VFX.draw(ctx, f.vis.proj, f.vis.pal, f.x, f.y - 16 + bob, { scale: 1.5, alpha: fade, frame: Math.floor(now * 8) });
+        G.VFX.draw(ctx, f.vis.proj, f.vis.pal, f.x, f.y - 16 + bob, { scale: 1.5, alpha: fade*opacity, frame: Math.floor(now * 8) });
       }
     }
   }
@@ -654,12 +656,12 @@ G.Combat = (() => {
         dmg: m.dmg * pl.atk,
         oa: (i / want) * 6.2832, orad: m.radius, ospeed: m.speed,
         rehit: Math.max(0.12, m.cd),
-        knock: m.knock || 0, burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, mtype: m.type, moveId:m.id, damageClass:m.damageClass
+        ...payload(m)
       });
     }
     const live = G.Projectiles.all().filter(mine);
     live.forEach((p, i) => {
-      p.dmg = m.dmg * pl.atk;
+      p.dmg = m.dmg * pl.atk;p.moveData=payload(m).moveData;
       p.orad = m.radius;
       p.ospeed = m.speed;
       p.r = m.size;

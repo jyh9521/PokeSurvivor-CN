@@ -1063,3 +1063,8 @@ body.touch #battle-shortcuts kbd{display:inline-block!important}
 .form-controls{flex-wrap:wrap;gap:4px}.form-controls button{font-size:12px;padding:5px 8px;min-width:0}.form-controls .on{border-color:var(--gold,#ffdc43)}
 
 #battle-mastery{position:fixed;z-index:16;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(320px,86vw);max-height:45vh;overflow:auto;background:#152f68ee;border:2px solid #ffd23f;border-radius:8px;padding:6px;pointer-events:auto;font:12px var(--font)}#battle-mastery[hidden]{display:none}#battle-mastery summary{cursor:pointer;color:#ffe9a0;overflow-wrap:anywhere}#battle-mastery button{display:block;width:100%;white-space:normal;margin-top:4px;min-height:36px}
+
+/* Long translated cycle status owns the full row, never shares hotkeys. */
+#battle-controls.spent .battle-actions{grid-column:1/-1}#battle-controls.spent #battle-shortcuts{visibility:hidden}#battle-controls.spent #battle-activate{white-space:normal;font-size:9px;line-height:12px;overflow-wrap:anywhere}#pause-growth{margin-top:12px;max-height:36vh;overflow:auto}#pause-growth .growth-move{display:block;width:100%;white-space:normal;text-align:left;margin:6px 0;font-size:12px;line-height:1.5}.move-power{color:#a6edff;font-size:12px;margin-top:5px}.dot.play{border-radius:0;background:#ffd23f}.rank-presence.play{color:#ffd23f!important}.hall-invite{min-width:110px;box-shadow:0 0 0 2px #ffd23f55}.invite-pop{z-index:100;left:50%;right:auto;bottom:auto;top:30%;transform:translateX(-50%);width:min(520px,90vw);box-sizing:border-box;border:3px solid #ffd23f;box-shadow:0 0 0 100vmax #0008;padding:22px}.invite-pop .btn{min-height:44px}
+
+#battle-info{grid-row:4}#battle-controls.spent #battle-info{grid-row:4}.conn.play{color:#ffd23f}

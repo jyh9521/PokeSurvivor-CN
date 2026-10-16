@@ -68,7 +68,7 @@ G.RankingUI = (() => {
       period=k;challengeDate='';if(k!=='a'&&dex){dex=null;$('rk-poke').value='';$('rk-clear').classList.add('hidden');}
     },'chip');
     $('rk-challenge-controls').classList.toggle('hidden',mode!=='c');$('rk-poke').classList.toggle('hidden',mode==='c');$('rk-clear').classList.toggle('hidden',mode==='c'||!dex);
-    mk($('rk-scope'), [['all', 'Todos'], ['friends', 'Sólo amigos']], scope, k => { scope = k; }, 'chip');
+    scope='all';$('rk-scope').replaceChildren();
   }
 
   const fmt = t => t >= 3600 ? Math.floor(t / 3600) + ':' + G.U.mmss(t % 3600).padStart(5, '0') : G.U.mmss(t);
@@ -161,7 +161,7 @@ G.RankingUI = (() => {
     r.dex.forEach((d, i) => { if (G.DEX_BY[d]) mons.appendChild(G.UI.spriteCanvas(d, 44, 40, { scale: 1, shiny: !!r.shiny[i] })); });
     el.appendChild(mons);
     el.insertAdjacentHTML('beforeend',
-      `<span class="who"><b translate="no">${r.names.map((n, i) => `<a href="#" class="plink" data-u="${esc(r.uids[i] || '')}">${esc(n)}</a>${Array.isArray(r.online)?` <small class="rank-presence" data-presence-uid="${esc(r.uids[i])}" style="display:inline;color:${r.online[i]?'#7ee07a':'#a8b4c8'}">${G.T(r.online[i]?'En línea':'Desconectado')}</small>`:''}`).join(' · ')}</b><small>Nv. ${r.lv || 1} · ${(r.kills || 0).toLocaleString(G.I18n.lang === 'zh-CN' ? 'zh-CN' : 'es')} derrotados</small></span>
+      `<span class="who"><b translate="no">${r.names.map((n, i) => `<a href="#" class="plink" data-u="${esc(r.uids[i] || '')}">${esc(n)}</a>${Array.isArray(r.online)?` <small class="rank-presence ${r.playing?.[i]?'play':''}" data-presence-uid="${esc(r.uids[i])}" style="display:inline;color:${r.online[i]?'#7ee07a':'#a8b4c8'}">${r.playing?.[i]?'■ '+G.T('Jugando'):G.T(r.online[i]?'En línea':'Desconectado')}</small>`:''}`).join(' · ')}</b><small>Nv. ${r.lv || 1} · ${(r.kills || 0).toLocaleString(G.I18n.lang === 'zh-CN' ? 'zh-CN' : 'es')} derrotados</small></span>
        <span class="time">${fmt(r.t)}</span>`);
     el.querySelectorAll('.plink').forEach(a => { a.onclick = e => { e.preventDefault(); G.ProfileUI.show(a.dataset.u); }; });
     // Reportar una marca sospechosa (no la tuya). Lo revisa el admin (mod-ui.js).

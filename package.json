@@ -1,6 +1,6 @@
 {
   "name": "pokesurvivor-cn",
-  "version": "0.16.5",
+  "version": "0.16.6",
   "private": true,
   "description": "Simplified Chinese local and self-hosted NAS edition with dual saves, co-op and leaderboards",
   "scripts": {
@@ -40,7 +40,7 @@
     "playwright": "1.62.1",
     "terser": "5.44.0"
   },
-  "buildEpoch": 1792108800,
+  "buildEpoch": 1792195200,
   "dependencies": {
     "ws": "8.22.0"
   },

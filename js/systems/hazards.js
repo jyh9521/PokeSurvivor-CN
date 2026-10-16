@@ -87,8 +87,9 @@ G.Hazards = (() => {
         ctx.globalAlpha = 0.32;
         ctx.beginPath(); ctx.ellipse(h.x, h.y, h.r * k, h.r * 0.75 * k, 0, 0, 6.2832); ctx.fill();
         ctx.globalAlpha = k > 0.75 && blink ? 0.95 : 0.6;
-        ctx.strokeStyle = h.color; ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = h.color; ctx.lineWidth = 3;
+        ctx.setLineDash([]);ctx.fillStyle='#ffcf75';ctx.font='bold 18px sans-serif';ctx.textAlign='center';ctx.fillText('!',h.x,h.y+6);ctx.beginPath();ctx.moveTo(h.x-10,h.y);ctx.lineTo(h.x+10,h.y);ctx.moveTo(h.x,h.y-10);ctx.lineTo(h.x,h.y+10);ctx.stroke();
+        ctx.setLineDash([]);
         ctx.beginPath(); ctx.ellipse(h.x, h.y, h.r, h.r * 0.75, 0, 0, 6.2832); ctx.stroke();
       } else {
         ctx.translate(h.x, h.y);
@@ -99,7 +100,7 @@ G.Hazards = (() => {
         ctx.globalAlpha = 0.34;
         ctx.fillRect(0, -h.w / 2 * k, h.len, h.w * k);
         ctx.globalAlpha = k > 0.75 && blink ? 0.95 : 0.55;
-        ctx.strokeStyle = h.color; ctx.lineWidth = 2;
+        ctx.strokeStyle = h.color; ctx.lineWidth = 3;
         ctx.setLineDash([6, 4]);
         ctx.strokeRect(0, -h.w / 2, h.len, h.w);
       }

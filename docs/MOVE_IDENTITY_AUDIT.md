@@ -7,20 +7,6 @@
 同kind与同一视觉绘图分支的候选组（忽略配色及数值，专门检出换皮风险）；相同底层函数不表示所有数值和范围完全相同。以下ID逐组审阅，保留伤害/冷却/范围差异，避免为去重篡改官方名称或属性。
 
 ### 修改前候选组
-- `tackle`, `wing-attack`, `body-slam`, `karate-chop`, `metal-claw`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `quick-attack`, `aerial-ace`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `water-gun`, `poison-sting`, `spirit-shackle`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `vine-whip`, `lick`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `razor-leaf`, `bonemerang`, `psycho-cut`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `discharge`, `dazzling-gleam`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `psybeam`, `flash-cannon`, `moongeist-beam`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `bug-bite`, `bite`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `rock-throw`, `bullet-seed`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `spikes`, `toxic-spikes`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `air-slash`, `last-resort`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `leech-seed`, `stealth-rock`, `natures-madness`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `hyper-beam`, `photon-geyser`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
-- `shadow-sneak`, `aqua-jet`, `spectral-thief`：共用施放/同一绘图分支，仅配色与参数未必足以识别，优先比较频率和命中覆盖。
 
 ### 本轮高频识别改进
 
@@ -34,20 +20,6 @@
 
 ## 剩余14组本轮处理
 
-- `tackle` → shoulder；`wing-attack` → wings；`body-slam` → body-drop；`karate-chop` → chop-plane；`metal-claw` → metal-talons
-- `quick-attack` → speed-lines；`aerial-ace` → aerial-cross
-- `water-gun` → water-stream；`poison-sting` → barbed-sting；`spirit-shackle` → shackle-arrow
-- `vine-whip` → whip-leaves；`lick` → curl-tongue
-- `razor-leaf` → serrated-leaf；`bonemerang` → bone-return；`psycho-cut` → psi-crescent
-- `discharge` → electric-burst；`dazzling-gleam` → star-flare
-- `psybeam` → sine-prism；`flash-cannon` → metal-rail；`moongeist-beam` → lunar-channel
-- `bug-bite` → mandibles；`bite` → closing-fangs
-- `rock-throw` → tumble-rock；`bullet-seed` → seed-burst
-- `spikes` → ground-spikes；`toxic-spikes` → poison-barbs
-- `air-slash` → air-scissors；`last-resort` → final-star
-- `leech-seed` → root-seed；`stealth-rock` → orbit-stones；`natures-madness` → guardian-jaws
-- `hyper-beam` → horizontal-charge；`photon-geyser` → rising-prism
-- `shadow-sneak` → shadow-steps；`aqua-jet` → jet-wake；`spectral-thief` → spectral-hand
 
 全部36个ID改为独立轮廓/展开节奏；不是把style标签换名后仍调用相同绘图分支。旧样式族检测规则保持不变。伤害类别、冷却、范围、碰撞和地形规则保留。
 

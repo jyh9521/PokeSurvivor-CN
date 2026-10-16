@@ -113,3 +113,4 @@ test('guest accepts host-authorized benefits once, ignores spoofed sender and do
  assert.equal(e.hp,1000);assert.equal(e.kx,0);
  G.Combat.meleeBenefits(n.p,G.Moves.instance('bite'),true,Infinity);assert.equal(n.p.dmgDealt,0);assert.equal(n.p.meleeGuardT,0);
  });
+test('guest melee training is transmitted and applied exactly once by host authority',()=>{const s=require('./battle-fixture.cjs')(),{G}=s,n=network(s,'host'),e=s.enemy(30,1e6);n.p.level=30;const remote=G.Coop.mate('u1').pl;remote.level=30;remote.hp=remote.maxHp;const m=G.Moves.instance('tackle',5);G.Moves.evolve(m);m.training=12;const expected=Math.min(e.hp,G.Battle.damage(remote,e,m,100));const ev=['mh',1,e.id,100,'#fff',1,0,m.id,m.lvl,1,null,12];n.receive('u1',{k:'f',ev:[ev,ev]});assert.ok(1e6-e.hp===Math.round(expected));assert.equal(G.Coop.mate('u1').q.filter(x=>x[0]==='mb').length,1);});

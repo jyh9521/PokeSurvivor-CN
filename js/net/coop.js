@@ -291,6 +291,7 @@ G.Coop = (() => {
           if (!e || e.dead || e.remote || !['melee','counter'].includes(def?.kind) || !Number.isFinite(ev[3]) || ev[3]<=0 || !Number.isFinite(ev[5]) || !Number.isFinite(ev[6])) break;
           const move=G.Moves.instance(def.id,Math.max(1,Math.min(def.maxLvl,ev[8]|0)));
           if (ev[9]) G.Moves.evolve(move);
+          move.training=Number.isSafeInteger(ev[11])?Math.max(0,Math.min(12,ev[11])):0;
           // No local damage prediction for melee: send confirmed hit feedback to the attacker too.
           G.Battle?.ingest(m.pl,m.pl.net?.battle);if(m.pl.net){m.pl.hp=m.pl.net.hp;m.pl.maxHp=m.pl.net.maxHp;}
           hitFrom=null;
@@ -459,7 +460,7 @@ G.Coop = (() => {
 
   function meleeHit(e,d,color,dx,dy,m,eff=null) {
     if (!active || host || !Number.isFinite(d) || d<=0) return;
-    outEv.push(['mh',++meleeSeq,e.id,d,color,r1(dx),r1(dy),m.id,m.lvl,m.evolved?1:0,eff]);
+    outEv.push(['mh',++meleeSeq,e.id,d,color,r1(dx),r1(dy),m.id,m.lvl,m.evolved?1:0,eff,Math.max(0,Math.min(12,m.training||0))]);
   }
 
   function battleHit(e,d,col,dx,dy,knock,m,eff){if(!active||host)return;outEv.push(['bh',++battleSeq,e.id,d,col,r1(dx),r1(dy),knock||0,m.id,eff]);}

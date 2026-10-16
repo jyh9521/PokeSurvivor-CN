@@ -238,7 +238,7 @@ window.PSStartup=(()=>{
         <button class="menu-item" data-go="upgrades">Mejoras<small>Haz más fuerte cada run</small></button>
         <button class="menu-item" data-go="gacha">Gacha<small>9 regiones · Pokémon y shinies</small></button>
         <button class="menu-item" data-go="goals">Misiones<small id="menu-goals-sub">Misiones, logros y perfil</small></button>
-        <button class="menu-item" data-go="friends">Amigos<small id="menu-friends-sub">Juega en grupo, hasta 8</small></button>
+        <button class="menu-item" data-go="friends">Hall<small id="menu-friends-sub">Juega en grupo, hasta 8</small></button>
         <button class="menu-item" data-go="rank">Ranking<small>Quién aguanta más</small></button>
         <button class="menu-item" data-go="settings">Ajustes<small>Sonido, gráficos, controles y cuenta</small></button>
       </div>
@@ -404,14 +404,10 @@ window.PSStartup=(()=>{
 <!-- ====== Amigos ====== -->
 <section id="scr-friends" class="scr dim hidden">
   <div class="box wide">
-    <div class="row between"><h2>Amigos</h2>
+    <div class="row between"><h2>Hall</h2>
       <div class="row"><button id="fr-create" class="btn small gold">Crear sala</button>
       <button id="fr-room" class="btn small gold hidden">Ir a la sala</button><button class="btn small ghost" data-back>Volver</button></div></div>
     <p class="sub" id="fr-me"></p>
-    <form id="fr-add" class="row" autocomplete="off">
-      <input id="fr-name" class="field grow" maxlength="16" spellcheck="false" placeholder="Apodo de tu amigo">
-      <button class="btn gold" type="submit" data-sfx="confirm">Añadir amigo</button>
-    </form>
     <p id="fr-msg" class="note"></p>
     <div id="fr-list" class="fr-list"></div>
   </div>
@@ -424,7 +420,7 @@ window.PSStartup=(()=>{
       <div class="row"><button id="lobby-menu" data-ui-back class="btn small ghost">Menú</button><button id="lobby-leave" class="btn small ghost">Salir de la sala</button></div></div>
     <p class="sub" id="lobby-sub"></p>
     <div id="lobby-members" class="lobby-members"></div>
-    <h3 id="lobby-inv-title" style="margin:14px 0 6px">Invitar amigos</h3>
+    <h3 id="lobby-inv-title" style="margin:14px 0 6px">Invite to party</h3>
     <div id="lobby-invite" class="fr-list"></div>
     <div class="row" style="margin-top:14px">
       <button id="lobby-ready" class="btn">Prepararse</button>
