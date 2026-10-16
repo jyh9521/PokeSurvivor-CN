@@ -5,6 +5,7 @@ module.exports=function dynamic(scene,id,kind='moving',seed=1,opt={}){
  G.VFX.forType=()=>({});G.Camera.sees=()=>true;G.Camera.outerRadius=()=>100000;G.Camera.kick=()=>{};G.Spawner={say(){},ahead:()=>true};G.Path.dirFor=(e,p)=>G.U.norm(p.x-e.x,p.y-e.y);G.Progress={event(){},kill(){}};G.Rift={inArena:false};G.Judgment.active=false;G.Items={BY:{}};
  vm.runInContext(fs.readFileSync('js/systems/hazards.js','utf8'),ctx);
  const p=s.player(opt.dex||6);p.level=41;const m=G.Moves.instance(id,opt.moveLevel||(kind==='surround'?3:5));if(G.Moves.evoInfo(m,{hp:1,atk:1,spd:1,cd:1,def:1,rgn:1,mag:1,xp:1}))G.Moves.evolve(m);p.moves=[m];p.slots=[[m]];if(opt.defense)for(const id of ['vitality','harden'])for(let i=0;i<3;i++)G.Battle.learn(p,id);
+ opt.configure?.(p,G);
  G.Game={player:p,st:{time:500},everyone:()=>[p]};let elapsed=0,damageTaken=0,hitsTaken=0,enemyTravel=0,playerTravel=0,hazardCasts=0;const hurt=p.hurt.bind(p);p.hurt=(...a)=>{const hp=p.hp;hurt(...a);const lost=hp-p.hp;if(lost>0){hitsTaken++;damageTaken+=lost;}};
  const targets=[];for(let i=0;i<(kind==='surround'?12:1);i++){const boss=kind==='boss',a=i*Math.PI*2/12,r=kind==='surround'?65:140;const e=new G.Enemy({dex:boss?92:1,hp:opt.enemyHp||(boss?10000:642),spd:boss?75:85,dmg:boss?65:92.4,xp:0,behavior:'chase',...(boss?{stageChain:[92,93,94]}:{})},Math.cos(a)*r,Math.sin(a)*r,{hp:1,dmg:1,spd:1},boss);e.die=function(){this.dead=true;};G.EnemyMgr.add(e);targets.push(e);}
  const add=G.Hazards.add;G.Hazards.add=(...a)=>{hazardCasts++;return add(...a);};

@@ -2,6 +2,8 @@
  * Initially adapted from DabaoHuang/pokesurvivor PR #74; reviewed against this game.
  * Names are separately verified in lang-zh-cn-names.js. See docs/LOCALIZATION.md. */
 G.I18n.add({
+ 'Effective permanent attack':'永久攻击实际生效','Purchased ranks retained; item and altar attack budgets add up to +70%.':'购买等级保留；道具与祭坛攻击加法合计最多+70%。','+4% presupuesto de ataque':'原始攻击预算 +4%',
+ 'daño ×1,5':'伤害 ×1.5',
  'Crecimiento y cooperación':'成长与联机交互','El diagnóstico individual identifica NAS; la maestría se reparte durante la subida de nivel y al regresar de una grieta, con espera cooperativa.':'单人诊断明确显示NAS；精通可在升级和裂隙返回时安全分配，联机全员协调等待。',
  'NAS connection':'NAS连接','Allocate at level-up or rift settlement':'升级或裂隙结算时分配','Continue · keep unspent mastery':'继续 · 保留未用精通点',
   "Boss exhausted: counterattack during the golden opening!": "首领出现疲劳：抓住金色破绽反击！",

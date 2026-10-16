@@ -4,6 +4,8 @@
  * son los oficiales en inglés.
  */
 G.I18n.add({
+ '+4% presupuesto de ataque':'+4% raw attack budget',
+ 'daño ×1,5':'damage ×1.5',
   "Vibración del mando": "Controller vibration",
   "Vibra al recibir daño real.": "Vibrate on actual damage while a controller is connected.",
   "Probar vibración": "Test vibration",

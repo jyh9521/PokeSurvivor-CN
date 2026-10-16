@@ -42,7 +42,7 @@ G.Combat = (() => {
       m.t = 0.05;
       return;
     }
-    m.t = Math.max(0.05, m.cd * pl.cdMul * (G.SpecialRuntime?.cooldown(pl,m)||1));
+    m.t = Math.max(0.05, m.cd * G.BattleBalance.cooldown(pl.cdMul*(G.SpecialRuntime?.cooldown(pl,m)||1)));
     // Publish the same steering angle used by local movement and ghost rendering.
     if(m.kind==='dash'&&pl.walking)pl.aim=pl.moveAngle;
     pl.cast(m);

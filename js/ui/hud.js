@@ -265,7 +265,7 @@ G.HUD = (() => {
     const {S,GAP,sx,sy,totalW}=l;
     const n=l.slots.length;
     const BOND = '#ff8ad8';
-    const cdOf = m => m.kind === 'orbit' ? 0 : G.U.clamp(m.t / (m.cd * pl.cdMul), 0, 1);
+    const cdOf = m => m.kind === 'orbit' ? 0 : G.U.clamp(m.t / (m.cd * G.BattleBalance.cooldown(pl.cdMul*(G.SpecialRuntime?.cooldown(pl,m)||1))), 0, 1);
 
     for (let i = 0; i < n; i++) {
       const g = pl.slots[i] || [];

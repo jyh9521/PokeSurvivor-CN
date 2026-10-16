@@ -79,7 +79,7 @@ G.Coop = (() => {
       const chunks=Math.ceil(text.length/8000);for(let i=0;i<chunks;i++)await control(uid,{k:'handoff-chunk',nonce,index:i,total:chunks,text:text.slice(i*8000,(i+1)*8000)});
       await until(()=>handoff?.ready===true);
       // After the receipt, only the NAS-authenticated epoch may switch authority.
-      const result=await G.NAS.api('room/transfer',{uid,nonce,protocol:15});return result;
+      const result=await G.NAS.api('room/transfer',{uid,nonce,protocol:16});return result;
     }catch(e){
       // A timed-out HTTP reply may already have committed; refresh before aborting.
       await G.Social.refreshPresence();if(G.Social.room?.host===uid)return {ok:true};
@@ -255,7 +255,7 @@ G.Coop = (() => {
     const ja = G.Judgment.netState();       // Arceus en la Sentencia
     if (ja) f.ja = ja;
     // Siempre: quién está eligiendo y, si hay cartas de nivel, cuáles (ver arriba).
-    f.ho = holdNames();f.aw=hostAway||reconnecting.size>0||!!handoff;
+    f.ho = holdNames();f.ls=levelSeq;f.aw=hostAway||reconnecting.size>0||!!handoff;
     // Repair enemy creation after a brief connection outage without restarting a run.
     if(!m.repairAt||performance.now()>m.repairAt){m.repairAt=performance.now()+2000;f.meta=f.e.map(a=>{const e=G.EnemyMgr.get(a[0]);return [e.id,e.dex,e.maxHp,e.dmg,e.boss?1:0,e.shiny?1:0,e.behavior];});}
     if (waiting.size) f.lu = [levelSeq, levelNow];
@@ -421,6 +421,8 @@ G.Coop = (() => {
     if(msg.ts)teamStats?.ingest(msg.ts);
     for (const ev of msg.ev || []) applyHostEvent(ev);
     if(msg.t===undefined)return;
+    // Reliable choice events can overtake an older lossy state channel frame.
+    if(Number.isSafeInteger(msg.ls)&&msg.ls<seenSeq)return;
     hostAway=!!msg.aw;updateAway();
     for(const a of msg.meta||[])if(!G.EnemyMgr.get(a[0])){const state=(msg.e||[]).find(e=>e[0]===a[0]);if(state)G.EnemyMgr.addRemote({id:a[0],dex:a[1],hp:a[2],dmg:a[3],boss:!!a[4],shiny:!!a[5],beh:a[6],x:state[1],y:state[2]});}
     if (msg.ja) G.Judgment.netApply(msg.ja);
@@ -429,7 +431,7 @@ G.Coop = (() => {
       const k = msg.ho.join('|');
       if (k !== lastHo) { lastHo = k; api.hold && api.hold(msg.ho); }
       if (msg.lu && msg.lu[0] > seenSeq) { seenSeq = msg.lu[0]; api.levelStart(msg.lu[1]); }
-      else if (!msg.lu && api.inLevelUp && api.inLevelUp()) api.resume();
+      else if (!msg.lu && Number.isSafeInteger(msg.ls) && msg.ls>=seenSeq && api.inLevelUp && api.inLevelUp()) api.resume();
     }
     api.syncTeam({ time: msg.t, level: msg.lv, xp: msg.xp, xpNext: msg.xn, kills: msg.ki, bosses: msg.bo, coins: msg.co,
                    t1: (msg.tk || [])[0], t10: (msg.tk || [])[1] });
@@ -495,7 +497,7 @@ G.Coop = (() => {
       case 'heal': if (!local.dead) { local.heal(local.maxHp * ev[1]); G.FX.ring(local.x, local.y, 6, 60, '#5fe08a', 0.4, 3); } break;
       case 'lu': if (!ev[2] || ev[2] > seenSeq) { seenSeq = ev[2] || seenSeq; api.levelStart(ev[1]); } break;
       case 'lw': api.waiting(ev[1]); break;
-      case 'lr': api.resume(); break;
+      case 'lr': if(Number.isSafeInteger(ev[1])&&ev[1]>=seenSeq)api.resume(); break;
       case 'hp': lastHo = (ev[1] || []).join('|'); api.hold && api.hold(ev[1]); break;
       case 'ha': hostAway = !!ev[1]; updateAway(); break;
       case 'sh': api.shiny(ev[1]); break;
@@ -585,7 +587,7 @@ G.Coop = (() => {
   function picked(u) {
     if (!waiting.delete(u)) return;
     if (waiting.size) { sendWaiting(); return; }
-    emit(['lr']);
+    emit(['lr',levelSeq]);
     flushAll();
     api.resume();
   }

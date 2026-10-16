@@ -2,7 +2,7 @@
  * Headless open terrain and deterministic driving, NOT player win-rate evidence. */
 const fs=require('node:fs'),vm=require('node:vm');
 module.exports=function waves(scene,opt={}){
-  const s=scene(),{G,ctx}=s,noop=()=>{};if(opt.balance?.xp)Object.assign(G.BattleBalance.XP,opt.balance.xp);if(opt.balance?.pressure)Object.assign(G.BattleBalance.PRESSURE,opt.balance.pressure);let state=(opt.seed||17)>>>0,t=0;
+  const s=scene(),{G,ctx}=s,noop=()=>{};if(opt.balance?.type)Object.assign(G.BattleBalance.TYPE,opt.balance.type);if(opt.balance?.layers)Object.assign(G.BattleBalance.LAYERS,opt.balance.layers);if(opt.balance?.xp)Object.assign(G.BattleBalance.XP,opt.balance.xp);if(opt.balance?.pressure)Object.assign(G.BattleBalance.PRESSURE,opt.balance.pressure);let state=(opt.seed||17)>>>0,t=0;
   const rng=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};ctx.Math.random=rng;
   ctx.window={G};vm.runInContext(fs.readFileSync('js/core/util.js','utf8'),ctx,{filename:'js/core/util.js'});
   // Paired versions keep reward/spawn/loot sequences independent of combat RNG

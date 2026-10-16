@@ -261,7 +261,7 @@ G.MenuUI = (() => {
       el.innerHTML = `
         <div class="ic">${G.Icons.html(u.icon, 32)}</div>
         <div>
-          <b>${u.name}</b> <span style="color:var(--muted);font-size:13px">${u.unit}</span>
+          <b>${u.name}</b> <span style="color:var(--muted);font-size:13px">${u.unit}</span>${u.id==='atk'?'<small data-effective-attack>'+G.T('Effective permanent attack')+' +'+Math.round((G.Upgrades.perks(levels).atkMul-1)*1000)/10+'% · '+G.T('Purchased ranks retained; item and altar attack budgets add up to +70%.')+'</small>':''}
           <div class="pips">${Array.from({ length: u.max }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('')}</div>
         </div>
         <div class="upg-btns">

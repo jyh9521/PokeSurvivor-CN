@@ -17,10 +17,10 @@ G.Interact = (() => {
   const CHEST_TIME = 3.5;
   const POWER_TIME = 25;
   const POWERS = [
-    { id: 'dmg', name: 'Furia', desc: 'daño ×2', color: '#ff5f6d', on: p => { p.atkMul *= 2; }, off: p => { p.atkMul /= 2; } },
-    { id: 'spd', name: 'Rayo', desc: '+45% velocidad', color: '#5fd4ff', on: p => { p.spdMul *= 1.45; }, off: p => { p.spdMul /= 1.45; } },
+    { id: 'dmg', name: 'Furia', desc: 'daño ×1,5', color: '#ff5f6d', on: p => { p.atkMul *= G.BattleBalance.ALTAR.damage; }, off: p => { p.atkMul /= G.BattleBalance.ALTAR.damage; } },
+    { id: 'spd', name: 'Rayo', desc: '+45% velocidad', color: '#5fd4ff', on: p => { p.spdMul *= G.BattleBalance.ALTAR.speed; }, off: p => { p.spdMul /= G.BattleBalance.ALTAR.speed; } },
     { id: 'mag', name: 'Imán', desc: 'atraes todo desde lejos', color: '#ff8ad8', on: p => { p.magnet *= 4; }, off: p => { p.magnet /= 4; } },
-    { id: 'cd', name: 'Prisa', desc: '-40% recarga', color: '#ffd23f', on: p => { p.cdMul *= 0.6; }, off: p => { p.cdMul /= 0.6; } }
+    { id: 'cd', name: 'Prisa', desc: '-40% recarga', color: '#ffd23f', on: p => { p.cdMul *= G.BattleBalance.ALTAR.cooldown; }, off: p => { p.cdMul /= G.BattleBalance.ALTAR.cooldown; } }
   ];
   const TRAP_R = 74;
   const authority = () => !G.Coop.active || G.Coop.isHost;

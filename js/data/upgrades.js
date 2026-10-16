@@ -1,10 +1,10 @@
 /* ============ upgrades.js — mejoras permanentes entre runs ============
  * Se compran con Pokémonedas en el menú. `per` es lo que da cada nivel.
  */
-(function(factory){if(typeof module==='object'&&module.exports)module.exports=factory();else G.Upgrades=factory();})(()=>{
+(function(factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('../core/battle-balance.js'));else G.Upgrades=factory(G.BattleBalance);})(balance=>{
   const LIST = [
     { id: 'hp',     icon: 'heart', name: 'Vitalidad',      unit: '+8 vida',            max: 10, base: 60,  grow: 1.35 },
-    { id: 'atk',    icon: 'fist', name: 'Fuerza',         unit: '+4% daño',           max: 10, base: 80,  grow: 1.38 },
+    { id: 'atk',    icon: 'fist', name: 'Fuerza',         unit: '+4% presupuesto de ataque',           max: 10, base: 80,  grow: 1.38 },
     { id: 'spd',    icon: 'boot', name: 'Zancada',        unit: '+3% velocidad',      max: 8,  base: 70,  grow: 1.4 },
     { id: 'cd',     icon: 'clock', name: 'Reflejos',       unit: '-3% recarga',        max: 8,  base: 90,  grow: 1.42 },
     { id: 'def',    icon: 'shield', name: 'Coraza',         unit: '+2% defensa',        max: 8,  base: 80,  grow: 1.4 },
@@ -31,7 +31,7 @@
     const L = id => Math.max(0, Math.min(BY[id].max, Math.floor(+levels[id] || 0)));
     return {
       hp: L('hp') * 8,
-      atkMul: 1 + L('atk') * 0.04,
+      atkMul: 1 + balance.permanentBonus(L('atk') * 0.04),
       spdMul: 1 + L('spd') * 0.03,
       cdMul: 1 - L('cd') * 0.03,
       dmgReduce: L('def') * 0.02,

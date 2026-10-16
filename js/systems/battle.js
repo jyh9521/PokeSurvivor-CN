@@ -30,7 +30,7 @@ G.Battle=(()=>{
   function types(p){const b=p.battle;if(b?.form==='mega')return G.SpecialRuntime.entry(p)?.types||p.mon.types;return p.mon.types;}
   function formStats(p){return p.battle?.form==='mega'?G.SpecialRuntime.entry(p)?.stats||p.baseStats:p.baseStats;}
   function damage(p,e,m,amount){ensure(p);const cls=rules.classify(m,data),s=formStats(p),index=cls==='physical'?1:3,old=Math.max(.1,p.mon.atk||1);
-    let k=(.70+s[index]*.0055)/old;
+    let k=(.70+G.BattleBalance.attackEff(s[index])*.0055)/old;
     k*=1+passive(p,cls);
     const actor=p.remote?G.Game?.player||p:p;
     k*=G.BattleBalance.offense(actor);
@@ -68,7 +68,9 @@ G.Battle=(()=>{
     if(trait(p).key==='sturdy'&&b.sturdyT<=0&&p.hp>=p.maxHp-.001&&d>=p.hp){d=p.hp-1;b.sturdyT=60;}
     if(d>0)b.counterT=2+legacyLevel(p,'revenge');return Math.max(0,d);
   }
-  function speed(p){const mobility=p.battle?.form==='mega'?Math.round(78+formStats(p)[5]*.42)/Math.round(78+p.baseStats[5]*.42):1;return G.SpecialRuntime.speed(p)*mobility*(1+passive(p,'speed'))*(trait(p)?.key==='swift'?1.08:1);}
+  function specialSpeed(p){const mobility=p.battle?.form==='mega'?Math.round(78+formStats(p)[5]*.42)/Math.round(78+p.baseStats[5]*.42):1;return G.SpecialRuntime.speed(p)*mobility;}
+  function normalSpeed(p){return (1+passive(p,'speed'))*(trait(p)?.key==='swift'?1.08:1);}
+  function speed(p){return normalSpeed(p)*specialSpeed(p);}
   function crit(p){return clamp(p.critChance+passive(p,'crit'),0,.6);}
   function tick(p,dt){const b=ensure(p);b.clock+=dt;G.SpecialRuntime.tick(p,dt);
     for(const k of ['blockT','shieldT','counterT','sturdyT','pressureT'])b[k]=Math.max(0,(b[k]||0)-dt);
@@ -96,5 +98,5 @@ G.Battle=(()=>{
   }
   function net(p){const b=p.battle;return b?[b.form||'',Math.round(b.remaining*10)/10,Math.round(b.energy),b.used?1:0,Math.round(b.shield),b.block,Object.entries(p.passives||{}),p.baseForm||'',b.megaKey||'',[(b.zBoost||0),(b.terrainT||0),b.fieldType||'',(b.maxBuffT||0),!!b.maxAtk,!!b.maxSpa,!!b.maxSpeed,!!b.maxDef,(b.guardT||0)],b.choice,b.rechargePending?1:0,b.uses||0,G.RunGrowth?.net(p)]:null;}
   function ingest(p,a){if(!p.remote||!Array.isArray(a))return;const b=ensure(p);if(a[7]!==p.baseForm)G.SpecialRuntime.base(p,a[7]);const m=G.SpecialRules.mega(p.dex,a[8],p.baseForm);b.megaKey=m?.key||G.SpecialRules.megas(p.dex,p.baseForm)[0]?.key||'';const f=Array.isArray(a[9])?a[9]:[];b.zBoost=clamp(+f[0]||0,0,20);b.terrainT=clamp(+f[1]||0,0,12);b.fieldType=typeof f[2]==='string'?f[2]:'';b.maxBuffT=clamp(+f[3]||0,0,8);[b.maxAtk,b.maxSpa,b.maxSpeed,b.maxDef]=f.slice(4,8).map(Boolean);b.guardT=clamp(+f[8]||0,0,2);b.form=['mega','max'].includes(a[0])?a[0]:null;b.remaining=clamp(Number(a[1])||0,0,30);b.energy=clamp(Number(a[2])||0,0,100);b.used=!!a[3];b.shield=clamp(Number(a[4])||0,0,1e6);b.block=a[5]?1:0;p.passives={};for(const row of (Array.isArray(a[6])?a[6]:[]).slice(0,4))if(Array.isArray(row)&&G.PassiveDefs.some(d=>d.id===row[0])&&Number.isSafeInteger(row[1])&&row[1]>0&&row[1]>0)p.passives[row[0]]=clamp(row[1],1,maxLevel(row[0]));b.choice=["mega","max","z"].includes(a[10])?a[10]:"z";b.rechargePending=!!a[11];b.uses=clamp(a[12]|0,0,100);p.growthSummary=a[13]||null;visual(p);}
-  return {maxLevel,trait,init,learn,retrain,passiveKey,damage,deal,accept,credit,charge,defend,speed,crit,tick,activate,available,endForm,visual,net,ingest,types,level,passive,stats:p=>formStats(p)};
+  return {maxLevel,trait,init,learn,retrain,passiveKey,damage,deal,accept,credit,charge,defend,speed,normalSpeed,specialSpeed,crit,tick,activate,available,endForm,visual,net,ingest,types,level,passive,stats:p=>formStats(p)};
 })();

@@ -88,12 +88,16 @@ G.Player = class Player {
   cy() { return this.y; }
 
   // ---------------- stats efectivos ----------------
-  get atk() { return this.baseAtk * this.atkMul * (1 + this.buffs.atk.n * this.buffs.atk.amount); }
+  get atk() { const item=this.item==='choiceband'?.4:this.item==='lifeorb'?.3:0,altar=this.power?.def.id==='dmg'?G.BattleBalance.ALTAR.damage-1:0;
+    // Remove known legacy bookkeeping factors, then add same-category run budgets.
+    // Keep on/off inversion exact; permanent, cards, levels and forms stay separate.
+    return this.baseAtk*(this.atkMul/(1+item)/(1+altar))*G.BattleBalance.temporaryAttack(item,altar)*(1+this.buffs.atk.n*this.buffs.atk.amount); }
   get spd() {
-    const s = this.baseSpd * (this.meleeHasteT > 0 ? 1 + this.meleeHaste : 1) * this.spdMul * (1 + this.buffs.spd.n * this.buffs.spd.amount) * (this.slowT > 0 ? 0.5 : 1);
+    const normal=this.spdMul*(1+this.buffs.spd.n*this.buffs.spd.amount)*(G.Battle?.normalSpeed(this)||1);
+    const s=this.baseSpd*G.BattleBalance.movement(normal)*(this.meleeHasteT>0?1+this.meleeHaste:1)*(this.slowT>0?.5:1);
     const w = G.Weather.speedFor(this.mon.types);
     const slow = this.inLiquid ? G.World.liquidEffect(this.mon.types).slow || 1 : 1;
-    return s * slow * w * (G.Battle?.speed(this)||1);
+    return s * slow * w * (G.Battle?.specialSpeed(this)||1);
   }
   get reduction() { return Math.min(0.8, this.dmgReduce + this.buffs.def.n * this.buffs.def.amount); }
   get regen() { return this.regenFlat + this.buffs.regen.n * this.buffs.regen.amount; }
@@ -215,7 +219,7 @@ G.Player = class Player {
     if(this.remote&&(remotePose||this.net?.pose)){if(remotePose)this.anim.sync(remotePose);return;}
     const meta = G.Sprites.animMeta(this.dex, anim,this.shiny);
     const len = meta ? meta.d.reduce((a, b) => a + b, 0) / 60 : 0.4;
-    const cd = Math.max(0.12, m.cd * this.cdMul);
+    const cd = Math.max(0.12, m.cd * (G.BattleBalance?.cooldown(this.cdMul*(G.SpecialRuntime?.cooldown(this,m)||1))??this.cdMul));
     this.anim.request(anim, { speed: Math.min(3,Math.max(1, len / (cd * 0.9))) });
     this.attackFace = 0.35;
   }

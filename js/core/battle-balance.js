@@ -1,6 +1,15 @@
 /* Combat tuning shared by source, production and authority. Values are run-only. */
 (function(factory){if(typeof module==='object'&&module.exports)module.exports=factory();else G.BattleBalance=factory();})(()=>{
   const STAB=1.20,DENSITY_HP=1.65,CONTACT_DAMAGE=1.8,CONTACT_FACTOR=.60,CONTACT_CAP=.22,RANGED_CONTACT_CAP=.30,CONTACT_GRACE=.60;
+  const TYPE={super:1.6,resist:.6,immune:.3,min:.3,max:2.4};
+  const WEATHER={major:1.2,minor:1.15,weak:.85};
+  const ALTAR={damage:1.5,speed:1.45,cooldown:.6};
+  const LAYERS={alphaAtk:1,permanentCap:.6,temporaryMax:1.7,cooldownMin:.5,speedMax:1.6};
+  const permanentBonus=raw=>LAYERS.permanentCap*(1-Math.exp(-Math.max(0,Number.isFinite(raw)?raw:0)/LAYERS.permanentCap));
+  const temporaryAttack=(item,altar)=>Math.min(LAYERS.temporaryMax,1+Math.max(0,item)+Math.max(0,altar));
+  const cooldown=x=>Math.max(LAYERS.cooldownMin,Number.isFinite(x)&&x>0?x:1);
+  const movement=x=>Math.min(LAYERS.speedMax,Math.max(0,Number.isFinite(x)?x:1));
+  const attackEff=a=>{a=Math.max(.001,Number.isFinite(a)?a:100);return LAYERS.alphaAtk===1?a:100*(a/100)**LAYERS.alphaAtk;};
   const level=p=>Math.max(1,Math.min(10000,Number.isFinite(p?.level)?p.level:1));
   const offense=p=>1+(level(p)-1)*.045;
   const enemyScale=t=>({hp:1+Math.min(1800,Math.max(0,t))/900,dmg:1+Math.max(0,t)/600,spd:1+Math.min(.35,Math.max(0,t)/1400)});
@@ -39,5 +48,5 @@
     m.dmg=+m.dmg.toFixed(3);
   }
   const bodyContact=e=>!e.judge&&(e.remote?!(e.net?.st&16):e.phase!=='dash'&&!e.jump&&!e.ai?.cast);
-  return{XP,xpFor,PRESSURE,pressureRate,pressureDamage,CONTACT_FACTOR,CONTACT_CAP,RANGED_CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,recoveryWindow,waveRate,tierBlend,FLOORS,budget,tune};
+  return{cooldown,movement,permanentBonus,temporaryAttack,LAYERS,attackEff,TYPE,WEATHER,ALTAR,XP,xpFor,PRESSURE,pressureRate,pressureDamage,CONTACT_FACTOR,CONTACT_CAP,RANGED_CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,recoveryWindow,waveRate,tierBlend,FLOORS,budget,tune};
 });

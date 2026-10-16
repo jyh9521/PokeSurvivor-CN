@@ -31,16 +31,15 @@ G.Types = (() => {
     steel:    { fire: .5, water: .5, electric: .5, ice: 2, rock: 2, steel: .5, fairy: 2 },
     fairy:    { fire: .5, fighting: 2, poison: .5, dragon: 2, dark: 2, steel: .5 }
   };
-  const SOFT = { 2: 1.6, 0.5: 0.6, 0: 0.3 };
-  const MIN = 0.3, MAX = 2.4;
+  const tuning=G.BattleBalance.TYPE,SOFT={2:tuning.super,0.5:tuning.resist,0:tuning.immune};
 
   /** Multiplicador de un ataque de tipo `atk` contra un Pokémon de tipos `def`. */
   function mult(atk, def) {
     const row = CHART[atk];
     if (!row || !def) return 1;
-    let m = 1;
-    for (const t of def) if (row[t] != null) m *= SOFT[row[t]];
-    return G.U.clamp(m, MIN, MAX);
+    let m = 1,immune=false;
+    for (const t of def) if (row[t] != null){m *= SOFT[row[t]];if(row[t]===0)immune=true;}
+    return G.U.clamp(m,immune?tuning.immune:tuning.min,tuning.max);
   }
 
   /** 'super' | 'weak' | null, para enseñar el aviso. */

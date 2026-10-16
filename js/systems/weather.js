@@ -15,18 +15,19 @@
  * Cooperativo: lo decide el anfitrión y lo manda con 'wx'.
  */
 G.Weather = (() => {
+  const W=G.BattleBalance.WEATHER;
   const KINDS = {
     sun:  { name: 'Sol abrasador', icon: 'wsun', color: '#ffcb3d', tint: [255, 190, 90, 0.07],
-            mult: { fire: 1.5, water: 0.5 }, hint: 'el Fuego se potencia y el Agua se debilita' },
+            mult: { fire: W.major, water: W.weak }, hint: 'el Fuego se potencia y el Agua se debilita' },
     rain: { name: 'Lluvia', icon: 'wrain', color: '#7fb8ff', tint: [50, 90, 170, 0.09],
-            mult: { water: 1.5, electric: 1.2, fire: 0.5 }, hint: 'el Agua se potencia y el Fuego se debilita' },
+            mult: { water: W.major, electric: W.minor, fire: W.weak }, hint: 'el Agua se potencia y el Fuego se debilita' },
     sand: { name: 'Tormenta de arena', icon: 'wsand', color: '#e0bf73', tint: [200, 160, 90, 0.09],
-            mult: { rock: 1.3, ground: 1.3, steel: 1.3 }, safe: ['rock', 'ground', 'steel'],
+            mult: { rock: W.minor, ground: W.minor, steel: W.minor }, safe: ['rock', 'ground', 'steel'],
             hint: 'Roca, Tierra y Acero se potencian; el resto sufre' },
     snow: { name: 'Nevada', icon: 'wsnow', color: '#d8f1ff', tint: [210, 230, 255, 0.08],
-            mult: { ice: 1.5 }, safe: ['ice'], slow: true, hint: 'el Hielo se potencia; el resto sufre y va más lento' },
+            mult: { ice: W.major }, safe: ['ice'], slow: true, hint: 'el Hielo se potencia; el resto sufre y va más lento' },
     fog:  { name: 'Niebla', icon: 'wfog', color: '#c9cfdc', tint: [190, 195, 210, 0.12],
-            mult: { ghost: 1.3, fairy: 1.3, psychic: 1.3 }, hint: 'Fantasma, Hada y Psíquico se potencian' }
+            mult: { ghost: W.minor, fairy: W.minor, psychic: W.minor }, hint: 'Fantasma, Hada y Psíquico se potencian' }
   };
   // Probabilidad de cada clima según el bioma (bosque, cueva, volcán).
   const BIOME_W = [
