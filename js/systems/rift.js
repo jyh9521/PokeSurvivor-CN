@@ -25,16 +25,18 @@ G.Rift = (() => {
   const CHECK = 30, CHANCE = 0.2, TTL = 45;
   const ARENA_R = 11, ARENA_TIME = 120, FROM = 75;
   let rift = null;          // { x, y, ttl, t }
+  let arenaSerial=0;
   let arena = null;         // { tx, ty, r, dex, shiny, x, y, back, biome, t, phase, endT, bossId }
-  let checkT = CHECK, asked = false, downT = 0, misses = 0;
+  let checkT = CHECK, asked = false, downT = 0, misses = 0,starterT=150;
   const authority = () => !G.Coop.active || G.Coop.isHost;
   const TS = () => G.Tiles.T * G.Sprites.PX;
 
-  function reset() { rift = null; arena = null; checkT = CHECK; asked = false; downT = 0; misses = 0; }
+  function reset() { rift = null; arena = null; checkT = CHECK; asked = false; downT = 0; misses = 0;starterT=150; }
 
   // ---------------- grieta en el mapa ----------------
 
   function update(dt, pl, time) {
+    if(authority()&&!arena&&time>FROM)starterT-=dt;
     if (rift) {
       rift.t += dt;
       rift.ttl -= dt;
@@ -49,29 +51,30 @@ G.Rift = (() => {
         else misses++;
       }
     }
+    if(!rift&&!arena&&authority()&&starterT<=0&&checkT>8&&time>FROM&&time<G.Judgment.AT-120&&!G.EnemyMgr.bossAlive()){open('starter');starterT=rift?180:10;}
     if (arena) arenaTick(dt, pl);
   }
 
-  function open() {
+  function open(kind='legend') {
     const alive = G.Game.everyone().filter(p => !p.dead);
     const near = G.U.pick(alive.length ? alive : [G.Game.player]);
     for (let i = 0; i < 24; i++) {
       const a = Math.random() * 6.2832, d = G.U.rand(380, 560);
       const x = near.x + Math.cos(a) * d, y = near.y + Math.sin(a) * d * 0.85;
       if (!G.World.isFree(x, y, 22)) continue;
-      show(x, y, TTL);
-      if (G.Coop.isHost) G.Coop.broadcast(['rift', Math.round(x), Math.round(y), TTL]);
+      show(x, y, TTL,kind);
+      if (G.Coop.isHost) G.Coop.broadcast(['rift', Math.round(x), Math.round(y), TTL,kind]);
       return;
     }
   }
 
   /** Aparece la grieta (también la que manda el anfitrión). */
-  function show(x, y, ttl) {
-    rift = { x, y, ttl, t: 0 };
+  function show(x, y, ttl,kind='legend') {
+    rift = { x, y, ttl, t: 0,kind:kind==='starter'?'starter':'legend' };
     asked = false;
     // (El aviso grande lo dibuja hud.js mientras rift.t < 4,5 s.)
     G.Audio.sfx('rift');
-    G.FX.ring(x, y, 6, 80, '#b48aff', 0.7, 5);
+    G.FX.ring(x, y, 6, 80, kind==='starter'?'#68e0a3':'#b48aff', 0.7, 5);
   }
 
   function enter() {
@@ -86,20 +89,22 @@ G.Rift = (() => {
   /** Quien manda: elige legendario y lugar, y avisa a todos. */
   let nextType = null;          // pruebas/vídeos: tipo de la próxima arena
 
-  function start(forceType) {
+  function start(forceType,forceKind,forceDex) {
     if (arena) return;
     forceType = forceType || nextType; nextType = null;
-    let pool = G.DEX.filter(p => p.leg && G.SPRITE_META[p.dex]);
+    const kind=forceKind||rift?.kind||'legend';
+    let pool = kind==='starter'?G.BossStages.starters().map(c=>G.DEX_BY[c[c.length-1]]):G.DEX.filter(p => p.leg && G.SPRITE_META[p.dex]);
+    if(forceDex)pool=pool.filter(p=>p.dex===forceDex);if(!pool.length)return;
     if (forceType && pool.some(p => p.types.includes(forceType))) pool = pool.filter(p => p.types.includes(forceType));
     // Los legendarios que aún no has vencido salen 4 veces más (menos repetidos).
-    const beaten = (G.DB.save && G.DB.save.legends) || {};
+    const beaten = (G.DB.save && G.DB.save[kind==='starter'?'starterBosses':'legends']) || {};
     const ws = pool.map(p => (beaten[p.dex] ? 1 : 4));
     let r = Math.random() * ws.reduce((a, b) => a + b, 0), mi = 0;
     while (mi < pool.length - 1 && (r -= ws[mi]) > 0) mi++;
     const mon = pool[mi];
     const cfg = {
       tx: 5000 + Math.floor(Math.random() * 3000), ty: 5000 + Math.floor(Math.random() * 3000), r: ARENA_R,
-      dex: mon.dex, shiny: G.Sprites.hasShiny(mon.dex) && Math.random() < 1 / 512,
+      id:Date.now().toString(36)+'-'+(++arenaSerial).toString(36),kind,dex: mon.dex, shiny: G.Sprites.hasShiny(mon.dex) && Math.random() < 1 / 512,
       // La arena es la de uno de sus tipos, al azar.
       type: forceType || G.U.pick(mon.types)
     };
@@ -114,7 +119,7 @@ G.Rift = (() => {
     const ts = TS();
     arena = Object.assign({}, cfg, {
       x: cfg.tx * ts + ts / 2, y: cfg.ty * ts + ts / 2,
-      back: { x: pl.x, y: pl.y }, biome: G.World.biome, t: 0, phase: 'fight', endT: 0, bossId: 0
+      flawless:true,back: { x: pl.x, y: pl.y }, biome: G.World.biome, t: 0, phase: 'fight', endT: 0, bossId: 0
     });
     rift = null; asked = false; downT = 0;
     if (authority()) G.EnemyMgr.stash(); else G.EnemyMgr.clearRemote();
@@ -136,12 +141,13 @@ G.Rift = (() => {
   }
 
   function spawnLegend() {
-    const mon = G.DEX_BY[arena.dex];
+    const chain=arena.kind==='starter'?G.BossStages.starters().find(c=>c[c.length-1]===arena.dex):null;
+    const mon = G.DEX_BY[chain?chain[0]:arena.dex];
     const t = G.Game.st.time;
     const n = G.Game.everyone().length;
     const ts = TS();
     const def = {
-      dex: mon.dex, name: mon.name,
+      dex: mon.dex, name: mon.name,stageChain:chain,
       hp: Math.round((3200 + t * 9) * G.Coop.scaleHp(n) * (n > 1 ? 1.4 : 1)),
       spd: Math.round(G.U.clamp(48 + (mon.spd - 78) * 0.6, 48, 105)),
       dmg: Math.round(36 + t / 20), xp: Math.round(500 + t * 1.2),
@@ -149,7 +155,7 @@ G.Rift = (() => {
       shotDmg: Math.round(18 + t / 40), shotCd: 0.9, range: 300
     };
     const e = new G.Enemy(def, arena.x, arena.y - ts * 3.5, { hp: 1, spd: 1, dmg: 1 }, true);
-    e.legend = true;
+    e.legend = arena.kind!=='starter';e.riftStarter=arena.kind==='starter'?arena.dex:0;
     // Choca con las paredes y columnas como tú: si volara por encima de las
     // rocas, tus disparos no podrían alcanzarle (bug de Celebi).
     e.flying = false;
@@ -177,20 +183,21 @@ G.Rift = (() => {
       if (!authority()) return;
       keepInside();
       const boss = G.EnemyMgr.get(arena.bossId);
-      if (!boss || boss.dead) { G.Coop.isHost && G.Coop.broadcast(['aw']); won(); return; }
+      if (!boss || boss.dead) {const result={id:arena.id,starterDex:arena.kind==='starter'?arena.dex:0,flawless:arena.flawless&&!G.Game.everyone().some(p=>p.dead)};G.Coop.isHost && G.Coop.broadcast(['aw',result]); won(result); return; }
+      if(G.Game.everyone().some(p=>p.dead))arena.flawless=false;
       const allDown = G.Game.everyone().every(p => p.dead);
       downT = allDown ? downT + dt : 0;
-      if (downT > 1.4 || arena.t > ARENA_TIME) { G.Coop.isHost && G.Coop.broadcast(['al']); lost(); }
+      if (downT > 1.4 || arena.t > ARENA_TIME) { G.Coop.isHost && G.Coop.broadcast(['al',arena.id]); lost(); }
       return;
     }
     arena.endT -= dt;
     if (arena.endT <= 0) finish();
   }
 
-  function won() {
-    if (!arena || arena.phase !== 'fight') return;
+  function won(result={}) {
+    if (!arena || arena.phase !== 'fight'||arena.id&&result.id!==arena.id) return;
     arena.phase = 'won'; arena.endT = 5;
-    G.Progress.event('rift', { type: arena.type });
+    G.Progress.event('rift', { type: arena.type,starterDex:arena.kind==='starter'?arena.dex:0,flawless:result.flawless===true });
     G.Pickups.pullAll();
     G.Spawner.say('¡Has vencido a ' + G.DEX_BY[arena.dex].name + '! Recoge el premio…', 3.4, true);
     G.Audio.sfx('legend');
@@ -246,7 +253,7 @@ G.Rift = (() => {
         const fadeIn = Math.min(1, rift.t * 2), fadeOut = Math.min(1, rift.ttl / 1.5);
         ctx.save();
         ctx.globalAlpha = 0.25 * fadeIn * fadeOut;
-        ctx.fillStyle = '#7b3cff';
+        ctx.fillStyle = rift.kind==='starter'?'#38bd89':'#7b3cff';
         ctx.beginPath(); ctx.ellipse(rift.x, rift.y, 34, 12, 0, 0, 6.2832); ctx.fill();
         ctx.globalAlpha = fadeIn * fadeOut;
         ctx.drawImage(img, Math.round(rift.x - w / 2), Math.round(rift.y - h + 4), w, h);
@@ -260,23 +267,23 @@ G.Rift = (() => {
 
   function onEvent(ev) {
     switch (ev[0]) {
-      case 'rift': show(ev[1], ev[2], ev[3]); break;
+      case 'rift': show(ev[1], ev[2], ev[3],ev[4]); break;
       case 'riftx': rift = null; break;
       case 'arena': begin(ev[1]); break;
-      case 'aw': won(); break;
-      case 'al': lost(); break;
+      case 'aw': won(ev[1]); break;
+      case 'al': if(!arena?.id||ev[1]===arena.id)lost(); break;
     }
   }
 
   return {
-    checkpoint(s){if(!s)return {rift,arena,checkT,asked,downT,misses};const back=arena?.back;({rift,arena,checkT,asked,downT,misses}=s);if(arena&&back)arena.back=back;},
+    checkpoint(s){if(!s)return {rift,arena,checkT,asked,downT,misses,starterT};const back=arena?.back;starterT=Number.isFinite(s.starterT)?s.starterT:150;({rift,arena,checkT,asked,downT,misses}=s);if(arena&&back)arena.back=back;},
     reset, update, drawable, onEvent, enterRequest() { if (!arena) start(); },
     get rift() { return rift; }, get arena() { return arena; },
     get inArena() { return !!arena; },
     get timeLeft() { return arena ? Math.max(0, ARENA_TIME - arena.t) : 0; },
     debugOpen() { open(); },
     /** Para pruebas: arena de un tipo ya. */
-    debugArena(type) { start(type); },
+    debugArena(type,kind='legend',dex) { start(type,kind,dex); },
     /** Para vídeos: la próxima grieta en la que entres será de este tipo. */
     debugNextType(type) { nextType = type; }
   };

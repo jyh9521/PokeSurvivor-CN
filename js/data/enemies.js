@@ -153,14 +153,16 @@ G.Enemies = (() => {
       if (r) { r.behavior = 'runner'; r.spd = Math.round(r.spd * 1.6); r.hp = Math.round(r.hp * 0.7); }
     }
     const used = new Set();
-    bosses = BOSS_SLOTS.map(slot => {
+    bosses = BOSS_SLOTS.map((slot,index) => {
       const ok = p => !p.leg && G.SPRITE_META[p.dex] && !used.has(p.dex);
       let pool = G.DEX.filter(p => ok(p) && p.bst >= slot.bst[0] && p.bst <= slot.bst[1]);
       if (!pool.length) pool = G.DEX.filter(p => ok(p) && p.bst >= 580);
-      const p = G.U.pick(pool);
-      used.add(p.dex);
+      const staged=(G.BossStages?.regular()||[]).filter(c=>!used.has(c[c.length-1]));
+      const stageChain=(index===0||index===2||index===4)&&staged.length?G.U.pick(staged):null;
+      const p = stageChain?G.DEX_BY[stageChain[0]]:G.U.pick(pool);
+      used.add(stageChain?stageChain[stageChain.length-1]:p.dex);
       return {
-        at: slot.at, dex: p.dex, name: p.name,
+        at: slot.at, dex: p.dex, name: p.name,stageChain,
         // (Desde 2026-10-10 más duros: ×1,35 de vida y ×1,2 de daño.)
         hp: Math.round(slot.hp * 1.35), spd: Math.round(G.U.clamp(40 + baseSpd(p) * 0.5, 40, 100)),
         dmg: Math.round(slot.dmg * 1.2), xp: slot.xp,

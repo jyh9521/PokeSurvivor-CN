@@ -20,7 +20,7 @@ G.Hazards = (() => {
     list.push(o);
     if (!fromNet && G.Coop.isHost) {
       G.Coop.broadcast(['hz', { kind: o.kind, x: Math.round(o.x), y: Math.round(o.y), r: o.r, angle: o.angle, len: o.len, w: o.w,
-                                delay: o.delay, dmg: Math.round(o.dmg), type: o.type, color: o.color, pct: o.pct, pure: o.pure, vis: o.vis }]);
+                                delay: o.delay, dmg: Math.round(o.dmg), type: o.type, color: o.color, ownerId:o.ownerId,ownerStage:o.ownerStage,pct: o.pct, pure: o.pure, vis: o.vis }]);
     }
     return o;
   }
@@ -105,5 +105,5 @@ G.Hazards = (() => {
     }
   }
 
-  return {checkpoint(s){if(!s)return {list};list=s.list.map(h=>{const old=list.find(o=>o.kind===h.kind&&o.x===h.x&&o.y===h.y&&Math.abs(o.t-h.t)<.5);return {...h,hit:old?.hit||false};});}, add, clear, update, draw, inside, get all() { return list; }, get count() { return list.length; } };
+  return {checkpoint(s){if(!s)return {list};list=s.list.map(h=>{const old=list.find(o=>o.kind===h.kind&&o.x===h.x&&o.y===h.y&&Math.abs(o.t-h.t)<.5);return {...h,hit:old?.hit||false};});}, add, clearOwner(id,stage=Infinity){list=list.filter(h=>h.ownerId!==id||(h.ownerStage||0)>=stage);},clearAround(x,y,r){list=list.filter(h=>G.U.dist2(h.x,h.y,x,y)>r*r);},clear, update, draw, inside, get all() { return list; }, get count() { return list.length; } };
 })();

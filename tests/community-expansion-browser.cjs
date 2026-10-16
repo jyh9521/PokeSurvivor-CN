@@ -108,6 +108,12 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
     }
     if(BATTLE){
       for(const p of pages)await p.evaluate(()=>{const p=G.Game.player;p.slots=[];G.Combat.clearFields();G.Battle.init(p);});
+      const phaseId=await a.evaluate(()=>{const p=G.Game.player,e=new G.Enemy({dex:92,hp:1000000,spd:0,dmg:1,xp:0,behavior:'chase',stageChain:[92,93,94]},p.x+100,p.y,{hp:1,spd:1,dmg:1},true);e.shotDmg=()=>0;G.EnemyMgr.add(e);e.hp=e.maxHp*.6;return e.id;});
+      await pages[1].waitForFunction(id=>G.EnemyMgr.get(id)?.dex===93&&G.EnemyMgr.get(id)?.bossStage===1,phaseId,{timeout:10000});
+      check('a real host boss stage changes species and reaches guest snapshots',true);
+      await a.evaluate(id=>G.EnemyMgr.get(id).hp=200000,phaseId);await pages[2].waitForFunction(id=>G.EnemyMgr.get(id)?.dex===94&&G.EnemyMgr.get(id)?.bossStage===2,phaseId,{timeout:10000});
+      check('third-stage Gengar synchronizes without refilling the one shared HP pool',await a.evaluate(id=>G.EnemyMgr.get(id).hp<=200000,phaseId));
+      await a.evaluate(id=>{const e=G.EnemyMgr.get(id);e.hp=0;e.dead=true;},phaseId);
       await a.evaluate(()=>{const p=G.Game.player;let card;for(let i=0;i<100&&!card;i++)card=G.LevelUp.offer(p).find(c=>c.type==='passive');if(!card)throw Error('No passive offers');window.__passiveCard=card.key;G.RunUI.showLevelUp(2,[card],c=>{c.apply(p);G.RunUI.closeLevelUp();});});
       await a.locator('#cards .card').click();
       check('a real level-up card learns a passive without taking an attack slot',await a.evaluate(()=>Object.keys(G.Game.player.passives).length===1&&G.Game.player.slots.length===0));
@@ -129,15 +135,29 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
       check('Mega uses audited alternate animation where available and does not replace species identity',await a.evaluate(()=>{const p=G.Game.player;return p.dex===6&&p.anim.dex===G.BattleDex.species[6].mega[0].id&&p.battle.remaining>0;}));
       const beforeMax=await pages[1].evaluate(()=>{const p=G.Game.player;p.battle.energy=100;window.__preMax={hp:p.hp,max:p.maxHp,r:p.r};return window.__preMax;});
       await pages[1].locator('[data-battle-choice="max"]').click();await pages[1].locator('#battle-activate').click();await a.waitForFunction(uid=>G.Coop.mate(uid)?.pl.battle.form==='max',users[1].id,{timeout:10000});
-      check('Dynamax grows the actual sprite and HP but leaves collision radius unchanged',await pages[1].evaluate(()=>{const p=G.Game.player;return p.maxHp>window.__preMax.max&&p.r===window.__preMax.r&&p.anim.scale>1.5;}));
+      check('Dynamax grows the actual sprite and HP and updates its collision radius',await pages[1].evaluate(()=>{const p=G.Game.player;return p.maxHp>window.__preMax.max&&p.r>window.__preMax.r&&p.anim.scale>1.5;}));
       const zTarget=await a.evaluate(uid=>{const q=G.Coop.mate(uid).pl,e=new G.Enemy({dex:1,hp:500,spd:0,dmg:0,xp:0,behavior:'chaser'},q.x+25,q.y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},users[2].id);
-      await pages[2].waitForFunction(id=>!!G.EnemyMgr.get(id),zTarget);await pages[2].evaluate(()=>G.Game.player.battle.energy=100);await pages[2].locator('[data-battle-choice="z"]').click();await pages[2].locator('#battle-activate').click();await a.waitForFunction(id=>G.EnemyMgr.get(id)?.hp<500,zTarget,{timeout:10000});
+      await pages[2].waitForFunction(id=>!!G.EnemyMgr.get(id),zTarget);await pages[2].evaluate(id=>{const p=G.Game.player;p.target=G.EnemyMgr.get(id);p.aim=Math.atan2(p.target.y-p.y,p.target.x-p.x);p.slots=[[G.Moves.instance('thunderbolt')]];p.activeMove().t=999;p.battle.energy=100;},zTarget);await pages[2].locator('[data-battle-choice="z"]').click();await pages[2].locator('#battle-activate').click();await a.waitForFunction(id=>G.EnemyMgr.get(id)?.hp<500,zTarget,{timeout:10000});
       check('guest Z-Move deals real host-authoritative damage and refuses another special form',await pages[2].evaluate(()=>G.Game.player.battle.used&&!G.Battle.activate(G.Game.player,'max')));
       await a.screenshot({animations:'disabled',path:path.join(OUT,'mega-eight-player.png')});await pages[1].screenshot({animations:'disabled',path:path.join(OUT,'dynamax-eight-player.png')});
       await a.evaluate(()=>G.Battle.tick(G.Game.player,31));await pages[1].evaluate(()=>G.Battle.tick(G.Game.player,21));
       await pages[2].waitForFunction(uid=>!G.Coop.mate(uid).pl.battle.form,users[0].id,{timeout:10000});await a.waitForFunction(uid=>!G.Coop.mate(uid).pl.battle.form,users[1].id,{timeout:10000});
       check('temporary forms expire on every peer and restore base HP without a toggle heal',await pages[1].evaluate(()=>{const p=G.Game.player;return p.maxHp===window.__preMax.max&&Math.abs(p.hp-window.__preMax.hp)<.01&&!p.battle.form;}));
       check('form and passive state never enters the persistent wallet/save schema',users.every(u=>{const s=app.store.getSave(u.id).save;return !s.battle&&!s.passives&&!s.form;}));
+    }
+    if(BATTLE){
+      await a.evaluate(()=>{G.Rift.debugArena('fire','starter',6);const e=G.EnemyMgr.get(G.Rift.arena.bossId);e.xp=0;window.__starterBoss=e.id;});
+      await pages[1].waitForFunction(()=>G.Rift.arena?.kind==='starter'&&G.Rift.arena.dex===6,null,{timeout:10000});
+      check('a starter rift enters the whole eight-player party with its own identity',await a.evaluate(()=>{const e=G.EnemyMgr.get(window.__starterBoss);return e.dex===4&&!e.legend;}));
+      await a.evaluate(()=>{const e=G.EnemyMgr.get(window.__starterBoss);e.hp=e.maxHp*.2;});
+      await pages[1].waitForFunction(()=>G.EnemyMgr.all().some(e=>e.boss&&e.dex===6&&e.bossStage===2),null,{timeout:10000});
+      await a.evaluate(()=>{const e=G.EnemyMgr.get(window.__starterBoss);e.hp=0;e.dead=true;});
+      await Promise.all(pages.map(p=>p.waitForFunction(()=>G.Rift.arena?.phase==='won'&&!!G.DB.save.starterBosses?.[6],null,{timeout:10000})));
+      check('all eight players receive starter progress, never a false legendary record',(await Promise.all(pages.map(p=>p.evaluate(()=>!G.DB.save.legends?.[6]&&G.DB.save.stats.starterRiftWins===1)))).every(Boolean));
+      const bonds=await pages[1].evaluate(()=>G.Game.player.bonds);await pages[1].evaluate(()=>G.Rift.onEvent(['aw',{flawless:true}]));
+      check('duplicate guest arena wins do not duplicate bonds or starter records',await pages[1].evaluate(()=>G.Game.player.bonds)===bonds);
+      for(const p of pages)await p.evaluate(()=>G.Game.player.bonds=0);
+      await a.waitForFunction(()=>!G.Rift.inArena,null,{timeout:10000});await pages[1].waitForFunction(()=>!G.Rift.inArena,null,{timeout:10000});
     }
     const last=pages[7];await last.evaluate(()=>{window.__testRoom=G.Social.room.id;window.__testRun=G.Game.st.time;});await last.context().setOffline(true);await last.evaluate(()=>window.__fixtureSockets.at(-1).close());await a.waitForFunction(()=>G.NAS.networkMetrics().reconnectingPeers>=1,null,{timeout:10000}).catch(async e=>{console.log('RECONNECT_DEBUG',JSON.stringify({host:await a.evaluate(()=>({metrics:G.NAS.networkMetrics(),members:G.Social.room?.members,state:G.Game.state})),last:await last.evaluate(()=>({state:G.Game.state,sockets:window.__fixtureSockets.map(s=>s.readyState)})),errors}));throw e;});await last.context().setOffline(false);await last.waitForFunction(()=>G.Social.room?.members.length===8&&G.NAS.networkMetrics().connected,{},{timeout:20000});
     check('same browser reconnects into the same normal room',await last.evaluate(()=>G.Social.room.id===window.__testRoom));

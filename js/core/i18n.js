@@ -68,7 +68,7 @@ G.I18n = (() => {
   function t(s, context) {
     const contextual = contexts.get(context);
     if (contextual && Object.prototype.hasOwnProperty.call(contextual, s)) return contextual[s];
-    if (lang === 'es' || !s || typeof s !== 'string') return s;
+    if (!s || typeof s !== 'string') return s;
     if (!/\p{L}/u.test(s)) return s;
     const c = cache.get(s);
     if (c !== undefined) return c;
@@ -150,7 +150,7 @@ G.I18n = (() => {
 
   function startDom() {
     document.title = { es: 'PokéSurvivor – Juego Pokémon gratis online estilo Survivor.io', en: 'PokéSurvivor – Free online Pokémon survival game (Survivor.io style)', 'zh-CN': 'PokéSurvivor – 宝可梦生存游戏中文本地版' }[lang];
-    if (lang === 'es') return;
+    // Registered extension dictionaries also translate new terms in the source locale.
     // Los enlaces a las páginas de la web, a su versión en inglés.
     const links = { 'guia/': 'guide', 'pokedex/': 'pokedex', 'contacto/': 'contact' };
     document.querySelectorAll('a[href]').forEach(a => { const page = links[a.getAttribute('href')]; if (page) a.setAttribute('href', pageUrl(page)); });

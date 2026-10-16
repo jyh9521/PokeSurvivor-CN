@@ -56,7 +56,7 @@ test('Mega uses real alternate stats, types and ability, expires cleanly, and is
  assert.equal(G.Battle.activate(p,'mega'),true);assert.equal(p.battle.remaining,30);assert.notDeepEqual(Array.from(G.Battle.stats(p)),base);assert.notEqual(G.Battle.trait(p).key,trait);assert.equal(p.dex,6);assert.equal(G.Battle.activate(p,'max'),false);
  G.Battle.tick(p,31);assert.equal(p.battle.form,null);assert.deepEqual(Array.from(G.Battle.stats(p)),base);assert.equal(G.Battle.trait(p).key,trait);
  const q=player(1);q.battle.energy=100;assert.equal(G.Battle.activate(q,'mega'),false);assert.equal(q.battle.used,false);
- const fast=player(15),before=G.Battle.speed(fast);fast.battle.energy=100;G.Battle.activate(fast,'mega');assert.ok(G.Battle.speed(fast)>before,'Mega speed stat changes real movement');G.Battle.endForm(fast);assert.equal(G.Battle.speed(fast),before);
+ const fast=player(428),before=G.Battle.speed(fast);fast.battle.energy=100;G.Battle.activate(fast,'mega');assert.ok(G.Battle.speed(fast)>before,'Mega speed stat changes real movement');G.Battle.endForm(fast);assert.equal(G.Battle.speed(fast),before);
 });
 
 test('Dynamax preserves original collision radius and HP fraction and cannot heal by toggling or expiration twice',()=>{
@@ -65,13 +65,13 @@ test('Dynamax preserves original collision radius and HP fraction and cannot hea
 });
 
 test('forms honor real charge and run/death boundaries; Z deals one burst and refuses repeats',()=>{
- const {G,player,enemy}=scene(),p=player(),e=enemy();assert.equal(G.Battle.activate(p,'z'),false);G.Battle.tick(p,10);assert.equal(p.battle.energy,8);p.battle.energy=100;assert.equal(G.Battle.activate(p,'z'),true);const hp=e.hp;assert.ok(hp<1000);assert.equal(G.Battle.activate(p,'z'),false);assert.equal(e.hp,hp);
+ const {G,player,enemy}=scene(),p=player(),e=enemy();p.aim=0;G.Camera.sees=()=>true;assert.equal(G.Battle.activate(p,'z'),false);G.Battle.tick(p,10);assert.equal(p.battle.energy,8);p.battle.energy=100;assert.equal(G.Battle.activate(p,'z'),true);G.Projectiles.update(.1,p,[e]);G.Combat.resolve(.1,p,.1);G.Combat.updateFields(1);const hp=e.hp;assert.ok(hp<1000);assert.equal(G.Battle.activate(p,'z'),false);assert.equal(e.hp,hp);
  const q=player();q.battle.energy=100;G.Battle.activate(q,'max');q.dead=true;q.hp=0;G.Battle.tick(q,.1);assert.equal(q.battle.form,null);assert.equal(q.hp,0);
  assert.equal(player().battle.used,false);
 });
 
 test('new waves use swept one-hit collision, delayed marks detonate once, decoys expire and counter requires a trigger',()=>{
- const {G,player,enemy}=scene(),p=player(),e=enemy(50);p.slots=[[G.Moves.instance('surf')]];p.target=e;p.aim=0;G.Combat.tick(.01,p,0);G.Combat.updateFields(.5);const hp=e.hp;assert.ok(hp<1000);G.Combat.updateFields(.01);assert.equal(e.hp,hp);
+ const {G,player,enemy}=scene(),p=player(),e=enemy(50);p.slots=[[G.Moves.instance('surf')]];p.target=e;p.aim=0;G.Combat.tick(.01,p,0);G.Combat.updateFields(.5);G.Projectiles.update(.1,p,[e]);G.Combat.resolve(.1,p,.1);G.Combat.updateFields(1);const hp=e.hp;assert.ok(hp<1000);G.Combat.updateFields(.01);assert.equal(e.hp,hp);
  G.Combat.clearFields();p.slots=[[G.Moves.instance('earth-power')]];G.Combat.tick(.01,p,0);const before=e.hp;G.Combat.updateFields(.3);assert.equal(e.hp,before);G.Combat.updateFields(.4);assert.ok(e.hp<before);const after=e.hp;G.Combat.updateFields(2);assert.equal(e.hp,after);
  p.slots=[[G.Moves.instance('substitute')]];G.Combat.tick(.01,p,0);assert.equal(G.Combat.decoys().length,1);G.Combat.updateFields(4);assert.equal(G.Combat.decoys().length,0);
  p.slots=[[G.Moves.instance('counter')]];p.battle.counterT=0;const old=e.hp;G.Combat.tick(.1,p,0);assert.equal(e.hp,old);p.battle.counterT=2;G.Combat.tick(.1,p,0);assert.ok(e.hp<old);assert.equal(p.battle.counterT,0);
@@ -106,8 +106,8 @@ test('per-skill layered effects are bounded and quality changes never alter comb
  for(let i=0;i<1000;i++)G.SkillVFX.cast(p,G.Moves.BY_ID.surf,true);assert.ok(G.SkillVFX.count<=100);assert.equal(e.hp,1000);G.SkillVFX.update(10);assert.equal(G.SkillVFX.count,0);
 });
 
-test('room protocol advertises version five and rejects previous battle clients',async()=>{
- const os=require('node:os'),path=require('node:path'),{createApp}=require('../server/app.cjs'),dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-protocol5-')),app=createApp({dataDir:dir,campaigns:[]});try{await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+app.server.address().port,u=await app.store.credentials('BattleProtocol','password123',true),cookie='ps_nas='+app.store.session(u);assert.equal((await fetch(base+'/api/config').then(r=>r.json())).protocol,5);const r=await fetch(base+'/api/room/create',{method:'POST',headers:{origin:base,cookie,'content-type':'application/json'},body:JSON.stringify({protocol:4})});assert.equal(r.status,409);}finally{await app.close();fs.rmSync(dir,{recursive:true,force:true});}
+test('room protocol advertises version six and rejects previous battle clients',async()=>{
+ const os=require('node:os'),path=require('node:path'),{createApp}=require('../server/app.cjs'),dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-protocol5-')),app=createApp({dataDir:dir,campaigns:[]});try{await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+app.server.address().port,u=await app.store.credentials('BattleProtocol','password123',true),cookie='ps_nas='+app.store.session(u);assert.equal((await fetch(base+'/api/config').then(r=>r.json())).protocol,6);const r=await fetch(base+'/api/room/create',{method:'POST',headers:{origin:base,cookie,'content-type':'application/json'},body:JSON.stringify({protocol:5})});assert.equal(r.status,409);}finally{await app.close();fs.rmSync(dir,{recursive:true,force:true});}
 });
 
 function network(s,uid){const {G,ctx}=s;let receive;const sent=[];G.Net={uid,on:f=>receive=f,onPeer:()=>{},interval:()=>.1,slow:()=>false,viaTurn:()=>false,send:(u,m)=>sent.push([u,m]),toHost:m=>sent.push(['host',m])};G.Flow={};G.TeamStats={create:()=>({snapshot:()=>[],hit:()=>{},ingest:()=>{}})};vm.runInContext(fs.readFileSync('js/net/coop.js','utf8'),ctx);const p=s.player();G.Coop.begin({host:'host',members:Array.from({length:8},(_,i)=>({uid:i?'u'+i:'host',name:'p'+i,dex:6}))},p,{choosing:()=>false});return {p,receive,sent};}

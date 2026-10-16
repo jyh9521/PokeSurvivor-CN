@@ -26,6 +26,8 @@ function validateSave(value,name) {
       for(const [id,prices]of Object.entries(ledger))if(!Upgrades.BY[id]||!Array.isArray(prices)||prices.length>(s.pupg[dex]?.[id]||0)||prices.some(p=>!Number.isSafeInteger(p)||p<0||p>1000000))throw error(400,'Invalid upgrade spending');
     }
   }
+  if(s.partnerForms!==undefined){const forms=require('../js/data/special-data.js').variants;if(!s.partnerForms||typeof s.partnerForms!=='object'||Array.isArray(s.partnerForms)||Object.entries(s.partnerForms).some(([dex,key])=>!s.owned[dex]||typeof key!=='string'||key!==''&&!forms.some(v=>v.dex===+dex&&v.key===key)))throw error(400,'Invalid partner form');}
+  if(s.starterBosses!==undefined){const allowed=new Set(require('../js/data/boss-catalog.js').starters.map(c=>c[c.length-1]));if(!s.starterBosses||typeof s.starterBosses!=='object'||Array.isArray(s.starterBosses)||Object.entries(s.starterBosses).some(([k,v])=>!allowed.has(+k)||!Number.isFinite(v)||v<0))throw error(400,'Invalid starter bosses');}
   s.profile ||= {favs:[],title:''};s.ach ||= {};s.legends ||= {};
   if(typeof s.profile!=='object'||Array.isArray(s.profile)||!Array.isArray(s.profile.favs)||s.profile.favs.length>3||typeof s.profile.title!=='string'||s.profile.title.length>128)throw error(400,'Invalid profile');
   for(const f of s.profile.favs)if(!f||!Number.isSafeInteger(f.dex)||f.dex<1||f.dex>1100||typeof f.shiny!=='boolean')throw error(400,'Invalid favorite');

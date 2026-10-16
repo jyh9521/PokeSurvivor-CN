@@ -3,6 +3,7 @@
   const REGIONS=[['Kanto','关都'],['Johto','城都'],['Hoenn','丰缘'],['Sinnoh','神奥'],['Unova','合众','Teselia'],['Kalos','卡洛斯'],['Alola','阿罗拉'],['Galar','伽勒尔'],['Paldea','帕底亚']];
   const ROLES={tank:['counter','body-slam','bulldoze','stealth-rock'],healer:['draining-kiss','leech-seed','hyper-voice','substitute'],skirmisher:['aqua-jet','shadow-sneak','quick-attack','air-slash'],caster:['psychic','dragon-pulse','earth-power','hyper-beam'],bruiser:['metal-claw','karate-chop','counter','body-slam'],controller:['whirlpool','icy-wind','leech-seed','stealth-rock']};
   const TRAITS={
+    disguise:{title:'Disguise',desc:'The first unblocked hit breaks Disguise and costs at most 12.5% max HP; once per run.'},
     carapace:{title:'Carapace',desc:'Physical damage taken -12%.',kind:'physical',reduction:.12},
     ward:{title:'Spirit ward',desc:'Special damage taken -12%.',kind:'special',reduction:.12},
     sturdy:{title:'Last stand',desc:'Survive a lethal hit at full HP with 1 HP; 60s cooldown.'},
@@ -16,12 +17,12 @@
     pressure:{title:'Pressure',desc:'Deal +15% damage to bosses and elites.'},
     guard:{title:'Battle guard',desc:'Gain a single-hit block every 12s; maximum one charge.'}
   };
-  function stats(mon,data){return data?.species?.[mon.dex]?.stats || [Math.max(1,Math.round((mon.hp-70)/.45)),80,60,80,60,70];}
+  function stats(mon,data){return mon.formStats||data?.species?.[mon.dex]?.stats || [Math.max(1,Math.round((mon.hp-70)/.45)),80,60,80,60,70];}
   function role(mon,data){const [hp,atk,def,spa,spd,spe]=stats(mon,data);return def+spd>=220?'tank':hp>=120?'healer':spe>=100?'skirmisher':spa>atk*1.15?'caster':atk>=95?'bruiser':'controller';}
-  function trait(mon,data){const id=data?.species?.[mon.dex]?.ability?.id||'',r=role(mon,data);
-    const groups={carapace:['shell-armor','battle-armor','fur-coat','fluffy','filter','solid-rock','heatproof'],ward:['ice-scales','magic-guard','wonder-skin','water-bubble'],sturdy:['sturdy','disguise'],technician:['technician','skill-link','iron-fist','strong-jaw'],vigor:['overgrow','blaze','torrent','swarm','guts','berserk'],adapt:['adaptability','protean','libero','normalize','scrappy','aerilate','pixilate','refrigerate'],swift:['speed-boost','quick-feet','swift-swim','chlorophyll','sand-rush','slush-rush','limber','run-away'],sustain:['regenerator','natural-cure','rain-dish','ice-body','poison-heal','hydration','healer'],focus:['competitive','solar-power','analytic','psychic-surge'],force:['huge-power','pure-power','sheer-force','moxie','tough-claws','defiant'],pressure:['pressure','intimidate','unnerve','supreme-overlord'],guard:['multiscale','shadow-shield','overcoat','bulletproof','soundproof']};
+  function trait(mon,data){const id=mon.formAbility||data?.species?.[mon.dex]?.ability?.id||'',r=role(mon,data);
+    const groups={carapace:['shell-armor','battle-armor','fur-coat','fluffy','filter','solid-rock','heatproof'],ward:['ice-scales','magic-guard','wonder-skin','water-bubble'],sturdy:['sturdy'],disguise:['disguise'],technician:['technician','skill-link','iron-fist','strong-jaw'],vigor:['overgrow','blaze','torrent','swarm','guts','berserk'],adapt:['adaptability','protean','libero','normalize','scrappy','aerilate','pixilate','refrigerate'],swift:['speed-boost','quick-feet','swift-swim','chlorophyll','sand-rush','slush-rush','limber','run-away'],sustain:['regenerator','natural-cure','rain-dish','ice-body','poison-heal','hydration','healer'],focus:['competitive','solar-power','analytic','psychic-surge'],force:['huge-power','pure-power','sheer-force','moxie','tough-claws','defiant'],pressure:['pressure','intimidate','unnerve','supreme-overlord'],guard:['multiscale','shadow-shield','overcoat','bulletproof','soundproof']};
     const key=Object.keys(groups).find(k=>groups[k].includes(id))||({tank:'carapace',healer:'sustain',skirmisher:'swift',caster:'focus',bruiser:'force',controller:'guard'}[r]);
-    return {key,...TRAITS[key],source:data?.species?.[mon.dex]?.ability,adapted:!groups[key].includes(id)};
+    return {key,...TRAITS[key],...(key==='disguise'&&mon.formKey==='busted'?{desc:'Disguise is broken for this run.'}:{}),source:mon.formAbilityData||data?.species?.[mon.dex]?.ability,adapted:!groups[key].includes(id)};
   }
   function pool(mon,data,defs){const entry=data?.species?.[mon.dex];if(!entry)return null;
     if(Array.isArray(mon.skillPool))return [...new Set(mon.skillPool)].filter(id=>defs[id]&&defs[id].kind!=='buff'&&!defs[id].specialOnly).slice(0,18);

@@ -4,7 +4,7 @@ const scene=require('./battle-fixture.cjs'),ids=new Set(config.additions.map(r=>
 test('catalog grows only by the nine audited species and retains every original species and battle value',()=>{
  const {G}=scene();assert.equal(G.DEX.length,975);assert.equal(new Set(G.DEX.map(p=>p.dex)).size,975);assert.deepEqual(Array.from(G.DEX,p=>p.dex),Array.from(G.DEX,p=>p.dex).sort((a,b)=>a-b));
  assert.equal(hash(JSON.stringify(G.DEX.filter(p=>!ids.has(p.dex)))),baseline.dexSha256);
- assert.equal(hash(JSON.stringify(Object.fromEntries(Object.entries(G.BattleDex.species).filter(([d])=>!ids.has(+d))))),baseline.battleSpeciesSha256);
+ assert.equal(hash(JSON.stringify(Object.fromEntries(Object.entries(G.BattleDex.species).filter(([d])=>!ids.has(+d)).map(([d,s])=>[d,Object.fromEntries(Object.entries(s).filter(([k])=>k!=='learned'))])))),baseline.battleIdentitySha256);
 });
 test('all imported normal/shiny sheets match pinned hashes and exact eight-direction frame geometry',()=>{
  const G={};vm.runInNewContext(fs.readFileSync('js/data/sprites-meta.js','utf8'),{G});assert.equal(manifest.revision,config.revision);assert.equal(manifest.species.length,9);assert.equal(manifest.files.length,178);

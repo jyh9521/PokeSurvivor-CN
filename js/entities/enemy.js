@@ -449,8 +449,9 @@
 
     bossMove(dt, pl, dist, dx, dy, spd) {
       if (!this.ai) this.bossInit();
+      if(G.BossStages?.tick(this,dt))return [0,0,'Idle'];
       const ai = this.ai;
-      if (!ai.fury && this.hp < this.maxHp * 0.5) this.enrage();
+      if (!this.def.stageChain && !ai.fury && this.hp < this.maxHp * 0.5) this.enrage();
       const k = ai.fury ? 1.25 : 1;
       if (ai.cast) return this.bossCast(dt, pl);
       ai.modeT -= dt; ai.cd -= dt * k;
@@ -497,18 +498,18 @@
       switch (id) {
         case 'slam':       // pisotón: onda alrededor
           c.wind = 0.85 * f;
-          G.Hazards.add({ kind: 'zone', x: this.x, y: this.y, r: 96 + this.r, delay: c.wind, dmg: this.dmg * 1.3, type, color: col });
+          G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'zone', x: this.x, y: this.y, r: 96 + this.r, delay: c.wind, dmg: this.dmg * 1.3, type, color: col });
           this.anim.play('Charge', { speed: 1.2 });
           break;
         case 'dash':       // embestida en línea recta
           c.wind = 0.75 * f; c.len = 330; c.dur = 0.32;
-          G.Hazards.add({ kind: 'beam', x: this.x, y: this.y, angle: ang, len: c.len + this.r, w: this.r * 2 + 16,
+          G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'beam', x: this.x, y: this.y, angle: ang, len: c.len + this.r, w: this.r * 2 + 16,
                           delay: c.wind + c.dur, dmg: this.dmg * 1.2, type, color: col });
           this.anim.play('Charge', { speed: 1.3 });
           break;
         case 'leap':       // salto y caída sobre ti
           this.jump = { sx: this.x, sy: this.y, tx: pl.x, ty: pl.y, t: -0.5 * f, dur: 0.65 };
-          G.Hazards.add({ kind: 'zone', x: pl.x, y: pl.y, r: 82, delay: 0.5 * f + 0.65, dmg: this.dmg * 1.25, type, color: col });
+          G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'zone', x: pl.x, y: pl.y, r: 82, delay: 0.5 * f + 0.65, dmg: this.dmg * 1.25, type, color: col });
           this.anim.play('Charge', { speed: 1.4 });
           ai.cast = null; ai.cd = G.U.rand(1.4, 2) + 0.6;
           break;
@@ -516,7 +517,7 @@
           const n = ai.fury ? 6 : 4;
           for (let i = 0; i < n; i++) {
             const a = i ? Math.random() * 6.2832 : 0, d = i ? G.U.rand(40, 120) : 0;
-            G.Hazards.add({ kind: 'zone', x: pl.x + Math.cos(a) * d, y: pl.y + Math.sin(a) * d * 0.8, r: 50,
+            G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'zone', x: pl.x + Math.cos(a) * d, y: pl.y + Math.sin(a) * d * 0.8, r: 50,
                             delay: 1.05 + i * 0.12, dmg: this.shotDmg() * 1.15, type, color: col });
           }
           c.wind = 0.5; this.anim.play('Shoot');
@@ -525,7 +526,7 @@
         case 'beam': {     // rayos en abanico
           const n = ai.fury ? 5 : 3, sp = ai.fury ? 0.42 : 0.5;
           for (let i = 0; i < n; i++) {
-            G.Hazards.add({ kind: 'beam', x: this.x, y: this.y, angle: ang + (i - (n - 1) / 2) * sp, len: 400, w: 26,
+            G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'beam', x: this.x, y: this.y, angle: ang + (i - (n - 1) / 2) * sp, len: 400, w: 26,
                             delay: 1.0, dmg: this.shotDmg() * 1.2, type, color: col });
           }
           c.wind = 1.0; c.after = 0.25; this.anim.play('Charge', { speed: 1.1 });
@@ -580,7 +581,7 @@
         const a = base + (n === 1 ? 0 : (i / (n - 1) - 0.5) * spread);
         const shot = G.Projectiles.spawn({
           x: this.x, y: this.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
-          dmg: this.shotDmg() * k, r: 7, life: 2.4, friendly: false, color: '#ff7a9e', mtype: type,
+          dmg: this.shotDmg() * k, r: 7, life: 2.4, friendly: false, color: '#ff7a9e', mtype: type, enemyId:this.id,enemyStage:this.bossStage||0,
           vis: G.VFX.forType(type)
         });
         if (G.Coop.isHost) G.Coop.enemyShot(shot, type);
@@ -596,14 +597,14 @@
         case 'fan': { const n = this.def.fanN || 5; this.shoot(dx, dy, n === 3 ? 0.6 : 0.9, n, 0.65); break; }
         case 'beamer':
           // Rayo con aviso: primero se ve la franja en el suelo.
-          G.Hazards.add({ kind: 'beam', x: this.x, y: this.y, angle: Math.atan2(dy, dx), len: 360, w: 22,
+          G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'beam', x: this.x, y: this.y, angle: Math.atan2(dy, dx), len: 360, w: 22,
                           delay: 1.0, dmg: this.shotDmg() * 1.05, type: this.atkType, color: col });
           this.anim.play('Charge', { speed: 1.2 });
           break;
         case 'zoner': {
           const n = G.U.randInt(1, this.def.zones || 3);
           for (let i = 0; i < n; i++) {
-            G.Hazards.add({ kind: 'zone', x: pl.x + (i ? G.U.rand(-70, 70) : 0), y: pl.y + (i ? G.U.rand(-55, 55) : 0), r: 44,
+            G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'zone', x: pl.x + (i ? G.U.rand(-70, 70) : 0), y: pl.y + (i ? G.U.rand(-55, 55) : 0), r: 44,
                             delay: 1.2, dmg: this.shotDmg() * 0.95, type: this.atkType, color: col });
           }
           this.anim.play('Shoot');
@@ -616,17 +617,18 @@
     }
 
     healAround() {
-      // 7 % de la vida (era 15 %: con varios curanderos curaban más de lo que
-      // pegabas), y más cuanto más fuerte pegas, pero cada vez menos: con el
-      // doble de ataque cura un 27 % más, con 10 veces más un 124 %, y como
-      // mucho ×2,5. (Como los enemigos que tienen más vida si haces más daño.)
-      const pow = Math.max(1, ...G.Game.everyone().map(p => (p.atk > 0 && p.baseAtk > 0 ? p.atk / p.baseAtk : 1)));
-      const k = 0.07 * Math.min(2.5, Math.pow(pow, 0.35));
+      // The recipient owns the lock: staggered healers cannot multiply healing.
+      if (this.remote || (G.Coop.active && !G.Coop.isHost) || this.dead) return;
+      const targets = G.EnemyMgr.queryCircle(this.x, this.y, 150)
+        .filter(e => e !== this && !e.remote && !e.dead && !e.boss && !e.legend && !e.judge && e.behavior !== 'healer' && e.def?.behavior !== 'healer' && e.hp < e.maxHp && !(e.enemyHealT > 0))
+        .sort((a,b) => a.hp/a.maxHp-b.hp/b.maxHp || a.id-b.id).slice(0,4);
       let n = 0;
-      for (const e of G.EnemyMgr.queryCircle(this.x, this.y, 150)) {
-        if (e.dead || e.hp >= e.maxHp) continue;
-        e.hp = Math.min(e.maxHp, e.hp + e.maxHp * k);
-        G.FX.burst(e.x, e.y - e.bodyH * 0.6, '#7dffb0', 5, 60);
+      for (const e of targets) {
+        e.enemyHealT = 3;
+        const healed = Math.min(e.maxHp-e.hp, e.maxHp*.05);
+        e.hp += healed;
+        G.FX.burst(e.x, e.y-e.bodyH*.6, '#7dffb0', 5, 60);
+        G.FX.dmgText(e.x, e.y-e.bodyH, '+'+Math.round(healed), '#7dffb0');
         n++;
       }
       this.anim.play('Charge');
@@ -665,14 +667,14 @@
 
     startFuse() {
       this.phase = 'fuse'; this.pt = 1.0;
-      G.Hazards.add({ kind: 'zone', x: this.x, y: this.y, r: 62, delay: 1.0, dmg: this.dmg * 1.4, type: this.atkType, color: '#ff7b3d' });
+      G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'zone', x: this.x, y: this.y, r: 62, delay: 1.0, dmg: this.dmg * 1.4, type: this.atkType, color: '#ff7b3d' });
     }
 
     startJump(pl) {
       const tx = pl.x, ty = pl.y;
       this.jump = { sx: this.x, sy: this.y, tx, ty, t: -0.45, dur: 0.6 };
       this.anim.play('Charge', { speed: 1.4 });
-      G.Hazards.add({ kind: 'zone', x: tx, y: ty, r: 50, delay: 1.05, dmg: this.dmg * 1.2, type: this.atkType,
+      G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'zone', x: tx, y: ty, r: 50, delay: 1.05, dmg: this.dmg * 1.2, type: this.atkType,
                       color: G.U.TYPE_COLOR[this.atkType] || '#ff7a9e' });
     }
 
@@ -924,6 +926,7 @@
         p._px = p.x; p._py = p.y;
       }
       rebuildGrid();
+      for(const e of list)e.enemyHealT=Math.max(0,(e.enemyHealT||0)-dt);
       for (const e of list) {
         if (e.remote) e.netUpdate(dt);
         else e.update(dt, nearestPlayer(players, e.x, e.y) || pl);

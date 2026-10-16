@@ -2,7 +2,7 @@
 (function(factory){if(typeof module==='object'&&module.exports)module.exports=factory();else G.SaveMerge=factory();})(()=>{
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const economy=['coins','tickets','pupg','pspent','pity','missions','ach'];
-const unions=new Set(['owned','shiny','legends','arenas','itemsFound','evoMoves','ach']);
+const unions=new Set(['owned','shiny','legends','starterBosses','arenas','itemsFound','evoMoves','ach']);
 function merge(base,local,remote){
   if(!base||!local||!remote)return {conflicts:['base-expired']};
   const conflicts=[],out=structuredClone(remote);

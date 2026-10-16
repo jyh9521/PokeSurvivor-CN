@@ -148,6 +148,7 @@ G.Progress = (() => {
         break;
       case 'rift':
         S.riftWins = (S.riftWins || 0) + 1;
+        if(d.starterDex&&G.BossCatalog.starters.some(c=>c[c.length-1]===d.starterDex)){s.starterBosses||={};s.starterBosses[d.starterDex] ||= Date.now();S.starterRiftWins=(S.starterRiftWins||0)+1;if(d.flawless)S.starterFlawless=(S.starterFlawless||0)+1;}
         if (d.type) { s.arenas = s.arenas || {}; s.arenas[d.type] = s.arenas[d.type] || Date.now(); }
         break;
       case 'evolve':
@@ -180,7 +181,7 @@ G.Progress = (() => {
     // Los legendarios de la Sentencia de Arceus no cuentan como jefes (ni para
     // misiones ni para logros de jefes): tienen su propio contador.
     if (G.Judgment.active && e.boss) { G.Judgment.bossDown(); event('kill', { types: e.types || [], boss: false, legend: 0 }); return; }
-    const legend = e.legend || (G.Rift.inArena && e.boss) ? e.dex : 0;
+    const legend = e.legend || (G.Rift.inArena && G.Rift.arena?.kind!=='starter' && e.boss) ? e.dex : 0;
     event('kill', { types: e.types || [], boss: !!e.boss, legend });
   }
 

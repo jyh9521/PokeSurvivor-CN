@@ -174,7 +174,7 @@ G.Coop = (() => {
       if (e.dead || G.U.dist2(e.x, e.y, near.x, near.y) > r2n) continue;
       const a = ANIMS.indexOf(e.anim.cur);
       out.push([e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
-                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.staggerT > 0 ? 8 : 0),e.anim.serial||0,Math.round((e.anim.elapsed||0)*10)/10,Math.round(e.anim.speed*100)/100]);
+                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.staggerT > 0 ? 8 : 0),e.anim.serial||0,Math.round((e.anim.elapsed||0)*10)/10,Math.round(e.anim.speed*100)/100,e.dex,e.bossStage||0,e.scale||1]);
     }
     return out;
   }
@@ -283,7 +283,7 @@ G.Coop = (() => {
           hitFrom=null;const result=G.Battle.accept(m.pl,e,ev[3],ev[4],ev[5],ev[6],ev[7],move,ev[9]);
           if(result.dealt>0)m.q.push(['bb',ev[1],move.id,result.dealt,result.killed]);break;
         }
-        case 'fc':G.Combat.special(m.pl,ev[1],true);emit(['fc',from,ev[1]],from);break;
+        case 'fc':if(G.Combat.special(m.pl,ev[1],true,ev[2]))G.Combat.specialEnvironment?.(m.pl,ev[2]);emit(['fc',from,ev[1],ev[2]],from);break;
         case 'mh': {
           if (!Number.isSafeInteger(ev[1]) || ev[1] <= (m.meleeSeen || 0)) break;
           m.meleeSeen=ev[1];
@@ -374,6 +374,7 @@ G.Coop = (() => {
     for (const a of msg.e || []) {
       const e = G.EnemyMgr.get(a[0]);
       if (!e || !e.remote || e.dead) continue;
+      G.BossStages?.remote(e,a[10],a[11],a[12]);
       const n = e.net;
       const dts = (now - (n.last || now)) / 1000;
       if (dts > 0.02 && dts < 1) {
@@ -396,7 +397,7 @@ G.Coop = (() => {
       case 'hn': { const e = G.EnemyMgr.get(ev[1]); if (e && !e.dead) e.showHurt(ev[2], ev[3],0,0,ev[4] || null); break; }
       case 'es':
         G.Projectiles.spawn({ x: ev[1], y: ev[2], vx: ev[3], vy: ev[4], dmg: ev[5], r: ev[6], life: ev[7],
-                              friendly: false, color: '#ff7a9e', vis: G.VFX.forType(ev[8]), mtype: ev[8] });
+                              friendly: false, color: '#ff7a9e', vis: G.VFX.forType(ev[8]), mtype: ev[8],enemyId:ev[9],enemyStage:ev[10] });
         break;
       case 'c': { const m = mates.get(ev[1]); if (m) G.Combat.ghostCast(m.pl, ev[2], ev[3], ev[4], ev[5],ev[6],ev[7]); break; }
       case 'mark':marks.set(ev[1],{uid:ev[1],kind:ev[2],x:ev[3],y:ev[4],at:performance.now()});break;
@@ -411,7 +412,8 @@ G.Coop = (() => {
         break;
       case 'pb': G.World.breakAt(ev[1], ev[2]); break;
       case 'say': G.Spawner.say(ev[1], ev[2]); break;
-      case 'fc': {const mate=mates.get(ev[1]);if(mate)G.Combat.special(mate.pl,ev[2],true);break;}
+      case 'zc': G.Hazards.clearAround?.(ev[1],ev[2],ev[3]);break;
+      case 'fc': {const mate=mates.get(ev[1]);if(mate)G.Combat.special(mate.pl,ev[2],true,ev[3]);break;}
       case 'bb': {
         if(!G.Battle||!Number.isSafeInteger(ev[1])||ev[1]<=battleAck)break;battleAck=ev[1];const move=G.Moves.BY_ID[ev[2]];if(move)G.Battle.credit(local,move,ev[3],ev[4]===true);break;
       }
@@ -459,7 +461,7 @@ G.Coop = (() => {
   }
 
   function battleHit(e,d,col,dx,dy,knock,m,eff){if(!active||host)return;outEv.push(['bh',++battleSeq,e.id,d,col,r1(dx),r1(dy),knock||0,m.id,eff]);}
-  function formCast(pl,kind){if(!active||pl!==local)return;if(host)emit(['fc',me,kind]);else outEv.push(['fc',kind]);}
+  function formCast(pl,kind,cast){if(!active||pl!==local)return;if(host)emit(['fc',me,kind,cast]);else outEv.push(['fc',kind,cast]);}
 
   // anfitrión
   function hurtShown(e, d, color, eff=null) { emitNear(['hn', e.id, d, color, eff], e.x, e.y, hitFrom); }
@@ -467,7 +469,7 @@ G.Coop = (() => {
     emit(['ne', e.id, e.dex, r1(e.x), r1(e.y), e.boss ? 1 : 0, e.shiny ? 1 : 0, Math.ceil(e.maxHp), r2(e.dmg), e.behavior]);
   }
   function enemyGone(e, died) { teamStats?.forget(e.id);emit([died ? 'ed' : 'eg', e.id]); }
-  function enemyShot(p, type) { emit(['es', r1(p.x), r1(p.y), r1(p.vx), r1(p.vy), r2(p.dmg), p.r, p.life, type]); }
+  function enemyShot(p, type) { emit(['es', r1(p.x), r1(p.y), r1(p.vx), r1(p.vy), r2(p.dmg), p.r, p.life, type,p.enemyId,p.enemyStage]); }
   function pickupAdded(o) { emit(['pk', o.id, o.kind, r1(o.x), r1(o.y), o.value]); }
   function pickupGone(id) { emit(['pc', id]); }
   function say(text, secs) { emit(['say', text, secs]); }

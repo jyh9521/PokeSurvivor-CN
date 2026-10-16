@@ -1,0 +1,859 @@
+{
+  "10100": {
+    "dex": 26,
+    "formKey": "alola",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d/sprite/0026/0001",
+    "revision": "afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d",
+    "credit": "2023-01-18 22:16:13.333024\t<@!544245909639397378>\tCUR\tPMDCollab_1\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Shock,Swing,Double,Rotate,Hop,Pose\n",
+    "xmlSha256": "fa161022a1a732b5aa0d1f37ac113b9ce603c598e78009d7953bed8c4e06e3c4",
+    "meta": {
+      "s": 1,
+      "a": {
+        "Idle": {
+          "w": 40,
+          "h": 72,
+          "n": 7,
+          "r": 8,
+          "d": [
+            12,
+            10,
+            9,
+            9,
+            12,
+            10,
+            9
+          ],
+          "ax": 19.5,
+          "ay": 39.5
+        },
+        "Walk": {
+          "w": 32,
+          "h": 72,
+          "n": 8,
+          "r": 8,
+          "d": [
+            10,
+            10,
+            6,
+            6,
+            10,
+            10,
+            6,
+            6
+          ],
+          "ax": 15.5,
+          "ay": 39.5
+        },
+        "Attack": {
+          "w": 72,
+          "h": 96,
+          "n": 14,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            6,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 35.5,
+          "ay": 49.5
+        },
+        "Shoot": {
+          "w": 40,
+          "h": 64,
+          "n": 12,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            6,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 19.5,
+          "ay": 34.5
+        },
+        "Charge": {
+          "w": 32,
+          "h": 64,
+          "n": 10,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 16.5,
+          "ay": 35.5
+        },
+        "Hurt": {
+          "w": 48,
+          "h": 72,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 23.5,
+          "ay": 37.5
+        },
+        "Faint": {
+          "w": 48,
+          "h": 72,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 23.5,
+          "ay": 37.5
+        }
+      }
+    },
+    "sha256": {
+      "Attack.png": "265ec62d4d774f13991ca415e74e7352b6a54f7371ffb2fd034526bd1e84726c",
+      "Charge.png": "f40d5b6242b9811a0e38d4407d2c42a32b98cf777753f86fc65b6214bb0cc131",
+      "Faint.png": "9aeb94ddfb6899ef7f4ac548dfefaa2040e0e7e22cb7f117c4765b9f4ba2687f",
+      "Hurt.png": "9aeb94ddfb6899ef7f4ac548dfefaa2040e0e7e22cb7f117c4765b9f4ba2687f",
+      "Idle.png": "2d5ff30bfac5785ec76589e9dd535a60bd9514b7fcd3788d5ef7a4941f76907c",
+      "Shoot.png": "be6ade5fd33bbf08dceb4dfd55d683b9a5ece359250dc582c1ff706dcd104653",
+      "Walk.png": "9f9946bcdcb80010e2c3732a04bbbb5ac78cc3ef37ed46ecf7cdc318f44810bf"
+    }
+  },
+  "10126": {
+    "dex": 745,
+    "formKey": "midnight",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d/sprite/0745/0001",
+    "revision": "afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d",
+    "credit": "2022-07-20 19:38:50.496066\t<@!544245909639397378>\tCUR\tPMDCollab_1\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,SpAttack,Swing,Double,Rotate,Hop,QuickStrike\n",
+    "xmlSha256": "e99d9ca6124843fe1052b8eec3d1443513b152e18296aa01634dcc2f15d5797e",
+    "meta": {
+      "s": 1,
+      "a": {
+        "Idle": {
+          "w": 40,
+          "h": 64,
+          "n": 2,
+          "r": 8,
+          "d": [
+            60,
+            20
+          ],
+          "ax": 19.5,
+          "ay": 35.5
+        },
+        "Walk": {
+          "w": 40,
+          "h": 64,
+          "n": 4,
+          "r": 8,
+          "d": [
+            8,
+            8,
+            8,
+            8
+          ],
+          "ax": 19.5,
+          "ay": 35.5
+        },
+        "Attack": {
+          "w": 72,
+          "h": 80,
+          "n": 10,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            6,
+            1,
+            1,
+            2,
+            2,
+            4,
+            2,
+            2
+          ],
+          "ax": 35.5,
+          "ay": 41.5
+        },
+        "Shoot": {
+          "w": 40,
+          "h": 72,
+          "n": 14,
+          "r": 8,
+          "d": [
+            1,
+            2,
+            3,
+            3,
+            2,
+            1,
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 19.5,
+          "ay": 39.5
+        },
+        "Charge": {
+          "w": 32,
+          "h": 56,
+          "n": 10,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 16.5,
+          "ay": 32.5
+        },
+        "Hurt": {
+          "w": 40,
+          "h": 56,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 19.5,
+          "ay": 31.5
+        },
+        "Faint": {
+          "w": 40,
+          "h": 56,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 19.5,
+          "ay": 31.5
+        }
+      }
+    },
+    "sha256": {
+      "Attack.png": "4470ee1a11f16f2bd94fdd875d0ec3092bf26d6e0d4f094558d64acc29ca94c5",
+      "Charge.png": "044eb0973bbe69d632233c4a4299db6b4edd4359011452e3e0b4111d14fff16d",
+      "Faint.png": "800ed020d538a26e7f26db0fae35f09be6fe0abd33bb7a466856d17c710a8813",
+      "Hurt.png": "800ed020d538a26e7f26db0fae35f09be6fe0abd33bb7a466856d17c710a8813",
+      "Idle.png": "4cb1623c81ddbb75ca8910e2eeef836cebc9f0c44296d7e36cff55f89e2983f2",
+      "Shoot.png": "a44dfb71db71c4423e386fed0420c0f7ca50f790e2af6061c6a889edc161a5cd",
+      "Walk.png": "f1fb1ed53aef245d59d38d6519194495da201d30dd5b421c7f4d6faf2ee1220c"
+    }
+  },
+  "10152": {
+    "dex": 745,
+    "formKey": "dusk",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d/sprite/0745/0002",
+    "revision": "afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d",
+    "credit": "2023-08-31 09:17:04.080310\t<@!356635814668664832>\tCUR\tPMDCollab_2\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,RearUp,Swing,Double,Rotate,Hop\n2023-09-02 17:32:36.291979\t<@!356635814668664832>\tCUR\tPMDCollab_2\tIdle,Walk,Hurt,Attack,Charge,Shoot,RearUp,Swing,Double,Hop\n2023-10-14 00:43:15.384998\t<@!356635814668664832>\tCUR\tPMDCollab_2\tAttack,Charge,Shoot,Swing,Hop,EventSleep,Wake,Eat,Tumble,Pose,Pull,Pain,Float,DeepBreath,Nod,Sit,LookUp,Sink,Trip,Laying,LeapForth,Head,Cringe,LostBalance,TumbleBack,HitGround,Faint\n2023-11-06 22:05:16.912888\t<@!356635814668664832>\tCUR\tPMDCollab_2\tIdle,Shoot,RearUp,Double,Hop,Pose,DeepBreath\n",
+    "xmlSha256": "1f8144ebcddb64dd35b24d510117f31d44c5a9fffe62ee057ac68ca80e7220dc",
+    "meta": {
+      "s": 1,
+      "a": {
+        "Idle": {
+          "w": 48,
+          "h": 56,
+          "n": 14,
+          "r": 8,
+          "d": [
+            60,
+            10,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            10
+          ],
+          "ax": 23.5,
+          "ay": 31.5
+        },
+        "Walk": {
+          "w": 48,
+          "h": 56,
+          "n": 4,
+          "r": 8,
+          "d": [
+            8,
+            12,
+            8,
+            12
+          ],
+          "ax": 23.5,
+          "ay": 31.5
+        },
+        "Attack": {
+          "w": 72,
+          "h": 80,
+          "n": 10,
+          "r": 8,
+          "d": [
+            2,
+            4,
+            1,
+            1,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 35.5,
+          "ay": 42.5
+        },
+        "Shoot": {
+          "w": 56,
+          "h": 56,
+          "n": 12,
+          "r": 8,
+          "d": [
+            6,
+            2,
+            6,
+            1,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 27.5,
+          "ay": 29.5
+        },
+        "Charge": {
+          "w": 48,
+          "h": 56,
+          "n": 10,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 24.5,
+          "ay": 31.5
+        },
+        "Hurt": {
+          "w": 56,
+          "h": 64,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 27.5,
+          "ay": 31.5
+        },
+        "Faint": {
+          "w": 48,
+          "h": 56,
+          "n": 4,
+          "r": 8,
+          "d": [
+            8,
+            12,
+            4,
+            10
+          ],
+          "ax": 23.5,
+          "ay": 31.5
+        }
+      }
+    },
+    "sha256": {
+      "Attack.png": "dac9b81e26dac377bd62eab505f1f090f109fcd3812f5293dfb3600cbc394b6d",
+      "Charge.png": "a5339c972e7953821339f7636be97b6803469bc680d27542aee0635f2d99ab5c",
+      "Faint.png": "ec29adc918db99b5f4c2ca05be7d5096072fc5c44909b2998728efefc65731b1",
+      "Hurt.png": "9432906afd1a77249e3d1e9f77ca82d14949f9e26709e90e8057efb8541fca2f",
+      "Idle.png": "9aa73dc11ffe22e5b3c93f43cdf03221630ecd5a783ffe1eed7a175ffe69ae23",
+      "Shoot.png": "3a83509026d689e362c0470a59ff9fadab7b6e7538191c2b2877027a054f49dd",
+      "Walk.png": "959752c038e0a2e5cd62f01892add8afe3c1c2a280e481ac092047b62cdf9b92"
+    }
+  },
+  "10143": {
+    "dex": 778,
+    "formKey": "busted",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d/sprite/0778/0001",
+    "revision": "afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d",
+    "credit": "2023-08-15 00:01:35.318202\t<@!544245909639397378>\tCUR\tPMDCollab_2\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop\n",
+    "xmlSha256": "a0db068319e5e782a6fdc15c14525c4f666a13f502c66ce8e39557ea32ecc3b3",
+    "meta": {
+      "s": 1,
+      "a": {
+        "Idle": {
+          "w": 32,
+          "h": 32,
+          "n": 4,
+          "r": 8,
+          "d": [
+            40,
+            6,
+            6,
+            6
+          ],
+          "ax": 15.5,
+          "ay": 19.5
+        },
+        "Walk": {
+          "w": 32,
+          "h": 32,
+          "n": 4,
+          "r": 8,
+          "d": [
+            8,
+            10,
+            8,
+            10
+          ],
+          "ax": 15.5,
+          "ay": 19.5
+        },
+        "Attack": {
+          "w": 72,
+          "h": 72,
+          "n": 10,
+          "r": 8,
+          "d": [
+            2,
+            6,
+            1,
+            1,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 35.5,
+          "ay": 38.5
+        },
+        "Shoot": {
+          "w": 48,
+          "h": 48,
+          "n": 11,
+          "r": 8,
+          "d": [
+            2,
+            6,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 23.5,
+          "ay": 25.5
+        },
+        "Charge": {
+          "w": 32,
+          "h": 40,
+          "n": 10,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 16.5,
+          "ay": 23.5
+        },
+        "Hurt": {
+          "w": 48,
+          "h": 56,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 23.5,
+          "ay": 29.5
+        },
+        "Faint": {
+          "w": 48,
+          "h": 56,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 23.5,
+          "ay": 29.5
+        }
+      }
+    },
+    "sha256": {
+      "Attack.png": "a77620476b527b01ce104982c46a7b43e88a9dd527082a9e8dec755c64b5c5b4",
+      "Charge.png": "08ca33906e4a552580f8aef9b6d0c5ff802cbfe7d9b159868fcf446aebc84038",
+      "Faint.png": "7b3cb5acb28fb1b21cc6e4d6cb3be1f013e9b06a79275b490ec8d0a636ee8eee",
+      "Hurt.png": "7b3cb5acb28fb1b21cc6e4d6cb3be1f013e9b06a79275b490ec8d0a636ee8eee",
+      "Idle.png": "2440dd3defcb6fdd991eb6e0ca7f1a2aa0ebfdaca8fd6e84c200e3b468de193c",
+      "Shoot.png": "82fcb6ff71dc486f6270d223b16da70f69cc57347b10fb3953fa77c4ac7e6b5d",
+      "Walk.png": "74b38de8e376cb67089c44094a1cd6e51f7278c09df81b6fb73a47bd38fc6c97"
+    }
+  },
+  "10061": {
+    "dex": 670,
+    "formKey": "eternal",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d/sprite/0670/0005",
+    "revision": "afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d",
+    "credit": "2023-05-18 07:11:55.007618\t<@!356635814668664832>\tCUR\tPMDCollab_2\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Twirl,Swing,Double,Rotate,Hop,Eat\n",
+    "xmlSha256": "6d4feb4522c1af4ecc3d15dc6574a69f83e4116c56f284185b6739940bb8eb11",
+    "meta": {
+      "s": 0,
+      "a": {
+        "Idle": {
+          "w": 32,
+          "h": 64,
+          "n": 8,
+          "r": 8,
+          "d": [
+            10,
+            8,
+            8,
+            8,
+            10,
+            8,
+            8,
+            8
+          ],
+          "ax": 15.5,
+          "ay": 35.5
+        },
+        "Walk": {
+          "w": 32,
+          "h": 64,
+          "n": 8,
+          "r": 8,
+          "d": [
+            10,
+            10,
+            6,
+            6,
+            10,
+            10,
+            6,
+            6
+          ],
+          "ax": 15.5,
+          "ay": 35.5
+        },
+        "Attack": {
+          "w": 72,
+          "h": 80,
+          "n": 14,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            6,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 35.5,
+          "ay": 41.5
+        },
+        "Shoot": {
+          "w": 40,
+          "h": 56,
+          "n": 12,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            6,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 19.5,
+          "ay": 30.5
+        },
+        "Charge": {
+          "w": 32,
+          "h": 56,
+          "n": 10,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 16.5,
+          "ay": 31.5
+        },
+        "Hurt": {
+          "w": 48,
+          "h": 64,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 23.5,
+          "ay": 33.5
+        },
+        "Faint": {
+          "w": 48,
+          "h": 64,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 23.5,
+          "ay": 33.5
+        }
+      }
+    },
+    "sha256": {
+      "Attack.png": "1ce6230fd8f1e888acfb2e4c049fc01ecd1767e3a7e890cbe15622d0150aaaf5",
+      "Charge.png": "64b70690c6751e03664822bd664d63b8444aa8752f53a498f07174615da82a82",
+      "Faint.png": "31a5572d26e9d3373accb537cebdb4e81d8ddaeacc29ee3031e41066226de9f1",
+      "Hurt.png": "31a5572d26e9d3373accb537cebdb4e81d8ddaeacc29ee3031e41066226de9f1",
+      "Idle.png": "94a9e193871ae227e69128c26c8f9f108ecd05eca7d14d4ae48f742a62b7a69b",
+      "Shoot.png": "2e9f6db6968f862419e6de9d69413f8cdbcbcf77a683964b40149a69ed77a77a",
+      "Walk.png": "8d31bdfc5b374a4ce548f0eb26811466d98bed24183904a09254c92023f23d31"
+    }
+  },
+  "10120": {
+    "dex": 718,
+    "formKey": "complete",
+    "source": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d/sprite/0718/0002",
+    "revision": "afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d",
+    "credit": "2024-12-21 22:58:51.519143\t<@!544245909639397378>\tCUR\tCC_BY-NC_4\tIdle,Walk,Sleep,Hurt,Attack,Charge,Shoot,Strike,Rumble,Emit,Swing,Double,Rotate,Hop\n",
+    "xmlSha256": "34c8240fbad8d24e7102f49fac2c0e6284706f63a6de5bb486262a4974c9bb03",
+    "meta": {
+      "s": 2,
+      "a": {
+        "Idle": {
+          "w": 88,
+          "h": 112,
+          "n": 8,
+          "r": 8,
+          "d": [
+            60,
+            12,
+            4,
+            4,
+            4,
+            4,
+            4,
+            20
+          ],
+          "ax": 43.5,
+          "ay": 59.5
+        },
+        "Walk": {
+          "w": 88,
+          "h": 104,
+          "n": 4,
+          "r": 8,
+          "d": [
+            8,
+            12,
+            8,
+            12
+          ],
+          "ax": 43.5,
+          "ay": 55.5
+        },
+        "Attack": {
+          "w": 112,
+          "h": 120,
+          "n": 14,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            6,
+            1,
+            1,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 55.5,
+          "ay": 61.5
+        },
+        "Shoot": {
+          "w": 88,
+          "h": 112,
+          "n": 11,
+          "r": 8,
+          "d": [
+            2,
+            10,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 43.5,
+          "ay": 57.5
+        },
+        "Charge": {
+          "w": 88,
+          "h": 104,
+          "n": 10,
+          "r": 8,
+          "d": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "ax": 44.5,
+          "ay": 55.5
+        },
+        "Hurt": {
+          "w": 96,
+          "h": 112,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 47.5,
+          "ay": 55.5
+        },
+        "Faint": {
+          "w": 96,
+          "h": 112,
+          "n": 2,
+          "r": 8,
+          "d": [
+            2,
+            8
+          ],
+          "ax": 47.5,
+          "ay": 55.5
+        }
+      }
+    },
+    "sha256": {
+      "Attack.png": "1a160f8b795cd60a9e4c459284a6add314e8ddfc7a0ade9d7e266f55d06d6320",
+      "Charge.png": "3a329463adbedbf7614a71e421ba395251aaf4ef17e9f77c69c954987c725d8c",
+      "Faint.png": "a93d7ebb2c0d280135cea51e945e92132ce5f694f0275eaf1f792f32c6e96a49",
+      "Hurt.png": "a93d7ebb2c0d280135cea51e945e92132ce5f694f0275eaf1f792f32c6e96a49",
+      "Idle.png": "7b2cf6a953baa4d4490aac62cc47b6dbe7654cbbc801eee5b560d203de2474f0",
+      "Shoot.png": "1014a07169ffad6361d3328dec244768a708780c8ba75fd3a81b5b46eb947ca2",
+      "Walk.png": "05ff03950fa87735367afe94fa2f483dc392e54acfecff6f01b6454bd9133786"
+    }
+  }
+}

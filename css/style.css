@@ -1059,3 +1059,5 @@ body.touch #battle-shortcuts kbd{display:inline-block!important}
 .stat-radar figcaption{text-align:center;color:var(--muted);font-size:12px;line-height:1.5;padding:0 4px 5px;overflow-wrap:anywhere}
 
 #scr-levelup .reward-category{font-size:12px;color:#b9dcff;margin-bottom:3px}#scr-levelup .card.unavailable{opacity:.5;cursor:default;border-style:dashed}#scr-levelup .card.unavailable .key{visibility:hidden}
+
+.form-controls{flex-wrap:wrap;gap:4px}.form-controls button{font-size:12px;padding:5px 8px;min-width:0}.form-controls .on{border-color:var(--gold,#ffdc43)}

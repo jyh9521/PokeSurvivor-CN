@@ -111,18 +111,18 @@ G.Game = (() => {
     time = 0; pendingLevels = 0;
     runReal = performance.now(); tampered = false;
 
-    pl = new G.Player(mon, perks, !!save.partnerShiny && G.DB.ownsShiny(mon.dex));
+    pl = new G.Player(G.SpecialRuntime.mon(mon, save.partnerForms?.[mon.dex]), perks, !!save.partnerShiny && G.DB.ownsShiny(mon.dex));
     banked = { t1: 0, t10: 0 };
     caught = [];
     // Atajos: movimientos con hueco fijo (save.pbind[dex] = [id del 1, id del 2, ...]),
     // antes de aprender nada: addMove ya los coloca.
     (save.pbind && save.pbind[mon.dex] || []).forEach((id, i) => { if (id) pl.bind[id] = i; });
-    pl.addMove(G.startMoveOf(mon.dex));
+    pl.addMove(G.Moves.startFor(pl.mon));
     // Mejora "Veto": movimientos que no quieres que te salgan.
     pl.banned = new Set((save.pban && save.pban[mon.dex] || []).slice(0, perks.bans));
     // Mejora "Repertorio": un segundo movimiento de ataque al azar.
     if (perks.startMoves >= 2) {
-      const pool = G.Moves.poolFor(mon).filter(id => !pl.hasMove(id) && !pl.banned.has(id) && G.Moves.BY_ID[id].kind !== 'buff');
+      const pool = G.Moves.poolFor(pl.mon).filter(id => !pl.hasMove(id) && !pl.banned.has(id) && G.Moves.BY_ID[id].kind !== 'buff');
       if (pool.length) pl.addMove(G.U.pick(pool));
       pl.setActive(0);
     }

@@ -42,7 +42,7 @@ G.Combat = (() => {
       m.t = 0.05;
       return;
     }
-    m.t = Math.max(0.05, m.cd * pl.cdMul);
+    m.t = Math.max(0.05, m.cd * pl.cdMul * (G.SpecialRuntime?.cooldown(pl,m)||1));
     pl.cast(m);
     if (G.Coop.active) G.Coop.cast(pl, m);
     // Vínculo: su icono destella en el HUD al lanzarse (uno que explota pegado al
@@ -54,9 +54,12 @@ G.Combat = (() => {
   }
 
   function run(pl, m) {
-    if(pl.battle?.form==='max')m={...m,radius:(m.radius||60)*1.35,width:(m.width||20)*1.35,size:(m.size||5)*1.2};
+    m=G.SpecialRuntime?.move(pl,m)||m;if(pl.battle?.form==='max'&&!m.specialOnly){m=G.SpecialRules.maxMove(m);if(!ghost)G.SpecialRuntime.maxEffect(pl,m);}
     G.SkillVFX?.cast(pl,m,ghost);
     switch (m.kind) {
+      case 'curve':case 'split':case 'spiral':case 'ricochet':case 'rolling':G.AdvancedShots.fire(pl,m,ghost);break;
+      case 'lob':lob(pl,m);break;
+      case 'guard':if(!ghost){pl.battle.guardT=1.2;pl.battle.block=1;pl.slowT=0;}break;
       case 'wave': case 'mark': case 'decoy': fieldMove(pl,m); break;
       case 'counter': melee(pl,{...m,kind:'melee'}); break;
       case 'projectile': fireProjectiles(pl, m); break;
@@ -76,7 +79,7 @@ G.Combat = (() => {
     }
   }
 
-  const TARGETED = ['melee', 'beam', 'projectile', 'boomerang', 'chain', 'meteor', 'dash', 'cone', 'counter', 'wave', 'mark'];
+  const TARGETED = ['melee', 'beam', 'projectile', 'boomerang', 'chain', 'meteor', 'dash', 'cone', 'counter', 'wave', 'mark','curve','split','spiral','ricochet','rolling','lob'];
   function needsTarget(m) { return TARGETED.includes(m.kind); }
   function reach(m) {
     if(m.kind==='counter')return m.radius;
@@ -93,11 +96,11 @@ G.Combat = (() => {
   }
 
   function payload(m) {
-    return { burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, knock: m.knock || 0, mtype: m.type, moveId: m.id, damageClass:m.damageClass };
+    return { burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, knock: m.knock || 0, mtype: m.type, moveId: m.id, damageClass:m.damageClass, moveData:{id:m.id,type:m.type,kind:m.kind,damageClass:m.damageClass,ignoreArmor:m.ignoreArmor,skinBoost:m.skinBoost,stealShield:m.stealShield,dmg:m.dmg} };
   }
 
   /** Tabla de tipos × clima para un ataque de tipo `type` contra `e`. */
-  function typeK(type, e) { return G.Types.mult(type, e.types) * G.Weather.mult(type); }
+  function typeK(type,e,p){const types=G.SpecialRuntime?.ability(p||{})==='scrappy'&&['normal','fighting'].includes(type)?e.types.filter(t=>t!=='ghost'):e.types;return G.Types.mult(type,types)*G.Weather.mult(type);}
 
   function fireProjectiles(pl, m) {
     const col = G.U.TYPE_COLOR[m.type];
@@ -209,7 +212,7 @@ G.Combat = (() => {
     for (const e of G.EnemyMgr.queryCircle(pl.x, pl.y, m.radius)) {
       if (!meleeContains(pl,m,e,aim)) continue;
       const crit = isCrit(pl);
-      const dmg = m.dmg * pl.atk * fraction * typeK(m.type,e) * (crit ? CRIT_MUL : 1);
+      const dmg = m.dmg * pl.atk * fraction * typeK(m.type,e,pl) * (crit ? CRIT_MUL : 1);
       const eff = crit ? 'crit' : G.Types.label(G.Types.mult(m.type,e.types));
       if (e.remote) G.Coop.meleeHit(e,dmg,col,e.x-pl.x,e.y-pl.y,m,eff);
       else acceptMeleeHit(pl,e,dmg,col,e.x-pl.x,e.y-pl.y,m,eff);
@@ -341,11 +344,41 @@ G.Combat = (() => {
     fields.push(f);
     const same=fields.filter(f=>f.owner===pl&&['wave','mark','decoy'].includes(f.kind));for(const f of same.slice(0,Math.max(0,same.length-10)))f.gone=true;
   }
-  function special(pl,kind,visualOnly=false){
-    if(kind!=='z')return;
-    G.SkillVFX?.form(pl,'z');if(visualOnly)return;
-    const active=pl.activeMove(),m={...G.Moves.BY_ID['z-burst'],type:G.Battle?.types(pl)?.[0]||pl.mon.types[0],damageClass:active?.damageClass||'special'};
-    for(const e of G.EnemyMgr.queryCircle(pl.x,pl.y,220))hit(pl,e,m.dmg*pl.atk,G.U.TYPE_COLOR[m.type],e.x-pl.x,e.y-pl.y,0,m);
+  function special(pl,kind,visualOnly=false,cast=null){
+    if(kind!=='z')return null;
+    if(cast&&(!Array.isArray(cast)||cast.length!==8||!G.Moves.BY_ID[cast[0]]||!cast.slice(1,7).every(Number.isFinite)||typeof cast[7]!=='string'||cast.slice(2,7).some(n=>Math.abs(n)>1e7)))return null;
+    const active=cast?G.Moves.instance(cast[0],Math.max(1,Math.min(5,cast[1]||1))):pl.activeMove();
+    if(!active)return null;
+    const packet=cast||[active.id,active.lvl||1,pl.aim,pl.x,pl.y,pl.target?.x??pl.x+Math.cos(pl.aim)*120,pl.target?.y??pl.y+Math.sin(pl.aim)*120,pl.baseForm||''];
+    const actor=cast?Object.assign(Object.create(pl),{x:packet[3],y:packet[4],aim:packet[2],target:{x:packet[5],y:packet[6]}}):pl;
+    const selector=cast?Object.assign(Object.create(pl),{baseForm:packet[7]}):pl;
+    const m=G.SpecialRules.zMove(selector,active),before=ghost;ghost=visualOnly;
+    try{
+      G.SkillVFX?.form(actor,'z');G.FX.dmgText(actor.x,actor.y-actor.bodyH-10,G.T(m.name),G.U.TYPE_COLOR[m.type]);
+      if(m.kind==='boost'){if(!visualOnly)pl.battle.zBoost=20;G.SkillVFX?.cast(actor,{...m,kind:'aura'});}
+      else if(m.kind==='guardian'){
+        G.SkillVFX?.cast(actor,m);
+        if(!visualOnly)for(const e of G.EnemyMgr.queryCircle(actor.x,actor.y,260)){
+          const value=Math.min(e.hp*.5,e.maxHp*(e.boss?.08:.5));
+          if(e.remote)G.Coop.battleHit(e,value,G.U.TYPE_COLOR[m.type],0,0,0,m,null);else G.Battle.accept(pl,e,value,G.U.TYPE_COLOR[m.type],0,0,0,m,null);
+        }
+      }else run(actor,m);
+      if(!visualOnly){if(m.boost)pl.battle.zBoost=12;if(m.terrain){pl.battle.fieldType='psychic';pl.battle.terrainT=12;}if(m.heal)pl.heal(pl.maxHp*.1);if(m.steal)pl.battle.shield=Math.max(pl.battle.shield,pl.maxHp*.1);specialEnvironment(pl,packet);}
+    }finally{ghost=before;}
+    return packet;
+  }
+  function specialEnvironment(p,cast){
+    if(G.Coop.active&&!G.Coop.isHost||p.specialEnvironmentUsed||!Array.isArray(cast)||cast.length!==8||!G.Moves.BY_ID[cast[0]]||!cast.slice(1,7).every(Number.isFinite))return false;
+    if(p.remote&&!p.net?.battle?.[3]&&!p.battle?.used)return false;
+    const selector=Object.assign(Object.create(p),{baseForm:cast[7]}),m=G.SpecialRules.zMove(selector,G.Moves.instance(cast[0],1));
+    if(!m.clear&&!m.steal)return false;p.specialEnvironmentUsed=true;
+    if(m.clear){G.Hazards?.clearAround?.(cast[3],cast[4],260);if(G.Coop.isHost)G.Coop.broadcast(['zc',cast[3],cast[4],260]);}
+    if(m.steal)for(const e of G.EnemyMgr.queryCircle(cast[3],cast[4],260))if(!e.remote)e.shield=0;
+    return true;
+  }
+  function lob(pl,m){const tx=pl.target?.x??pl.x+Math.cos(pl.aim)*180,ty=pl.target?.y??pl.y+Math.sin(pl.aim)*180;
+    for(let i=0;i<Math.min(4,m.count||1);i++)fields.push({kind:'meteor',lob:true,sx:pl.x,sy:pl.y,owner:pl,ghost,m,col:G.U.TYPE_COLOR[m.type],vis:G.VFX.forMove(m),x:tx+(i%2?20:-20),y:ty,t:-i*.1,fall:.8,r:m.radius||65,dmg:m.dmg*pl.atk});
+    const own=fields.filter(f=>f.lob&&f.owner===pl);for(const f of own.slice(0,Math.max(0,own.length-12)))f.gone=true;
   }
   function authorizeDecoy(owner){for(const f of fields)if(f.owner===owner&&f.kind==='decoy'&&!f.gone)f.authority=true;}
   function decoys(){return fields.filter(f=>f.kind==='decoy'&&(!f.ghost||f.authority)&&!f.gone&&f.t<f.life&&!f.owner.dead).map(f=>f.decoy);}
@@ -466,6 +499,7 @@ G.Combat = (() => {
     }
     for (let i = fields.length - 1; i >= 0; i--) {
       const f = fields[i];
+      if(f.gone||f.owner?.dead){fields.splice(i,1);continue;}
       f.t += dt;
       if(['wave','mark','decoy'].includes(f.kind)){
         if(f.gone||!f.owner||f.owner.dead){fields.splice(i,1);continue;}
@@ -574,7 +608,7 @@ G.Combat = (() => {
       if (!G.Camera.sees(f.x, f.y, 200)) continue;
       if (f.kind === 'meteor' && f.t > 0) {
         const k = G.U.clamp(f.t / f.fall, 0, 1);
-        G.VFX.draw(ctx, f.vis.proj, f.vis.pal, f.x + (1 - k) * 40, f.y - (1 - k) * 170 - 6,
+        G.VFX.draw(ctx, f.vis.proj, f.vis.pal, f.lob?f.sx+(f.x-f.sx)*k:f.x+(1-k)*40, f.lob?f.sy+(f.y-f.sy)*k-90*Math.sin(k*Math.PI)-6:f.y-(1-k)*170-6,
                    { scale: 1.5, angle: Math.atan2(170, -40), frame: Math.floor(now * 12) });
       } else if (f.kind === 'turret') {
         const fade = Math.min(1, (f.life - f.t) * 2, f.t * 5);
@@ -650,7 +684,8 @@ G.Combat = (() => {
   const isCrit = pl => !ghost && Math.random() < (G.Battle?G.Battle.crit(pl):pl.critChance||0);
 
   function hit(pl, e, dmg, col, dx, dy, knock, m) {
-    const k = typeK(m.type, e);
+    if(ghost||pl.dead)return;
+    const k = typeK(m.type,e,pl);
     const crit = isCrit(pl);
     dmg *= k * (crit ? CRIT_MUL : 1);
     const eff=crit?'crit':G.Types.label(G.Types.mult(m.type,e.types));
@@ -699,6 +734,7 @@ G.Combat = (() => {
       if (!p.orb) {
         const block = G.World.projectileBlock(p.x, p.y, p.r);
         if (block === 'wall' || (block && !block.destructible)) {
+          if(G.AdvancedShots.wall(p))continue;
           G.FX.burst(p.x, p.y - G.LIFT, p.color, 5, 80);
           projectiles.splice(i, 1);
           continue;
@@ -759,9 +795,9 @@ G.Combat = (() => {
         }
 
         const crit = isCrit(pl);
-        const k = (p.mtype ? typeK(p.mtype, e) : 1) * (crit ? CRIT_MUL : 1);
+        const k = (p.mtype ? typeK(p.mtype,e,pl) : 1) * (crit ? CRIT_MUL : 1);
         const eff=crit?'crit':p.mtype?G.Types.label(G.Types.mult(p.mtype,e.types)):null;
-        if(G.Battle)G.Battle.deal(pl,e,p.dmg*k,p.color,p.vx||(e.x-pl.x),p.vy||(e.y-pl.y),p.knock,G.Moves.BY_ID[p.moveId]||{id:p.moveId,type:p.mtype,kind:'projectile',damageClass:p.damageClass,dmg:p.dmg},eff);
+        if(G.Battle)G.Battle.deal(pl,e,p.dmg*k,p.color,p.vx||(e.x-pl.x),p.vy||(e.y-pl.y),p.knock,p.moveData||{...(G.Moves.BY_ID[p.moveId]||{}),id:p.moveId,type:p.mtype,damageClass:p.damageClass,dmg:p.dmg},eff);
         else e.hurt(p.dmg*k,p.color,p.vx||(e.x-pl.x),p.vy||(e.y-pl.y),p.knock,eff,pl.uid);
         if (Math.random() < 0.5) G.FX.sp('impact', p.vis ? p.vis.pal : 'normal', e.x, e.y - e.bodyH * 0.5, { life: 0.12, scale: 1 });
         if(!G.Battle){pl.dmgDealt += p.dmg*k;pl.onDealt(p.dmg*k);}
@@ -794,6 +830,6 @@ G.Combat = (() => {
     }
   }
 
-  return { authorizeDecoy,special,decoys,meleeTarget, meleeInRange, meleeContains, acceptMeleeHit, meleeBenefits, tick, resolve, ghostCast, ghostOrbit, updateFields, drawGroundFields, drawAirFields, clearFields,
+  return { authorizeDecoy,specialEnvironment,special,decoys,meleeTarget, meleeInRange, meleeContains, acceptMeleeHit, meleeBenefits, tick, resolve, ghostCast, ghostOrbit, updateFields, drawGroundFields, drawAirFields, clearFields,
            get fieldCount() { return fields.length; } };
 })();

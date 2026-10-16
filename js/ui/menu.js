@@ -171,11 +171,12 @@ G.MenuUI = (() => {
   }
 
   // Variante que se está viendo en la ficha (normal o shiny).
-  let viewShiny = false;
+  let viewShiny = false,viewForm='';
 
   function showDetail(dex) {
     const s = G.DB.save;
-    const p = G.DEX_BY[dex];
+    if(dex!==showDetail.last)viewForm=s.partnerForms?.[dex]||'';
+    const base=G.DEX_BY[dex],p=G.SpecialRuntime.mon(base,viewForm);
     const own = !!s.owned[dex];
     const hasSh = G.DB.ownsShiny(dex);
     const isPartner = dex === s.partner;
@@ -184,12 +185,12 @@ G.MenuUI = (() => {
     showDetail.last = dex;
 
     const stats=G.BattleRules.stats(p,G.BattleDex),trait=G.BattleRules.trait(p,G.BattleDex);
-    const usingThis = isPartner && (!hasSh || !!s.partnerShiny === viewShiny);
+    const usingThis = isPartner && (s.partnerForms?.[dex]||'')===viewForm && (!hasSh || !!s.partnerShiny === viewShiny);
 
     const box = $('dex-detail');
     box.innerHTML = `
       <canvas id="dex-big" class="stage" width="220" height="190"></canvas>
-      ${hasSh ? `<div class="seg">
+      ${hasSh&&!viewForm ? `<div class="seg">
           <button class="${viewShiny ? '' : 'on'}" data-v="0">${G.T('Normal', 'form')}</button>
           <button class="${viewShiny ? 'on' : ''}" data-v="1">${G.Icons.html('shiny', 12)} Shiny</button></div>` : ''}
       <div class="center">
@@ -199,11 +200,12 @@ G.MenuUI = (() => {
         <div style="margin:6px 0">${own ? G.UI.typeChips(p.types) : ''}</div>
       </div>
       ${own ? `
+        ${G.SpecialRules.variants(dex).length?`<div class="seg form-controls">${[['','Base form'],...G.SpecialRules.variants(dex).map(v=>[v.key,v.title])].map(([key,title])=>`<button type="button" data-form-key="${key}" class="${viewForm===key?'on':''}">${G.T(title)}</button>`).join('')}</div>`:''}
         ${G.StatRadar.html(stats,G.T)}
         ${p.spriteForm?`<p class="sub center sprite-form">${G.T(p.spriteForm)}</p>`:''}
         <p class="trait-description"><b>${G.T('Species trait')}: ${trait.source?.[G.I18n.lang==='zh-CN'?'zh':G.I18n.lang==='es'?'es':'en']||G.T(trait.title)}</b><br>${G.T('Survivor adaptation')}: ${G.T(trait.desc)}</p>
-        <p class="sub">${G.T('Battle role')}: ${G.T(G.BattleRules.role(p,G.BattleDex))} · ${G.T('Special forms')}: ${G.BattleDex.species[p.dex]?.mega.length?'Mega / ':''}Z / ${G.T('Dynamax')}</p>
-        <p style="font-size:14px;margin:10px 0 4px">Empieza con <b class="gold">${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].name, 'move')}</b><br><small>${G.T(G.Moves.BY_ID[G.startMoveOf(dex)].damageClass==='physical'?'Physical · scales with Attack':'Special · scales with Special Attack')}</small></p>
+        <p class="sub">${G.T('Battle role')}: ${G.T(G.BattleRules.role(p,G.BattleDex))} · ${G.T('Special forms')}: ${G.SpecialRules.megas(dex,viewForm).length?'Mega / ':''}Z${G.SpecialRules.maxAllowed(dex,viewForm)?' / '+G.T('Dynamax'):''}</p>
+        <p style="font-size:14px;margin:10px 0 4px">Empieza con <b class="gold">${G.T(G.Moves.BY_ID[G.Moves.startFor(p)].name, 'move')}</b><br><small>${G.T(G.Moves.BY_ID[G.Moves.startFor(p)].damageClass==='physical'?'Physical · scales with Attack':'Special · scales with Special Attack')}</small></p>
         <p class="move-icons" title="Movimientos que puede aprender">
           ${G.Moves.poolFor(p).map(id => `<span title="${G.T(G.Moves.BY_ID[id].name, 'move')}">${G.Icons.html('move:' + id, 16)}</span>`).join('')}</p>
         ${usingThis
@@ -214,14 +216,15 @@ G.MenuUI = (() => {
     `;
     $('dex-big').style.setProperty('--stage-c', !own ? '#5b83d6' : viewShiny ? '#9ae6ff' : G.U.TYPE_COLOR[p.types[0]]);
     $('dex-big').classList.toggle('shiny', own && viewShiny);
-    G.UI.sprite($('dex-big'), dex, { lively: own, spin: own, silhouette: !own, scale: 3, hero: true, shiny: own && viewShiny });
-    box.querySelectorAll('.seg button').forEach(b => {
+    G.UI.sprite($('dex-big'), p.formSprite||dex, { lively: own, spin: own, silhouette: !own, scale: 3, hero: true, shiny: own && viewShiny });
+    box.querySelectorAll('.seg button[data-v]').forEach(b => {
       b.onclick = () => { viewShiny = b.dataset.v === '1'; showDetail(dex); };
     });
+    box.querySelectorAll('[data-form-key]').forEach(b=>b.onclick=()=>{viewForm=b.dataset.formKey;if(viewForm)viewShiny=false;showDetail(dex);});
     const pick = $('dex-pick');
     if (pick) pick.onclick = () => {
       s.partner = dex;
-      s.partnerShiny = hasSh && viewShiny;
+      s.partnerShiny = !viewForm&&hasSh&&viewShiny;s.partnerForms||={};s.partnerForms[dex]=viewForm;
       G.DB.commit();
       G.UI.toast(p.name + (s.partnerShiny ? ' shiny' : '') + ' es ahora tu compañero');
       renderGrid(); showDetail(dex);

@@ -1,0 +1,4335 @@
+{
+  "revision": "afef3762a2e5cdf9cf88957aa3f9dff43ec88e8d",
+  "deferred": [
+    {
+      "dex": 3,
+      "zh": "妙蛙花",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10033,
+      "identifier": "venusaur-mega",
+      "speciesInGame": true,
+      "battleId": 3,
+      "candidates": [
+        {
+          "path": "0003/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0003/0001",
+          "status": "portrait-only",
+          "portraitSha256": "6145ea8e4fc5822febbd52a77587cca1c7368e8c1e793d9acf4ad40a4bf54bc3",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 6,
+      "zh": "喷火龙",
+      "form": "mega_y",
+      "category": "mega",
+      "pokemonId": 10035,
+      "identifier": "charizard-mega-y",
+      "speciesInGame": true,
+      "battleId": 6,
+      "candidates": [
+        {
+          "path": "0006/0002",
+          "name": "Mega_Y",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0006/0002",
+          "status": "portrait-only",
+          "portraitSha256": "50d7c872d7c245205c46e3bfa75f12e60ca32636dbe49d8ad23b97a8e07d3b8f",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 9,
+      "zh": "水箭龟",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10036,
+      "identifier": "blastoise-mega",
+      "speciesInGame": true,
+      "battleId": 9,
+      "candidates": [
+        {
+          "path": "0009/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0009/0001",
+          "status": "portrait-only",
+          "portraitSha256": "6be0889bee933da3f5edadf7dc82b0744f77387c89191ca57312277e54c1428e",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 127,
+      "zh": "凯罗斯",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10040,
+      "identifier": "pinsir-mega",
+      "speciesInGame": true,
+      "battleId": 127,
+      "candidates": [
+        {
+          "path": "0127/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0127/0001",
+          "status": "portrait-only",
+          "portraitSha256": "0c5590fe1afa71b531807d6aa3f13780336131867de59f8a6bd48c917ff40c85",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 130,
+      "zh": "暴鲤龙",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10041,
+      "identifier": "gyarados-mega",
+      "speciesInGame": true,
+      "battleId": 130,
+      "candidates": [
+        {
+          "path": "0130/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0130/0001",
+          "status": "portrait-only",
+          "portraitSha256": "d5779589bb395ad18644c3ce134e1c2c9320cb3cc6a5065238fa3828b5e4a63b",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 150,
+      "zh": "超梦",
+      "form": "mega_x",
+      "category": "mega",
+      "pokemonId": 10043,
+      "identifier": "mewtwo-mega-x",
+      "speciesInGame": true,
+      "battleId": 150,
+      "candidates": [
+        {
+          "path": "0150/0001",
+          "name": "Mega_X",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Determined",
+            "Pain",
+            "Crying",
+            "Teary-Eyed",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0150/0001",
+          "status": "portrait-only",
+          "portraitSha256": "b22dc6b694ddb8e9867cb77365d3716ba0cc1085eb86687998772c0be10ea6ec",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 181,
+      "zh": "电龙",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10045,
+      "identifier": "ampharos-mega",
+      "speciesInGame": true,
+      "battleId": 181,
+      "candidates": [
+        {
+          "path": "0181/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0181/0001",
+          "status": "portrait-only",
+          "portraitSha256": "bf7788b92b06d64c68537d3dbe728e4ed82498b644df209535df4d34107d1358",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 212,
+      "zh": "巨钳螳螂",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10046,
+      "identifier": "scizor-mega",
+      "speciesInGame": true,
+      "battleId": 212,
+      "candidates": [
+        {
+          "path": "0212/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0212/0001",
+          "status": "portrait-only",
+          "portraitSha256": "fb2a566891b07a615cbcbb503681d9cea7c9c07d2c6859cffdb1b30381508a8d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 214,
+      "zh": "赫拉克罗斯",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10047,
+      "identifier": "heracross-mega",
+      "speciesInGame": true,
+      "battleId": 214,
+      "candidates": [
+        {
+          "path": "0214/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0214/0001",
+          "status": "portrait-only",
+          "portraitSha256": "5d824086a354cd43a33a7c1b3c0b54cebaf3976f2e22dd2bf64641afc675173a",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 257,
+      "zh": "火焰鸡",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10050,
+      "identifier": "blaziken-mega",
+      "speciesInGame": true,
+      "battleId": 257,
+      "candidates": [
+        {
+          "path": "0257/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0257/0001",
+          "status": "portrait-only",
+          "portraitSha256": "05aa32e71390c16d30203bbbda378e7ff76b55a52341fe05436a464a2113eae1",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 306,
+      "zh": "波士可多拉",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10053,
+      "identifier": "aggron-mega",
+      "speciesInGame": true,
+      "battleId": 306,
+      "candidates": [
+        {
+          "path": "0306/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0306/0001",
+          "status": "portrait-only",
+          "portraitSha256": "c488760d3f26cdba3cd9efd1d7ce714d3f3049ad6c4a72488ffac0fef270adb1",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 445,
+      "zh": "烈咬陆鲨",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10058,
+      "identifier": "garchomp-mega",
+      "speciesInGame": true,
+      "battleId": 445,
+      "candidates": [
+        {
+          "path": "0445/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0445/0001",
+          "status": "portrait-only",
+          "portraitSha256": "5e7cd18d168c1d67c6dc1deedd85ed4be5363aa2cda339800a9b9f161f59d38a",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 460,
+      "zh": "暴雪王",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10060,
+      "identifier": "abomasnow-mega",
+      "speciesInGame": true,
+      "battleId": 460,
+      "candidates": [
+        {
+          "path": "0460/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0460/0001",
+          "status": "portrait-only",
+          "portraitSha256": "be14c838712cd80cd0e4ae911eeba81a2c4875d8e4b24daef35fc599d6bf2c9c",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 260,
+      "zh": "巨沼怪",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10064,
+      "identifier": "swampert-mega",
+      "speciesInGame": true,
+      "battleId": 260,
+      "candidates": [
+        {
+          "path": "0260/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0260/0001",
+          "status": "portrait-only",
+          "portraitSha256": "4ff341cc06659fb5cf3969a233a937569ac8031898c3867d03accf9bd9d614ca",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 254,
+      "zh": "蜥蜴王",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10065,
+      "identifier": "sceptile-mega",
+      "speciesInGame": true,
+      "battleId": 254,
+      "candidates": [
+        {
+          "path": "0254/0001",
+          "name": "Mega",
+          "actions": [
+            "Walk",
+            "Idle",
+            "Rotate"
+          ],
+          "portraitActions": [
+            "Normal",
+            "Pain",
+            "Happy"
+          ]
+        }
+      ],
+      "imported": true,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0254/0001",
+          "status": "partial",
+          "actions": [
+            "Walk",
+            "Idle",
+            "Rotate"
+          ],
+          "xmlSha256": "203cf477b1c64e7dda7d933fb1d538821e17094fd3442ae79ebc822cd41c6739",
+          "resolved": {
+            "idle": [
+              "Idle",
+              56,
+              48,
+              2
+            ],
+            "walk": [
+              "Walk",
+              56,
+              48,
+              4
+            ]
+          }
+        }
+      ],
+      "materialStatus": "partial"
+    },
+    {
+      "dex": 531,
+      "zh": "差不多娃娃",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10069,
+      "identifier": "audino-mega",
+      "speciesInGame": true,
+      "battleId": 531,
+      "candidates": [
+        {
+          "path": "0531/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Angry^",
+            "Shouting^",
+            "Sigh^",
+            "Determined",
+            "Determined^",
+            "Inspired^",
+            "Crying^",
+            "Pain",
+            "Happy^",
+            "Special1^",
+            "Teary-Eyed^",
+            "Sad^",
+            "Pain^",
+            "Special0^",
+            "Special0",
+            "Crying",
+            "Dizzy^",
+            "Worried^",
+            "Stunned^",
+            "Teary-Eyed",
+            "Dizzy",
+            "Special1",
+            "Surprised^",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Joyous^",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0531/0001",
+          "status": "portrait-only",
+          "portraitSha256": "57d0fb89036a7a2ad9ababf4ccc7d3bccc40cc08be71b77df1608524ff6c8ea7",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 18,
+      "zh": "大比鸟",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10073,
+      "identifier": "pidgeot-mega",
+      "speciesInGame": true,
+      "battleId": 18,
+      "candidates": [
+        {
+          "path": "0018/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0018/0001",
+          "status": "portrait-only",
+          "portraitSha256": "81747a54238e534c790f6404bc367e88943e1faa09f0097cdbc6598e8697193b",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 376,
+      "zh": "巨金怪",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10076,
+      "identifier": "metagross-mega",
+      "speciesInGame": true,
+      "battleId": 376,
+      "candidates": [
+        {
+          "path": "0376/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0376/0001",
+          "status": "portrait-only",
+          "portraitSha256": "9d23144275bff7268b43148b7c657f957a743b085eb5340bb66d886dc20cf87d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 373,
+      "zh": "暴飞龙",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10089,
+      "identifier": "salamence-mega",
+      "speciesInGame": true,
+      "battleId": 373,
+      "candidates": [
+        {
+          "path": "0373/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0373/0001",
+          "status": "portrait-only",
+          "portraitSha256": "4a0e95f1aa79b4eb9f5cec479a20a51bee7503ba1304beadea2bb7e60be8f9ac",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 15,
+      "zh": "大针蜂",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10090,
+      "identifier": "beedrill-mega",
+      "speciesInGame": true,
+      "battleId": 15,
+      "candidates": [
+        {
+          "path": "0015/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0015/0001",
+          "status": "portrait-only",
+          "portraitSha256": "4993904df4ff0879e2170ebad3838b9ce99590487979bfa901190f15fa537f22",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 3,
+      "zh": "妙蛙花",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10195,
+      "identifier": "venusaur-gmax",
+      "speciesInGame": true,
+      "battleId": 3,
+      "candidates": [
+        {
+          "path": "0003/0002",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0003/0002",
+          "status": "portrait-only",
+          "portraitSha256": "0348d1e1dfaf96179353dd3d3a852e5a88193bc77571487fb6d9110a0541f68e",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 6,
+      "zh": "喷火龙",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10196,
+      "identifier": "charizard-gmax",
+      "speciesInGame": true,
+      "battleId": 6,
+      "candidates": [
+        {
+          "path": "0006/0003",
+          "name": "Gigantamax",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0006/0003",
+          "status": "partial",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "xmlSha256": "d54a56e152f95e294ac2928f2491a6cf2b8331f974b7792cc2e8d390b9072e37",
+          "resolved": {
+            "idle": [
+              "Idle",
+              168,
+              192,
+              1
+            ]
+          }
+        }
+      ],
+      "materialStatus": "partial"
+    },
+    {
+      "dex": 9,
+      "zh": "水箭龟",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10197,
+      "identifier": "blastoise-gmax",
+      "speciesInGame": true,
+      "battleId": 9,
+      "candidates": [
+        {
+          "path": "0009/0002",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0009/0002",
+          "status": "portrait-only",
+          "portraitSha256": "7f7eea24a1b8d4b0c0aea86066c7340d77663156414cca0be8598bc20919945f",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 12,
+      "zh": "巴大蝶",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10198,
+      "identifier": "butterfree-gmax",
+      "speciesInGame": true,
+      "battleId": 12,
+      "candidates": [
+        {
+          "path": "0012/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0012/0001",
+          "status": "portrait-only",
+          "portraitSha256": "10f8bff146fa78f545489aa3b7e56dab43d38b189b8a1866dbe50508f146aa60",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 25,
+      "zh": "皮卡丘",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10199,
+      "identifier": "pikachu-gmax",
+      "speciesInGame": true,
+      "battleId": 25,
+      "candidates": [
+        {
+          "path": "0025/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0025/0001",
+          "status": "portrait-only",
+          "portraitSha256": "f6a13ec2bb4b93dd4a0702d32562ea1cbab27806abd04da91b9c8d0c4a358df9",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 52,
+      "zh": "喵喵",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10200,
+      "identifier": "meowth-gmax",
+      "speciesInGame": true,
+      "battleId": 52,
+      "candidates": [
+        {
+          "path": "0052/0003",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0052/0003",
+          "status": "portrait-only",
+          "portraitSha256": "773f55f942ccc8bd12dcab62f250c6dd2c385043ea341e9272bc0e36fa55a072",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 68,
+      "zh": "怪力",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10201,
+      "identifier": "machamp-gmax",
+      "speciesInGame": true,
+      "battleId": 68,
+      "candidates": [
+        {
+          "path": "0068/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0068/0001",
+          "status": "portrait-only",
+          "portraitSha256": "552e21cc4085d1a7995eb2c355500057dafa53f26182a5e3fc02a6ba89126ce3",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 94,
+      "zh": "耿鬼",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10202,
+      "identifier": "gengar-gmax",
+      "speciesInGame": true,
+      "battleId": 94,
+      "candidates": [
+        {
+          "path": "0094/0002",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0094/0002",
+          "status": "portrait-only",
+          "portraitSha256": "eeb7648aa2f113b095af3cc0285dfbc91dc9961cba852838e1ce65c90f469960",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 99,
+      "zh": "巨钳蟹",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10203,
+      "identifier": "kingler-gmax",
+      "speciesInGame": true,
+      "battleId": 99,
+      "candidates": [
+        {
+          "path": "0099/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0099/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 131,
+      "zh": "拉普拉斯",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10204,
+      "identifier": "lapras-gmax",
+      "speciesInGame": true,
+      "battleId": 131,
+      "candidates": [
+        {
+          "path": "0131/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Special1"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0131/0001",
+          "status": "portrait-only",
+          "portraitSha256": "f0d5afe99af51cc336a86b5ae76b6397b811aec6250140beee072e186f984fce",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 133,
+      "zh": "伊布",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10205,
+      "identifier": "eevee-gmax",
+      "speciesInGame": true,
+      "battleId": 133,
+      "candidates": [
+        {
+          "path": "0133/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0133/0001",
+          "status": "portrait-only",
+          "portraitSha256": "9f1f08a882ab7be009763417bbe8c54f8e9fc20f7dfa38dd6473ffb265ed690c",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 143,
+      "zh": "卡比兽",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10206,
+      "identifier": "snorlax-gmax",
+      "speciesInGame": true,
+      "battleId": 143,
+      "candidates": [
+        {
+          "path": "0143/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0143/0001",
+          "status": "portrait-only",
+          "portraitSha256": "8a7beadeacca955b2c1d20245233e80bb246630297bb25cf3f9a9eca822e812a",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 569,
+      "zh": "灰尘山",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10207,
+      "identifier": "garbodor-gmax",
+      "speciesInGame": true,
+      "battleId": 569,
+      "candidates": [
+        {
+          "path": "0569/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0569/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 809,
+      "zh": "美录梅塔",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10208,
+      "identifier": "melmetal-gmax",
+      "speciesInGame": true,
+      "battleId": 809,
+      "candidates": [
+        {
+          "path": "0809/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0809/0001",
+          "status": "portrait-only",
+          "portraitSha256": "ab1d0417ac076e453c8700360a816865b9c9dd3f1263f02e41374655358bb6f7",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 812,
+      "zh": "轰擂金刚猩",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10209,
+      "identifier": "rillaboom-gmax",
+      "speciesInGame": true,
+      "battleId": 812,
+      "candidates": [
+        {
+          "path": "0812/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0812/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 815,
+      "zh": "闪焰王牌",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10210,
+      "identifier": "cinderace-gmax",
+      "speciesInGame": true,
+      "battleId": 815,
+      "candidates": [
+        {
+          "path": "0815/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0815/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 818,
+      "zh": "千面避役",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10211,
+      "identifier": "inteleon-gmax",
+      "speciesInGame": true,
+      "battleId": 818,
+      "candidates": [
+        {
+          "path": "0818/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0818/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 823,
+      "zh": "钢铠鸦",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10212,
+      "identifier": "corviknight-gmax",
+      "speciesInGame": true,
+      "battleId": 823,
+      "candidates": [
+        {
+          "path": "0823/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0823/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 826,
+      "zh": "以欧路普",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10213,
+      "identifier": "orbeetle-gmax",
+      "speciesInGame": true,
+      "battleId": 826,
+      "candidates": [
+        {
+          "path": "0826/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0826/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 834,
+      "zh": "暴噬龟",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10214,
+      "identifier": "drednaw-gmax",
+      "speciesInGame": true,
+      "battleId": 834,
+      "candidates": [
+        {
+          "path": "0834/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0834/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 839,
+      "zh": "巨炭山",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10215,
+      "identifier": "coalossal-gmax",
+      "speciesInGame": false,
+      "battleId": 839,
+      "candidates": [
+        {
+          "path": "0839/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0839/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 841,
+      "zh": "苹裹龙",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10216,
+      "identifier": "flapple-gmax",
+      "speciesInGame": true,
+      "battleId": 841,
+      "candidates": [
+        {
+          "path": "0841/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0841/0001",
+          "status": "portrait-only",
+          "portraitSha256": "ee7f531dac5afe39f1e476d1ffa21af1ed4b687c368b247ae09d5955fa706814",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 842,
+      "zh": "丰蜜龙",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10217,
+      "identifier": "appletun-gmax",
+      "speciesInGame": true,
+      "battleId": 842,
+      "candidates": [
+        {
+          "path": "0842/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0842/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 844,
+      "zh": "沙螺蟒",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10218,
+      "identifier": "sandaconda-gmax",
+      "speciesInGame": true,
+      "battleId": 844,
+      "candidates": [
+        {
+          "path": "0844/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0844/0001",
+          "status": "portrait-only",
+          "portraitSha256": "c41dd86c9db39cf5a6c81ba1fd7877c7b07a361fa15ce5a63138a1b7b22da6fa",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 849,
+      "zh": "颤弦蝾螈",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10219,
+      "identifier": "toxtricity-amped-gmax",
+      "speciesInGame": true,
+      "battleId": 849,
+      "candidates": [
+        {
+          "path": "0849/0002",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0849/0002",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 851,
+      "zh": "焚焰蚣",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10220,
+      "identifier": "centiskorch-gmax",
+      "speciesInGame": true,
+      "battleId": 851,
+      "candidates": [
+        {
+          "path": "0851/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0851/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 858,
+      "zh": "布莉姆温",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10221,
+      "identifier": "hatterene-gmax",
+      "speciesInGame": true,
+      "battleId": 858,
+      "candidates": [
+        {
+          "path": "0858/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0858/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 861,
+      "zh": "长毛巨魔",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10222,
+      "identifier": "grimmsnarl-gmax",
+      "speciesInGame": true,
+      "battleId": 861,
+      "candidates": [
+        {
+          "path": "0861/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0861/0001",
+          "status": "portrait-only",
+          "portraitSha256": "3bc35106e466721b6cea38af6a6a635d63848cf410e807b42fc159e6ebc3f3fe",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 869,
+      "zh": "霜奶仙",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10223,
+      "identifier": "alcremie-gmax",
+      "speciesInGame": true,
+      "battleId": 869,
+      "candidates": [
+        {
+          "path": "0869/0063",
+          "name": "Gigantamax",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0869/0063",
+          "status": "partial",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "xmlSha256": "26c9ff45e5c92f7ef1cdf7cc00352a37da13629fccbe222f0096ad65116be314",
+          "resolved": {
+            "idle": [
+              "Idle",
+              72,
+              184,
+              1
+            ]
+          }
+        }
+      ],
+      "materialStatus": "partial"
+    },
+    {
+      "dex": 879,
+      "zh": "大王铜象",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10224,
+      "identifier": "copperajah-gmax",
+      "speciesInGame": false,
+      "battleId": 879,
+      "candidates": [
+        {
+          "path": "0879/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0879/0001",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 884,
+      "zh": "铝钢龙",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10225,
+      "identifier": "duraludon-gmax",
+      "speciesInGame": true,
+      "battleId": 884,
+      "candidates": [
+        {
+          "path": "0884/0001",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0884/0001",
+          "status": "portrait-only",
+          "portraitSha256": "e51da45402d1c061e0249b38da475f817038f468b75b8c73539b1cc940238a9d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 892,
+      "zh": "武道熊师",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10226,
+      "identifier": "urshifu-single-strike-gmax",
+      "speciesInGame": true,
+      "battleId": 892,
+      "candidates": [
+        {
+          "path": "0892/0002",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0892/0002",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 892,
+      "zh": "武道熊师",
+      "form": "Rapid_Strike_Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10227,
+      "identifier": "urshifu-rapid-strike-gmax",
+      "speciesInGame": true,
+      "battleId": 892,
+      "candidates": [
+        {
+          "path": "0892/0003",
+          "name": "Rapid_Strike_Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0892/0003",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 849,
+      "zh": "颤弦蝾螈",
+      "form": "Gigantamax",
+      "category": "gmax",
+      "pokemonId": 10228,
+      "identifier": "toxtricity-low-key-gmax",
+      "speciesInGame": true,
+      "battleId": 849,
+      "candidates": [
+        {
+          "path": "0849/0002",
+          "name": "Gigantamax",
+          "actions": [],
+          "portraitActions": []
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0849/0002",
+          "status": "empty",
+          "actions": []
+        }
+      ],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 36,
+      "zh": "皮可西",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10278,
+      "identifier": "clefable-mega",
+      "speciesInGame": true,
+      "battleId": 36,
+      "candidates": [
+        {
+          "path": "0036/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0036/0001",
+          "status": "portrait-only",
+          "portraitSha256": "deaa08f1a21dab35eb4b43d26f6512cfc607c0b382452f3c0d5bc54e798cd3f9",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 71,
+      "zh": "大食花",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10279,
+      "identifier": "victreebel-mega",
+      "speciesInGame": true,
+      "battleId": 71,
+      "candidates": [
+        {
+          "path": "0071/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0071/0001",
+          "status": "portrait-only",
+          "portraitSha256": "6075e53b728209b3932f5f2c7e998b53dfee839d0d8eff5baef003c6ec62d8ba",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 121,
+      "zh": "宝石海星",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10280,
+      "identifier": "starmie-mega",
+      "speciesInGame": true,
+      "battleId": 121,
+      "candidates": [
+        {
+          "path": "0121/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Special0",
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0121/0001",
+          "status": "portrait-only",
+          "portraitSha256": "111e14d0d4db982184a70f4e5e4b1f12c7c3f68ec2722ae301f69670cc2f24ca",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 149,
+      "zh": "快龙",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10281,
+      "identifier": "dragonite-mega",
+      "speciesInGame": true,
+      "battleId": 149,
+      "candidates": [
+        {
+          "path": "0149/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Sigh",
+            "Determined",
+            "Pain",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Special0",
+            "Crying",
+            "Teary-Eyed",
+            "Dizzy",
+            "Special1",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0149/0001",
+          "status": "portrait-only",
+          "portraitSha256": "1df49ea5210cf6dbdb28457d076dc4eb0dc4fa7ecb25b4fe0883ee6e04e39f10",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 154,
+      "zh": "大竺葵",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10282,
+      "identifier": "meganium-mega",
+      "speciesInGame": true,
+      "battleId": 154,
+      "candidates": [
+        {
+          "path": "0154/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0154/0001",
+          "status": "portrait-only",
+          "portraitSha256": "f0c8ec20dc7fe2530f6469d54864c8fe2691c1c7ad916363d2d107fa74fb26f0",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 160,
+      "zh": "大力鳄",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10283,
+      "identifier": "feraligatr-mega",
+      "speciesInGame": true,
+      "battleId": 160,
+      "candidates": [
+        {
+          "path": "0160/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0160/0001",
+          "status": "portrait-only",
+          "portraitSha256": "790995161e0d5b8c4676847bf7ebe05ec2c05461627a0c216b854cdbebfa2eb9",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 478,
+      "zh": "雪妖女",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10285,
+      "identifier": "froslass-mega",
+      "speciesInGame": true,
+      "battleId": 478,
+      "candidates": [
+        {
+          "path": "0478/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0478/0001",
+          "status": "portrait-only",
+          "portraitSha256": "b12acef44350288b8fcc9ce3778e93530097cb5397677c2dcd73b4d7a1d1f35a",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 500,
+      "zh": "炎武王",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10286,
+      "identifier": "emboar-mega",
+      "speciesInGame": true,
+      "battleId": 500,
+      "candidates": [
+        {
+          "path": "0500/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0500/0001",
+          "status": "portrait-only",
+          "portraitSha256": "4d7a61a66cf3089a993e473004b9cfdf6d2ba135e172e733a64fc0e99c014d3e",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 545,
+      "zh": "蜈蚣王",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10288,
+      "identifier": "scolipede-mega",
+      "speciesInGame": true,
+      "battleId": 545,
+      "candidates": [
+        {
+          "path": "0545/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0545/0001",
+          "status": "portrait-only",
+          "portraitSha256": "a9d480822ef52bfd8e0757514de00fea6fc67efd2a58d9ab6093aab4d5759b95",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 609,
+      "zh": "水晶灯火灵",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10291,
+      "identifier": "chandelure-mega",
+      "speciesInGame": true,
+      "battleId": 609,
+      "candidates": [
+        {
+          "path": "0609/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0609/0001",
+          "status": "portrait-only",
+          "portraitSha256": "bf60287e5a0c70b6d1e44a77d01ae6b9ed3799d8d3c81dc525a0b898ff895952",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 652,
+      "zh": "布里卡隆",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10292,
+      "identifier": "chesnaught-mega",
+      "speciesInGame": true,
+      "battleId": 652,
+      "candidates": [
+        {
+          "path": "0652/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0652/0001",
+          "status": "portrait-only",
+          "portraitSha256": "325299da7febc449c305c87ff21289744d96718a7f93c1a2f1c963da5fd24131",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 655,
+      "zh": "妖火红狐",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10293,
+      "identifier": "delphox-mega",
+      "speciesInGame": true,
+      "battleId": 655,
+      "candidates": [
+        {
+          "path": "0655/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0655/0001",
+          "status": "portrait-only",
+          "portraitSha256": "85d6d218c63b1642e3e1f0551f362d74a7b83c528ace6fb8c3ac5f00e12ffdb9",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 658,
+      "zh": "甲贺忍蛙",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10294,
+      "identifier": "greninja-mega",
+      "speciesInGame": true,
+      "battleId": 658,
+      "candidates": [
+        {
+          "path": "0658/0002",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0658/0002",
+          "status": "portrait-only",
+          "portraitSha256": "e5ba1fed631b4049e6359de3a5dbb10988fbc75b4855ee590d592edb81298dca",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 668,
+      "zh": "火炎狮",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10295,
+      "identifier": "pyroar-mega",
+      "speciesInGame": true,
+      "battleId": 668,
+      "candidates": [
+        {
+          "path": "0668/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0668/0001",
+          "status": "portrait-only",
+          "portraitSha256": "50c335ea5d6a5fdc3e9ac04cc3fd3b11bf9a0b147c83af3584c4ce512b89a63d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 687,
+      "zh": "乌贼王",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10297,
+      "identifier": "malamar-mega",
+      "speciesInGame": true,
+      "battleId": 687,
+      "candidates": [
+        {
+          "path": "0687/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0687/0001",
+          "status": "portrait-only",
+          "portraitSha256": "42dec214a60124e5501b1bcb0fe1c5f1aef0872f6e10de76dbae18d32279ae90",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 689,
+      "zh": "龟足巨铠",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10298,
+      "identifier": "barbaracle-mega",
+      "speciesInGame": true,
+      "battleId": 689,
+      "candidates": [
+        {
+          "path": "0689/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0689/0001",
+          "status": "portrait-only",
+          "portraitSha256": "3b2741f4d4a4ef4a8f9c37b2cf702abaa66c657a658c2e26b4ed891f75dcb995",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 870,
+      "zh": "列阵兵",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10303,
+      "identifier": "falinks-mega",
+      "speciesInGame": true,
+      "battleId": 870,
+      "candidates": [
+        {
+          "path": "0870/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0870/0001",
+          "status": "portrait-only",
+          "portraitSha256": "14b3a6a04fdffae678b276a8e16df8cced82bdd8a6feb20abf50cf3cd6786efe",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 26,
+      "zh": "雷丘",
+      "form": "mega_x",
+      "category": "mega",
+      "pokemonId": 10304,
+      "identifier": "raichu-mega-x",
+      "speciesInGame": true,
+      "battleId": 26,
+      "candidates": [
+        {
+          "path": "0026/0002",
+          "name": "Mega_X",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0026/0002",
+          "status": "portrait-only",
+          "portraitSha256": "5e4581202834d6df39fa7f514738356434286d4e09b7bac46b5fa3228f1df548",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 26,
+      "zh": "雷丘",
+      "form": "mega_y",
+      "category": "mega",
+      "pokemonId": 10305,
+      "identifier": "raichu-mega-y",
+      "speciesInGame": true,
+      "battleId": 26,
+      "candidates": [
+        {
+          "path": "0026/0003",
+          "name": "Mega_Y",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0026/0003",
+          "status": "portrait-only",
+          "portraitSha256": "5a7bb0709de9e6553acc1b1ab10c839449703ecbc51c1d615e53d376deb8ae98",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 358,
+      "zh": "风铃铃",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10306,
+      "identifier": "chimecho-mega",
+      "speciesInGame": true,
+      "battleId": 358,
+      "candidates": [
+        {
+          "path": "0358/0001",
+          "name": "Mega",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": true,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0358/0001",
+          "status": "partial",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "xmlSha256": "3535f4799c5688124d57b1d2dce9fb8ea8caccd88951759e237bf1edef2348e3",
+          "resolved": {
+            "idle": [
+              "Idle",
+              48,
+              88,
+              1
+            ]
+          }
+        }
+      ],
+      "materialStatus": "partial"
+    },
+    {
+      "dex": 359,
+      "zh": "阿勃梭鲁",
+      "form": "mega_z",
+      "category": "mega",
+      "pokemonId": 10307,
+      "identifier": "absol-mega-z",
+      "speciesInGame": true,
+      "battleId": 359,
+      "candidates": [
+        {
+          "path": "0359/0002",
+          "name": "Mega_Z",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Angry^",
+            "Shouting^",
+            "Sigh^",
+            "Determined",
+            "Determined^",
+            "Inspired^",
+            "Crying^",
+            "Pain",
+            "Happy^",
+            "Teary-Eyed^",
+            "Sad^",
+            "Pain^",
+            "Special0^",
+            "Special0",
+            "Crying",
+            "Dizzy^",
+            "Worried^",
+            "Stunned^",
+            "Teary-Eyed",
+            "Dizzy",
+            "Surprised^",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Joyous^",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0359/0002",
+          "status": "portrait-only",
+          "portraitSha256": "9061937fede3510b174659485df640ca66fac957fd813cc1c0b603b99f04a1c8",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 398,
+      "zh": "姆克鹰",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10308,
+      "identifier": "staraptor-mega",
+      "speciesInGame": true,
+      "battleId": 398,
+      "candidates": [
+        {
+          "path": "0398/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0398/0001",
+          "status": "portrait-only",
+          "portraitSha256": "829279e7eebba34de0f525c01f7bc495dc2a36ebc6cdbc7a566beb120bc613da",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 445,
+      "zh": "烈咬陆鲨",
+      "form": "mega_z",
+      "category": "mega",
+      "pokemonId": 10309,
+      "identifier": "garchomp-mega-z",
+      "speciesInGame": true,
+      "battleId": 445,
+      "candidates": [
+        {
+          "path": "0445/0002",
+          "name": "Mega_Z",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0445/0002",
+          "status": "portrait-only",
+          "portraitSha256": "c12d0584dcf2570ed9f641287af9ee3c6e5b5e8c9ef6340a3435e41541583a0d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 448,
+      "zh": "路卡利欧",
+      "form": "mega_z",
+      "category": "mega",
+      "pokemonId": 10310,
+      "identifier": "lucario-mega-z",
+      "speciesInGame": true,
+      "battleId": 448,
+      "candidates": [
+        {
+          "path": "0448/0002",
+          "name": "Mega_Z",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0448/0002",
+          "status": "portrait-only",
+          "portraitSha256": "2f1ea7f307b17ffb7ad250615c68c6bca72c03a28f3e6926cafbd1090029cb34",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 485,
+      "zh": "席多蓝恩",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10311,
+      "identifier": "heatran-mega",
+      "speciesInGame": true,
+      "battleId": 485,
+      "candidates": [
+        {
+          "path": "0485/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0485/0001",
+          "status": "portrait-only",
+          "portraitSha256": "11793b4c26e1953054b175272496f97a7c27407ca8d450e03ecb7d588f458f5a",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 623,
+      "zh": "泥偶巨人",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10313,
+      "identifier": "golurk-mega",
+      "speciesInGame": true,
+      "battleId": 623,
+      "candidates": [
+        {
+          "path": "0623/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0623/0001",
+          "status": "portrait-only",
+          "portraitSha256": "ebcec82ee71c2821ef9967393bdd3a33172b5d3d53df7e84ff8d2b277d83971d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 678,
+      "zh": "超能妙喵",
+      "form": "Mega",
+      "category": "mega",
+      "pokemonId": 10314,
+      "identifier": "meowstic-male-mega",
+      "speciesInGame": true,
+      "battleId": 678,
+      "candidates": [
+        {
+          "path": "0678/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0678/0001",
+          "status": "portrait-only",
+          "portraitSha256": "c1842c37a0c653ecd9bc7e50cdf66c6f9309130adbd38d2feaf3190abc920518",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 740,
+      "zh": "好胜毛蟹",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10315,
+      "identifier": "crabominable-mega",
+      "speciesInGame": true,
+      "battleId": 740,
+      "candidates": [
+        {
+          "path": "0740/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0740/0001",
+          "status": "portrait-only",
+          "portraitSha256": "54a5b3eb7aca186462a6037e72be3de4e450fb056c64f7f1303e79ae3c05d7f9",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 768,
+      "zh": "具甲武者",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10316,
+      "identifier": "golisopod-mega",
+      "speciesInGame": true,
+      "battleId": 768,
+      "candidates": [
+        {
+          "path": "0768/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0768/0001",
+          "status": "portrait-only",
+          "portraitSha256": "8b4f4af921446a863e07034ef2e30e1d22356f3c91ac4f632923a50bc359ae73",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 801,
+      "zh": "玛机雅娜",
+      "form": "Mega",
+      "category": "mega",
+      "pokemonId": 10317,
+      "identifier": "magearna-mega",
+      "speciesInGame": true,
+      "battleId": 801,
+      "candidates": [
+        {
+          "path": "0801/0002",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0801/0002",
+          "status": "portrait-only",
+          "portraitSha256": "31e013b9df5cab217dd55034158b9375da5e69afe55733df62055e5292e0b3f8",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 801,
+      "zh": "玛机雅娜",
+      "form": "Original_Mega",
+      "category": "mega",
+      "pokemonId": 10318,
+      "identifier": "magearna-original-mega",
+      "speciesInGame": true,
+      "battleId": 801,
+      "candidates": [
+        {
+          "path": "0801/0003",
+          "name": "Original_Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0801/0003",
+          "status": "portrait-only",
+          "portraitSha256": "8b891e71a227f803f8903d75054307e38fef6c600dd3509f5fc12ce58db5e433",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 952,
+      "zh": "狠辣椒",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10320,
+      "identifier": "scovillain-mega",
+      "speciesInGame": true,
+      "battleId": 952,
+      "candidates": [
+        {
+          "path": "0952/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0952/0001",
+          "status": "portrait-only",
+          "portraitSha256": "b7d0c0e359f2507ba05d0243f10a1d55d176c0d07b60604661a74c013adc0703",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 970,
+      "zh": "晶光花",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10321,
+      "identifier": "glimmora-mega",
+      "speciesInGame": true,
+      "battleId": 970,
+      "candidates": [
+        {
+          "path": "0970/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0970/0001",
+          "status": "portrait-only",
+          "portraitSha256": "c6ea95f844bf7d1bb31485e7543a9290dbad499d0b6b767eb2d5fd579d5247ea",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 978,
+      "zh": "米立龙",
+      "form": "Droopy_Mega",
+      "category": "mega",
+      "pokemonId": 10323,
+      "identifier": "tatsugiri-droopy-mega",
+      "speciesInGame": true,
+      "battleId": 978,
+      "candidates": [
+        {
+          "path": "0978/0005",
+          "name": "Droopy_Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": true,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0978/0005",
+          "status": "portrait-only",
+          "portraitSha256": "19d19e7d997e6d2b8a30c8df0311721c69f2f4519090a6cbfa819cc2ff6b2c9d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 978,
+      "zh": "米立龙",
+      "form": "Stretchy_Mega",
+      "category": "mega",
+      "pokemonId": 10324,
+      "identifier": "tatsugiri-stretchy-mega",
+      "speciesInGame": true,
+      "battleId": 978,
+      "candidates": [
+        {
+          "path": "0978/0004",
+          "name": "Stretchy_Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "imported": true,
+      "selectableNow": false,
+      "materials": [
+        {
+          "path": "0978/0004",
+          "status": "portrait-only",
+          "portraitSha256": "339f145368fb4afb62f1f3fb3518328bda9e8d48e8b50955a76864805ec865c1",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 998,
+      "zh": "戟脊龙",
+      "form": "mega",
+      "category": "mega",
+      "pokemonId": 10325,
+      "identifier": "baxcalibur-mega",
+      "speciesInGame": true,
+      "battleId": 998,
+      "candidates": [
+        {
+          "path": "0998/0001",
+          "name": "Mega",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "imported": false,
+      "selectableNow": true,
+      "materials": [
+        {
+          "path": "0998/0001",
+          "status": "portrait-only",
+          "portraitSha256": "27b6fbd588994047e295a9af95a21cdc04dcd402a80790c111bac94e25fad2e8",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 678,
+      "zh": "超能妙喵",
+      "form": "Female_Mega",
+      "category": "mega",
+      "pokemonId": 10326,
+      "identifier": "meowstic-female-mega",
+      "speciesInGame": true,
+      "battleId": 678,
+      "candidates": [],
+      "imported": false,
+      "selectableNow": false,
+      "materials": [],
+      "materialStatus": "empty"
+    },
+    {
+      "dex": 25,
+      "zh": "皮卡丘",
+      "form": "Original_Cap",
+      "category": "z-user",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": true,
+      "battleId": 25,
+      "candidates": [
+        {
+          "path": "0025/0008",
+          "name": "Original_Cap",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "path": "0025/0008",
+          "status": "portrait-only",
+          "portraitSha256": "3ee63cb27e92acfd908565c37288965542b58c92b35eea300f7982ec4c64f621",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 25,
+      "zh": "皮卡丘",
+      "form": "Hoenn_Cap",
+      "category": "z-user",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": true,
+      "battleId": 25,
+      "candidates": [
+        {
+          "path": "0025/0009",
+          "name": "Hoenn_Cap",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "path": "0025/0009",
+          "status": "portrait-only",
+          "portraitSha256": "d8efa976962a28e4b8313163d03bfb9d6a3eb5f7369b22bcaee77d6a5ce6bcb2",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 25,
+      "zh": "皮卡丘",
+      "form": "Sinnoh_Cap",
+      "category": "z-user",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": true,
+      "battleId": 25,
+      "candidates": [
+        {
+          "path": "0025/0010",
+          "name": "Sinnoh_Cap",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "path": "0025/0010",
+          "status": "portrait-only",
+          "portraitSha256": "02fcee0e959849bf672319bcb6ba6cfa4572024ea4dc5f903edf88e5f89a3ce7",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 25,
+      "zh": "皮卡丘",
+      "form": "Unova_Cap",
+      "category": "z-user",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": true,
+      "battleId": 25,
+      "candidates": [
+        {
+          "path": "0025/0011",
+          "name": "Unova_Cap",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "path": "0025/0011",
+          "status": "portrait-only",
+          "portraitSha256": "532ea32486f9ad242425ea0c7bfd2a8db54d52a64a9665a89d0550fc04858a07",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 25,
+      "zh": "皮卡丘",
+      "form": "Kalos_Cap",
+      "category": "z-user",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": true,
+      "battleId": 25,
+      "candidates": [
+        {
+          "path": "0025/0012",
+          "name": "Kalos_Cap",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "path": "0025/0012",
+          "status": "portrait-only",
+          "portraitSha256": "2870922c0b67d54cc64d39faabeec1408cb521b39043b02cf522b54f799c8c4d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 25,
+      "zh": "皮卡丘",
+      "form": "Alola_Cap",
+      "category": "z-user",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": true,
+      "battleId": 25,
+      "candidates": [
+        {
+          "path": "0025/0013",
+          "name": "Alola_Cap",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "path": "0025/0013",
+          "status": "portrait-only",
+          "portraitSha256": "2f083fb0b60a64ab209c34287286deb2c4d60d141f1dc7dc4fd623d83b069fe2",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 25,
+      "zh": "皮卡丘",
+      "form": "Partner_Cap",
+      "category": "z-user",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": true,
+      "battleId": 25,
+      "candidates": [
+        {
+          "path": "0025/0014",
+          "name": "Partner_Cap",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "path": "0025/0014",
+          "status": "portrait-only",
+          "portraitSha256": "dda85003fc1d8f8e953b962c59a096a899b78e08ca959e7219fc023fc0ef9bd3",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 800,
+      "zh": "奈克洛兹玛",
+      "form": "Dusk_Mane",
+      "category": "z-user",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": true,
+      "battleId": 800,
+      "candidates": [
+        {
+          "path": "0800/0001",
+          "name": "Dusk_Mane",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^",
+            "Inspired^",
+            "Pain",
+            "Happy^",
+            "Pain^",
+            "Inspired",
+            "Happy"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "path": "0800/0001",
+          "status": "portrait-only",
+          "portraitSha256": "21b149a3153a4637eeaaf9d2d3a28a54083f386c0be58e762cd5cef14a98b27d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 800,
+      "zh": "奈克洛兹玛",
+      "form": "Dawn_Wings",
+      "category": "z-user",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": true,
+      "battleId": 800,
+      "candidates": [
+        {
+          "path": "0800/0002",
+          "name": "Dawn_Wings",
+          "actions": [],
+          "portraitActions": [
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Angry^",
+            "Shouting^",
+            "Sigh^",
+            "Determined",
+            "Determined^",
+            "Inspired^",
+            "Crying^",
+            "Pain",
+            "Happy^",
+            "Teary-Eyed^",
+            "Sad^",
+            "Pain^",
+            "Special0^",
+            "Special0",
+            "Crying",
+            "Dizzy^",
+            "Worried^",
+            "Stunned^",
+            "Normal",
+            "Teary-Eyed",
+            "Dizzy",
+            "Surprised^",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Joyous^",
+            "Worried",
+            "Normal^",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "path": "0800/0002",
+          "status": "portrait-only",
+          "portraitSha256": "ee945da3d65aafc14ba4452a8083a4d0d12126452438f05294df3083858d9a29",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 514,
+      "zh": "爆香猿",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 514,
+      "candidates": [
+        {
+          "path": "0514",
+          "name": "Simisear",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": false,
+      "materials": [
+        {
+          "path": "0514",
+          "status": "portrait-only",
+          "portraitSha256": "a2e5356ffc2d9048aaf855f1d7d6a306c5d7584fc88e69d3892d352b8ec11fe0",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 516,
+      "zh": "冷水猿",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 516,
+      "candidates": [
+        {
+          "path": "0516",
+          "name": "Simipour",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Determined",
+            "Pain",
+            "Special3",
+            "Teary-Eyed",
+            "Happy",
+            "Shouting",
+            "Crying",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": false,
+      "materials": [
+        {
+          "path": "0516",
+          "status": "portrait-only",
+          "portraitSha256": "0d64a17e952dec45ceefa4efc0a774df4e388bbd20952fef8620a049be61333c",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 520,
+      "zh": "咕咕鸽",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 520,
+      "candidates": [
+        {
+          "path": "0520",
+          "name": "Tranquill",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0520",
+          "status": "portrait-only",
+          "portraitSha256": "729e5c37fc4c126271a4c2f5a50ad99d4feee6105cf8b860b32f6fa33fc0a728",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 522,
+      "zh": "斑斑马",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 522,
+      "candidates": [
+        {
+          "path": "0522",
+          "name": "Blitzle",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Determined",
+            "Pain",
+            "Crying",
+            "Teary-Eyed",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": false,
+      "materials": [
+        {
+          "path": "0522",
+          "status": "portrait-only",
+          "portraitSha256": "c1c94e4404c95ca037b8437788e03de7e7603892f5858fff002a0ae694e0af51",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 523,
+      "zh": "雷电斑马",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 523,
+      "candidates": [
+        {
+          "path": "0523",
+          "name": "Zebstrika",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": false,
+      "materials": [
+        {
+          "path": "0523",
+          "status": "portrait-only",
+          "portraitSha256": "48cc51df4f09e38499ee713cf775561a99ca34f9f354d3d5d01fe893f76fd43f",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 538,
+      "zh": "投摔鬼",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 538,
+      "candidates": [
+        {
+          "path": "0538",
+          "name": "Throh",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0538",
+          "status": "portrait-only",
+          "portraitSha256": "7e63e3b1f0e18f6a0233f109a0a9bd0255e07f53385d86cac14e26cdf9c0e869",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 558,
+      "zh": "岩殿居蟹",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 558,
+      "candidates": [
+        {
+          "path": "0558",
+          "name": "Crustle",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Normal^"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0558",
+          "status": "portrait-only",
+          "portraitSha256": "3cdf63ae5f5fe301a0ff7b92a9e06cae0ca8f585c993424621a118707f414b12",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 564,
+      "zh": "原盖海龟",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 564,
+      "candidates": [
+        {
+          "path": "0564",
+          "name": "Tirtouga",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0564",
+          "status": "portrait-only",
+          "portraitSha256": "fea40f94be1ba474f784603742737f21f8cab6437c0fa3c4ddf3d2a62061e21d",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 565,
+      "zh": "肋骨海龟",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 565,
+      "candidates": [
+        {
+          "path": "0565",
+          "name": "Carracosta",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0565",
+          "status": "portrait-only",
+          "portraitSha256": "c9cf58b2f2731f9f4db1b54196a1cd3bf3c3b869173c093c9103761414e03072",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 591,
+      "zh": "败露球菇",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 591,
+      "candidates": [
+        {
+          "path": "0591",
+          "name": "Amoonguss",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Angry^",
+            "Shouting^",
+            "Sigh^",
+            "Determined",
+            "Determined^",
+            "Inspired^",
+            "Crying^",
+            "Pain",
+            "Happy^",
+            "Teary-Eyed^",
+            "Sad^",
+            "Pain^",
+            "Crying",
+            "Dizzy^",
+            "Worried^",
+            "Stunned^",
+            "Teary-Eyed",
+            "Dizzy",
+            "Surprised^",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Joyous^",
+            "Worried",
+            "Normal^",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0591",
+          "status": "portrait-only",
+          "portraitSha256": "6468a8acd03835d00e0c5ed63a969eccee580c0bf5fac4385c698cd15ea90f6b",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 592,
+      "zh": "轻飘飘",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 592,
+      "candidates": [
+        {
+          "path": "0592",
+          "name": "Frillish",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0592",
+          "status": "portrait-only",
+          "portraitSha256": "b104ce052c7be1ff92c2bd6d85879826ca55940b0dbdddfc2ba27ee07ce23dd1",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 616,
+      "zh": "小嘴蜗",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 616,
+      "candidates": [
+        {
+          "path": "0616",
+          "name": "Shelmet",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0616",
+          "status": "portrait-only",
+          "portraitSha256": "7cd7999fb12ef5a73fb5c77dd6c90426cc62edd950ca0e60966794a93597fccb",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 618,
+      "zh": "泥巴鱼",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 618,
+      "candidates": [
+        {
+          "path": "0618",
+          "name": "Stunfisk",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0618",
+          "status": "partial",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "xmlSha256": "d73b04658a8274788a19e417099536bae73113d9ef8fd36ee9fb9ca279f54615",
+          "resolved": {
+            "idle": [
+              "Idle",
+              24,
+              16,
+              1
+            ]
+          }
+        }
+      ],
+      "materialStatus": "partial"
+    },
+    {
+      "dex": 626,
+      "zh": "爆炸头水牛",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 626,
+      "candidates": [
+        {
+          "path": "0626",
+          "name": "Bouffalant",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0626",
+          "status": "portrait-only",
+          "portraitSha256": "b55e032198bcb0a8b1812d507385f5b7fff278bd8e6e54414f3df33e7ceafe73",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 683,
+      "zh": "芳香精",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 683,
+      "candidates": [
+        {
+          "path": "0683",
+          "name": "Aromatisse",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "portraitActions": [
+            "Normal",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Determined",
+            "Pain",
+            "Special0",
+            "Crying",
+            "Teary-Eyed",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0683",
+          "status": "partial",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "xmlSha256": "35d0deacdc3fc56912b88a80ed8ed4068bcf51b54ce99502c00286c492f737f8",
+          "resolved": {
+            "idle": [
+              "Idle",
+              24,
+              40,
+              1
+            ]
+          }
+        }
+      ],
+      "materialStatus": "partial"
+    },
+    {
+      "dex": 732,
+      "zh": "喇叭啄鸟",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 732,
+      "candidates": [
+        {
+          "path": "0732",
+          "name": "Trumbeak",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": false,
+      "materials": [
+        {
+          "path": "0732",
+          "status": "portrait-only",
+          "portraitSha256": "c034d1f8716614fff56f7ab352c479f45439728696b9243decd304e9c46ae3e6",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 733,
+      "zh": "铳嘴大鸟",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 733,
+      "candidates": [
+        {
+          "path": "0733",
+          "name": "Toucannon",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "portraitActions": [
+            "Normal",
+            "Determined"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": false,
+      "materials": [
+        {
+          "path": "0733",
+          "status": "partial",
+          "actions": [
+            "Idle",
+            "Rotate"
+          ],
+          "xmlSha256": "2674047fc11cace1d6cd0709f26f5f779c5a79425931261f455a352743898411",
+          "resolved": {
+            "idle": [
+              "Idle",
+              48,
+              48,
+              1
+            ]
+          }
+        }
+      ],
+      "materialStatus": "partial"
+    },
+    {
+      "dex": 735,
+      "zh": "猫鼬探长",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 735,
+      "candidates": [
+        {
+          "path": "0735",
+          "name": "Gumshoos",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Determined",
+            "Pain",
+            "Special0",
+            "Crying",
+            "Teary-Eyed",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": false,
+      "materials": [
+        {
+          "path": "0735",
+          "status": "portrait-only",
+          "portraitSha256": "0c0a377d8b2a132107746bc833ff0ad2265392c3701b119c122cc9cf7e864413",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 756,
+      "zh": "灯罩夜菇",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 756,
+      "candidates": [
+        {
+          "path": "0756",
+          "name": "Shiinotic",
+          "actions": [],
+          "portraitActions": [
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Determined",
+            "Pain",
+            "Crying",
+            "Normal",
+            "Teary-Eyed",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned",
+            "Happy",
+            "Special0",
+            "Special2"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0756",
+          "status": "portrait-only",
+          "portraitSha256": "62a3cf7cf85f66d4f9104b4612fb69e236ec17bb0553486fac0bd46a410f4411",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 765,
+      "zh": "智挥猩",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 765,
+      "candidates": [
+        {
+          "path": "0765",
+          "name": "Oranguru",
+          "actions": [],
+          "portraitActions": [
+            "Pain",
+            "Normal",
+            "Angry",
+            "Happy",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Determined",
+            "Crying",
+            "Teary-Eyed",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Worried",
+            "Stunned"
+          ]
+        }
+      ],
+      "gen7Z": true,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0765",
+          "status": "portrait-only",
+          "portraitSha256": "cf4d21cec90da5ac8036d86a8ec93a8968ba187beac84d4719da23e276a7587e",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 837,
+      "zh": "小炭仔",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 837,
+      "candidates": [
+        {
+          "path": "0837",
+          "name": "Rolycoly",
+          "actions": [],
+          "portraitActions": [
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Determined",
+            "Pain",
+            "Special3",
+            "Special0",
+            "Crying",
+            "Normal",
+            "Teary-Eyed",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "gen7Z": false,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0837",
+          "status": "portrait-only",
+          "portraitSha256": "6766185a77bc83101016c7ddd250d09401ba6db44dac610da0c0ad50c9a87807",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 838,
+      "zh": "大炭车",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 838,
+      "candidates": [
+        {
+          "path": "0838",
+          "name": "Carkol",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": false,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0838",
+          "status": "portrait-only",
+          "portraitSha256": "90eeb8c147972baa7ef4eaaa4936b8661fa0c72438cd38e7c44176d0746b3744",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 839,
+      "zh": "巨炭山",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 839,
+      "candidates": [
+        {
+          "path": "0839",
+          "name": "Coalossal",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": false,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0839",
+          "status": "portrait-only",
+          "portraitSha256": "b4ce8d29101d2095ff921e67e460b835c7eb36b5efb243641aa2b918d98aa001",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 866,
+      "zh": "踏冰人偶",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 866,
+      "candidates": [
+        {
+          "path": "0866",
+          "name": "Mr_Rime",
+          "actions": [],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": false,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0866",
+          "status": "portrait-only",
+          "portraitSha256": "3055a4aa9094627302024de8b58ae276712d31baf4f09162530bfef9c5e6ed86",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 878,
+      "zh": "铜象",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 878,
+      "candidates": [
+        {
+          "path": "0878",
+          "name": "Cufant",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Determined",
+            "Pain",
+            "Crying",
+            "Teary-Eyed",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "gen7Z": false,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0878",
+          "status": "portrait-only",
+          "portraitSha256": "73c8889f3b5b27b4ca0d3ec8a2d898cc5204e775c2f440352975668aed877a2f",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    },
+    {
+      "dex": 879,
+      "zh": "大王铜象",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 879,
+      "candidates": [
+        {
+          "path": "0879",
+          "name": "Copperajah",
+          "actions": [
+            "Walk",
+            "Idle",
+            "Rotate"
+          ],
+          "portraitActions": [
+            "Normal"
+          ]
+        }
+      ],
+      "gen7Z": false,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0879",
+          "status": "partial",
+          "actions": [
+            "Walk",
+            "Idle",
+            "Rotate"
+          ],
+          "xmlSha256": "476a31903051d697015b38fd02990961828757d9ef5f6cf77a8fc8a6de06fb37",
+          "resolved": {
+            "idle": [
+              "Idle",
+              64,
+              72,
+              1
+            ],
+            "walk": [
+              "Walk",
+              64,
+              72,
+              4
+            ]
+          }
+        }
+      ],
+      "materialStatus": "partial"
+    },
+    {
+      "dex": 893,
+      "zh": "萨戮德",
+      "form": "普通形态",
+      "category": "base-missing",
+      "pokemonId": null,
+      "identifier": null,
+      "speciesInGame": false,
+      "battleId": 893,
+      "candidates": [
+        {
+          "path": "0893",
+          "name": "Zarude",
+          "actions": [],
+          "portraitActions": [
+            "Normal",
+            "Sigh",
+            "Joyous",
+            "Sad",
+            "Shouting",
+            "Determined",
+            "Pain",
+            "Crying",
+            "Teary-Eyed",
+            "Dizzy",
+            "Inspired",
+            "Surprised",
+            "Angry",
+            "Worried",
+            "Stunned",
+            "Happy"
+          ]
+        }
+      ],
+      "gen7Z": false,
+      "gen8Dynamax": true,
+      "materials": [
+        {
+          "path": "0893",
+          "status": "portrait-only",
+          "portraitSha256": "d1e2026d01fb79f8928cbe981dec1c79832ab8b7983013d771689307d7058ddb",
+          "actions": []
+        }
+      ],
+      "materialStatus": "portrait-only"
+    }
+  ],
+  "ultraDeferred": "Ultra sprite exists, but Dusk Mane/Dawn Wings prerequisite sprites are missing; no fabricated direct Ultra Burst."
+}

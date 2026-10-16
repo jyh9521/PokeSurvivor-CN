@@ -436,10 +436,10 @@
   }
 
   RAW.push({id:'z-burst',name:'Z-Move',desc:'One decisive burst per run.',type:'normal',kind:'mark',cd:999,dmg:90,radius:220,delay:0,specialOnly:true});
-  for (const extra of G.BattleMoves || []) {
+  for (const extra of [...(G.BattleMoves || []),...(G.ExpansionMoves||[])]) {
     const names=G.BattleDex?.moveNames?.[extra.id];
     const descriptions={wave:'A moving wave hits each enemy once.',mark:'Marks the ground, then detonates after a delay.',counter:'Automatically counterattack after taking damage or blocking.',decoy:'An automatic decoy distracts enemies and bursts after its lifetime.',beam:'A powerful long-range beam.',projectile:'Rapid penetrating seeds.',dash:'Dash through nearby enemies.'};
-    const def={...extra,name:names?.['7']||extra.id,desc:descriptions[extra.kind]},index=RAW.findIndex(m=>m.id===extra.id);if(index<0)RAW.push(def);else RAW[index]=def;
+    const def={...extra,name:extra.name||names?.['7']||extra.id,desc:extra.desc||descriptions[extra.kind]||'A distinct moving attack.'},index=RAW.findIndex(m=>m.id===extra.id);if(index<0)RAW.push(def);else RAW[index]=def;
   }
   LADDERS.wave=[{t:'+40% daño',m:{dmg:1.4}},{t:'+25% alcance',m:{width:1.25,life:1.25}},{t:'-25% recarga',m:{cd:.75}},{t:'+50% daño',m:{dmg:1.5}}];
   LADDERS.mark=[{t:'+40% daño',m:{dmg:1.4}},{t:'+25% alcance',m:{radius:1.25}},{t:'-25% recarga',m:{cd:.75}},{t:'+50% daño',m:{dmg:1.5}}];
@@ -452,7 +452,7 @@
 
   const BY_ID = {};
   for (const m of RAW) {
-    m.ups = LADDERS[m.kind];
+    m.ups = LADDERS[m.kind]||LADDERS.projectile;
     m.maxLvl = m.ups.length + 1;
     BY_ID[m.id] = m;
   }

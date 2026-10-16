@@ -86,6 +86,12 @@ G.AchDefs = (() => {
   const evoTotal = Object.keys(G.Moves.EVO).length;
   for (const a of LIST) if (a.id === 'evoAll') { a.goal = evoTotal; a.desc = `Evoluciona los ${evoTotal} movimientos distintos.`; }
 
+  const starterFinals=(G.BossCatalog?.starters||[]).filter(c=>c.every(d=>G.SPRITE_META[d])).map(c=>c[c.length-1]);
+  for(const dex of starterFinals){const p=G.DEX_BY[dex];LIST.push({id:'starter_'+dex,cat:'grietas',tier:1,name:'Starter rift: '+p.name,desc:'Defeat this starter in a rift.',value:s=>s.starterBosses?.[dex]?1:0,goal:1,reward:{coins:150}});}
+  LIST.push({id:'starter_first',cat:'grietas',tier:1,name:'Starter Challenger',desc:'Win a starter rift.',value:s=>Object.keys(s.starterBosses||{}).length,goal:1,reward:{t1:1}},
+    {id:'starter_flawless',cat:'grietas',tier:2,name:'Unbroken Team',desc:'Win a starter rift without anyone going down.',value:st('starterFlawless'),goal:1,reward:{t1:2}},
+    {id:'starter_all',cat:'grietas',tier:3,name:'Starter Champion',desc:'Defeat every available starter rift boss.',value:s=>starterFinals.filter(d=>s.starterBosses?.[d]).length,goal:starterFinals.length,reward:{t10:2},title:'Starter Champion'});
+  for(let region=1;region<=9;region++){const ids=starterFinals.filter(d=>G.DEX_BY[d].gen===region);if(ids.length)LIST.push({id:'starter_region_'+region,cat:'grietas',tier:2,name:'Starter Region '+region,desc:'Defeat all three starters from this region.',value:s=>ids.filter(d=>s.starterBosses?.[d]).length,goal:ids.length,reward:{t1:2}});}
   const BY = {};
   for (const a of LIST) BY[a.id] = a;
 

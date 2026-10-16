@@ -44,6 +44,7 @@ for r in rows('move_names.csv'):
     if r['local_language_id'] in ['7','9','12']:
         move_names.setdefault(moves[int(r['move_id'])]['identifier'], {})[r['local_language_id']] = r['name']
 implemented = set(re.findall(r"id: '([a-z0-9-]+)'", (ROOT/'js/data/moves.js').read_text(encoding='utf-8')))
+implemented.update(re.findall(r"id:\s*'([a-z0-9-]+)'",(ROOT/'js/data/expansion-moves.js').read_text(encoding='utf-8')))
 implemented.update(['protect','double-team','iron-defense','light-screen','focus-energy','ingrain','recover','counter','substitute','leech-seed','wish','icy-wind','surf','whirlpool','stealth-rock','shadow-sneak','hyper-beam','psychic','explosion','earth-power','air-slash','bullet-seed','dragon-pulse','aqua-jet'])
 aliases={'petal-blizzard':'leaf-storm','grass-knot':'giga-drain'}
 learned = {}

@@ -175,7 +175,7 @@ G.HUD = (() => {
     if (rift) {
       const sx = (rift.x - cam.left()) * cam.scale, sy = (rift.y - 40 - cam.top()) * cam.scale;
       const now = performance.now() / 1000, beat = 0.5 + Math.sin(now * 7) * 0.5;
-      const label = 'GRIETA · ' + Math.round(G.U.dist(pl.x, pl.y, rift.x, rift.y) / 32) + ' m · ' + Math.ceil(rift.ttl) + ' s';
+      const label = (rift.kind==='starter'?G.T('Starter Rift'):'GRIETA')+' · ' + Math.round(G.U.dist(pl.x, pl.y, rift.x, rift.y) / 32) + ' m · ' + Math.ceil(rift.ttl) + ' s';
       const off = sx < 0 || sx > w || sy < 0 || sy > h;
       ctx.save();
       if (off) {
@@ -235,7 +235,7 @@ G.HUD = (() => {
       ctx.globalAlpha = a;
       ctx.translate(w / 2, y0); ctx.scale(pop, pop);
       ctx.font = F(800, 20);
-      const t1 = '¡SE HA ABIERTO UNA GRIETA!', t2 = 'Sigue la flecha morada: dentro te espera un legendario';
+      const t1 = rift.kind==='starter'?G.T('A starter rift has opened!'):'¡SE HA ABIERTO UNA GRIETA!', t2 = rift.kind==='starter'?G.T('An evolving starter boss awaits inside.'):'Sigue la flecha morada: dentro te espera un legendario';
       const bw = Math.min(w - 24, Math.max(ctx.measureText(t1).width, (ctx.font = F(700, 11), ctx.measureText(t2).width)) + 36);
       roundRect(ctx, -bw / 2, -26, bw, 52, 10);
       ctx.fillStyle = 'rgba(26,11,51,.88)'; ctx.fill();

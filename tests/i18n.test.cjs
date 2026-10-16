@@ -30,7 +30,7 @@ function context({ saved = 'zh-CN', nav = 'en-US', pathname = '/', storageThrows
     else dict[lang] = { ...dict[lang], ...d };
     add(d, lang, scope);
   };
-  for (const f of ['lang-en', 'lang-zh-cn', 'lang-zh-cn-names']) load(`js/data/${f}.js`);
+  for (const f of ['lang-en', 'lang-zh-cn', 'lang-zh-cn-names', 'lang-special']) load(`js/data/${f}.js`);
   return { ...ctx, ctx, calls, dict, contexts, storage, load, Canvas };
 }
 test('bootstrap and runtime choose the same supported language', () => {

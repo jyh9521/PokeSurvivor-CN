@@ -42,7 +42,7 @@ G.Projectiles = (() => {
   function update(dt, player, enemies) {
     for (let i = list.length - 1; i >= 0; i--) {
       const p = list[i];
-      p.t += dt;
+      p.t += dt;G.AdvancedShots?.step(p,dt,enemies);
 
       if (p.orb) {
         // Gira alrededor de su jugador.
@@ -134,6 +134,6 @@ G.Projectiles = (() => {
     }
   }
 
-  return { clear, all, spawn, spawnOrb, clearOrbs, update, remove, draw, nearest,
+  return { removeEnemy(id,stage=Infinity){list=list.filter(p=>p.enemyId!==id||(p.enemyStage||0)>=stage);},clear, all, spawn, spawnOrb, clearOrbs, update, remove, draw, nearest,
            get count() { return list.length; } };
 })();
