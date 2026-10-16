@@ -461,7 +461,7 @@ def moves_page(lang):
     body = f'<article class="doc wide"><h1>{h1}</h1>{intro}<div class="tablewrap"><table class="list"><thead><tr>{th}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>{cta(pid, lang, c)}</article>'
     passive_rows=''.join(f'<tr><td>{esc(L(lang,p["name"]))}</td><td>{esc(L(lang,p["desc"]))}</td></tr>' for p in D.get('passives',[]))
     heading='Independent passive moves' if lang=='en' else 'Movimientos pasivos independientes'
-    description=('4 independent slots, 3 levels per passive. C or R3 chooses a special; V or L3 activates it. One special per run: Mega 30s / Dynamax 20s / one Z burst.' if lang=='en' else '4 huecos independientes y 3 niveles por pasivo. C o R3 elige; V o L3 activa. Una elección por partida: Mega 30 s / Dinamax 20 s / un movimiento Z.')
+    description=('4 independent slots, 6 levels per passive; the previous total power is preserved. C or R3 chooses a special; V or L3 activates it. One special per charge cycle: Mega 30s / Dynamax 20s / one Z burst; a successful rift return reopens charging.' if lang=='en' else '4 huecos independientes y 6 niveles por pasivo, con la misma potencia máxima. C o R3 elige; V o L3 activa. Una elección por ciclo de carga: Mega 30 s / Dinamax 20 s / un movimiento Z; ganar una grieta permite recargar.')
     body=body.replace('</article>',f'<h2>{heading}</h2><p>{description}</p><table class="list"><tbody>{passive_rows}</tbody></table></article>')
     write(pid, lang, page(pid, lang, title, desc, body, {'@context': 'https://schema.org', '@graph': [crumbs(pid, lang, h1)]}))
 

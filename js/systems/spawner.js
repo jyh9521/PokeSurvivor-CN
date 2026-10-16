@@ -122,7 +122,7 @@ G.Spawner = (() => {
     // It persists if ordinary enemies are instantly cleared. Armor still applies.
     if(t>=pressureAt){pressureAt=t+(G.BattleBalance.pressureWindow(t)?12:24);for(const p of players.filter(p=>!p.dead)){
       G.Hazards.add({kind:'zone',x:p.x,y:p.y,r:38,delay:1.5,dmg:12*(1+t/600),type:'normal',damageClass:'special',color:'#ffb74d'});
-    }say(G.I18n?.lang==='zh-CN'?'波次压制：离开橙色落点！':'Wave pressure: leave the orange marker!',1.5);}
+    }say(G.T('Wave pressure: leave the orange marker!'),1.5);}
 
     // --- jefes ---
     const b = G.Enemies.BOSSES[bossIdx];

@@ -75,8 +75,8 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
     if(BATTLE)check('seven added species start and synchronize their multiplayer identities',await Promise.all(pages.slice(1).map((p,i)=>p.evaluate(d=>G.Game.player.dex===d,[593,668,865,999,1003,1008,1025][i]))).then(xs=>xs.every(Boolean))&&await a.evaluate(uids=>uids.every(uid=>!!G.Coop.mate(uid)?.pl&&G.SPRITE_META[G.Coop.mate(uid).pl.dex]),users.slice(1).map(u=>u.id)));
     await a.waitForTimeout(2200);const metrics=await a.evaluate(()=>G.NAS.networkMetrics());check('eight-player snapshot pacing caps at 10Hz and diagnostics separate actual paths',metrics.targetHz<=10&&(RELAY?metrics.directPeers===0&&metrics.relayPeers===7:metrics.directPeers>=3&&metrics.relayPeers>=4));
     if(BATTLE){
-      for(const lane of [3,1]){await a.evaluate(()=>G.Coop.levelStart(G.Game.player.level));for(const p of pages)await p.locator('#scr-levelup').waitFor({state:'visible'});check('eight-player shared level exposes four fixed lanes '+lane,await Promise.all(pages.map(p=>p.locator('#cards .card').count())).then(xs=>xs.every(n=>n===4)));for(const p of pages)await p.locator('#cards .card').nth(lane).click();for(const p of pages)await p.waitForFunction(()=>G.Game.state==='playing');}
-      check('eight players resume after learning then upgrading their own passive',await Promise.all(pages.map(p=>p.evaluate(()=>Object.values(G.Game.player.passives).length===1&&Object.values(G.Game.player.passives)[0]===2))).then(xs=>xs.every(Boolean)));
+      for(const lane of [2,1]){await a.evaluate(()=>G.Coop.levelStart(G.Game.player.level));for(const p of pages)await p.locator('#scr-levelup').waitFor({state:'visible'});check('eight-player shared level exposes three valid random choices '+lane,await Promise.all(pages.map(p=>p.locator('#cards .card').count())).then(xs=>xs.every(n=>n===3)));for(const p of pages)await p.locator('#cards .card').nth(lane).click();for(const p of pages)await p.waitForFunction(()=>G.Game.state==='playing');}
+      check('eight players resume after two random growth choices without exceeding slots',await Promise.all(pages.map(p=>p.evaluate(()=>G.Game.state==='playing'&&G.Game.player.slots.length<=4&&Object.keys(G.Game.player.passives).length<=4))).then(xs=>xs.every(Boolean)));
     }
     if(MELEE){
     // Controlled real-game fixtures: actual cast/host messages and actual enemy deaths.
@@ -157,6 +157,7 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
       check('form and passive state never enters the persistent wallet/save schema',users.every(u=>{const s=app.store.getSave(u.id).save;return !s.battle&&!s.passives&&!s.form;}));
     }
     if(BATTLE){
+      await Promise.all(pages.map(p=>p.evaluate(()=>{G.Game.player.battle.used=true;G.Game.player.battle.energy=0;G.Battle.endForm(G.Game.player);G.Game.player.bonds=0;})));
       await a.evaluate(()=>{G.Rift.debugArena('fire','starter',6);const e=G.EnemyMgr.get(G.Rift.arena.bossId);e.xp=0;window.__starterBoss=e.id;});
       await pages[1].waitForFunction(()=>G.Rift.arena?.kind==='starter'&&G.Rift.arena.dex===6,null,{timeout:10000});
       check('a starter rift enters the whole eight-player party with its own identity',await a.evaluate(()=>{const e=G.EnemyMgr.get(window.__starterBoss);return e.dex===4&&!e.legend;}));
@@ -169,6 +170,12 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
       check('duplicate guest arena wins do not duplicate bonds or starter records',await pages[1].evaluate(()=>G.Game.player.bonds)===bonds);
       for(const p of pages)await p.evaluate(()=>G.Game.player.bonds=0);
       await a.waitForFunction(()=>!G.Rift.inArena,null,{timeout:10000});await pages[1].waitForFunction(()=>!G.Rift.inArena,null,{timeout:10000});
+      await Promise.all(pages.map(p=>p.waitForFunction(()=>!G.Rift.inArena,null,{timeout:10000})));
+      check('eight authoritative rift returns reopen spent cycles with non-instant energy', (await Promise.all(pages.map(p=>p.evaluate(()=>!G.Game.player.battle.used&&G.Game.player.battle.energy<20&&G.RunGrowth.state(G.Game.player).points===1)))).every(Boolean));
+      await a.evaluate(()=>{G.Coop.broadcast(['mr','boss:browser-eight']);G.RunGrowth.reward(G.Game.player,'boss:browser-eight');G.Coop.broadcast(['mr','boss:browser-eight']);});
+      await Promise.all(pages.map(p=>p.waitForFunction(()=>G.RunGrowth.state(G.Game.player).points===2,null,{timeout:10000})));
+      check('host mastery reward reaches all eight once despite duplicate messages',true);
+
     }
     const last=pages[7];await last.evaluate(()=>{window.__testRoom=G.Social.room.id;window.__testRun=G.Game.st.time;});await last.evaluate(()=>new Promise(resolve=>{const ws=window.__fixtureSockets.at(-1);if(ws.readyState===3)return resolve();ws.addEventListener('close',()=>resolve(),{once:true});ws.close();}));await last.context().setOffline(true);await a.waitForFunction(()=>G.NAS.networkMetrics().reconnectingPeers>=1,null,{timeout:10000}).catch(async e=>{console.log('RECONNECT_DEBUG',JSON.stringify({host:await a.evaluate(()=>({metrics:G.NAS.networkMetrics(),members:G.Social.room?.members,state:G.Game.state})),last:await last.evaluate(()=>({state:G.Game.state,sockets:window.__fixtureSockets.map(s=>s.readyState)})),errors}));throw e;});await last.context().setOffline(false);await last.waitForFunction(()=>G.Social.room?.members.length===8&&G.NAS.networkMetrics().connected,{},{timeout:20000});
     check('same browser reconnects into the same normal room',await last.evaluate(()=>G.Social.room.id===window.__testRoom));

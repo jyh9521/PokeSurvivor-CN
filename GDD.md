@@ -513,3 +513,12 @@ guitarra punteada, bajo, pad, lead y batería, con reverb). Cero ficheros.
 - Más tarde (10-10): subir de nivel otra vez la mitad de rápido (experiencia
   por nivel ×4 respecto al original) y tickets ×1 más raros (1/400 en vez de 1/260).
   Misiones de nivel 8/12/15 y logros de nivel 15 y 30 (antes 12/16/20, 20 y 40).
+
+
+## Actualización 0.16.4 · 2026-10-16
+
+- Tres recompensas válidas sin reemplazo, con crecimiento activo garantizado si quedan candidatos; cuatro huecos pasivos, seis pasos con el mismo total anterior.
+- Maestría de instancias evolucionadas, sólo por jefes/grietas, máximo 3 por movimiento y 6 global; puntos pendientes si aún no puede asignarse.
+- Una habilidad especial por ciclo; una grieta ganada permite recargar desde cero después de volver y terminar la forma activa.
+- Economía medida durante 30 minutos; coste de perforación y presión de área anunciada con presupuestos globales. Se mantienen las dos agrupaciones de habilidades, fusiones, seis stats, multijugador, guardados y Sentencia.
+- Véase docs/BALANCE_0164_REPORT.md para pruebas reproducibles, diferencias y límites de aceptación humana/dispositivos.

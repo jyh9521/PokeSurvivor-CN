@@ -1,7 +1,7 @@
 /* Unified weighted sampling without replacement; RNG is injectable for replay. */
 G.LevelUp=(()=>{
   const labels={'active-up':'Upgrade active','active-new':'New active','passive-up':'Upgrade passive','passive-new':'New passive'};
-  const describe=d=>{const zh=G.I18n?.lang==='zh-CN',names={maxhp:'最大生命',cooldown:'攻击冷却',magnet:'拾取范围',experience:'经验获取',armor:'物理防御',ward:'特殊防御',dodge:'闪避率',crit:'暴击率',physical:'物理伤害',special:'特殊伤害',root:'静止每秒回复',regen:'每秒回复',shield:'每8秒护盾',speed:'移动速度'};return d.stat==='block'?(zh?'每11/10/9/8/7/6秒补充一次格挡，最多1层。':d.desc):d.stat==='counter'?(zh?'每级增加0.5秒反击窗口与10%反击倍率。':d.desc):(zh?(names[d.stat]||d.stat):d.stat)+' '+(d.stat==='cooldown'?'-':'+')+(['maxhp','armor','ward'].includes(d.stat)?d.value:(d.value*100).toFixed(2)+'%')+(zh?' /级；最高6级':' / level; cap 6');};
+  const describe=d=>G.T(d.desc);
   function active(pl){const out=[];
     for(const m of pl.moves){const ev=G.Moves.evoInfo(m,pl.statsTaken),instanceId=m.instanceId;
       // Resolve by immutable identity at confirmation, not array order/current slot.

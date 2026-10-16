@@ -36,12 +36,14 @@ G.Rift = (() => {
   // ---------------- grieta en el mapa ----------------
 
   function update(dt, pl, time) {
+    const sweeps=pl.riftSweeps||[];pl.riftSweeps=[];
+    const crossed=()=>sweeps.some(s=>{const dx=s.x-s.sx,dy=s.y-s.sy,n=dx*dx+dy*dy,t=n?Math.max(0,Math.min(1,((rift.x-s.sx)*dx+(rift.y-10-s.sy)*dy)/n)):0;return G.U.dist2(s.sx+dx*t,s.sy+dy*t,rift.x,rift.y-10)<30*30;});
     if(authority()&&!arena&&time>FROM)starterT-=dt;
     if (rift) {
       rift.t += dt;
       rift.ttl -= dt;
       if (rift.ttl <= 0) { rift = null; return; }
-      if (!arena && !pl.dead && G.U.dist2(pl.x, pl.y, rift.x, rift.y - 10) < 30 * 30) enter();
+      if (!arena && !pl.dead && (G.U.dist2(pl.x, pl.y, rift.x, rift.y - 10) < 30 * 30||crossed())) enter();
     } else if (!arena && authority() && time > FROM && time < G.Judgment.AT - 120) {
       checkT -= dt;
       if (checkT <= 0) {
@@ -133,7 +135,7 @@ G.Rift = (() => {
     if (th && th.weather) G.Weather.force(th.weather, ARENA_TIME + 15);
     // Todos al sur de la arena, en fila; el legendario aparece al norte.
     const ps = G.Game.everyone();
-    ps.forEach((p, i) => { p.x = arena.x + (i - (ps.length - 1) / 2) * 34; p.y = arena.y + ts * 3; });
+    ps.forEach((p, i) => { p.x = arena.x + (i - (ps.length - 1) / 2) * 34; p.y = arena.y + ts * 3; G.Telemetry?.relocate(p); });
     G.Camera.x = pl.x; G.Camera.y = pl.y;
     G.Game.flash('#c9a6ff', 0.9);
     G.Audio.sfx('rift');
@@ -231,7 +233,7 @@ G.Rift = (() => {
     G.Projectiles.clear();
     G.Combat.clearFields();
     G.Hazards.clear();
-    for (const p of G.Game.everyone()) { p.x = a.back.x; p.y = a.back.y; }
+    for (const p of G.Game.everyone()) { p.x = a.back.x; p.y = a.back.y; G.Telemetry?.relocate(p); }
     pl.x = a.back.x; pl.y = a.back.y;
     if (pl.dead) pl.revive(0.3);
     G.Camera.x = pl.x; G.Camera.y = pl.y;

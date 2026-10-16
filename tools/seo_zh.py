@@ -97,7 +97,7 @@ def generate(e):
     passive_rows=''.join(f'<tr><td>{esc(z(p["name"]))}</td><td>{esc(z(p["desc"]))}</td></tr>' for p in D.get('passives',[]))
     nm, nevo = len(D['moves']), sum(bool(m['evo']) for m in D['moves'])
     body = f'<article class="doc wide"><h1>招式与招式进化</h1><p class="lead">共有 {nm} 种基础招式，覆盖 18 种属性。伙伴自动使用当前招式攻击，升级时选择卡牌学习或强化招式。{nevo} 种招式可进化：达到满级并取得所需能力强化后，会出现进化卡牌。名称沿用官方译名，效果说明以本作机制为准。“虫群”为本作原创进化名称。</p><div class="tablewrap"><table class="list"><thead><tr><th>招式</th><th>属性</th><th>攻击方式</th><th>效果</th><th>进化</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>{cta(pid,"尝试不同招式")}</article>'
-    body=body.replace('</article>',f'<h2>独立被动招式</h2><p>四个槽位，每项最多三级，不占主动招式位。防御、闪避、格挡与恢复各有不同用途。</p><table class="list"><tbody>{passive_rows}</tbody></table></article>')
+    body=body.replace('</article>',f'<h2>独立被动招式</h2><p>四个槽位，每项最多六级，满级总收益保持旧三级强度，不占主动招式位。防御、闪避、格挡与恢复各有不同用途。</p><table class="list"><tbody>{passive_rows}</tbody></table></article>')
     write(pid,f'PokéSurvivor 招式：{nm} 种基础招式及进化',f'查看 {nm} 种基础招式的名称、属性、效果和进化条件。',body)
 
     pid = 'items'

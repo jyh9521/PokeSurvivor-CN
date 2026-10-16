@@ -1,0 +1,9 @@
+/* Paired initial builds/roles, actual damage and finite stationary exposure. */
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const root=path.resolve(process.argv[2]||'.'),out=path.resolve(process.argv[3]||'artifacts/balance/matrix.json');process.chdir(root);
+const scene=require(path.join(root,'tests/battle-fixture.cjs')),waves=require('./../tests/wave-growth-fixture.cjs');const rows=[];
+for(const dex of [208,242,101,143,213])for(const move of ['tackle','aura-sphere'])for(const idle of [false,true])for(const seed of [1,17,101]){
+ const r=waves(scene,{profile:move==='tackle'?'melee':'ranged',dex,move,idle,seed,seconds:180,strong:true});if(r.error)throw Error(r.error);rows.push({dex,move,...r});console.log(JSON.stringify({dex,move,idle,seed,alive:r.alive,seconds:r.seconds,kills:r.kills,kps:r.kills/r.seconds,damageTaken:r.damageTaken,level:r.levels[0]}));
+}
+const defense=[];for(const dex of [208,242,101,143,213]){const s=scene(),{G}=s,p=s.player(dex);for(const id of ['harden','light-screen','protect','iron-defense'])for(let i=0;i<6;i++)G.Battle.learn(p,id);for(const cls of ['physical','special']){p.battle.shield=0;p.battle.block=0;defense.push({dex,cls,stats:Array.from(p.baseStats),incoming100:G.Battle.defend(p,100,false,cls,0),pure100:G.Battle.defend(p,100,true,cls,0),outgoing:G.Battle.damage(p,s.enemy(),p.activeMove(),100),speed:p.spd});}}
+fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,JSON.stringify({model:'Same species, seed, initial move, permanent investment and driver. Cards earned normally, so walking/XP creates divergent later builds; not a fixed fully-maxed loadout or human win rate. Actual wave AI/casts/HP/collision on open terrain. No hardcoded future levels, revives or invulnerability.',rows,defense},null,2));

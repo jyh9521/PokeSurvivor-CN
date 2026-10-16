@@ -17,7 +17,7 @@ G.Projectiles = (() => {
 
   /** Proyectil del jugador. */
   function spawn(o) {
-    if(o.friendly===false&&list.filter(p=>!p.friendly).length>=24)return null;
+    if(o.friendly===false&&!o.fromNet&&list.filter(p=>!p.friendly).length>=24)return null;
     const p = Object.assign({
       id: nextId++, x: 0, y: 0, vx: 0, vy: 0,
       dmg: 10, r: 6, life: 1.4, t: 0,

@@ -100,6 +100,7 @@
     /** @param eff  'super' | 'weak' | null (tabla de tipos, sólo para enseñarlo) */
     hurt(amount, color = '#fff', dirX = 0, dirY = 0, knock = 0, eff = null, source = null) {
       if (this.dead) return;
+      this.firstHitAt??=G.Game?.st?.time||0;this.hitCount=(this.hitCount||0)+1;
       const d = Math.max(1, Math.round(amount));
       // Copia de un enemigo del anfitrión: el golpe se le manda a él, que es
       // quien decide si cae. Aquí sólo se ve (número, destello y animación).
@@ -190,8 +191,8 @@
         if (this.shiny) { G.FX.burst(this.x, cy, '#ffe9a0', 30, 220); G.FX.ring(this.x, this.y, this.r, this.r * 7, '#9ae6ff', 0.7, 5); }
         return;
       }
-      G.RunGrowth?.boss(this);
-      if(this.boss||this.elite){const t=G.Game?.player?.telemetry;if(t&&t.ttk.length<200)t.ttk.push({id:this.id,boss:this.boss,elite:!!this.elite,seconds:(G.Game?.st?.time||0)-this.bornAt});}
+      G.RunGrowth?.boss(this);G.Telemetry?.down(this);
+      if(this.boss||this.elite){const t=G.Game?.player?.telemetry;if(t&&t.ttk.length<200)t.ttk.push({id:this.id,boss:this.boss,elite:!!this.elite,spawnSeconds:(G.Game?.st?.time||0)-this.bornAt,engagedSeconds:this.firstHitAt==null?null:(G.Game?.st?.time||0)-this.firstHitAt});}
       // (Los legendarios de la Sentencia de Arceus sólo dan experiencia.)
       if (this.boss && !this.judge) {
         G.Camera.kick(0.9);

@@ -43,6 +43,8 @@ G.Combat = (() => {
       return;
     }
     m.t = Math.max(0.05, m.cd * pl.cdMul * (G.SpecialRuntime?.cooldown(pl,m)||1));
+    // Publish the same steering angle used by local movement and ghost rendering.
+    if(m.kind==='dash'&&pl.walking)pl.aim=pl.moveAngle;
     pl.cast(m);
     if (G.Coop.active) G.Coop.cast(pl, m);
     // Vínculo: su icono destella en el HUD al lanzarse (uno que explota pegado al
@@ -213,7 +215,7 @@ G.Combat = (() => {
       if (!meleeContains(pl,m,e,aim)) continue;
       const crit = isCrit(pl);
       const dmg = m.dmg * pl.atk * fraction * typeK(m.type,e,pl) * (crit ? CRIT_MUL : 1);
-      const eff = crit ? 'crit' : G.Types.label(G.Types.mult(m.type,e.types));
+      const eff = crit ? 'crit' : G.Types.label(G.Types.mult(m.type,e.types));G.Telemetry?.factor(pl,crit,typeK(m.type,e,pl));
       if (e.remote) G.Coop.meleeHit(e,dmg,col,e.x-pl.x,e.y-pl.y,m,eff);
       else acceptMeleeHit(pl,e,dmg,col,e.x-pl.x,e.y-pl.y,m,eff);
     }
@@ -428,7 +430,7 @@ G.Combat = (() => {
   /** Embestida: cruzas como un rayo hacia el enemigo y golpeas a todo lo del camino. */
   function dash(pl, m) {
     const col = G.U.TYPE_COLOR[m.type], vis = G.VFX.forMove(m);
-    const direction=pl.walking?pl.moveAngle:pl.aim;
+    const direction=pl.aim;
     const ca = Math.cos(direction), sa = Math.sin(direction);
     const sx = pl.x, sy = pl.y;
     let len = 0;
@@ -443,6 +445,7 @@ G.Combat = (() => {
     pl.x = sx + ca * len; pl.y = sy + sa * len;
     G.World.collide(pl);
     if(!G.World.isFree(pl.x,pl.y,pl.r,true)){pl.x=sx;pl.y=sy;len=0;}
+    if(len>0){pl.riftSweeps||=[];pl.riftSweeps.push({sx,sy,x:pl.x,y:pl.y});if(pl.riftSweeps.length>4)pl.riftSweeps.shift();}
     if(len>0)pl.invuln = Math.max(pl.invuln || 0, 0.3);
     const w = m.width || 34;
     const mx = sx + ca * len / 2, my = sy + sa * len / 2;
@@ -526,7 +529,7 @@ G.Combat = (() => {
       if (f.gone || !f.owner || (f.life && f.t >= f.life && !['mine','meteor'].includes(f.kind))) { fields.splice(i, 1); continue; }
       if (f.kind === 'mine') {
         const armed = f.t >= f.arm;
-        const trig = armed && G.EnemyMgr.queryCircle(f.x, f.y, 14).length > 0;
+        const trig = armed && (G.EnemyMgr.queryCircle(f.x, f.y, 14).length > 0 || G.World.propsInCircle(f.x,f.y,14).some(p=>p.solid));
         if (trig || f.t >= f.life) {
           G.FX.ring(f.x, f.y, 4, f.r, f.col, 0.3, 4);
           G.FX.burst(f.x, f.y - 6, f.col, 10, 150);
@@ -546,7 +549,7 @@ G.Combat = (() => {
         f.shotT -= dt;
         if (f.shotT <= 0) {
           const m = f.m;
-          const tg = G.Projectiles.nearest(G.EnemyMgr.all(), f.x, f.y, m.range || 300);
+          const tg = G.Projectiles.nearest(G.EnemyMgr.all(), f.x, f.y, m.range || 300)||G.World.nearestBreakable(f.x,f.y,m.range||300);
           f.shotT = tg ? m.rate || 0.6 : 0.15;
           if (tg) {
             const a = Math.atan2(tg.y - f.y, tg.x - f.x);
@@ -699,6 +702,7 @@ G.Combat = (() => {
     if(ghost||pl.dead)return;
     const k = typeK(m.type,e,pl);
     const crit = isCrit(pl);
+    G.Telemetry?.factor(pl,crit,k);
     dmg *= k * (crit ? CRIT_MUL : 1);
     const eff=crit?'crit':G.Types.label(G.Types.mult(m.type,e.types));
     if(G.Battle)G.Battle.deal(pl,e,dmg,col,dx,dy,knock,m,eff);
@@ -750,7 +754,8 @@ G.Combat = (() => {
 
       // Objetos del escenario (rocas, cofres, hierba).
       let consumed = false;
-      for (const prop of G.World.propsInCircle(p.x, p.y, p.r)) {
+      for (const prop of G.World.propsInCircle((p.x+(p.px??p.x))/2,(p.y+(p.py??p.y))/2,p.r+Math.hypot(p.x-(p.px??p.x),p.y-(p.py??p.y))/2)) {
+        if(!p.orb&&segDist2(p.px??p.x,p.py??p.y,p.x,p.y,prop.x,prop.y)>(p.r+prop.r)**2)continue;
         if (p.orb) {
           const k = 'p' + prop.id, last = p.hitLog.get(k) || -99;
           if (now - last < p.rehit) continue;
@@ -803,7 +808,7 @@ G.Combat = (() => {
 
         const crit = isCrit(pl);
         const k = (p.mtype ? typeK(p.mtype,e,pl) : 1) * (crit ? CRIT_MUL : 1);
-        const eff=crit?'crit':p.mtype?G.Types.label(G.Types.mult(p.mtype,e.types)):null;
+        G.Telemetry?.factor(pl,crit,p.mtype?typeK(p.mtype,e,pl):1);const eff=crit?'crit':p.mtype?G.Types.label(G.Types.mult(p.mtype,e.types)):null;
         if(G.Battle)G.Battle.deal(pl,e,p.dmg*k,p.color,p.vx||(e.x-pl.x),p.vy||(e.y-pl.y),p.knock,p.moveData||{...(G.Moves.BY_ID[p.moveId]||{}),id:p.moveId,type:p.mtype,damageClass:p.damageClass,dmg:p.dmg},eff);
         else e.hurt(p.dmg*k,p.color,p.vx||(e.x-pl.x),p.vy||(e.y-pl.y),p.knock,eff,pl.uid);
         if (Math.random() < 0.5) G.FX.sp('impact', p.vis ? p.vis.pal : 'normal', e.x, e.y - e.bodyH * 0.5, { life: 0.12, scale: 1 });

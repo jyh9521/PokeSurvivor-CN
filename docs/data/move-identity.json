@@ -1,0 +1,4454 @@
+{
+  "definitions": 152,
+  "normalDamage": 93,
+  "baselineSuspects": [
+    [
+      "tackle",
+      "wing-attack",
+      "body-slam",
+      "karate-chop",
+      "metal-claw"
+    ],
+    [
+      "quick-attack",
+      "aerial-ace"
+    ],
+    [
+      "water-gun",
+      "poison-sting",
+      "spirit-shackle"
+    ],
+    [
+      "hydro-pump",
+      "ice-beam"
+    ],
+    [
+      "vine-whip",
+      "lick"
+    ],
+    [
+      "razor-leaf",
+      "bonemerang",
+      "psycho-cut"
+    ],
+    [
+      "discharge",
+      "dazzling-gleam"
+    ],
+    [
+      "confusion",
+      "rock-throw",
+      "bullet-seed"
+    ],
+    [
+      "psybeam",
+      "flash-cannon",
+      "moongeist-beam"
+    ],
+    [
+      "psychic",
+      "leech-seed",
+      "stealth-rock",
+      "natures-madness"
+    ],
+    [
+      "bug-bite",
+      "bite"
+    ],
+    [
+      "rock-slide",
+      "hail",
+      "meteor-mash"
+    ],
+    [
+      "spikes",
+      "toxic-spikes"
+    ],
+    [
+      "air-slash",
+      "last-resort"
+    ],
+    [
+      "hyper-beam",
+      "photon-geyser"
+    ],
+    [
+      "shadow-sneak",
+      "aqua-jet",
+      "spectral-thief"
+    ]
+  ],
+  "currentSuspects": [
+    [
+      "tackle",
+      "wing-attack",
+      "body-slam",
+      "karate-chop",
+      "metal-claw"
+    ],
+    [
+      "quick-attack",
+      "aerial-ace"
+    ],
+    [
+      "water-gun",
+      "poison-sting",
+      "spirit-shackle"
+    ],
+    [
+      "vine-whip",
+      "lick"
+    ],
+    [
+      "razor-leaf",
+      "bonemerang",
+      "psycho-cut"
+    ],
+    [
+      "discharge",
+      "dazzling-gleam"
+    ],
+    [
+      "psybeam",
+      "flash-cannon",
+      "moongeist-beam"
+    ],
+    [
+      "bug-bite",
+      "bite"
+    ],
+    [
+      "rock-throw",
+      "bullet-seed"
+    ],
+    [
+      "spikes",
+      "toxic-spikes"
+    ],
+    [
+      "air-slash",
+      "last-resort"
+    ],
+    [
+      "leech-seed",
+      "stealth-rock",
+      "natures-madness"
+    ],
+    [
+      "hyper-beam",
+      "photon-geyser"
+    ],
+    [
+      "shadow-sneak",
+      "aqua-jet",
+      "spectral-thief"
+    ]
+  ],
+  "rows": [
+    {
+      "id": "tackle",
+      "name": "撞击",
+      "type": "normal",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "impact",
+      "range": 69,
+      "trajectory": "melee",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star",
+        "melee": "impact"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "knock": 90
+      },
+      "cooldown": 0.45,
+      "damage": 30.624,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "猛撞",
+        "damage": 122.18975999999996,
+        "cd": 0.3375,
+        "radius": 112.125
+      }
+    },
+    {
+      "id": "quick-attack",
+      "name": "电光一闪",
+      "type": "normal",
+      "damageClass": "physical",
+      "kind": "dash",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "impact",
+      "range": 110,
+      "trajectory": "dash",
+      "projectile": "streak",
+      "animation": {
+        "pal": "normal",
+        "proj": "streak"
+      },
+      "hit": "Combat.run/dash",
+      "status": {
+        "knock": 40
+      },
+      "cooldown": 0.75,
+      "damage": 27,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "神速",
+        "damage": 114.91199999999999,
+        "cd": 0.45,
+        "radius": 178.75
+      }
+    },
+    {
+      "id": "swords-dance",
+      "name": "剑舞",
+      "type": "normal",
+      "damageClass": "status",
+      "kind": "buff",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "impact",
+      "range": null,
+      "trajectory": "buff",
+      "projectile": "star",
+      "animation": {
+        "pal": "fighting",
+        "proj": "star",
+        "buff": "arrow"
+      },
+      "hit": "Combat.run/buff",
+      "status": {},
+      "cooldown": 0.85,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "agility",
+      "name": "高速移动",
+      "type": "normal",
+      "damageClass": "status",
+      "kind": "buff",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "impact",
+      "range": null,
+      "trajectory": "buff",
+      "projectile": "star",
+      "animation": {
+        "pal": "flying",
+        "proj": "star",
+        "buff": "arrow"
+      },
+      "hit": "Combat.run/buff",
+      "status": {},
+      "cooldown": 0.85,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "harden",
+      "name": "变硬",
+      "type": "normal",
+      "damageClass": "status",
+      "kind": "buff",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "impact",
+      "range": null,
+      "trajectory": "buff",
+      "projectile": "star",
+      "animation": {
+        "pal": "steel",
+        "proj": "star",
+        "buff": "arrow"
+      },
+      "hit": "Combat.run/buff",
+      "status": {},
+      "cooldown": 0.85,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "ember",
+      "name": "火花",
+      "type": "fire",
+      "damageClass": "special",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "flame",
+      "range": 496,
+      "trajectory": "projectile",
+      "projectile": "fire",
+      "animation": {
+        "pal": "fire",
+        "proj": "fire",
+        "trail": "ember"
+      },
+      "hit": "Combat.resolve",
+      "status": {
+        "burn": 1
+      },
+      "cooldown": 0.52,
+      "damage": 18,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "大字爆炎",
+        "damage": 46.98,
+        "cd": 0.39,
+        "count": 5,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "flamethrower",
+      "name": "喷射火焰",
+      "type": "fire",
+      "damageClass": "special",
+      "kind": "cone",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "jet",
+      "range": 159.6,
+      "trajectory": "cone",
+      "projectile": "fire",
+      "animation": {
+        "pal": "fire",
+        "proj": "fire",
+        "trail": "ember",
+        "beam": "fire"
+      },
+      "hit": "Combat.run/cone",
+      "status": {
+        "burn": 1
+      },
+      "cooldown": 0.7,
+      "damage": 7.467,
+      "count": 7,
+      "pierce": 1,
+      "evolution": {
+        "name": "过热",
+        "damage": 17.771459999999998,
+        "cd": 0.7,
+        "count": 17,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "fire-spin",
+      "name": "火焰旋涡",
+      "type": "fire",
+      "damageClass": "special",
+      "kind": "orbit",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "vortex",
+      "range": 62,
+      "trajectory": "orbit",
+      "projectile": "fire",
+      "animation": {
+        "pal": "fire",
+        "proj": "fire",
+        "trail": "ember"
+      },
+      "hit": "Combat.run/orbit",
+      "status": {
+        "burn": 1
+      },
+      "cooldown": 0.3,
+      "damage": 14,
+      "count": 3,
+      "pierce": 0,
+      "evolution": {
+        "name": "神圣之火",
+        "damage": 57.1795,
+        "cd": 0.3,
+        "radius": 89.125,
+        "count": 7
+      }
+    },
+    {
+      "id": "heat-wave",
+      "name": "热风",
+      "type": "fire",
+      "damageClass": "special",
+      "kind": "nova",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "heat",
+      "range": 275,
+      "trajectory": "nova",
+      "projectile": "fire",
+      "animation": {
+        "pal": "fire",
+        "proj": "fire",
+        "trail": "ember"
+      },
+      "hit": "Combat.run/nova",
+      "status": {
+        "burn": 1
+      },
+      "cooldown": 1.25,
+      "damage": 17.5,
+      "count": 10,
+      "pierce": 1,
+      "evolution": {
+        "name": "喷火",
+        "damage": 39.2,
+        "cd": 0.9375,
+        "count": 24,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "water-gun",
+      "name": "水枪",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "drops",
+      "range": 525,
+      "trajectory": "projectile",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop",
+        "trail": "drip"
+      },
+      "hit": "Combat.resolve",
+      "status": {},
+      "cooldown": 0.44,
+      "damage": 14,
+      "count": 1,
+      "pierce": 1,
+      "evolution": {
+        "name": "热水",
+        "damage": 36.54,
+        "cd": 0.33,
+        "count": 5,
+        "pierce": 4
+      }
+    },
+    {
+      "id": "bubble",
+      "name": "泡沫",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "nova",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "bubble-cloud",
+      "range": 273,
+      "trajectory": "nova",
+      "projectile": "bubble",
+      "animation": {
+        "pal": "water",
+        "proj": "bubble"
+      },
+      "hit": "Combat.run/nova",
+      "status": {
+        "slow": 0.45
+      },
+      "cooldown": 1,
+      "damage": 14,
+      "count": 8,
+      "pierce": 0,
+      "evolution": {
+        "name": "冲浪",
+        "damage": 31.36,
+        "cd": 0.75,
+        "count": 22,
+        "pierce": 2
+      }
+    },
+    {
+      "id": "hydro-pump",
+      "name": "水炮",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "pressure-jet",
+      "range": 250,
+      "trajectory": "beam",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop",
+        "beam": "drop"
+      },
+      "hit": "Combat.hit",
+      "status": {},
+      "cooldown": 1.5,
+      "damage": 45,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "加农水炮",
+        "damage": 176.175,
+        "cd": 0.9562499999999999,
+        "radius": 390
+      }
+    },
+    {
+      "id": "aqua-ring",
+      "name": "水流环",
+      "type": "water",
+      "damageClass": "status",
+      "kind": "buff",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "wave",
+      "range": null,
+      "trajectory": "buff",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop",
+        "buff": "bubble"
+      },
+      "hit": "Combat.run/buff",
+      "status": {},
+      "cooldown": 0.9,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "vine-whip",
+      "name": "藤鞭",
+      "type": "grass",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "vine",
+      "range": 115.34,
+      "trajectory": "melee",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf",
+        "melee": "vine"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "knock": 60
+      },
+      "cooldown": 0.558,
+      "damage": 36.828,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "强力鞭打",
+        "damage": 146.94372,
+        "cd": 0.41850000000000004,
+        "radius": 187.4275
+      }
+    },
+    {
+      "id": "razor-leaf",
+      "name": "飞叶快刀",
+      "type": "grass",
+      "damageClass": "physical",
+      "kind": "boomerang",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "blades",
+      "range": 210,
+      "trajectory": "boomerang",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf"
+      },
+      "hit": "Combat.run/boomerang",
+      "status": {},
+      "cooldown": 0.9,
+      "damage": 10,
+      "count": 2,
+      "pierce": 0,
+      "evolution": {
+        "name": "飞叶风暴",
+        "damage": 36.54,
+        "cd": 0.9,
+        "radius": 327.59999999999997,
+        "count": 5
+      }
+    },
+    {
+      "id": "leaf-storm",
+      "name": "落英缤纷",
+      "type": "grass",
+      "damageClass": "physical",
+      "kind": "orbit",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "leaves",
+      "range": 74,
+      "trajectory": "orbit",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf"
+      },
+      "hit": "Combat.run/orbit",
+      "status": {},
+      "cooldown": 0.26,
+      "damage": 14,
+      "count": 4,
+      "pierce": 0,
+      "evolution": {
+        "name": "花瓣舞",
+        "damage": 57.1795,
+        "cd": 0.26,
+        "radius": 106.37499999999999,
+        "count": 8
+      }
+    },
+    {
+      "id": "giga-drain",
+      "name": "打草结",
+      "type": "grass",
+      "damageClass": "special",
+      "kind": "aura",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "vine",
+      "range": 76,
+      "trajectory": "aura",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf",
+        "aura": "heart",
+        "inward": true
+      },
+      "hit": "Combat.run/aura",
+      "status": {},
+      "cooldown": 0.55,
+      "damage": 12.65,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "疯狂植物",
+        "damage": 49.524750000000004,
+        "cd": 0.385,
+        "radius": 173.394
+      }
+    },
+    {
+      "id": "thunder-shock",
+      "name": "电击",
+      "type": "electric",
+      "damageClass": "special",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "fork",
+      "range": 528,
+      "trajectory": "projectile",
+      "projectile": "bolt",
+      "animation": {
+        "pal": "electric",
+        "proj": "bolt",
+        "trail": "spark"
+      },
+      "hit": "Combat.resolve",
+      "status": {},
+      "cooldown": 0.4,
+      "damage": 13,
+      "count": 1,
+      "pierce": 2,
+      "evolution": {
+        "name": "打雷",
+        "damage": 33.93,
+        "cd": 0.30000000000000004,
+        "count": 5,
+        "pierce": 5
+      }
+    },
+    {
+      "id": "discharge",
+      "name": "放电",
+      "type": "electric",
+      "damageClass": "special",
+      "kind": "aura",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "radial",
+      "range": 70,
+      "trajectory": "aura",
+      "projectile": "bolt",
+      "animation": {
+        "pal": "electric",
+        "proj": "bolt",
+        "aura": "bolt"
+      },
+      "hit": "Combat.run/aura",
+      "status": {},
+      "cooldown": 0.45,
+      "damage": 10.35,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "电气场地",
+        "damage": 40.52025,
+        "cd": 0.315,
+        "radius": 159.705
+      }
+    },
+    {
+      "id": "thunderbolt",
+      "name": "十万伏特",
+      "type": "electric",
+      "damageClass": "special",
+      "kind": "chain",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "strike",
+      "range": 140,
+      "trajectory": "chain",
+      "projectile": "bolt",
+      "animation": {
+        "pal": "electric",
+        "proj": "bolt",
+        "beam": "lightning"
+      },
+      "hit": "Combat.run/chain",
+      "status": {},
+      "cooldown": 0.95,
+      "damage": 22.8,
+      "count": 4,
+      "pierce": 0,
+      "evolution": {
+        "name": "电磁炮",
+        "damage": 78.6828,
+        "cd": 0.7124999999999999,
+        "radius": 168,
+        "count": 11
+      }
+    },
+    {
+      "id": "confusion",
+      "name": "念力",
+      "type": "psychic",
+      "damageClass": "special",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "mind-orbs",
+      "range": 616,
+      "trajectory": "projectile",
+      "projectile": "ring",
+      "animation": {
+        "pal": "psychic",
+        "proj": "ring"
+      },
+      "hit": "Combat.resolve",
+      "status": {},
+      "cooldown": 0.58,
+      "damage": 17.4,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "精神冲击",
+        "damage": 45.413999999999994,
+        "cd": 0.43499999999999994,
+        "count": 5,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "psybeam",
+      "name": "幻象光线",
+      "type": "psychic",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "prism",
+      "range": 215,
+      "trajectory": "beam",
+      "projectile": "ring",
+      "animation": {
+        "pal": "psychic",
+        "proj": "ring",
+        "beam": "ring"
+      },
+      "hit": "Combat.hit",
+      "status": {},
+      "cooldown": 1.15,
+      "damage": 34.5,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "预知未来",
+        "damage": 135.0675,
+        "cd": 0.7331249999999999,
+        "radius": 335.4
+      }
+    },
+    {
+      "id": "psychic",
+      "name": "精神强念",
+      "type": "psychic",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "mind-crush",
+      "range": 64,
+      "trajectory": "mark",
+      "projectile": "ring",
+      "animation": {
+        "pal": "psychic",
+        "proj": "ring"
+      },
+      "hit": "Combat.run/mark",
+      "status": {
+        "slow": 0.3
+      },
+      "cooldown": 1.9,
+      "damage": 45.6,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "精神强念 +",
+        "damage": 172.368,
+        "cd": 1.4249999999999998,
+        "radius": 108
+      }
+    },
+    {
+      "id": "sludge",
+      "name": "污泥攻击",
+      "type": "poison",
+      "damageClass": "special",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "glob",
+      "range": 435,
+      "trajectory": "projectile",
+      "projectile": "blob",
+      "animation": {
+        "pal": "poison",
+        "proj": "blob",
+        "trail": "bubbles"
+      },
+      "hit": "Combat.resolve",
+      "status": {
+        "poison": 1
+      },
+      "cooldown": 0.6,
+      "damage": 18,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "污泥炸弹",
+        "damage": 46.98,
+        "cd": 0.44999999999999996,
+        "count": 5,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "mud-shot",
+      "name": "泥巴射击",
+      "type": "ground",
+      "damageClass": "special",
+      "kind": "nova",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "splash",
+      "range": 200,
+      "trajectory": "nova",
+      "projectile": "blob",
+      "animation": {
+        "pal": "ground",
+        "proj": "blob",
+        "trail": "dirt"
+      },
+      "hit": "Combat.run/nova",
+      "status": {
+        "slow": 0.4
+      },
+      "cooldown": 1.1,
+      "damage": 15.4,
+      "count": 7,
+      "pierce": 0,
+      "evolution": {
+        "name": "大地之力",
+        "damage": 34.496,
+        "cd": 0.8250000000000001,
+        "count": 21,
+        "pierce": 2
+      }
+    },
+    {
+      "id": "gust",
+      "name": "起风",
+      "type": "flying",
+      "damageClass": "special",
+      "kind": "orbit",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "feather",
+      "range": 72,
+      "trajectory": "orbit",
+      "projectile": "wind",
+      "animation": {
+        "pal": "flying",
+        "proj": "wind"
+      },
+      "hit": "Combat.run/orbit",
+      "status": {
+        "knock": 40
+      },
+      "cooldown": 0.26,
+      "damage": 13,
+      "count": 3,
+      "pierce": 0,
+      "evolution": {
+        "name": "暴风",
+        "damage": 53.09525000000001,
+        "cd": 0.26,
+        "radius": 103.49999999999999,
+        "count": 7
+      }
+    },
+    {
+      "id": "wing-attack",
+      "name": "翅膀攻击",
+      "type": "flying",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "feather",
+      "range": 83.95,
+      "trajectory": "melee",
+      "projectile": "wind",
+      "animation": {
+        "pal": "flying",
+        "proj": "wind",
+        "melee": "feather"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "knock": 70
+      },
+      "cooldown": 0.495,
+      "damage": 32.67,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "勇鸟猛攻",
+        "damage": 130.3533,
+        "cd": 0.37124999999999997,
+        "radius": 136.41875000000002
+      }
+    },
+    {
+      "id": "body-slam",
+      "name": "泰山压顶",
+      "type": "normal",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "impact",
+      "range": 76.7,
+      "trajectory": "melee",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star",
+        "melee": "impact"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "knock": 140
+      },
+      "cooldown": 0.855,
+      "damage": 53.745,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "终极冲击",
+        "damage": 214.44254999999998,
+        "cd": 0.64125,
+        "radius": 124.6375
+      }
+    },
+    {
+      "id": "hyper-voice",
+      "name": "巨声",
+      "type": "normal",
+      "damageClass": "special",
+      "kind": "nova",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 234,
+      "trajectory": "nova",
+      "projectile": "note",
+      "animation": {
+        "pal": "normal",
+        "proj": "note"
+      },
+      "hit": "Combat.run/nova",
+      "status": {},
+      "cooldown": 1.15,
+      "damage": 16.1,
+      "count": 9,
+      "pierce": 1,
+      "evolution": {
+        "name": "吵闹",
+        "damage": 36.064,
+        "cd": 0.8624999999999999,
+        "count": 23,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "poison-sting",
+      "name": "毒针",
+      "type": "poison",
+      "damageClass": "physical",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "needles",
+      "range": 420,
+      "trajectory": "projectile",
+      "projectile": "needle",
+      "animation": {
+        "pal": "poison",
+        "proj": "needle"
+      },
+      "hit": "Combat.resolve",
+      "status": {
+        "poison": 1
+      },
+      "cooldown": 0.34,
+      "damage": 10.2,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "毒击",
+        "damage": 26.622,
+        "cd": 0.255,
+        "count": 5,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "toxic",
+      "name": "剧毒",
+      "type": "poison",
+      "damageClass": "special",
+      "kind": "trail",
+      "specialOnly": false,
+      "cast": "Walk",
+      "style": "glob",
+      "range": 26,
+      "trajectory": "trail",
+      "projectile": "blob",
+      "animation": {
+        "pal": "poison",
+        "proj": "blob",
+        "aura": "bubble",
+        "rise": true
+      },
+      "hit": "Combat.run/trail",
+      "status": {
+        "poison": 1
+      },
+      "cooldown": 0.3,
+      "damage": 6,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "毒瓦斯",
+        "damage": 22.679999999999996,
+        "cd": 0.3,
+        "radius": 54.925000000000004
+      }
+    },
+    {
+      "id": "bulldoze",
+      "name": "重踏",
+      "type": "ground",
+      "damageClass": "physical",
+      "kind": "aura",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "quake",
+      "range": 80,
+      "trajectory": "aura",
+      "projectile": "blob",
+      "animation": {
+        "pal": "ground",
+        "proj": "blob",
+        "aura": "rock",
+        "rise": true
+      },
+      "hit": "Combat.run/aura",
+      "status": {
+        "slow": 0.35
+      },
+      "cooldown": 0.7,
+      "damage": 16.1,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "地震",
+        "damage": 63.03150000000001,
+        "cd": 0.48999999999999994,
+        "radius": 182.52000000000004
+      }
+    },
+    {
+      "id": "bug-bite",
+      "name": "虫咬",
+      "type": "bug",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "jaws",
+      "range": 63.25,
+      "trajectory": "melee",
+      "projectile": "needle",
+      "animation": {
+        "pal": "bug",
+        "proj": "needle",
+        "melee": "jaws"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "knock": 40
+      },
+      "cooldown": 0.378,
+      "damage": 24.948,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "十字剪",
+        "damage": 99.54252,
+        "cd": 0.2835,
+        "radius": 102.78125
+      }
+    },
+    {
+      "id": "string-shot",
+      "name": "吐丝",
+      "type": "bug",
+      "damageClass": "special",
+      "kind": "mine",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "seed",
+      "range": 56,
+      "trajectory": "mine",
+      "projectile": "web",
+      "animation": {
+        "pal": "bug",
+        "proj": "web"
+      },
+      "hit": "Combat.run/mine",
+      "status": {
+        "slow": 0.6
+      },
+      "cooldown": 1.1,
+      "damage": 16.5,
+      "count": 2,
+      "pierce": 0,
+      "evolution": {
+        "name": "黏黏网",
+        "damage": 44.550000000000004,
+        "cd": 0.8250000000000001,
+        "radius": 91,
+        "count": 6
+      }
+    },
+    {
+      "id": "bug-buzz",
+      "name": "虫鸣",
+      "type": "bug",
+      "damageClass": "special",
+      "kind": "aura",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "seed",
+      "range": 66,
+      "trajectory": "aura",
+      "projectile": "needle",
+      "animation": {
+        "pal": "bug",
+        "proj": "needle",
+        "aura": "note"
+      },
+      "hit": "Combat.run/aura",
+      "status": {},
+      "cooldown": 0.45,
+      "damage": 10.35,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "虫群",
+        "damage": 40.52025,
+        "cd": 0.315,
+        "radius": 150.579
+      }
+    },
+    {
+      "id": "rock-throw",
+      "name": "落石",
+      "type": "rock",
+      "damageClass": "physical",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "rock",
+      "range": 364,
+      "trajectory": "projectile",
+      "projectile": "rock",
+      "animation": {
+        "pal": "rock",
+        "proj": "rock",
+        "trail": "dirt"
+      },
+      "hit": "Combat.resolve",
+      "status": {
+        "knock": 90
+      },
+      "cooldown": 0.7,
+      "damage": 24,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "尖石攻击",
+        "damage": 62.63999999999999,
+        "cd": 0.5249999999999999,
+        "count": 5,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "rock-slide",
+      "name": "岩崩",
+      "type": "rock",
+      "damageClass": "physical",
+      "kind": "meteor",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "boulder-fall",
+      "range": 52.9,
+      "trajectory": "meteor",
+      "projectile": "rock",
+      "animation": {
+        "pal": "rock",
+        "proj": "rock",
+        "trail": "dirt"
+      },
+      "hit": "Combat.run/meteor",
+      "status": {
+        "knock": 50
+      },
+      "cooldown": 1.3,
+      "damage": 28.35,
+      "count": 3,
+      "pierce": 0,
+      "evolution": {
+        "name": "隐形岩",
+        "damage": 69.88275,
+        "cd": 1.04,
+        "radius": 82.52399999999999,
+        "count": 8
+      }
+    },
+    {
+      "id": "ice-beam",
+      "name": "冰冻光束",
+      "type": "ice",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "ice-lance",
+      "range": 220,
+      "trajectory": "beam",
+      "projectile": "shard",
+      "animation": {
+        "pal": "ice",
+        "proj": "shard",
+        "beam": "shard"
+      },
+      "hit": "Combat.hit",
+      "status": {
+        "slow": 0.7
+      },
+      "cooldown": 1.1,
+      "damage": 33,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "暴风雪",
+        "damage": 129.19500000000002,
+        "cd": 0.70125,
+        "radius": 343.2
+      }
+    },
+    {
+      "id": "powder-snow",
+      "name": "细雪",
+      "type": "ice",
+      "damageClass": "special",
+      "kind": "aura",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "snow",
+      "range": 76,
+      "trajectory": "aura",
+      "projectile": "shard",
+      "animation": {
+        "pal": "ice",
+        "proj": "shard",
+        "aura": "star"
+      },
+      "hit": "Combat.run/aura",
+      "status": {
+        "slow": 0.45
+      },
+      "cooldown": 0.55,
+      "damage": 12.65,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "冰冻之风",
+        "damage": 49.524750000000004,
+        "cd": 0.385,
+        "radius": 173.394
+      }
+    },
+    {
+      "id": "karate-chop",
+      "name": "空手劈",
+      "type": "fighting",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "claw",
+      "range": 72.45,
+      "trajectory": "melee",
+      "projectile": "ball",
+      "animation": {
+        "pal": "fighting",
+        "proj": "ball",
+        "melee": "impact"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "knock": 110
+      },
+      "cooldown": 0.45,
+      "damage": 38.28,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "近身战",
+        "damage": 152.7372,
+        "cd": 0.3375,
+        "radius": 117.73125
+      }
+    },
+    {
+      "id": "aura-sphere",
+      "name": "波导弹",
+      "type": "fighting",
+      "damageClass": "special",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 600,
+      "trajectory": "projectile",
+      "projectile": "ball",
+      "animation": {
+        "pal": "aura",
+        "proj": "ball",
+        "trail": "spark"
+      },
+      "hit": "Combat.resolve",
+      "status": {},
+      "cooldown": 0.62,
+      "damage": 18.6,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "真气弹",
+        "damage": 48.54600000000001,
+        "cd": 0.46499999999999997,
+        "count": 5,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "lick",
+      "name": "舌舔",
+      "type": "ghost",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "tongue",
+      "range": 69,
+      "trajectory": "melee",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow",
+        "melee": "impact"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "slow": 0.55
+      },
+      "cooldown": 0.432,
+      "damage": 28.512,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "暗影拳",
+        "damage": 113.76287999999998,
+        "cd": 0.324,
+        "radius": 112.125
+      }
+    },
+    {
+      "id": "shadow-ball",
+      "name": "暗影球",
+      "type": "ghost",
+      "damageClass": "special",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "shadow",
+      "range": 448,
+      "trajectory": "projectile",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow",
+        "trail": "wisp"
+      },
+      "hit": "Combat.resolve",
+      "status": {},
+      "cooldown": 0.66,
+      "damage": 19.8,
+      "count": 1,
+      "pierce": 2,
+      "evolution": {
+        "name": "潜灵奇袭",
+        "damage": 51.678000000000004,
+        "cd": 0.495,
+        "count": 5,
+        "pierce": 5
+      }
+    },
+    {
+      "id": "dragon-rage",
+      "name": "龙之怒",
+      "type": "dragon",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "dragon",
+      "range": 230,
+      "trajectory": "beam",
+      "projectile": "fire",
+      "animation": {
+        "pal": "dragon",
+        "proj": "fire",
+        "beam": "fire"
+      },
+      "hit": "Combat.hit",
+      "status": {},
+      "cooldown": 1,
+      "damage": 30,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "流星群",
+        "damage": 117.45,
+        "cd": 0.6375,
+        "radius": 358.8
+      }
+    },
+    {
+      "id": "dragon-dance",
+      "name": "龙之舞",
+      "type": "dragon",
+      "damageClass": "status",
+      "kind": "buff",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "dragon",
+      "range": null,
+      "trajectory": "buff",
+      "projectile": "fire",
+      "animation": {
+        "pal": "dragon",
+        "proj": "fire",
+        "buff": "arrow"
+      },
+      "hit": "Combat.run/buff",
+      "status": {},
+      "cooldown": 0.7,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "fairy-wind",
+      "name": "妖精之风",
+      "type": "fairy",
+      "damageClass": "special",
+      "kind": "nova",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "petals",
+      "range": 276,
+      "trajectory": "nova",
+      "projectile": "star",
+      "animation": {
+        "pal": "fairy",
+        "proj": "star"
+      },
+      "hit": "Combat.run/nova",
+      "status": {},
+      "cooldown": 1,
+      "damage": 14,
+      "count": 10,
+      "pierce": 0,
+      "evolution": {
+        "name": "月亮之力",
+        "damage": 31.36,
+        "cd": 0.75,
+        "count": 24,
+        "pierce": 2
+      }
+    },
+    {
+      "id": "dazzling-gleam",
+      "name": "魔法闪耀",
+      "type": "fairy",
+      "damageClass": "special",
+      "kind": "aura",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "radial",
+      "range": 72,
+      "trajectory": "aura",
+      "projectile": "star",
+      "animation": {
+        "pal": "fairy",
+        "proj": "star",
+        "aura": "star"
+      },
+      "hit": "Combat.run/aura",
+      "status": {},
+      "cooldown": 0.5,
+      "damage": 11.5,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "薄雾场地",
+        "damage": 45.02250000000001,
+        "cd": 0.35,
+        "radius": 164.26800000000003
+      }
+    },
+    {
+      "id": "metal-claw",
+      "name": "金属爪",
+      "type": "steel",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "claw",
+      "range": 72.45,
+      "trajectory": "melee",
+      "projectile": "shard",
+      "animation": {
+        "pal": "steel",
+        "proj": "shard",
+        "melee": "claw"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "knock": 60
+      },
+      "cooldown": 0.45,
+      "damage": 31.32,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "铁头",
+        "damage": 124.96679999999998,
+        "cd": 0.3375,
+        "radius": 117.73125
+      }
+    },
+    {
+      "id": "flash-cannon",
+      "name": "加农光炮",
+      "type": "steel",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "prism",
+      "range": 220,
+      "trajectory": "beam",
+      "projectile": "shard",
+      "animation": {
+        "pal": "steel",
+        "proj": "shard",
+        "beam": "shard"
+      },
+      "hit": "Combat.hit",
+      "status": {},
+      "cooldown": 1.05,
+      "damage": 31.5,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "铁蹄光线",
+        "damage": 123.32249999999998,
+        "cd": 0.669375,
+        "radius": 343.2
+      }
+    },
+    {
+      "id": "bite",
+      "name": "咬住",
+      "type": "dark",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "jaws",
+      "range": 66.7,
+      "trajectory": "melee",
+      "projectile": "crescent",
+      "animation": {
+        "pal": "dark",
+        "proj": "crescent",
+        "melee": "jaws"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "knock": 70
+      },
+      "cooldown": 0.405,
+      "damage": 29.58,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "咬碎",
+        "damage": 118.02419999999996,
+        "cd": 0.30375,
+        "radius": 108.3875
+      }
+    },
+    {
+      "id": "dark-pulse",
+      "name": "恶之波动",
+      "type": "dark",
+      "damageClass": "special",
+      "kind": "nova",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "ripple",
+      "range": 264,
+      "trajectory": "nova",
+      "projectile": "crescent",
+      "animation": {
+        "pal": "dark",
+        "proj": "crescent"
+      },
+      "hit": "Combat.run/nova",
+      "status": {},
+      "cooldown": 1.15,
+      "damage": 16.1,
+      "count": 10,
+      "pierce": 1,
+      "evolution": {
+        "name": "大声咆哮",
+        "damage": 36.064,
+        "cd": 0.8624999999999999,
+        "count": 24,
+        "pierce": 3
+      }
+    },
+    {
+      "id": "night-shade",
+      "name": "黑夜魔影",
+      "type": "dark",
+      "damageClass": "special",
+      "kind": "aura",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "tendrils",
+      "range": 72,
+      "trajectory": "aura",
+      "projectile": "crescent",
+      "animation": {
+        "pal": "dark",
+        "proj": "crescent",
+        "aura": "shadow",
+        "rise": true
+      },
+      "hit": "Combat.run/aura",
+      "status": {},
+      "cooldown": 0.5,
+      "damage": 11.5,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "恶梦",
+        "damage": 45.02250000000001,
+        "cd": 0.35,
+        "radius": 164.26800000000003
+      }
+    },
+    {
+      "id": "bonemerang",
+      "name": "骨头回力镖",
+      "type": "ground",
+      "damageClass": "physical",
+      "kind": "boomerang",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "blades",
+      "range": 230,
+      "trajectory": "boomerang",
+      "projectile": "crescent",
+      "animation": {
+        "pal": "ground",
+        "proj": "crescent"
+      },
+      "hit": "Combat.run/boomerang",
+      "status": {
+        "knock": 40
+      },
+      "cooldown": 0.95,
+      "damage": 18.05,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "骨棒乱打",
+        "damage": 65.95469999999999,
+        "cd": 0.95,
+        "radius": 358.8,
+        "count": 4
+      }
+    },
+    {
+      "id": "psycho-cut",
+      "name": "精神利刃",
+      "type": "psychic",
+      "damageClass": "physical",
+      "kind": "boomerang",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "blades",
+      "range": 200,
+      "trajectory": "boomerang",
+      "projectile": "crescent",
+      "animation": {
+        "pal": "psychic",
+        "proj": "crescent"
+      },
+      "hit": "Combat.run/boomerang",
+      "status": {},
+      "cooldown": 0.8,
+      "damage": 9,
+      "count": 2,
+      "pierce": 0,
+      "evolution": {
+        "name": "精神之牙",
+        "damage": 32.885999999999996,
+        "cd": 0.8,
+        "radius": 312,
+        "count": 5
+      }
+    },
+    {
+      "id": "spikes",
+      "name": "撒菱",
+      "type": "ground",
+      "damageClass": "special",
+      "kind": "mine",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "spikes",
+      "range": 60,
+      "trajectory": "mine",
+      "projectile": "star",
+      "animation": {
+        "pal": "ground",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mine",
+      "status": {},
+      "cooldown": 1.2,
+      "damage": 18,
+      "count": 2,
+      "pierce": 0,
+      "evolution": {
+        "name": "地裂",
+        "damage": 48.6,
+        "cd": 0.8999999999999999,
+        "radius": 97.5,
+        "count": 6
+      }
+    },
+    {
+      "id": "toxic-spikes",
+      "name": "毒菱",
+      "type": "poison",
+      "damageClass": "special",
+      "kind": "mine",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "spikes",
+      "range": 56,
+      "trajectory": "mine",
+      "projectile": "star",
+      "animation": {
+        "pal": "poison",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mine",
+      "status": {
+        "poison": 2
+      },
+      "cooldown": 1.1,
+      "damage": 16.5,
+      "count": 2,
+      "pierce": 0,
+      "evolution": {
+        "name": "垃圾射击",
+        "damage": 44.550000000000004,
+        "cd": 0.8250000000000001,
+        "radius": 91,
+        "count": 6
+      }
+    },
+    {
+      "id": "hail",
+      "name": "冰雹",
+      "type": "ice",
+      "damageClass": "special",
+      "kind": "meteor",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "ice-rain",
+      "range": 46,
+      "trajectory": "meteor",
+      "projectile": "shard",
+      "animation": {
+        "pal": "ice",
+        "proj": "shard"
+      },
+      "hit": "Combat.run/meteor",
+      "status": {
+        "slow": 0.4
+      },
+      "cooldown": 1.2,
+      "damage": 25.92,
+      "count": 4,
+      "pierce": 0,
+      "evolution": {
+        "name": "雪崩",
+        "damage": 63.8928,
+        "cd": 0.96,
+        "radius": 71.76,
+        "count": 9
+      }
+    },
+    {
+      "id": "meteor-mash",
+      "name": "彗星拳",
+      "type": "steel",
+      "damageClass": "physical",
+      "kind": "meteor",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "metal-fall",
+      "range": 62.1,
+      "trajectory": "meteor",
+      "projectile": "rock",
+      "animation": {
+        "pal": "steel",
+        "proj": "rock",
+        "trail": "spark"
+      },
+      "hit": "Combat.run/meteor",
+      "status": {
+        "knock": 80
+      },
+      "cooldown": 1.4,
+      "damage": 45.9,
+      "count": 2,
+      "pierce": 0,
+      "evolution": {
+        "name": "磁铁炸弹",
+        "damage": 113.14349999999999,
+        "cd": 1.1199999999999999,
+        "radius": 96.876,
+        "count": 7
+      }
+    },
+    {
+      "id": "will-o-wisp",
+      "name": "鬼火",
+      "type": "fire",
+      "damageClass": "special",
+      "kind": "turret",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "wisps",
+      "range": null,
+      "trajectory": "turret",
+      "projectile": "ball",
+      "animation": {
+        "pal": "fire",
+        "proj": "ball",
+        "trail": "ember"
+      },
+      "hit": "Combat.run/turret",
+      "status": {
+        "burn": 1
+      },
+      "cooldown": 3.5,
+      "damage": 15,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "炼狱",
+        "damage": 56.699999999999996,
+        "cd": 3.5,
+        "count": 3
+      }
+    },
+    {
+      "id": "substitute",
+      "name": "替身",
+      "type": "normal",
+      "damageClass": "special",
+      "kind": "decoy",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "decoy",
+      "range": 85,
+      "trajectory": "decoy",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/decoy",
+      "status": {},
+      "cooldown": 6,
+      "damage": 14,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "替身 +",
+        "damage": 52.92,
+        "cd": 4.5,
+        "radius": 143.4375
+      }
+    },
+    {
+      "id": "aerial-ace",
+      "name": "燕返",
+      "type": "flying",
+      "damageClass": "physical",
+      "kind": "dash",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "feather",
+      "range": 120,
+      "trajectory": "dash",
+      "projectile": "wind",
+      "animation": {
+        "pal": "flying",
+        "proj": "wind"
+      },
+      "hit": "Combat.run/dash",
+      "status": {
+        "knock": 60
+      },
+      "cooldown": 0.75,
+      "damage": 27,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "杂技",
+        "damage": 114.91199999999999,
+        "cd": 0.45,
+        "radius": 195
+      }
+    },
+    {
+      "id": "flame-wheel",
+      "name": "火焰轮",
+      "type": "fire",
+      "damageClass": "physical",
+      "kind": "trail",
+      "specialOnly": false,
+      "cast": "Walk",
+      "style": "wheel",
+      "range": 28,
+      "trajectory": "trail",
+      "projectile": "fire",
+      "animation": {
+        "pal": "fire",
+        "proj": "fire",
+        "aura": "fire"
+      },
+      "hit": "Combat.run/trail",
+      "status": {
+        "burn": 1
+      },
+      "cooldown": 0.28,
+      "damage": 10,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "闪焰冲锋",
+        "damage": 37.800000000000004,
+        "cd": 0.28,
+        "radius": 59.15
+      }
+    },
+    {
+      "id": "bubble-beam",
+      "name": "泡沫光线",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "cone",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "bubble-lance",
+      "range": 153,
+      "trajectory": "cone",
+      "projectile": "bubble",
+      "animation": {
+        "pal": "water",
+        "proj": "bubble"
+      },
+      "hit": "Combat.run/cone",
+      "status": {
+        "slow": 0.3
+      },
+      "cooldown": 0.65,
+      "damage": 6.933,
+      "count": 7,
+      "pierce": 0,
+      "evolution": {
+        "name": "水流尾",
+        "damage": 16.500539999999997,
+        "cd": 0.65,
+        "count": 17,
+        "pierce": 2
+      }
+    },
+    {
+      "id": "hex",
+      "name": "祸不单行",
+      "type": "ghost",
+      "damageClass": "special",
+      "kind": "chain",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "sigil",
+      "range": 150,
+      "trajectory": "chain",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow",
+        "beam": "shadow"
+      },
+      "hit": "Combat.run/chain",
+      "status": {},
+      "cooldown": 0.9,
+      "damage": 21.6,
+      "count": 4,
+      "pierce": 0,
+      "evolution": {
+        "name": "灵骚",
+        "damage": 74.5416,
+        "cd": 0.675,
+        "radius": 180,
+        "count": 11
+      }
+    },
+    {
+      "id": "z-burst",
+      "name": "Z招式",
+      "type": "normal",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 90,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "surf",
+      "name": "冲浪",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "wave",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "wave",
+      "range": 210,
+      "trajectory": "wave",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop"
+      },
+      "hit": "Combat.run/wave",
+      "status": {
+        "slow": 0.2
+      },
+      "cooldown": 2.4,
+      "damage": 62.4,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "冲浪 +",
+        "damage": 235.87199999999999,
+        "cd": 1.7999999999999998,
+        "radius": 283.5
+      }
+    },
+    {
+      "id": "icy-wind",
+      "name": "冰冻之风",
+      "type": "ice",
+      "damageClass": "special",
+      "kind": "wave",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "frost",
+      "range": 170,
+      "trajectory": "wave",
+      "projectile": "shard",
+      "animation": {
+        "pal": "ice",
+        "proj": "shard"
+      },
+      "hit": "Combat.run/wave",
+      "status": {
+        "slow": 0.55
+      },
+      "cooldown": 1.9,
+      "damage": 49.4,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "冰冻之风 +",
+        "damage": 186.732,
+        "cd": 1.4249999999999998,
+        "radius": 229.50000000000003
+      }
+    },
+    {
+      "id": "air-slash",
+      "name": "空气斩",
+      "type": "flying",
+      "damageClass": "special",
+      "kind": "wave",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "feather",
+      "range": 230,
+      "trajectory": "wave",
+      "projectile": "wind",
+      "animation": {
+        "pal": "flying",
+        "proj": "wind"
+      },
+      "hit": "Combat.run/wave",
+      "status": {
+        "knock": 30
+      },
+      "cooldown": 1.3,
+      "damage": 33.8,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "空气斩 +",
+        "damage": 127.76399999999998,
+        "cd": 0.9750000000000001,
+        "radius": 310.5
+      }
+    },
+    {
+      "id": "whirlpool",
+      "name": "潮旋",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "vortex",
+      "range": 78,
+      "trajectory": "mark",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop"
+      },
+      "hit": "Combat.run/mark",
+      "status": {
+        "slow": 0.55
+      },
+      "cooldown": 2.2,
+      "damage": 52.8,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "潮旋 +",
+        "damage": 199.58399999999997,
+        "cd": 1.6500000000000001,
+        "radius": 131.625
+      }
+    },
+    {
+      "id": "leech-seed",
+      "name": "寄生种子",
+      "type": "grass",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "seed",
+      "range": 76,
+      "trajectory": "mark",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf"
+      },
+      "hit": "Combat.run/mark",
+      "status": {
+        "seedHeal": 0.012
+      },
+      "cooldown": 2.8,
+      "damage": 57.96,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "寄生种子 +",
+        "damage": 219.08879999999996,
+        "cd": 2.0999999999999996,
+        "radius": 128.25
+      }
+    },
+    {
+      "id": "stealth-rock",
+      "name": "隐形岩",
+      "type": "rock",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "rock",
+      "range": 70,
+      "trajectory": "mark",
+      "projectile": "rock",
+      "animation": {
+        "pal": "rock",
+        "proj": "rock"
+      },
+      "hit": "Combat.run/mark",
+      "status": {
+        "knock": 25
+      },
+      "cooldown": 2.3,
+      "damage": 55.2,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "隐形岩 +",
+        "damage": 208.656,
+        "cd": 1.7249999999999999,
+        "radius": 118.12500000000001
+      }
+    },
+    {
+      "id": "earth-power",
+      "name": "大地之力",
+      "type": "ground",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "fissure",
+      "range": 72,
+      "trajectory": "mark",
+      "projectile": "blob",
+      "animation": {
+        "pal": "ground",
+        "proj": "blob"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 2,
+      "damage": 48,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "大地之力 +",
+        "damage": 181.43999999999997,
+        "cd": 1.5,
+        "radius": 121.50000000000001
+      }
+    },
+    {
+      "id": "counter",
+      "name": "双倍奉还",
+      "type": "fighting",
+      "damageClass": "physical",
+      "kind": "counter",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "claw",
+      "range": 90,
+      "trajectory": "counter",
+      "projectile": "ball",
+      "animation": {
+        "pal": "fighting",
+        "proj": "ball"
+      },
+      "hit": "Combat.run/counter",
+      "status": {
+        "knock": 30
+      },
+      "cooldown": 1.2,
+      "damage": 20,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "双倍奉还 +",
+        "damage": 79.8,
+        "cd": 0.8999999999999999,
+        "radius": 146.25
+      }
+    },
+    {
+      "id": "explosion",
+      "name": "大爆炸",
+      "type": "normal",
+      "damageClass": "physical",
+      "kind": "mark",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "blast",
+      "range": 115,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 3.5,
+      "damage": 84,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "大爆炸 +",
+        "damage": 317.52,
+        "cd": 2.625,
+        "radius": 194.0625
+      }
+    },
+    {
+      "id": "hyper-beam",
+      "name": "破坏光线",
+      "type": "normal",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "charge",
+      "range": 320,
+      "trajectory": "beam",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.hit",
+      "status": {},
+      "cooldown": 2.4,
+      "damage": 72,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "破坏光线 +",
+        "damage": 281.88,
+        "cd": 1.5299999999999998,
+        "radius": 499.2
+      }
+    },
+    {
+      "id": "dragon-pulse",
+      "name": "龙之波动",
+      "type": "dragon",
+      "damageClass": "special",
+      "kind": "wave",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "dragon",
+      "range": 240,
+      "trajectory": "wave",
+      "projectile": "fire",
+      "animation": {
+        "pal": "dragon",
+        "proj": "fire"
+      },
+      "hit": "Combat.run/wave",
+      "status": {},
+      "cooldown": 1.8,
+      "damage": 46.8,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "龙之波动 +",
+        "damage": 176.904,
+        "cd": 1.35,
+        "radius": 324
+      }
+    },
+    {
+      "id": "bullet-seed",
+      "name": "种子机关枪",
+      "type": "grass",
+      "damageClass": "physical",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "seed",
+      "range": 400,
+      "trajectory": "projectile",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf"
+      },
+      "hit": "Combat.resolve",
+      "status": {},
+      "cooldown": 0.7,
+      "damage": 10.5,
+      "count": 4,
+      "pierce": 1,
+      "evolution": {
+        "name": "种子机关枪 +",
+        "damage": 27.405,
+        "cd": 0.5249999999999999,
+        "count": 8,
+        "pierce": 4
+      }
+    },
+    {
+      "id": "shadow-sneak",
+      "name": "影子偷袭",
+      "type": "ghost",
+      "damageClass": "physical",
+      "kind": "dash",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "shadow",
+      "range": 105,
+      "trajectory": "dash",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow"
+      },
+      "hit": "Combat.run/dash",
+      "status": {},
+      "cooldown": 1.15,
+      "damage": 41.4,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "影子偷袭 +",
+        "damage": 176.19839999999996,
+        "cd": 0.69,
+        "radius": 170.625
+      }
+    },
+    {
+      "id": "aqua-jet",
+      "name": "水流喷射",
+      "type": "water",
+      "damageClass": "physical",
+      "kind": "dash",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "wave",
+      "range": 115,
+      "trajectory": "dash",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop"
+      },
+      "hit": "Combat.run/dash",
+      "status": {},
+      "cooldown": 1,
+      "damage": 36,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "水流喷射 +",
+        "damage": 153.21599999999998,
+        "cd": 0.6000000000000001,
+        "radius": 186.875
+      }
+    },
+    {
+      "id": "volt-tackle",
+      "name": "伏特攻击",
+      "type": "electric",
+      "damageClass": "physical",
+      "kind": "dash",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "charge",
+      "range": 160,
+      "trajectory": "dash",
+      "projectile": "bolt",
+      "animation": {
+        "pal": "electric",
+        "proj": "bolt"
+      },
+      "hit": "Combat.run/dash",
+      "status": {},
+      "cooldown": 1.8,
+      "damage": 64.8,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "伏特攻击 +",
+        "damage": 275.7888,
+        "cd": 1.08,
+        "radius": 260
+      }
+    },
+    {
+      "id": "spirit-shackle",
+      "name": "缝影",
+      "type": "ghost",
+      "damageClass": "physical",
+      "kind": "projectile",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "needles",
+      "range": 504,
+      "trajectory": "projectile",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow"
+      },
+      "hit": "Combat.resolve",
+      "status": {
+        "slow": 0.4
+      },
+      "cooldown": 1.4,
+      "damage": 42,
+      "count": 1,
+      "pierce": 2,
+      "evolution": {
+        "name": "缝影 +",
+        "damage": 109.62,
+        "cd": 1.0499999999999998,
+        "count": 5,
+        "pierce": 5
+      }
+    },
+    {
+      "id": "last-resort",
+      "name": "珍藏",
+      "type": "normal",
+      "damageClass": "physical",
+      "kind": "wave",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 170,
+      "trajectory": "wave",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/wave",
+      "status": {},
+      "cooldown": 2.7,
+      "damage": 70.2,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "珍藏 +",
+        "damage": 265.35600000000005,
+        "cd": 2.0250000000000004,
+        "radius": 229.50000000000003
+      }
+    },
+    {
+      "id": "darkest-lariat",
+      "name": "ＤＤ金勾臂",
+      "type": "dark",
+      "damageClass": "physical",
+      "kind": "aura",
+      "specialOnly": false,
+      "cast": "Charge",
+      "style": "wheel",
+      "range": 105,
+      "trajectory": "aura",
+      "projectile": "crescent",
+      "animation": {
+        "pal": "dark",
+        "proj": "crescent"
+      },
+      "hit": "Combat.run/aura",
+      "status": {
+        "ignoreArmor": true
+      },
+      "cooldown": 1.9,
+      "damage": 43.7,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "ＤＤ金勾臂 +",
+        "damage": 171.0855,
+        "cd": 1.3299999999999998,
+        "radius": 239.55750000000003
+      }
+    },
+    {
+      "id": "clanging-scales",
+      "name": "鳞片噪音",
+      "type": "dragon",
+      "damageClass": "special",
+      "kind": "wave",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "radial",
+      "range": 220,
+      "trajectory": "wave",
+      "projectile": "fire",
+      "animation": {
+        "pal": "dragon",
+        "proj": "fire"
+      },
+      "hit": "Combat.run/wave",
+      "status": {},
+      "cooldown": 2.1,
+      "damage": 54.6,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "鳞片噪音 +",
+        "damage": 206.388,
+        "cd": 1.5750000000000002,
+        "radius": 297
+      }
+    },
+    {
+      "id": "moongeist-beam",
+      "name": "暗影之光",
+      "type": "ghost",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "prism",
+      "range": 340,
+      "trajectory": "beam",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow"
+      },
+      "hit": "Combat.hit",
+      "status": {
+        "ignoreArmor": true
+      },
+      "cooldown": 2.5,
+      "damage": 75,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "暗影之光 +",
+        "damage": 293.625,
+        "cd": 1.59375,
+        "radius": 530.4
+      }
+    },
+    {
+      "id": "stone-edge",
+      "name": "尖石攻击",
+      "type": "rock",
+      "damageClass": "physical",
+      "kind": "mark",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "spikes",
+      "range": 70,
+      "trajectory": "mark",
+      "projectile": "rock",
+      "animation": {
+        "pal": "rock",
+        "proj": "rock"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 2,
+      "damage": 48,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "尖石攻击 +",
+        "damage": 181.43999999999997,
+        "cd": 1.5,
+        "radius": 118.12500000000001
+      }
+    },
+    {
+      "id": "spectral-thief",
+      "name": "暗影偷盗",
+      "type": "ghost",
+      "damageClass": "physical",
+      "kind": "dash",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "shadow",
+      "range": 150,
+      "trajectory": "dash",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow"
+      },
+      "hit": "Combat.run/dash",
+      "status": {
+        "stealShield": true
+      },
+      "cooldown": 1.8,
+      "damage": 64.8,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "暗影偷盗 +",
+        "damage": 275.7888,
+        "cd": 1.08,
+        "radius": 243.75
+      }
+    },
+    {
+      "id": "play-rough",
+      "name": "嬉闹",
+      "type": "fairy",
+      "damageClass": "physical",
+      "kind": "melee",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "hearts",
+      "range": 98,
+      "trajectory": "melee",
+      "projectile": "star",
+      "animation": {
+        "pal": "fairy",
+        "proj": "star"
+      },
+      "hit": "Combat.acceptMeleeHit",
+      "status": {
+        "knock": 18
+      },
+      "cooldown": 1.2,
+      "damage": 57.024,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "嬉闹 +",
+        "damage": 227.52575999999996,
+        "cd": 0.8999999999999999,
+        "radius": 159.25
+      }
+    },
+    {
+      "id": "sparkling-aria",
+      "name": "泡影的咏叹调",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "wave",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "ripple",
+      "range": 220,
+      "trajectory": "wave",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop"
+      },
+      "hit": "Combat.run/wave",
+      "status": {},
+      "cooldown": 2.1,
+      "damage": 54.6,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "泡影的咏叹调 +",
+        "damage": 206.388,
+        "cd": 1.5750000000000002,
+        "radius": 297
+      }
+    },
+    {
+      "id": "giga-impact",
+      "name": "终极冲击",
+      "type": "normal",
+      "damageClass": "physical",
+      "kind": "rolling",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "quake",
+      "range": 220,
+      "trajectory": "rolling",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/rolling",
+      "status": {
+        "knock": 28
+      },
+      "cooldown": 3,
+      "damage": 90,
+      "count": 1,
+      "pierce": 5,
+      "evolution": {
+        "name": "终极冲击 +",
+        "damage": 234.9,
+        "cd": 2.25,
+        "radius": 220,
+        "count": 5,
+        "pierce": 8
+      }
+    },
+    {
+      "id": "sunsteel-strike",
+      "name": "流星闪冲",
+      "type": "steel",
+      "damageClass": "physical",
+      "kind": "dash",
+      "specialOnly": false,
+      "cast": "Attack",
+      "style": "lance",
+      "range": 190,
+      "trajectory": "dash",
+      "projectile": "shard",
+      "animation": {
+        "pal": "steel",
+        "proj": "shard"
+      },
+      "hit": "Combat.run/dash",
+      "status": {
+        "ignoreArmor": true
+      },
+      "cooldown": 2.5,
+      "damage": 90,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "流星闪冲 +",
+        "damage": 383.03999999999996,
+        "cd": 1.5,
+        "radius": 308.75
+      }
+    },
+    {
+      "id": "natures-madness",
+      "name": "自然之怒",
+      "type": "fairy",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "sigil",
+      "range": 68,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "fairy",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 2.3,
+      "damage": 55.2,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "自然之怒 +",
+        "damage": 208.656,
+        "cd": 1.7249999999999999,
+        "radius": 114.75000000000001
+      }
+    },
+    {
+      "id": "photon-geyser",
+      "name": "光子喷涌",
+      "type": "psychic",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "charge",
+      "range": 310,
+      "trajectory": "beam",
+      "projectile": "ring",
+      "animation": {
+        "pal": "psychic",
+        "proj": "ring"
+      },
+      "hit": "Combat.hit",
+      "status": {},
+      "cooldown": 2.3,
+      "damage": 69,
+      "count": 1,
+      "pierce": 0,
+      "evolution": {
+        "name": "光子喷涌 +",
+        "damage": 270.135,
+        "cd": 1.4662499999999998,
+        "radius": 483.59999999999997
+      }
+    },
+    {
+      "id": "seed-bomb",
+      "name": "种子炸弹",
+      "type": "grass",
+      "damageClass": "physical",
+      "kind": "lob",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "seed",
+      "range": 72,
+      "trajectory": "lob",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf"
+      },
+      "hit": "Combat.run/lob",
+      "status": {},
+      "cooldown": 1.7,
+      "damage": 30,
+      "count": 2,
+      "pierce": 0,
+      "evolution": {
+        "name": "种子炸弹 +",
+        "damage": 73.95,
+        "cd": 1.275,
+        "radius": 86.39999999999999,
+        "count": 6,
+        "pierce": 1
+      }
+    },
+    {
+      "id": "dragon-darts",
+      "name": "龙箭",
+      "type": "dragon",
+      "damageClass": "physical",
+      "kind": "split",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "fork",
+      "range": 390,
+      "trajectory": "split",
+      "projectile": "fire",
+      "animation": {
+        "pal": "dragon",
+        "proj": "fire"
+      },
+      "hit": "Combat.run/split",
+      "status": {},
+      "cooldown": 1.3,
+      "damage": 19.5,
+      "count": 2,
+      "pierce": 1,
+      "evolution": {
+        "name": "龙箭 +",
+        "damage": 50.894999999999996,
+        "cd": 0.9750000000000001,
+        "count": 6,
+        "pierce": 4
+      }
+    },
+    {
+      "id": "magical-leaf",
+      "name": "魔法叶",
+      "type": "grass",
+      "damageClass": "special",
+      "kind": "curve",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "leaves",
+      "range": 352,
+      "trajectory": "curve",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf"
+      },
+      "hit": "Combat.run/curve",
+      "status": {},
+      "cooldown": 1.1,
+      "damage": 18,
+      "count": 3,
+      "pierce": 1,
+      "evolution": {
+        "name": "魔法叶 +",
+        "damage": 46.98,
+        "cd": 0.8250000000000001,
+        "count": 7,
+        "pierce": 4
+      }
+    },
+    {
+      "id": "water-shuriken",
+      "name": "飞水手里剑",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "ricochet",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "wheel",
+      "range": 465,
+      "trajectory": "ricochet",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop"
+      },
+      "hit": "Combat.run/ricochet",
+      "status": {},
+      "cooldown": 1,
+      "damage": 15,
+      "count": 3,
+      "pierce": 3,
+      "evolution": {
+        "name": "飞水手里剑 +",
+        "damage": 39.15,
+        "cd": 0.75,
+        "count": 7,
+        "pierce": 6
+      }
+    },
+    {
+      "id": "rollout",
+      "name": "滚动",
+      "type": "rock",
+      "damageClass": "physical",
+      "kind": "rolling",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "rock",
+      "range": 324,
+      "trajectory": "rolling",
+      "projectile": "rock",
+      "animation": {
+        "pal": "rock",
+        "proj": "rock"
+      },
+      "hit": "Combat.run/rolling",
+      "status": {},
+      "cooldown": 1.6,
+      "damage": 48,
+      "count": 1,
+      "pierce": 4,
+      "evolution": {
+        "name": "滚动 +",
+        "damage": 125.27999999999999,
+        "cd": 1.2000000000000002,
+        "count": 5,
+        "pierce": 7
+      }
+    },
+    {
+      "id": "mystical-fire",
+      "name": "魔法火焰",
+      "type": "fire",
+      "damageClass": "special",
+      "kind": "spiral",
+      "specialOnly": false,
+      "cast": "Shoot",
+      "style": "vortex",
+      "range": 270,
+      "trajectory": "spiral",
+      "projectile": "fire",
+      "animation": {
+        "pal": "fire",
+        "proj": "fire"
+      },
+      "hit": "Combat.run/spiral",
+      "status": {
+        "burn": 0.5
+      },
+      "cooldown": 1.7,
+      "damage": 25.5,
+      "count": 4,
+      "pierce": 2,
+      "evolution": {
+        "name": "魔法火焰 +",
+        "damage": 66.555,
+        "cd": 1.275,
+        "count": 8,
+        "pierce": 5
+      }
+    },
+    {
+      "id": "z-normal",
+      "name": "究极无敌大冲撞",
+      "type": "normal",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-fire",
+      "name": "超强极限爆焰弹",
+      "type": "fire",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "flame",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "fire",
+      "animation": {
+        "pal": "fire",
+        "proj": "fire"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-water",
+      "name": "超级水流大漩涡",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "wave",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-electric",
+      "name": "终极伏特狂雷闪",
+      "type": "electric",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "fork",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "bolt",
+      "animation": {
+        "pal": "electric",
+        "proj": "bolt"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-grass",
+      "name": "绚烂缤纷花怒放",
+      "type": "grass",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "vine",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-ice",
+      "name": "激狂大地万里冰",
+      "type": "ice",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "frost",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "shard",
+      "animation": {
+        "pal": "ice",
+        "proj": "shard"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-fighting",
+      "name": "全力无双激烈拳",
+      "type": "fighting",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "ball",
+      "animation": {
+        "pal": "fighting",
+        "proj": "ball"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-poison",
+      "name": "强酸剧毒灭绝雨",
+      "type": "poison",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "vortex",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "blob",
+      "animation": {
+        "pal": "poison",
+        "proj": "blob"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-ground",
+      "name": "地隆啸天大终结",
+      "type": "ground",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "fissure",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "blob",
+      "animation": {
+        "pal": "ground",
+        "proj": "blob"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-flying",
+      "name": "极速俯冲轰烈撞",
+      "type": "flying",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "feather",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "wind",
+      "animation": {
+        "pal": "flying",
+        "proj": "wind"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-psychic",
+      "name": "至高精神破坏波",
+      "type": "psychic",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "sigil",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "ring",
+      "animation": {
+        "pal": "psychic",
+        "proj": "ring"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-bug",
+      "name": "绝对捕食回旋斩",
+      "type": "bug",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "seed",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "needle",
+      "animation": {
+        "pal": "bug",
+        "proj": "needle"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-rock",
+      "name": "毁天灭地巨岩坠",
+      "type": "rock",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "rock",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "rock",
+      "animation": {
+        "pal": "rock",
+        "proj": "rock"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-ghost",
+      "name": "无尽暗夜之诱惑",
+      "type": "ghost",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "shadow",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-dragon",
+      "name": "究极巨龙震天地",
+      "type": "dragon",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "dragon",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "fire",
+      "animation": {
+        "pal": "dragon",
+        "proj": "fire"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-dark",
+      "name": "黑洞吞噬万物灭",
+      "type": "dark",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "jaws",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "crescent",
+      "animation": {
+        "pal": "dark",
+        "proj": "crescent"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-steel",
+      "name": "超绝螺旋连击",
+      "type": "steel",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "claw",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "shard",
+      "animation": {
+        "pal": "steel",
+        "proj": "shard"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-fairy",
+      "name": "可爱星星飞天撞",
+      "type": "fairy",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "sigil",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "fairy",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 100,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "stoked-sparksurfer",
+      "name": "驾雷驭电戏冲浪",
+      "type": "electric",
+      "damageClass": "special",
+      "kind": "wave",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "fork",
+      "range": 220,
+      "trajectory": "wave",
+      "projectile": "bolt",
+      "animation": {
+        "pal": "electric",
+        "proj": "bolt"
+      },
+      "hit": "Combat.run/wave",
+      "status": {
+        "slow": 0.65
+      },
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "sinister-arrow-raid",
+      "name": "遮天蔽日暗影箭",
+      "type": "ghost",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "shadow",
+      "range": 220,
+      "trajectory": "beam",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow"
+      },
+      "hit": "Combat.hit",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "extreme-evoboost",
+      "name": "九彩升华齐聚顶",
+      "type": "normal",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "malicious-moonsault",
+      "name": "极恶飞跃粉碎击",
+      "type": "dark",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "jaws",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "crescent",
+      "animation": {
+        "pal": "dark",
+        "proj": "crescent"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "clangorous-soulblaze",
+      "name": "炽魂热舞烈音爆",
+      "type": "dragon",
+      "damageClass": "special",
+      "kind": "nova",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "dragon",
+      "range": 220,
+      "trajectory": "nova",
+      "projectile": "fire",
+      "animation": {
+        "pal": "dragon",
+        "proj": "fire"
+      },
+      "hit": "Combat.run/nova",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "menacing-moonraze-maelstrom",
+      "name": "月华飞溅落灵霄",
+      "type": "ghost",
+      "damageClass": "special",
+      "kind": "beam",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "shadow",
+      "range": 220,
+      "trajectory": "beam",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow"
+      },
+      "hit": "Combat.hit",
+      "status": {
+        "ignoreArmor": true
+      },
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "splintered-stormshards",
+      "name": "狼啸石牙飓风暴",
+      "type": "rock",
+      "damageClass": "special",
+      "kind": "meteor",
+      "specialOnly": true,
+      "cast": "Charge",
+      "style": "rock",
+      "range": 220,
+      "trajectory": "meteor",
+      "projectile": "rock",
+      "animation": {
+        "pal": "rock",
+        "proj": "rock"
+      },
+      "hit": "Combat.run/meteor",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "soul-stealing-7-star-strike",
+      "name": "七星夺魂腿",
+      "type": "ghost",
+      "damageClass": "special",
+      "kind": "dash",
+      "specialOnly": true,
+      "cast": "Attack",
+      "style": "shadow",
+      "range": 220,
+      "trajectory": "dash",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow"
+      },
+      "hit": "Combat.run/dash",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "genesis-supernova",
+      "name": "起源超新星大爆炸",
+      "type": "psychic",
+      "damageClass": "special",
+      "kind": "wave",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "sigil",
+      "range": 220,
+      "trajectory": "wave",
+      "projectile": "ring",
+      "animation": {
+        "pal": "psychic",
+        "proj": "ring"
+      },
+      "hit": "Combat.run/wave",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "lets-snuggle-forever",
+      "name": "Let's Snuggle Forever",
+      "type": "fairy",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "sigil",
+      "range": 220,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "fairy",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "catastropika",
+      "name": "皮卡皮卡必杀击",
+      "type": "electric",
+      "damageClass": "special",
+      "kind": "dash",
+      "specialOnly": true,
+      "cast": "Attack",
+      "style": "fork",
+      "range": 220,
+      "trajectory": "dash",
+      "projectile": "bolt",
+      "animation": {
+        "pal": "electric",
+        "proj": "bolt"
+      },
+      "hit": "Combat.run/dash",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "oceanic-operetta",
+      "name": "海神庄严交响乐",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "wave",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "wave",
+      "range": 220,
+      "trajectory": "wave",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop"
+      },
+      "hit": "Combat.run/wave",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "pulverizing-pancake",
+      "name": "认真起来大爆击",
+      "type": "normal",
+      "damageClass": "special",
+      "kind": "rolling",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 220,
+      "trajectory": "rolling",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/rolling",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "searing-sunraze-smash",
+      "name": "日光回旋下苍穹",
+      "type": "steel",
+      "damageClass": "special",
+      "kind": "dash",
+      "specialOnly": true,
+      "cast": "Attack",
+      "style": "claw",
+      "range": 220,
+      "trajectory": "dash",
+      "projectile": "shard",
+      "animation": {
+        "pal": "steel",
+        "proj": "shard"
+      },
+      "hit": "Combat.run/dash",
+      "status": {
+        "ignoreArmor": true
+      },
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "guardian-of-alola",
+      "name": "巨人卫士・阿罗拉",
+      "type": "fairy",
+      "damageClass": "special",
+      "kind": "guardian",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "sigil",
+      "range": 220,
+      "trajectory": "guardian",
+      "projectile": "star",
+      "animation": {
+        "pal": "fairy",
+        "proj": "star"
+      },
+      "hit": "Combat.run/guardian",
+      "status": {},
+      "cooldown": 999,
+      "damage": 160,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-normal",
+      "name": "极巨攻击",
+      "type": "normal",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-fire",
+      "name": "极巨火爆",
+      "type": "fire",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "flame",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "fire",
+      "animation": {
+        "pal": "fire",
+        "proj": "fire"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-water",
+      "name": "极巨水流",
+      "type": "water",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "wave",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "drop",
+      "animation": {
+        "pal": "water",
+        "proj": "drop"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-electric",
+      "name": "极巨闪电",
+      "type": "electric",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "fork",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "bolt",
+      "animation": {
+        "pal": "electric",
+        "proj": "bolt"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-grass",
+      "name": "极巨草原",
+      "type": "grass",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "vine",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "leaf",
+      "animation": {
+        "pal": "grass",
+        "proj": "leaf"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-ice",
+      "name": "极巨寒冰",
+      "type": "ice",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "frost",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "shard",
+      "animation": {
+        "pal": "ice",
+        "proj": "shard"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-fighting",
+      "name": "极巨拳斗",
+      "type": "fighting",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "ball",
+      "animation": {
+        "pal": "fighting",
+        "proj": "ball"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-poison",
+      "name": "极巨酸毒",
+      "type": "poison",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "vortex",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "blob",
+      "animation": {
+        "pal": "poison",
+        "proj": "blob"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-ground",
+      "name": "极巨大地",
+      "type": "ground",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "fissure",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "blob",
+      "animation": {
+        "pal": "ground",
+        "proj": "blob"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-flying",
+      "name": "极巨飞冲",
+      "type": "flying",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "feather",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "wind",
+      "animation": {
+        "pal": "flying",
+        "proj": "wind"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-psychic",
+      "name": "极巨超能",
+      "type": "psychic",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "sigil",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "ring",
+      "animation": {
+        "pal": "psychic",
+        "proj": "ring"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-bug",
+      "name": "极巨虫蛊",
+      "type": "bug",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "seed",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "needle",
+      "animation": {
+        "pal": "bug",
+        "proj": "needle"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-rock",
+      "name": "极巨岩石",
+      "type": "rock",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "rock",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "rock",
+      "animation": {
+        "pal": "rock",
+        "proj": "rock"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-ghost",
+      "name": "极巨幽魂",
+      "type": "ghost",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "shadow",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "shadow",
+      "animation": {
+        "pal": "ghost",
+        "proj": "shadow"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-dragon",
+      "name": "极巨龙骑",
+      "type": "dragon",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "dragon",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "fire",
+      "animation": {
+        "pal": "dragon",
+        "proj": "fire"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-dark",
+      "name": "极巨恶霸",
+      "type": "dark",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "jaws",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "crescent",
+      "animation": {
+        "pal": "dark",
+        "proj": "crescent"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-steel",
+      "name": "极巨钢铁",
+      "type": "steel",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "claw",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "shard",
+      "animation": {
+        "pal": "steel",
+        "proj": "shard"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-fairy",
+      "name": "极巨妖精",
+      "type": "fairy",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "sigil",
+      "range": 100,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "fairy",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 50,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "z-support",
+      "name": "Z辅助强化",
+      "type": "normal",
+      "damageClass": "special",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 1,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 0,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    },
+    {
+      "id": "max-guard",
+      "name": "极巨防壁",
+      "type": "normal",
+      "damageClass": "status",
+      "kind": "mark",
+      "specialOnly": true,
+      "cast": "Shoot",
+      "style": "impact",
+      "range": 1,
+      "trajectory": "mark",
+      "projectile": "star",
+      "animation": {
+        "pal": "normal",
+        "proj": "star"
+      },
+      "hit": "Combat.run/mark",
+      "status": {},
+      "cooldown": 999,
+      "damage": 0,
+      "count": 1,
+      "pierce": 0,
+      "evolution": null
+    }
+  ]
+}

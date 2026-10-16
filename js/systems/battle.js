@@ -59,7 +59,7 @@ G.Battle=(()=>{
     if(interval&&b.blockT<=0){b.block=1;b.blockT=interval;}
     const shield=passive(p,'shield');if(shield&&b.shieldT<=0){b.shield=Math.max(b.shield,p.maxHp*shield);b.shieldT=8;}
     const regen=passive(p,'regen')+(!p.walking?passive(p,'root'):0)+(trait(p).key==='sustain'?.004:0);
-    if(regen)p.hp=Math.min(p.maxHp,p.hp+p.maxHp*regen*dt);
+    if(regen){const hp=p.hp;p.hp=Math.min(p.maxHp,p.hp+p.maxHp*regen*dt);G.Telemetry?.add(p,'healed',p.hp-hp);}
     if(b.form){b.remaining=Math.max(0,b.remaining-dt);if(b.remaining===0)endForm(p);}
     visual(p);
   }

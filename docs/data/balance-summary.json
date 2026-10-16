@@ -1,0 +1,482 @@
+{
+  "baseline": "0ce1d685",
+  "version": "0.16.4",
+  "seeds": [
+    1,
+    17,
+    101
+  ],
+  "growth": [
+    {
+      "profile": "melee",
+      "time": 0,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 1,
+      "modifiedMedianLevel": 1
+    },
+    {
+      "profile": "melee",
+      "time": 180,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 16,
+      "modifiedMedianLevel": 14
+    },
+    {
+      "profile": "melee",
+      "time": 360,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 29,
+      "modifiedMedianLevel": 28
+    },
+    {
+      "profile": "melee",
+      "time": 600,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 39,
+      "modifiedMedianLevel": 37
+    },
+    {
+      "profile": "melee",
+      "time": 900,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 51,
+      "modifiedMedianLevel": 46
+    },
+    {
+      "profile": "melee",
+      "time": 1200,
+      "baselineAlive": 2,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 78,
+      "modifiedMedianLevel": 52
+    },
+    {
+      "profile": "melee",
+      "time": 1500,
+      "baselineAlive": 2,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 87.5,
+      "modifiedMedianLevel": 57
+    },
+    {
+      "profile": "melee",
+      "time": 1800,
+      "baselineAlive": 2,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 94,
+      "modifiedMedianLevel": 60
+    },
+    {
+      "profile": "ranged",
+      "time": 0,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 1,
+      "modifiedMedianLevel": 1
+    },
+    {
+      "profile": "ranged",
+      "time": 180,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 16,
+      "modifiedMedianLevel": 13
+    },
+    {
+      "profile": "ranged",
+      "time": 360,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 33,
+      "modifiedMedianLevel": 28
+    },
+    {
+      "profile": "ranged",
+      "time": 600,
+      "baselineAlive": 3,
+      "modifiedAlive": 1,
+      "baselineMedianLevel": 65,
+      "modifiedMedianLevel": 45
+    },
+    {
+      "profile": "ranged",
+      "time": 900,
+      "baselineAlive": 3,
+      "modifiedAlive": 1,
+      "baselineMedianLevel": 99,
+      "modifiedMedianLevel": 59
+    },
+    {
+      "profile": "ranged",
+      "time": 1200,
+      "baselineAlive": 3,
+      "modifiedAlive": 0,
+      "baselineMedianLevel": 124,
+      "modifiedMedianLevel": null
+    },
+    {
+      "profile": "ranged",
+      "time": 1500,
+      "baselineAlive": 2,
+      "modifiedAlive": 0,
+      "baselineMedianLevel": 161,
+      "modifiedMedianLevel": null
+    },
+    {
+      "profile": "ranged",
+      "time": 1800,
+      "baselineAlive": 2,
+      "modifiedAlive": 0,
+      "baselineMedianLevel": 192,
+      "modifiedMedianLevel": null
+    },
+    {
+      "profile": "tank",
+      "time": 0,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 1,
+      "modifiedMedianLevel": 1
+    },
+    {
+      "profile": "tank",
+      "time": 180,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 16,
+      "modifiedMedianLevel": 14
+    },
+    {
+      "profile": "tank",
+      "time": 360,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 27,
+      "modifiedMedianLevel": 24
+    },
+    {
+      "profile": "tank",
+      "time": 600,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 34,
+      "modifiedMedianLevel": 34
+    },
+    {
+      "profile": "tank",
+      "time": 900,
+      "baselineAlive": 3,
+      "modifiedAlive": 3,
+      "baselineMedianLevel": 44,
+      "modifiedMedianLevel": 39
+    },
+    {
+      "profile": "tank",
+      "time": 1200,
+      "baselineAlive": 2,
+      "modifiedAlive": 1,
+      "baselineMedianLevel": 62,
+      "modifiedMedianLevel": 55
+    },
+    {
+      "profile": "tank",
+      "time": 1500,
+      "baselineAlive": 2,
+      "modifiedAlive": 1,
+      "baselineMedianLevel": 67,
+      "modifiedMedianLevel": 59
+    },
+    {
+      "profile": "tank",
+      "time": 1800,
+      "baselineAlive": 1,
+      "modifiedAlive": 1,
+      "baselineMedianLevel": 92,
+      "modifiedMedianLevel": 64
+    }
+  ],
+  "combat": [
+    {
+      "kind": "moving",
+      "baseline": {
+        "cleared": 273,
+        "alive": 279
+      },
+      "modified": {
+        "cleared": 273,
+        "alive": 279
+      }
+    },
+    {
+      "kind": "surround",
+      "baseline": {
+        "cleared": 0,
+        "alive": 33
+      },
+      "modified": {
+        "cleared": 0,
+        "alive": 51
+      }
+    },
+    {
+      "kind": "boss",
+      "baseline": {
+        "cleared": 152,
+        "alive": 271
+      },
+      "modified": {
+        "cleared": 140,
+        "alive": 271
+      }
+    }
+  ],
+  "paired": [
+    {
+      "dex": 208,
+      "move": "tackle",
+      "idleDamage": 257.4,
+      "movingDamage": 0,
+      "idleKps": 2.7337889648274714,
+      "movingKps": 1.5669278213035507,
+      "idleAlive": 2,
+      "movingAlive": 3
+    },
+    {
+      "dex": 208,
+      "move": "aura-sphere",
+      "idleDamage": 123.1,
+      "movingDamage": 0,
+      "idleKps": 1.5391454131244096,
+      "movingKps": 1.4391287436795022,
+      "idleAlive": 2,
+      "movingAlive": 3
+    },
+    {
+      "dex": 242,
+      "move": "tackle",
+      "idleDamage": 254.2,
+      "movingDamage": 0,
+      "idleKps": 2.7337889648274714,
+      "movingKps": 1.605823192754348,
+      "idleAlive": 2,
+      "movingAlive": 3
+    },
+    {
+      "dex": 242,
+      "move": "aura-sphere",
+      "idleDamage": 223.1,
+      "movingDamage": 0,
+      "idleKps": 1.522475968216925,
+      "movingKps": 1.4502417069511586,
+      "idleAlive": 3,
+      "movingAlive": 3
+    },
+    {
+      "dex": 101,
+      "move": "tackle",
+      "idleDamage": 321.9,
+      "movingDamage": 0,
+      "idleKps": 2.7337889648274714,
+      "movingKps": 1.4835805967661277,
+      "idleAlive": 2,
+      "movingAlive": 3
+    },
+    {
+      "dex": 101,
+      "move": "aura-sphere",
+      "idleDamage": 106.4,
+      "movingDamage": 0,
+      "idleKps": 1.5391454131244096,
+      "movingKps": 1.4391287436795022,
+      "idleAlive": 3,
+      "movingAlive": 3
+    },
+    {
+      "dex": 143,
+      "move": "tackle",
+      "idleDamage": 294.6,
+      "movingDamage": 0,
+      "idleKps": 2.7337889648274714,
+      "movingKps": 1.5669278213035507,
+      "idleAlive": 2,
+      "movingAlive": 3
+    },
+    {
+      "dex": 143,
+      "move": "aura-sphere",
+      "idleDamage": 237,
+      "movingDamage": 0,
+      "idleKps": 1.5391454131244096,
+      "movingKps": 1.4224592987720175,
+      "idleAlive": 3,
+      "movingAlive": 3
+    },
+    {
+      "dex": 213,
+      "move": "tackle",
+      "idleDamage": 191.7,
+      "movingDamage": 0,
+      "idleKps": 2.7337889648274714,
+      "movingKps": 1.7169528254709119,
+      "idleAlive": 2,
+      "movingAlive": 3
+    },
+    {
+      "dex": 213,
+      "move": "aura-sphere",
+      "idleDamage": 178.8,
+      "movingDamage": 0,
+      "idleKps": 1.5391454131244096,
+      "movingKps": 1.4502417069511586,
+      "idleAlive": 3,
+      "movingAlive": 3
+    }
+  ],
+  "threeMinuteIdle": {
+    "before": {
+      "seconds": 179.97,
+      "damage": 107.5
+    },
+    "after": {
+      "seconds": 106.97,
+      "damage": 105
+    }
+  },
+  "fullRunSamples": {
+    "baseline": [
+      {
+        "profile": "melee",
+        "seed": 1,
+        "seconds": 1799.97,
+        "level": 79,
+        "alive": 1
+      },
+      {
+        "profile": "melee",
+        "seed": 17,
+        "seconds": 1074.33,
+        "level": 50,
+        "alive": 0
+      },
+      {
+        "profile": "melee",
+        "seed": 101,
+        "seconds": 1799.97,
+        "level": 109,
+        "alive": 1
+      },
+      {
+        "profile": "ranged",
+        "seed": 1,
+        "seconds": 1373.1,
+        "level": 139,
+        "alive": 0
+      },
+      {
+        "profile": "ranged",
+        "seed": 17,
+        "seconds": 1799.97,
+        "level": 180,
+        "alive": 1
+      },
+      {
+        "profile": "ranged",
+        "seed": 101,
+        "seconds": 1799.97,
+        "level": 204,
+        "alive": 1
+      },
+      {
+        "profile": "tank",
+        "seed": 1,
+        "seconds": 1799.97,
+        "level": 92,
+        "alive": 1
+      },
+      {
+        "profile": "tank",
+        "seed": 17,
+        "seconds": 1562.73,
+        "level": 49,
+        "alive": 0
+      },
+      {
+        "profile": "tank",
+        "seed": 101,
+        "seconds": 992,
+        "level": 48,
+        "alive": 0
+      }
+    ],
+    "modified": [
+      {
+        "profile": "melee",
+        "seed": 1,
+        "seconds": 1799.97,
+        "level": 72,
+        "alive": 1
+      },
+      {
+        "profile": "melee",
+        "seed": 17,
+        "seconds": 1799.97,
+        "level": 48,
+        "alive": 1
+      },
+      {
+        "profile": "melee",
+        "seed": 101,
+        "seconds": 1799.97,
+        "level": 60,
+        "alive": 1
+      },
+      {
+        "profile": "ranged",
+        "seed": 1,
+        "seconds": 536.83,
+        "level": 40,
+        "alive": 0
+      },
+      {
+        "profile": "ranged",
+        "seed": 17,
+        "seconds": 544.83,
+        "level": 41,
+        "alive": 0
+      },
+      {
+        "profile": "ranged",
+        "seed": 101,
+        "seconds": 1049.73,
+        "level": 63,
+        "alive": 0
+      },
+      {
+        "profile": "tank",
+        "seed": 1,
+        "seconds": 1799.97,
+        "level": 64,
+        "alive": 1
+      },
+      {
+        "profile": "tank",
+        "seed": 17,
+        "seconds": 968.03,
+        "level": 38,
+        "alive": 0
+      },
+      {
+        "profile": "tank",
+        "seed": 101,
+        "seconds": 1013.8,
+        "level": 41,
+        "alive": 0
+      }
+    ]
+  }
+}
