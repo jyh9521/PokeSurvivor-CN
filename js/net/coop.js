@@ -23,7 +23,7 @@
  */
 G.Coop = (() => {
   const ANIMS = ['Idle', 'Walk', 'Attack', 'Shoot', 'Charge', 'Hurt', 'Faint','Strike','Swing','Double','Hop','Rotate'];
-  const COLORS = ['#ffcb3d', '#5fc8ff', '#7ee07a', '#ff8ad8'];
+  const COLORS = ['#ffcb3d', '#5fc8ff', '#7ee07a', '#ff8ad8', '#c7a0ff', '#ff9c55', '#70e3d1', '#d8e878'];
   // Mensajes por segundo: 15 directo, 4 por el TURN de Cloudflare (se paga por
   // GB: era 7 y se iban unos 110 GB al día, el 12-10-2026) y 3 por el relé de
   // la Realtime Database (1 $ el GB: sólo si todo lo demás falla).

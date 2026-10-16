@@ -82,7 +82,7 @@ G.MenuUI = (() => {
         socialLine();
       });
     }
-    G.InvitePop.refresh();
+    G.InvitePop.refresh();G.ChallengeUI?.availability();
   }
 
   /** Texto bajo "Amigos" y "Jugar": quién está en línea, solicitudes, sala. */

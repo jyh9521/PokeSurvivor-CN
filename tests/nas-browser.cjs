@@ -40,7 +40,7 @@ fs.mkdirSync(OUT,{recursive:true});
     await a.evaluate(()=>{G.DB.save.coins-=11;G.DB.commit();return G.NAS.flush();});
     check('concurrent update retains both versions instead of overwriting',await a.evaluate(()=>!!G.NAS.conflict)&&app.store.getSave(uid).save.coins===(await c.evaluate(()=>G.DB.save.coins)));
     await a.locator('#btn-settings').click();await a.locator('#set-tabs [data-t="acc"]').click();
-    check('conflict resolution exposed in account UI',await a.locator('[data-nas="nas"]').isVisible());await a.locator('[data-nas="nas"]').click();await a.locator('#set-close').click();
+    check('conflict resolution exposed in account UI',await a.locator('[data-nas="nas"]').isVisible());await a.locator('[data-nas="nas"]').click();await a.locator('#dialog-confirm').click();await a.waitForFunction(()=>!G.NAS.conflict);await a.locator('#set-close').click();
     check('explicit NAS resolution keeps coin balance exact',await a.evaluate(()=>G.DB.save.coins)==app.store.getSave(uid).save.coins);
     await cc.close();await a.reload();await a.waitForFunction(()=>G.NAS.user&&document.getElementById('boot').classList.contains('hidden'));if(await a.locator('#tap-start').isVisible())await a.locator('#tap-start').click();
     // Offline writes persist first. A genuine failed API request exercises the retry path.

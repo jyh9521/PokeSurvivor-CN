@@ -12,7 +12,16 @@ G.NasUI=(()=>{
       <button class="btn small" data-nas="sync">${T('Sincronizar ahora')}</button>
       <button class="btn small" data-nas="export">${T('Exportar copia local')}</button>
       ${G.NAS.conflict?`<p>${T('Conflicto: conserva ambas partidas')} · ${esc((G.NAS.conflict.differences||[]).map(k=>T(k==='economy'?'Monedas, tickets o recompensas':k==='base-expired'?'Copia base caducada':k)).join(' / '))}</p><button class="btn small" data-nas="browser">${T('Usar copia del navegador')}</button> <button class="btn small" data-nas="nas">${T('Usar copia del NAS')}</button>`:''}`;
-    if(G.NAS.conflict?.save){const difference=document.createElement('p'),a=G.DB.save,b=G.NAS.conflict.save;difference.className='sub';difference.textContent=T('Navegador / NAS')+' · '+T('Monedas')+': '+a.coins+' / '+b.coins+' · '+T('Tickets')+': '+a.tickets.t1+','+a.tickets.t10+' / '+b.tickets.t1+','+b.tickets.t10+' · '+T('Colección')+': '+Object.keys(a.owned).length+' / '+Object.keys(b.owned).length;panel.append(difference);}
+    if(G.NAS.conflict?.save){
+      const a=G.SaveDiff.summary(G.DB.save,G.NAS.revision),b=G.SaveDiff.summary(G.NAS.conflict.save,G.NAS.conflict.rev);
+      const table=document.createElement('table');table.className='save-comparison';table.innerHTML=`<thead><tr><th>${T('Campo')}</th><th>${T('Navegador')}</th><th>NAS</th></tr></thead>`;
+      const labels={rev:'Revisión',updated:'Último guardado',coins:'Monedas',t1:'Ticket individual',t10:'Ticket diez',owned:'Colección',shiny:'Shinies',upgrades:'Mejoras'};
+      const body=document.createElement('tbody');for(const k of Object.keys(a)){const tr=document.createElement('tr');for(const v of [T(labels[k]),k==='updated'?(a[k]?new Date(a[k]).toLocaleString(G.I18n.lang):'—'):a[k],k==='updated'?(b[k]?new Date(b[k]).toLocaleString(G.I18n.lang):'—'):b[k]]){const td=document.createElement('td');td.textContent=v;tr.append(td);}body.append(tr);}table.append(body);panel.append(table);
+      const detail=document.createElement('p');detail.className='sub';detail.textContent=T('Las colecciones se conservan de ambas copias. Monedas, tickets, mejoras y premios usan solo la copia elegida; nunca se suman.');panel.append(detail);
+      const changed=document.createElement('p');changed.className='sub';changed.textContent=T('Campos distintos')+': '+G.SaveDiff.compare(G.DB.save,G.NAS.conflict.save).join(', ');panel.append(changed);
+      const exportBoth=document.createElement('button');exportBoth.className='btn small gold';exportBoth.dataset.nas='export-both';exportBoth.textContent=T('Exportar ambas copias antes de elegir');panel.append(exportBoth);
+    }
+
     const nickname=document.createElement('div');nickname.className='set-row nickname-row';
     const label=document.createElement('label');label.textContent=T('Apodo público');label.htmlFor='nas-nickname';
     const input=document.createElement('input');input.id='nas-nickname';input.className='field';input.maxLength=32;input.value=G.NAS.user.nick||G.NAS.user.name;input.setAttribute('translate','no');input.setAttribute('autocomplete','off');
@@ -22,8 +31,8 @@ G.NasUI=(()=>{
       const action=b.dataset.nas;
       if(action==='reauth'){const p=await G.Dialog.password(T('Contraseña de tu cuenta de juego'));if(p){const r=await G.NAS.reauthenticate(p);if(!r.ok)throw Error(r.error);}}
       if(action==='sync')await G.NAS.refreshSave();
-      if(action==='browser'||action==='nas')await G.NAS.resolve(action);
-      if(action==='export'){const blob=new Blob([JSON.stringify({save:G.DB.save,conflict:G.NAS.conflict},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pokesurvivor-local-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+      if(action==='browser'||action==='nas'){if(!(await G.Dialog.confirm(action==='nas'?'Usar la economía del NAS y conservar las colecciones de ambas copias. ¿Continuar?':'Usar la economía del navegador y conservar las colecciones de ambas copias. ¿Continuar?',{danger:true})))return;await G.NAS.resolve(action);}
+      if(action==='export'||action==='export-both'){const blob=new Blob([JSON.stringify(G.NAS.exportCopies(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pokesurvivor-local-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
       G.SettingsUI.open('acc');
     }catch(e){G.UI.toast(e.message,5000);}finally{b.disabled=false;}});
   }

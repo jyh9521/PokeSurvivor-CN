@@ -269,6 +269,6 @@ G.UI = (() => {
     return cv;
   }
 
-  return { $, show, hide, hideAll, isOpen, chrome, refreshCoins, toast, typeChips, stars, confirmDelete,
+  return { registerScreen(id){if(!SCREENS.includes(id))SCREENS.push(id);}, $, show, hide, hideAll, isOpen, chrome, refreshCoins, toast, typeChips, stars, confirmDelete,
            sprite, spriteCanvas, tick, initChrome, soundControls };
 })();

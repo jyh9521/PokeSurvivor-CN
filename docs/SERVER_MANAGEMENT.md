@@ -72,3 +72,7 @@ HTTP 协议来自 PerformanceResourceTiming。体积差仅表明压缩，不能�
 自动化使用临时数据库、独立 Chrome 上下文和实际本机 WebSocket/WebRTC；
 浏览器注入伤害/复活场景只验证事件和统计链路，不代表真实跨国网络或物理手柄验收。
 NAS 部署须执行更新命令；本地测试不修改线上账号或存档。
+
+## 0.9.0 冲突交互补充
+
+现已增加修订号、时间和字段对照，导出两份原始快照与二次确认；选定经济分支后保留两份安全收藏的并集，备份失败时保持冲突。详情见 [COMMUNITY_EXPANSION.md](COMMUNITY_EXPANSION.md)。

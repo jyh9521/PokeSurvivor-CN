@@ -13,8 +13,9 @@ G.NAS = (() => {
   let health=G.RelayHealth.create();
   const probesAnswered=new Map();
   const flow=G.RelayFlow.create({onSent:value=>{if(value.type==='relay'&&(value.data?.k==='f'||value.data?.lane==='state'))health.tx(value.to);}});
-  const direct=G.DirectLink.create({signal:(to,data)=>rawRelay(to,{k:'rtc-signal',...data}),relay:rawRelay,deliver:deliver,sent:uid=>health.tx(uid),changed:(uid,mode)=>{if(mode==='overflow'){action('room/leave',{});G.UI?.toast(G.T('Demasiados eventos pendientes; vuelve a la sala.'));}else peers.forEach(f=>f(uid,social.room?.members.find(m=>m.uid===uid)?.connected===false?'reconnecting':mode));}});
-  const interval=()=>flow.congested(socket)||serverBuffered>=65536?1/5:1/15;
+  const quality=G.NetworkQuality.create();
+  const direct=G.DirectLink.create({batchAcks:()=>social.room?.experiment===true,signal:(to,data)=>rawRelay(to,{k:'rtc-signal',...data}),relay:rawRelay,deliver:deliver,sent:uid=>health.tx(uid),changed:(uid,mode)=>{if(mode==='overflow'){action('room/leave',{});G.UI?.toast(G.T('Demasiados eventos pendientes; vuelve a la sala.'));}else peers.forEach(f=>f(uid,social.room?.members.find(m=>m.uid===uid)?.connected===false?'reconnecting':mode));}});
+  const interval=uid=>{const directPath=direct.mode(uid)==='direct',pressure=direct.pressure(uid);return quality.interval(uid||'all',{...pressure,bufferedBytes:Math.max(pressure.bufferedBytes,directPath?0:socket?.bufferedAmount||0),serverBufferedBytes:directPath?0:serverBuffered},social.room?.experiment?10:15);};
   function networkTick(){
     direct.tick();flow.drain(socket,(_v,_key,scope)=>!!activeRoom&&scope===activeRoom);health.sweep();
     if(!socket||socket.readyState!==1||performance.now()<nextProbe)return;nextProbe=performance.now()+2000;
@@ -22,13 +23,13 @@ G.NAS = (() => {
     const peers=social.room?.isHost?social.room.members.filter(m=>m.uid!==user?.id).map(m=>m.uid):[social.room?.host];
     if(activeRoom)for(const peer of peers.filter(Boolean)){const id=health.probe(peer);if(id)relay(peer,{k:'nas-diagnostic-ping',id});}
   }
-  function metrics(){const links=direct.stats();const entries=performance.getEntriesByType('resource').filter(r=>{try{const u=new URL(r.name);return u.origin===location.origin&&/^\/(css|js|assets)\//.test(u.pathname);}catch{return false;}});const resources=[...entries.filter(r=>/\.(?:js|css|woff2?|ttf)(?:[?#]|$)/.test(r.name)).slice(-48),...entries.filter(r=>! /\.(?:js|css|woff2?|ttf)(?:[?#]|$)/.test(r.name)).slice(-16)].map(r=>({kind:r.initiatorType,resource:new URL(r.name).pathname.split('/').at(-1),durationMs:Math.round(r.duration),ttfbMs:Math.max(0,Math.round(r.responseStart-r.requestStart)),transferBytes:r.transferSize,encodedBytes:r.encodedBodySize,decodedBytes:r.decodedBodySize,protocol:r.nextHopProtocol,compressed:r.encodedBodySize>0&&r.decodedBodySize>r.encodedBodySize,cached:r.transferSize===0&&r.decodedBodySize>0}));return {...links,startupResources:resources,gameTransport:links.directPeers?(links.relayPeers?'mixed':'webrtc-direct'):'websocket-relay',probeTransport:'websocket-relay',...health.sample({connected:socket?.readyState===1,targetHz:1/interval(),bufferedBytes:socket?.bufferedAmount||0,serverBufferedBytes:serverBuffered,coalescedFrames:flow.stats().coalesced,queuedSnapshots:flow.stats().pending,disconnects,background:document.hidden})};}
+  function metrics(){const links=direct.stats();const entries=performance.getEntriesByType('resource').filter(r=>{try{const u=new URL(r.name);return u.origin===location.origin&&/^\/(css|js|assets)\//.test(u.pathname);}catch{return false;}});const resources=[...entries.filter(r=>/\.(?:js|css|woff2?|ttf)(?:[?#]|$)/.test(r.name)).slice(-48),...entries.filter(r=>! /\.(?:js|css|woff2?|ttf)(?:[?#]|$)/.test(r.name)).slice(-16)].map(r=>({kind:r.initiatorType,resource:new URL(r.name).pathname.split('/').at(-1),durationMs:Math.round(r.duration),ttfbMs:Math.max(0,Math.round(r.responseStart-r.requestStart)),transferBytes:r.transferSize,encodedBytes:r.encodedBodySize,decodedBytes:r.decodedBodySize,protocol:r.nextHopProtocol,compressed:r.encodedBodySize>0&&r.decodedBodySize>r.encodedBodySize,cached:r.transferSize===0&&r.decodedBodySize>0}));return {...links,reconnectingPeers:(social.room?.members||[]).filter(m=>m.uid!==user?.id&&m.connected===false).length,startupResources:resources,gameTransport:links.directPeers?(links.relayPeers?'mixed':'webrtc-direct'):'websocket-relay',probeTransport:'websocket-relay',...health.sample({connected:socket?.readyState===1,targetHz:Math.min(1/interval(),...(social.room?.members||[]).filter(m=>m.uid!==user?.id).map(m=>1/interval(m.uid))),bufferedBytes:socket?.bufferedAmount||0,serverBufferedBytes:serverBuffered,coalescedFrames:flow.stats().coalesced,queuedSnapshots:flow.stats().pending,disconnects,background:document.hidden})};}
   const clone=v=>JSON.parse(JSON.stringify(v));
   const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;}};
   const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true;}catch{storageOk=false;setState('storage-error');return false;}};
   const key=()=>user?'ps.nas.save.'+user.id:'';
   const notify=()=>socialListeners.forEach(f=>{f('friends');f('invites');f('room');});
-  function receiveSocial(next){const previous=social.room;if(previous?.id!==next.room?.id||(previous?.members||[]).map(m=>m.uid).sort().join('|')!==(next.room?.members||[]).map(m=>m.uid).sort().join('|')){flow.clear();health.clearPeers();probesAnswered.clear();}for(const p of previous?.members||[])if(p.uid!==user?.id&&(previous.id!==next.room?.id||!next.room.members.some(m=>m.uid===p.uid)))peers.forEach(f=>f(p.uid,'closed'));social=next;direct.sync(social.room?.id,user?.id,social.room?.host,social.room?.members||[]);notify();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,p.connected===false?'reconnecting':direct.mode(p.uid)));});}
+  function receiveSocial(next){const previous=social.room;if(previous?.id!==next.room?.id||(previous?.members||[]).map(m=>m.uid).sort().join('|')!==(next.room?.members||[]).map(m=>m.uid).sort().join('|')){flow.clear();quality.clear();health.clearPeers();probesAnswered.clear();}for(const p of previous?.members||[])if(p.uid!==user?.id&&(previous.id!==next.room?.id||!next.room.members.some(m=>m.uid===p.uid)))peers.forEach(f=>f(p.uid,'closed'));social=next;flow.setLimit(social.room?.experiment?7:4);direct.sync(social.room?.id,user?.id,social.room?.host,social.room?.members||[]);notify();social.room?.members.forEach(p=>{if(p.uid!==user?.id)peers.forEach(f=>f(p.uid,p.connected===false?'reconnecting':direct.mode(p.uid)));});}
   const setState=s=>{state=storageOk?s:'storage-error';syncListeners.forEach(f=>f(state));};
   function assign(dst,src){for(const k of Object.keys(dst))if(!(k in src))delete dst[k];for(const k in src){if(dst[k]&&src[k]&&typeof dst[k]==='object'&&typeof src[k]==='object'&&!Array.isArray(dst[k])&&!Array.isArray(src[k]))assign(dst[k],src[k]);else dst[k]=clone(src[k]);}}
   function persist(){if(!user||guest)return false;return write(key(),{user,save,rev,pending,conflict,request});}
@@ -76,9 +77,14 @@ G.NAS = (() => {
     })();return flushing;
   }
   function commit(){if(!enabled)return local.commit(...arguments);if(!user||guest||!save)return false;change++;save.updated=Date.now();pending=true;const ok=persist();if(!conflict){clearTimeout(retry);retry=setTimeout(flush,500);}return ok;}
-  async function resolve(choice){if(!conflict)return false;write('ps.nas.conflict-backup.'+user.id,{local:save,remote:conflict,at:Date.now()});
-    request=null;change++;rev=conflict.rev;if(choice==='nas'&&conflict.save){assign(save,conflict.save);pending=false;}else if(choice==='browser'){reconcileRewards(save,conflict.save);pending=true;}else return false;
+  async function resolve(choice){if(!conflict||!['nas','browser'].includes(choice))return false;if(!write('ps.nas.conflict-backup.'+user.id,{local:save,remote:conflict,at:Date.now()}))return false;
+    const selected=clone(choice==='nas'?conflict.save:save),other=choice==='nas'?save:conflict.save;
+    if(!selected)return false;
+    for(const field of ['owned','shiny','legends','arenas','itemsFound','evoMoves'])selected[field]={...(other?.[field]||{}),...(selected[field]||{})};
+    if(choice==='browser')reconcileRewards(selected,conflict.save);
+    request=null;change++;rev=conflict.rev;pending=JSON.stringify(selected)!==JSON.stringify(conflict.save);assign(save,selected);
     conflict=null;persist();setState(pending?'pending':'ok');return pending?flush():true;}
+
   async function logout(){if(!enabled)return local.logout();await flush();if(pending||conflict){G.UI?.toast('还有未同步进度，请先处理存档同步。',4000);return false;}
     try{await api('logout',{});}catch{}clearTimeout(retry);user=null;save=null;guest=false;socket?.close();socket=null;social={friends:[],invites:[],room:null};activeRoom=null;
     try{localStorage.removeItem('ps.nas.session');}catch{}setState('local');notify();return true;}
@@ -110,13 +116,13 @@ G.NAS = (() => {
     get mode(){return 'nas';},get fb(){return null;},get online(){return available&&!!user&&!guest;},get nameAccount(){return !!user;},get hasGoogle(){return false;},
     get user(){return user?.nick||user?.name||'Invitado';},get uid(){return user?.id;},get guest(){return guest;},get save(){return save;},get loggedIn(){return !!save;},get syncState(){return state;},get localReason(){return 'nas';},get storageOk(){return storageOk;}
   },['ready','onSync']);
-  async function action(route,b){try{if ((route==='room/create'||route==='room/member'||route==='room/ready') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,{...b,protocol:3});await refresh();return r;}catch(e){return {ok:false,error:e.message,status:e.status};}}
+  async function action(route,b){try{if(route==='invite/accept'&&social.invites.find(i=>i.from===b.uid)?.experiment){if(!(await G.Dialog.confirm('Sala experimental de 8: sin monedas, tickets ni progreso guardado. ¿Entrar?')))return {ok:false,error:G.T('Cancelado')};b={...b,experimentAccepted:true};}if ((route==='room/create'||route==='room/member'||route==='room/ready') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,{...b,protocol:3});await refresh();return r;}catch(e){return {ok:false,error:e.message,status:e.status};}}
   async function refresh(){if(enabled)connect();if(!enabled)return oldSocial.refreshPresence();if(!user||guest)return;try{receiveSocial(await api('social'));available=true;}catch{available=false;}}
   const profile=()=>oldSocial.profileData();
   G.Social=proxy(oldSocial,{
     start:async()=>{connect();await refresh();return user?'ok':'off';},stop:async()=>{await action('room/leave',{});},
     claimNick:n=>setNickname(n),request:n=>action('friends/request',{name:n}),requestUid:uid=>action('friends/request',{uid}),accept:uid=>action('friends/accept',{uid}),remove:uid=>action('friends/remove',{uid}),
-    createRoom:()=>action('room/create',{}),joinRoom:id=>{const invitation=social.invites.find(i=>i.room===id);return invitation?action('invite/accept',{uid:invitation.from}):Promise.resolve({ok:false,error:'邀请已失效。'});},leaveRoom:()=>action('room/leave',{}),refreshMember:()=>action('room/member',{}),setOpen:open=>action('room/open',{open}),setReady:ready=>action('room/ready',{ready}),transferHost:uid=>action('room/transfer',{uid}),
+    createRoom:(options={})=>action('room/create',{experiment:options.experiment===true}),get MAX_PLAYERS(){return social.room?.capacity||4;},joinRoom:id=>{const invitation=social.invites.find(i=>i.room===id);return invitation?action('invite/accept',{uid:invitation.from}):Promise.resolve({ok:false,error:'邀请已失效。'});},leaveRoom:()=>action('room/leave',{}),refreshMember:()=>action('room/member',{}),setOpen:open=>action('room/open',{open}),setReady:ready=>action('room/ready',{ready}),transferHost:uid=>action('room/transfer',{uid}),
     async invite(uid){if(!social.room){const r=await action('room/create',{});if(!r.ok)return r;}return action('invite',{uid});},
     acceptInvite:uid=>action('invite/accept',{uid}),declineInvite:uid=>action('invite/decline',{uid}),
     refreshPresence:refresh,setPlaying(){},publishProfile(){commit();},profileData:profile,
@@ -142,7 +148,7 @@ G.NAS = (() => {
     if(deviceBusy){G.UI.toast(G.T('Otra sesión controla la partida. Revisa tus dispositivos.'));return false;}
     if(!(await refreshSave())||pending||conflict){if(!coop&&state==='offline'&&!conflict&&!operations.draining)return true;return false;}
     try{receiveOperations(await api('operations'));if(operations.draining)throw Error('服务器维护排空中，暂不开始新局。');
-      if(!coop||coop.host===user.id){const value=await api('run',{mode:coop?'g':'s'});runPromise=Promise.resolve(value);}return true;
+      if(!coop||coop.host===user.id){const value=await api('run',{mode:coop?'g':'s',challenge:!coop?G.RunModes?.pending?.id:undefined});if(value.challenge)G.RunModes.configure(value.challenge);runPromise=Promise.resolve(value);}return true;
     }catch(e){G.UI.toast(e.message,5000);return false;}}
   async function finishRun(){const run=await runPromise;runPromise=null;if(run)await api('run/end',{run:run.id}).catch(()=>{});}
 
@@ -160,6 +166,6 @@ G.NAS = (() => {
   return {prepareRun,finishRun,onOperations:f=>{operationListeners.add(f);f(operations);},get operations(){return operations;},get isAdmin(){return user?.name?.toLowerCase()==='jyh9521';},
     async devices(){return api('devices');},async revokeDevice(id,password){return api('devices/revoke',{id,password});},async takeover(password){await api('devices/takeover',{password});deviceBusy=false;connect();return refreshSave();},
     async administer(op,message,confirm){const value=await api('admin/operations',{op,message,confirm});receiveOperations(value);return value;},adminStatus:()=>api('admin/status'),
-    announce:text=>action('announcement',{text}),get canAnnounce(){return social.me?.canAnnounce===true;},upgrade,setNickname,networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
+    announce:text=>action('announcement',{text}),get canAnnounce(){return social.me?.canAnnounce===true;},upgrade,setNickname,networkMetrics:metrics,refreshSave,get enabled(){return enabled;},get conflict(){return conflict;},get pending(){return pending;},get user(){return user;},get revision(){return rev;},exportCopies:()=>({format:1,recordedAt:new Date().toISOString(),browser:{rev,save:clone(save)},nas:clone(conflict),differences:G.SaveDiff.compare(save,conflict?.save)}),api,flush,resolve,reauthenticate:password=>auth(user.name,password,false),
   };
 })();

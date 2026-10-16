@@ -19,7 +19,7 @@
         pending.delete(key);send(socket,row.value,{key,scope:row.scope,replaceable:true});
       }
     }
-    return {send,drain,congested,clear:()=>pending.clear(),stats:()=>({pending:pending.size,coalesced,closed})};
+    return {setLimit(n){if(Number.isInteger(n)&&n>=1&&n<=8){maxPending=n;while(pending.size>maxPending)pending.delete(pending.keys().next().value);}},send,drain,congested,clear:()=>pending.clear(),stats:()=>({pending:pending.size,coalesced,closed})};
   }
   return {create};
 });

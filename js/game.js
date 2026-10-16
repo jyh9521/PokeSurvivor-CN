@@ -80,11 +80,13 @@ G.Game = (() => {
     if(starting)return;starting=true;
     try{if(G.NAS?.enabled&&!(await G.NAS.prepareRun(coop))){if(coop&&G.Social.room?.isHost)await G.Social.setOpen(true);return;}
       beginRun(coop);
+    }catch(e){G.RunModes?.end();await G.NAS?.finishRun();G.UI.toast(e.message,5000);
     }finally{starting=false;}
   }
   function beginRun(coop = null) {
     holdBy = []; awayBy = null;
     openItem = null; laterItems.length = 0;
+    G.RunModes?.activate(coop);
     const save = G.DB.save;
     const mon = G.DEX_BY[save.partner];
     const perks = G.Upgrades.perks(G.DB.upgradesOf(mon.dex));
@@ -103,9 +105,9 @@ G.Game = (() => {
     G.Weather.reset();
     G.Path.clear();
     G.Hazards.clear();
-    G.World.reset(coop ? coop.seed : Math.floor(Math.random() * 1e6));
-    G.World.setBiome(0, true);
-    biome = 0;
+    G.World.reset(coop ? coop.seed : G.RunModes?.active?.seed ?? Math.floor(Math.random() * 1e6));
+    biome=G.RunModes?.active?.biome||0;
+    G.World.setBiome(biome, true);
     time = 0; pendingLevels = 0;
     runReal = performance.now(); tampered = false;
 
@@ -132,7 +134,7 @@ G.Game = (() => {
     G.Camera.x = pl.x; G.Camera.y = pl.y; G.Camera.shake = 0;
     // Hojas de sprites locales: el compañero y los primeros enemigos.
     G.Sprites.preload([mon.dex], 8000, pl.shiny);
-    G.Audio.music(G.BIOME_MUSIC[0]);
+    G.Audio.music(G.BIOME_MUSIC[biome % G.BIOME_MUSIC.length]);
     // Para el ranking: el servidor apunta cuándo empieza la partida (anti-trampas).
     if (!coop || G.Coop.isHost) G.Ranking.runStarted(coop ? 'g' : 's');
     deathT = 0;
@@ -284,6 +286,7 @@ G.Game = (() => {
     const wasHost = !!pl.coopHost;
     const team = coop ? G.Coop.members.slice() : [];
     const teamStats=coop?G.Coop.teamStats:[];
+    const isolated=G.RunModes?.active;
     if (G.Coop.active) G.Coop.end();
     if (coop) G.Social.setPlaying(false);
     state = 'over';
@@ -300,6 +303,8 @@ G.Game = (() => {
     const coins = Math.round((parts.tiempo + parts.derrotados + parts.jefes + parts.recogidas) * mul);
     const record = time > save.stats.bestTime;
 
+    const judge = G.Judgment.summary();
+    if(!isolated){
     save.coins += coins;
     bankTickets(false);
     save.stats.runs++;
@@ -308,7 +313,6 @@ G.Game = (() => {
     if (coop) save.stats.bestGroupTime = Math.max(save.stats.bestGroupTime || 0, Math.floor(time));
     save.stats.bestLevel = Math.max(save.stats.bestLevel, pl.level);
     save.stats.coinsEarned += coins;
-    const judge = G.Judgment.summary();
     if (judge) G.Progress.event('judgeEnd', judge);
     G.Judgment.reset();
     G.Progress.event('runEnd', { time, level: pl.level, coins: pl.coins, types: pl.mon.types, group: coop });
@@ -316,6 +320,7 @@ G.Game = (() => {
     // A la nube: un récord, enseguida; si no, al acabar la partida (como mucho cada 20 min).
     G.DB.commit(record ? true : 'run');
     if (G.Social.me) G.Social.publishProfile();
+    }else G.Judgment.reset();
 
     // Ranking: en solitario cada uno lo suyo; en grupo lo sube el anfitrión.
     const mark = { t: Math.floor(time), lv: pl.level, kills: pl.kills };
@@ -326,11 +331,12 @@ G.Game = (() => {
 
     if(!ok||(!wasHost&&coop))G.NAS?.finishRun();
     G.RunUI.showOver({
-      dead, time, level: pl.level, kills: pl.kills, bosses: pl.bosses, coins, record, t1: pl.t1, t10: pl.t10, judge,
-      moves: pl.moves, caught,team,teamStats,
-      breakdown: Object.entries(parts).filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join(' · ') +
+      dead, time, level: pl.level, kills: pl.kills, bosses: pl.bosses, coins:isolated?0:coins, record:!isolated&&record, t1:isolated?0:pl.t1, t10:isolated?0:pl.t10, judge:isolated?null:judge, isolated:isolated?.kind,
+      moves: pl.moves, caught:isolated?[]:caught,team,teamStats,
+      breakdown: isolated?G.T('Solo estadísticas de esta partida; tu cuenta no cambia.'):Object.entries(parts).filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join(' · ') +
                  (mul > 1 ? ` · ×${mul.toFixed(2)} Fortuna` : '')
     }, () => { pl = null; G.Flow.afterRun(); });
+    G.RunModes?.end();
   }
 
   /*
@@ -634,8 +640,9 @@ G.Game = (() => {
       return;
     }
     time += dt;
+    if(G.RunModes?.active?.maxSeconds&&time>=G.RunModes.active.maxSeconds){time=G.RunModes.active.maxSeconds;endRun(false);return;}
 
-    const b = Math.floor(time / 240);
+    const b = (G.RunModes?.active?.biome||0)+Math.floor(time / 240);
     if (b !== biome && !G.Rift.inArena && !G.Judgment.active) {
       biome = b;
       G.World.setBiome(b);

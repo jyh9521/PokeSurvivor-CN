@@ -192,12 +192,13 @@
       const room = G.Social.room;
       if (!room) return;
       const ms = room.members;
+      let experiment=$('lobby-experiment');if(!experiment){experiment=document.createElement('p');experiment.id='lobby-experiment';experiment.className='sub';$('lobby-sub').after(experiment);}experiment.textContent=room.experiment?G.T('Sala experimental de 8: sin monedas, tickets ni progreso guardado.'):'';
       $('lobby-sub').textContent = room.isHost
         ? 'Eres el anfitrión. Invita a tus amigos (hasta ' + G.Social.MAX_PLAYERS + ') y empezad cuando estéis.'
         : 'Estás en la sala de ' + ((ms.find(m => m.uid === room.host) || {}).name || '…') + '. El anfitrión empezará la partida.';
 
       // Las tarjetas sólo se rehacen si cambian los miembros (los sprites no parpadean).
-      const key = ms.map(m => m.uid + ':' + m.dex + ':' + (m.shiny ? 1 : 0)).join('|');
+      const key = G.Social.MAX_PLAYERS+':'+ms.map(m => m.uid + ':' + m.dex + ':' + (m.shiny ? 1 : 0)).join('|');
       const box = $('lobby-members');
       if (key !== membersKey) {
         membersKey = key;
@@ -266,7 +267,7 @@
       };
       const opened = await G.Social.setOpen(false);
       if (opened && opened.ok === false) { G.UI.toast(opened.error); return; }
-      const current=G.Social.room;if(G.NAS?.enabled&&current){cfg.host=current.host;cfg.members=current.members;}
+      const current=G.Social.room;if(G.NAS?.enabled&&current){cfg.host=current.host;cfg.members=current.members;cfg.experiment=current.experiment===true;}
       if(G.NAS?.enabled&&!(await G.NAS.prepareRun(cfg))){await G.Social.setOpen(true);return;}
       G.Net.broadcast(cfg);
       G.Flow.startCoop(cfg);

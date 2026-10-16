@@ -39,3 +39,7 @@ npm run test:nas 检查回声鉴权、队列合并/顺序、房间边界、硬�
 ## 格式 2（0.8.0）
 
 新增实际 WebRTC candidate-pair 的 RTT、候选类型和传输协议，及公开静态资源的首字节、下载体积与压缩/缓存迹象。NAS 探针 RTT 与实际直连 RTT 分开，不再用队友探针解释本机到 NAS 的线路。导出不含 IP、SDP、账号、房间、令牌或存档；性能条目不含源站与 query。完整字段与测量边界见 [服务器管理说明](SERVER_MANAGEMENT.md)。
+
+## 格式 3（0.9.0）
+
+实际路径提示、逐对端自适应频率、队友重连人数和事件积压年龄见 [COMMUNITY_EXPANSION.md](COMMUNITY_EXPANSION.md)。全直连不再使用经 NAS 探针作为直连 RTT。
