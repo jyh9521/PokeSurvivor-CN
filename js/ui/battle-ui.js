@@ -20,7 +20,7 @@ G.BattleUI=(()=>{
     const energy=Math.max(0,Math.min(100,Number(b.energy)||0));meter.style.setProperty('--charge',energy+'%');meter.setAttribute('aria-valuenow',String(Math.floor(energy)));meter.hidden=b.used;
     panel.classList.toggle('spent',b.used&&!b.form);panel.classList.toggle('ready',!b.used&&energy>=100);button.disabled=p.dead||b.used||energy<100;button.textContent=b.form?G.T(labels[b.form])+' '+Math.ceil(b.remaining)+'s':b.used?G.T('Used this cycle · clear a rift to recharge'):G.T('Activate')+' '+Math.floor(energy)+'%';
     const z=G.SpecialRules.zMove(p,p.activeMove());button.title=choice==='z'&&z?G.T(z.name)+' · '+G.T(z.exclusive?'Exclusive Z-Move':'Type Z-Move')+(!G.SpecialRules.original(p.dex,'z')?' · '+G.T('Cross-generation adaptation'):''):choice==='mega'?G.SpecialRuntime.traitsText(p)+' · '+G.SpecialRuntime.description(p):G.T(G.SpecialRules.original(p.dex,'max')?'Dynamax':'Cross-generation adaptation');
-    info.textContent=[choice==='z'&&z?G.T(z.name):b.form==='mega'?G.SpecialRuntime.traitsText(p):G.T(G.Battle.trait(p).title),...Object.entries(p.passives).map(([id,n])=>G.T(G.PassiveDefs.find(d=>d.id===id).name)+' '+n+'/'+G.PASSIVE_MAX_LEVEL)].join(' · ');info.title=info.textContent;
+    info.textContent=[choice==='z'&&z?G.T(z.name):b.form==='mega'?G.SpecialRuntime.traitsText(p):G.T(G.Battle.trait(p).title),...Object.entries(p.passives).map(([id,n])=>G.T(G.PassiveDefs.find(d=>d.id===id).name)+' '+n+'/'+(Number.isFinite(G.Battle.maxLevel(id))?G.Battle.maxLevel(id):'∞'))].join(' · ');info.title=info.textContent;
     renderGrowth(mastery,p,false);
   }
   function renderGrowth(box,p,inPause){

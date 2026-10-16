@@ -187,6 +187,11 @@ G.Game = (() => {
 
   const coopApi = {
     team: teamState,
+    canTransfer:()=>!pendingLevels&&!openItem&&!laterItems.length&&!holdBy.length&&state==='playing'&&!G.Judgment.cinematic,
+    authority(s){const names=['World','EnemyMgr','Pickups','Spawner','Rift','Judgment','Events','Weather','Hazards'];
+      if(!s){const parts=Object.fromEntries(names.map(n=>[n,G[n].checkpoint()]));return {team:teamState(),biome,parts};}
+      time=s.team.time;biome=s.biome;this.syncTeam(s.team);for(const n of names)G[n].checkpoint(s.parts[n],true);G.Path.clear();
+    },
     summary,
     // Invitado: el anfitrión manda el reloj y lo del equipo.
     syncTeam(t) {

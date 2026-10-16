@@ -207,6 +207,7 @@
     async function start() {
       const room = G.Social.room;
       if (!room || !room.isHost || room.members.length < 2) return;
+      if(G.NAS?.enabled&&room.members.some(m=>m.uid!==room.host&&G.Net.mode(m.uid)!=='direct')){G.UI.toast('等待所有玩家建立 P2P 直连后再开始。',5000);return;}
       const cfg = {
         k: 'start', seed: Math.floor(Math.random() * 1e6), host: room.host,
         members: room.members.map(m => ({ uid: m.uid, name: m.name, dex: m.dex, shiny: !!m.shiny }))

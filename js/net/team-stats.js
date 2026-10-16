@@ -8,7 +8,7 @@
     }
     function rescue(helpers){for(const uid of new Set(helpers))if(rows.has(uid))rows.get(uid).rescues++;}
     function ingest(values){if(!Array.isArray(values)||values.length!==rows.size)return;const seen=new Set();for(const v of values){if(!rows.has(v.uid)||seen.has(v.uid))return;seen.add(v.uid);if(['damage','kills','assists','rescues'].some(k=>!Number.isFinite(v[k])||v[k]<0||v[k]>1e12))return;}for(const v of values)for(const k of ['damage','kills','assists','rescues'])rows.get(v.uid)[k]=v[k];}
-    return {hit,rescue,forget:id=>hits.delete(id),ingest,snapshot:()=>[...rows.values()].map(r=>({...r,damage:Math.floor(r.damage)}))};
+    return {checkpoint(s){if(!s)return {rows:[...rows.values()],hits:[...hits].map(([id,set])=>[id,[...set]])};ingest(s.rows);hits.clear();for(const [id,values]of s.hits)hits.set(id,new Set(values));},hit,rescue,forget:id=>hits.delete(id),ingest,snapshot:()=>[...rows.values()].map(r=>({...r,damage:Math.floor(r.damage)}))};
   }
   return {create};
 });

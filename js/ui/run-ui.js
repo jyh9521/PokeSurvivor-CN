@@ -228,6 +228,8 @@ G.RunUI = (() => {
     G.UI.soundControls($('pause-sound'));
     $('pause-coop').classList.toggle('hidden', !coop);
     $('btn-quit').textContent = coop ? 'Salir de la partida' : 'Abandonar run';
+    let transfer=$('pause-host-transfer');if(!transfer){transfer=document.createElement('div');transfer.id='pause-host-transfer';$('pause-coop').after(transfer);}transfer.replaceChildren();
+    if(coop&&G.NAS?.enabled&&G.Coop.isHost)for(const m of G.Coop.members.filter(m=>m.uid!==G.Net.uid)){const b=document.createElement('button');b.className='btn';b.dataset.hostTransfer=m.uid;b.textContent='转移主机 → '+m.name;b.onclick=async()=>{b.disabled=true;const r=await G.Social.transferHost(m.uid);if(!r.ok)G.UI.toast(r.error,5000);else G.UI.hide('scr-pause');b.disabled=false;};transfer.appendChild(b);}
     G.BattleUI?.pauseGrowth(); G.UI.show('scr-pause');
     $('btn-resume').focus({preventScroll:true});
   }

@@ -1,3 +1,5 @@
+> 历史设计记录。0.16.7 的当前传输、诊断与主动主机迁移以 [HOST_P2P_0167.md](HOST_P2P_0167.md) 为准；NAS 战斗回退已移除。
+
 当前 0.7.0 的实际报告分析及直连状态字段见 [COMMUNITY_POLISH.md](COMMUNITY_POLISH.md)。
 
 # 历史记录：0.2.4 的 NAS 诊断

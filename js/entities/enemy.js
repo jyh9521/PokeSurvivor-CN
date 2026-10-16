@@ -1035,7 +1035,7 @@
     function bossAlive() { return list.some(e => e.boss && !e.dead); }
     function shinies() { return list.filter(e => e.shiny && !e.dead); }
 
-    return { checkpoint(s,authority){if(!s)return {list,stashed,nextId};clear();const restore=e=>{const o=new Enemy(e.def,e.x,e.y,{hp:1,spd:1,dmg:1},e.boss);Object.assign(o,e);o.remote=!authority;if(e.shiny)o.anim.shiny=true;if(!authority)o.net={x:o.x,y:o.y,vx:0,vy:0,age:0,dir:0,anim:0,st:0};return o;};list=s.list.map(restore);for(const e of list)byId.set(e.id,e);stashed=s.stashed?s.stashed.map(restore):null;nextId=s.nextId;rebuildGrid();},clear, all, add, get, addRemote, removeRemote, stash, restore, clearRemote, update, drawables, queryCircle, rebuildGrid, bossAlive, shinies, nearestPlayer,
+    return { checkpoint(s,authority){if(!s)return {list,stashed,nextId};clear();const restore=e=>{const o=Object.create(Enemy.prototype),anim=new G.Sprites.Animator(e.dex,e.scale,e.shiny);Object.assign(o,e);o.anim=Object.assign(anim,e.anim||{});o.remote=!authority;if(e.shiny)o.anim.shiny=true;if(!authority)o.net={x:o.x,y:o.y,vx:0,vy:0,age:0,dir:0,anim:0,st:0};return o;};list=s.list.map(restore);for(const e of list)byId.set(e.id,e);stashed=s.stashed?s.stashed.map(restore):null;nextId=s.nextId;for(const e of [...list,...(stashed||[])])e.minions=(e.minions||[]).map(m=>byId.get(m.id)||m);rebuildGrid();},clear, all, add, get, addRemote, removeRemote, stash, restore, clearRemote, update, drawables, queryCircle, rebuildGrid, bossAlive, shinies, nearestPlayer,
              get count() { return list.length; } };
   })();
 })();

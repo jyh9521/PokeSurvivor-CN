@@ -1,0 +1,411 @@
+{
+  "3": {
+    "checks": [
+      "all room members use real P2P channels",
+      "state channel is unordered with zero retransmissions, events channel reliable/ordered",
+      "lobby transfer changes actual RTC offerer/host star",
+      "only room owner simulates enemies",
+      "running host transfer returns authenticated success",
+      "handoff preserves world seed, elapsed time and live enemies without restarting",
+      "old host relinquishes enemy authority",
+      "NAS run credential moves to new host, without starting another run",
+      "new host clock and enemy simulation continue on all peers",
+      "signalling interruption keeps RTC open and gameplay advancing",
+      "NAS receives zero combat snapshots, events, retries or migration checkpoints",
+      "direct snapshot pacing is 30 Hz when queues are clear",
+      "failed candidate topology aborts before authority changes",
+      "failed migration preserves the working run and original host",
+      "second live transfer succeeds without resetting the run",
+      "all transfers and failed preflight send only signalling/start to NAS",
+      "64-enemy multiplayer load keeps direct paths and bounded queues",
+      "no runtime/console errors"
+    ],
+    "errors": [],
+    "players": 3,
+    "nasWireKinds": [
+      "rtc-signal",
+      "start"
+    ],
+    "before": {
+      "time": 1.032633333333334,
+      "world": 690772,
+      "enemy": [
+        1
+      ]
+    },
+    "after": {
+      "time": 3.031733333333332,
+      "world": 690772,
+      "enemy": [
+        1,
+        2
+      ],
+      "real": true
+    },
+    "load": [
+      {
+        "fps": 101.5,
+        "targetHz": 30,
+        "sendHz": 30,
+        "receiveHz": 30,
+        "directPeers": 1,
+        "bufferedBytes": 326,
+        "oldestEventMs": 0,
+        "enemies": 63
+      },
+      {
+        "fps": 101,
+        "targetHz": 25,
+        "sendHz": 30,
+        "receiveHz": 30,
+        "directPeers": 2,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      },
+      {
+        "fps": 101,
+        "targetHz": 30,
+        "sendHz": 29.5,
+        "receiveHz": 25,
+        "directPeers": 1,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      }
+    ],
+    "network": {
+      "transport": "webrtc-direct",
+      "controlTransport": "websocket",
+      "gameTransport": "webrtc-direct",
+      "p2pOnly": true,
+      "peerLinks": [
+        {
+          "mode": "direct",
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 1,
+          "incomingEvents": 0,
+          "ackRttMs": 2.0999999940395355,
+          "error": null,
+          "path": {
+            "rttMs": 0,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "direct",
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 1,
+          "incomingEvents": 0,
+          "ackRttMs": 1.5999999940395355,
+          "error": null,
+          "path": {
+            "rttMs": 0,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        }
+      ],
+      "directPeers": 2,
+      "relayPeers": 0,
+      "connectingPeers": 0,
+      "pendingEvents": 1,
+      "targetHz": 25,
+      "sendHz": 30,
+      "receiveHz": 30,
+      "fps": 101.5,
+      "directBufferedBytes": 0,
+      "oldestEventMs": 2
+    }
+  },
+  "8": {
+    "checks": [
+      "all room members use real P2P channels",
+      "state channel is unordered with zero retransmissions, events channel reliable/ordered",
+      "lobby transfer changes actual RTC offerer/host star",
+      "only room owner simulates enemies",
+      "running host transfer returns authenticated success",
+      "handoff preserves world seed, elapsed time and live enemies without restarting",
+      "old host relinquishes enemy authority",
+      "NAS run credential moves to new host, without starting another run",
+      "new host clock and enemy simulation continue on all peers",
+      "signalling interruption keeps RTC open and gameplay advancing",
+      "NAS receives zero combat snapshots, events, retries or migration checkpoints",
+      "direct snapshot pacing is 30 Hz when queues are clear",
+      "failed candidate topology aborts before authority changes",
+      "failed migration preserves the working run and original host",
+      "second live transfer succeeds without resetting the run",
+      "all transfers and failed preflight send only signalling/start to NAS",
+      "64-enemy multiplayer load keeps direct paths and bounded queues",
+      "no runtime/console errors"
+    ],
+    "errors": [],
+    "players": 8,
+    "nasWireKinds": [
+      "rtc-signal",
+      "start"
+    ],
+    "before": {
+      "time": 1.1849333333333323,
+      "world": 864915,
+      "enemy": [
+        1,
+        2
+      ]
+    },
+    "after": {
+      "time": 3.287233333333333,
+      "world": 864915,
+      "enemy": [
+        1,
+        3,
+        5,
+        6
+      ],
+      "real": true
+    },
+    "load": [
+      {
+        "fps": 39.5,
+        "targetHz": 15,
+        "sendHz": 15,
+        "receiveHz": 30,
+        "directPeers": 1,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      },
+      {
+        "fps": 39,
+        "targetHz": 25,
+        "sendHz": 30,
+        "receiveHz": 30,
+        "directPeers": 7,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      },
+      {
+        "fps": 39,
+        "targetHz": 30,
+        "sendHz": 29.5,
+        "receiveHz": 24.5,
+        "directPeers": 1,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      },
+      {
+        "fps": 39,
+        "targetHz": 30,
+        "sendHz": 29.5,
+        "receiveHz": 24.5,
+        "directPeers": 1,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      },
+      {
+        "fps": 39.5,
+        "targetHz": 30,
+        "sendHz": 30,
+        "receiveHz": 24.5,
+        "directPeers": 1,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      },
+      {
+        "fps": 39,
+        "targetHz": 30,
+        "sendHz": 29.5,
+        "receiveHz": 24.5,
+        "directPeers": 1,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      },
+      {
+        "fps": 39,
+        "targetHz": 30,
+        "sendHz": 30,
+        "receiveHz": 24.5,
+        "directPeers": 1,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      },
+      {
+        "fps": 39,
+        "targetHz": 30,
+        "sendHz": 29.5,
+        "receiveHz": 24.5,
+        "directPeers": 1,
+        "bufferedBytes": 0,
+        "oldestEventMs": 0,
+        "enemies": 63
+      }
+    ],
+    "network": {
+      "transport": "webrtc-direct",
+      "controlTransport": "websocket",
+      "gameTransport": "webrtc-direct",
+      "p2pOnly": true,
+      "peerLinks": [
+        {
+          "mode": "direct",
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 1,
+          "incomingEvents": 0,
+          "ackRttMs": 4.0999999940395355,
+          "error": null,
+          "path": {
+            "rttMs": 0,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "direct",
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 1,
+          "incomingEvents": 0,
+          "ackRttMs": 3.9000000059604645,
+          "error": null,
+          "path": {
+            "rttMs": 0,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "direct",
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 1,
+          "incomingEvents": 0,
+          "ackRttMs": 3.9000000059604645,
+          "error": null,
+          "path": {
+            "rttMs": 6,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "direct",
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 1,
+          "incomingEvents": 0,
+          "ackRttMs": 3.7999999821186066,
+          "error": null,
+          "path": {
+            "rttMs": 6,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "direct",
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 1,
+          "incomingEvents": 0,
+          "ackRttMs": 3.7999999821186066,
+          "error": null,
+          "path": {
+            "rttMs": 6,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "direct",
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 1,
+          "incomingEvents": 0,
+          "ackRttMs": 3.5999999940395355,
+          "error": null,
+          "path": {
+            "rttMs": 6,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        },
+        {
+          "mode": "direct",
+          "connection": "connected",
+          "ice": "connected",
+          "reason": "connected",
+          "attempts": 1,
+          "incomingEvents": 0,
+          "ackRttMs": 3.5,
+          "error": null,
+          "path": {
+            "rttMs": 6,
+            "localType": "host",
+            "remoteType": "host",
+            "protocol": "udp"
+          }
+        }
+      ],
+      "directPeers": 7,
+      "relayPeers": 0,
+      "connectingPeers": 0,
+      "pendingEvents": 0,
+      "targetHz": 25,
+      "sendHz": 30,
+      "receiveHz": 30,
+      "fps": 39,
+      "directBufferedBytes": 0,
+      "oldestEventMs": 0
+    }
+  },
+  "production": {
+    "checks": 20,
+    "errors": [],
+    "runtimePrivate": true,
+    "transport": "real local WebRTC P2P",
+    "productionManifest": {
+      "v": "d97f675c0a",
+      "at": "2026-10-17T00:00:00.000Z"
+    }
+  },
+  "package": {
+    "file": "PokeSurvivor-CN-local-0.1.0.zip",
+    "bytes": 145947285,
+    "sha256": "e7f826b63d75a0ec4fd7b2e3c73feace774fa8ad035ff7ce27a062d9f7de3869",
+    "files": 24100,
+    "upstream": "537440510dcdadf8ed711ec3dea7ae795533a662",
+    "simplifiedChinese": "a23065deefa1dd4d23557c7b10f6d8d99af42dbc"
+  },
+  "version": {
+    "v": "d97f675c0a",
+    "at": "2026-10-17T00:00:00.000Z"
+  },
+  "sourceSha256": "ae1a1ad692a5ac48603539c0aa4e9ad617307d702ca3d75ac33a3a5611d6dc2a",
+  "sourceHashMethod": "sorted POSIX path UTF8 + file bytes, all js/**/*.js except app.min.js"
+}

@@ -279,7 +279,7 @@ G.Rift = (() => {
   }
 
   return {
-    checkpoint(s){if(!s)return {rift,arena,checkT,asked,downT,misses,starterT};const back=arena?.back;starterT=Number.isFinite(s.starterT)?s.starterT:150;({rift,arena,checkT,asked,downT,misses}=s);if(arena&&back)arena.back=back;},
+    checkpoint(s){if(!s)return {rift,arena,checkT,asked,downT,misses,starterT,arenaSerial};const back=arena?.back;arenaSerial=s.arenaSerial??arenaSerial;starterT=Number.isFinite(s.starterT)?s.starterT:150;({rift,arena,checkT,asked,downT,misses}=s);if(arena&&back)arena.back=back;},
     reset, update, drawable, onEvent, enterRequest() { if (!arena) start(); },
     get rift() { return rift; }, get arena() { return arena; },
     get inArena() { return !!arena; },

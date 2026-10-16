@@ -55,6 +55,70 @@ G.Coop = (() => {
   let members = [];let teamStats=null;
   const reconnecting=new Set(),marks=new Map();let pingAt=-Infinity;
 
+  // Cooperative two-phase handoff: drain old reliable events, send a bounded
+  // checkpoint directly, obtain an authenticated receipt, then change authority.
+  // NAS carries only the receipt/epoch and never the checkpoint.
+  let handoff=null,staged=null;
+  const delay=ms=>new Promise(r=>setTimeout(r,ms));
+  async function until(test,ms=12000){const at=performance.now();while(!test()){if(!active||performance.now()-at>ms)throw Error('P2P 交接超时，保留原主机。');await delay(25);}}
+  const pack=value=>JSON.stringify(value,(key,v)=>key==='follow'&&v?.uid?undefined:v instanceof Set?{$set:[...v]}:v instanceof Map?{$map:[...v]}:v===Infinity?{$infinity:true}:v);
+  const unpack=value=>JSON.parse(value,(_key,v)=>v?.$set?new Set(v.$set):v?.$map?new Map(v.$map):v?.$infinity?Infinity:v);
+  async function control(uid,msg){await until(()=>G.Net.send(uid,msg)!==false);}
+  function clearHandoff(){handoff=null;staged=null;updateAway();}
+  async function transferHost(uid){
+    if(!active||!host||handoff||!mates.get(uid)?.connected||!api.canTransfer?.()||waiting.size||holds.size)return {ok:false,error:'请在所有队友完成选择、正常战斗时转移主机。'};
+    if(members.some(m=>m.uid!==me&&G.Net.mode(m.uid)!=='direct'))return {ok:false,error:'请先恢复所有队友的 P2P 直连。'};
+    const nonce=[...crypto.getRandomValues(new Uint8Array(16))].map(n=>n.toString(16).padStart(2,'0')).join('');
+    const epoch=G.Social.room.epoch||0;handoff={nonce,to:uid,epoch,frozen:new Set(),at:performance.now(),old:hostUid};updateAway();
+    try{
+      await G.NAS.api('room/handoff-begin',{uid,nonce});
+      for(const m of mates.values())if(m.connected)await control(m.uid,{k:'handoff-freeze',nonce,to:uid,epoch});
+      flushAll();await until(()=>handoff?.frozen.size===mates.size&&!G.Net.stats().pendingEvents);
+      const snapshot={version:1,game:api.authority(),team:teamStats.checkpoint(),levelSeq,levelNow,seenSeq,doneSeq,meleeSeq,battleSeq,mates:[...mates].map(([u,m])=>[u,{meleeSeen:m.meleeSeen||0,battleSeen:m.battleSeen||0}])};
+      const text=pack(snapshot);if(text.length>8*1024*1024)throw Error('主机检查点过大，保留原主机。');
+      const chunks=Math.ceil(text.length/8000);for(let i=0;i<chunks;i++)await control(uid,{k:'handoff-chunk',nonce,index:i,total:chunks,text:text.slice(i*8000,(i+1)*8000)});
+      await until(()=>handoff?.ready===true);
+      // After the receipt, only the NAS-authenticated epoch may switch authority.
+      const result=await G.NAS.api('room/transfer',{uid,nonce,protocol:13});return result;
+    }catch(e){
+      // A timed-out HTTP reply may already have committed; refresh before aborting.
+      await G.Social.refreshPresence();if(G.Social.room?.host===uid)return {ok:true};
+      await G.NAS.api('room/handoff-abort',{nonce}).catch(()=>{});if(handoff?.nonce===nonce){for(const m of mates.values())if(m.connected)G.Net.send(m.uid,{k:'handoff-abort',nonce});clearHandoff();}return {ok:false,error:e.message};
+    }
+  }
+  async function handoffMessage(from,msg){
+    if(msg.k==='handoff-freeze'){
+      if(host||from!==hostUid||handoff||msg.epoch!==(G.Social.room?.epoch||0)||!members.some(m=>m.uid===msg.to)||! /^[a-f0-9]{32}$/.test(msg.nonce||''))return;
+      handoff={nonce:msg.nonce,to:msg.to,epoch:msg.epoch,at:performance.now(),old:hostUid};updateAway();flushClient(true);
+      await until(()=>!G.Net.stats().pendingEvents&&(handoff.to!==me||members.filter(m=>m.uid!==me).every(m=>G.Net.mode(m.uid)==='direct')));await control(from,{k:'handoff-frozen',nonce:msg.nonce});return;
+    }
+    if(!handoff||msg.nonce!==handoff.nonce)return;
+    if(msg.k==='handoff-frozen'&&host&&mates.has(from)){handoff.frozen.add(from);return;}
+    if(msg.k==='handoff-ready'&&host&&from===handoff.to){handoff.ready=true;return;}
+    if(from!==hostUid||host)return;
+    if(msg.k==='handoff-abort'){clearHandoff();return;}
+    if(msg.k==='handoff-chunk'&&handoff.to===me){
+      if(!Number.isSafeInteger(msg.total)||msg.total<1||msg.total>1049||!Number.isSafeInteger(msg.index)||msg.index<0||msg.index>=msg.total||typeof msg.text!=='string'||msg.text.length>8000)return;
+      if(!staged)staged={chunks:new Map(),total:msg.total};if(staged.total!==msg.total)return;staged.chunks.set(msg.index,msg.text);
+      if(staged.chunks.size===staged.total&&!staged.snapshot){const value=unpack(Array.from({length:staged.total},(_,i)=>staged.chunks.get(i)).join(''));
+        if(value.version!==1||!value.game?.parts||!Number.isFinite(value.game.team?.time))throw Error('Invalid handoff checkpoint');
+        staged.snapshot=value;await G.NAS.api('room/handoff-ready',{nonce:msg.nonce,epoch:handoff.epoch});await control(from,{k:'handoff-ready',nonce:msg.nonce});}
+    }
+  }
+  async function roomChanged(room){if(!active||!room||room.host===hostUid)return;
+    const previous=hostUid;hostUid=room.host;host=hostUid===me;local.coopHost=host;
+    if(!handoff||handoff.to!==hostUid){const lost=api.lost;end();lost?.('主机交接状态不完整，本局已保存。');return;}
+    try{
+      if(host){if(!staged?.snapshot)throw Error('Missing handoff checkpoint');const s=staged.snapshot;api.authority(s.game);teamStats.checkpoint(s.team);levelSeq=s.levelSeq;levelNow=s.levelNow;seenSeq=s.seenSeq;doneSeq=s.doneSeq;
+        const fences=new Map(s.mates);for(const [u,m]of mates){const f=fences.get(u);m.meleeSeen=u===previous?s.meleeSeq:f?.meleeSeen||0;m.battleSeen=u===previous?s.battleSeq:f?.battleSeen||0;}
+      }else if(previous===me){const s=G.EnemyMgr.checkpoint();G.EnemyMgr.checkpoint(unpack(pack(s)),false);}
+      outEv=[];for(const m of mates.values()){m.q=[];m.repairAt=0;m.lastAt=performance.now();m.flushT=0;}flushT=0;lastHostAt=performance.now();hostAway=false;stalled=false;reconnecting.clear();
+      await G.NAS.adoptAuthority();handoff.committed=true;handoff.at=performance.now();
+      await until(()=>members.filter(m=>m.uid!==me&&(host||m.uid===hostUid)).every(m=>G.Net.mode(m.uid)==='direct'),25000);
+      clearHandoff();
+    }catch(e){console.error('[Coop handoff]',e);const lost=api.lost;end();lost?.(e.message);}
+  }
+
   // ---------------- escalado de dificultad ----------------
 
   const scaleRate = n => 1 + 0.75 * Math.max(0, n - 1);
@@ -69,7 +133,7 @@ G.Coop = (() => {
    */
   function begin(cfg, pl, cb) {
     meleeSeq=0; meleeAck=0;battleSeq=0;battleAck=0;
-    active = true;reconnecting.clear();marks.clear();pingAt=-Infinity;
+    handoff=null;staged=null;active = true;reconnecting.clear();marks.clear();pingAt=-Infinity;
     me = G.Net.uid; hostUid = cfg.host;
     host = me === hostUid;
     local = pl;
@@ -93,7 +157,7 @@ G.Coop = (() => {
   }
 
   function end() {
-    active = false; host = false; local = null;reconnecting.clear();marks.clear();
+    handoff=null;staged=null;active = false; host = false; local = null;reconnecting.clear();marks.clear();
     mates.clear(); outEv = []; waiting = new Set(); holds = new Set();
   }
 
@@ -191,7 +255,7 @@ G.Coop = (() => {
     const ja = G.Judgment.netState();       // Arceus en la Sentencia
     if (ja) f.ja = ja;
     // Siempre: quién está eligiendo y, si hay cartas de nivel, cuáles (ver arriba).
-    f.ho = holdNames();f.aw=hostAway||reconnecting.size>0;
+    f.ho = holdNames();f.aw=hostAway||reconnecting.size>0||!!handoff;
     // Repair enemy creation after a brief connection outage without restarting a run.
     if(!m.repairAt||performance.now()>m.repairAt){m.repairAt=performance.now()+2000;f.meta=f.e.map(a=>{const e=G.EnemyMgr.get(a[0]);return [e.id,e.dex,e.maxHp,e.dmg,e.boss?1:0,e.shiny?1:0,e.behavior];});}
     if (waiting.size) f.lu = [levelSeq, levelNow];
@@ -209,6 +273,7 @@ G.Coop = (() => {
   /** Cada fotograma (también en la pantalla de subida de nivel). */
   function tick(dt) {
     if (!active) return;
+    if(handoff&&!handoff.committed&&performance.now()-handoff.at>20000)clearHandoff();
     if (host) {
       for (const m of mates.values()) {
         if (!m.connected) continue;
@@ -233,13 +298,14 @@ G.Coop = (() => {
 
   G.Net.on((from, msg) => {
     if (!msg) return;
-    if (msg.k === 'start') { if (G.Flow.startCoop) G.Flow.startCoop(msg); return; }
-    if (!active || msg.k !== 'f') return;
+    if (msg.k === 'start') { if(G.NAS?.enabled&&(from!==G.Social.room?.host||msg.host!==from))return;if (G.Flow.startCoop) G.Flow.startCoop(msg); return; }
+    if(!active)return;if(msg.k?.startsWith('handoff-')){handoffMessage(from,msg).catch(()=>{if(handoff&&!handoff.committed)clearHandoff();});return;}
+    if(msg.k!=='f')return;
     if (host) onClientFrame(from, msg); else if (from === hostUid) onHostFrame(msg);
   });
 
   G.Net.onPeer((u, mode) => {
-    if(!active)return;
+    if(!active||!host&&u!==hostUid)return;
     if(mode==='reconnecting'){reconnecting.add(u);updateAway();return;}
     if(mode==='relay'||mode==='direct'){reconnecting.delete(u);const m=mates.get(u);if(m)m.repairAt=0;updateAway();return;}
     reconnecting.delete(u);updateAway();
@@ -339,7 +405,7 @@ G.Coop = (() => {
   // --- en el invitado ---
 
   /** Invitado: se para (o sigue) según si el anfitrión está. */
-  function updateAway(){if(api.away)api.away(reconnecting.size?[...reconnecting].map(nameOf).join(', '):hostAway||stalled?nameOf(hostUid):null);}
+  function updateAway(){if(api.away)api.away(handoff?'P2P 主机交接':reconnecting.size?[...reconnecting].map(nameOf).join(', '):hostAway||stalled?nameOf(hostUid):null);}
 
   // Anfitrión: al irse de la pestaña avisa a todos al momento (después ya no
   // podrá mandar nada) y al volver, que sigue.
@@ -567,7 +633,7 @@ G.Coop = (() => {
 
   function rescued(victim){if(!active||!host)return;const v=victim===me?local:mates.get(victim)?.pl;if(!v)return;teamStats?.rescue(players().filter(p=>p&&p.uid!==victim&&!p.dead&&G.U.dist2(p.x,p.y,v.x,v.y)<56*56).map(p=>p.uid));}
   return {
-    rescued,noteDamage(e,uid,damage,killed){if(active&&host)teamStats?.hit(e.id,uid,damage,killed);},get teamStats(){return teamStats?.snapshot()||[];},
+    transferHost,roomChanged,get transferring(){return !!handoff;},rescued,noteDamage(e,uid,damage,killed){if(active&&host)teamStats?.hit(e.id,uid,damage,killed);},get teamStats(){return teamStats?.snapshot()||[];},
     ping,get marks(){return [...marks.values()].filter(m=>performance.now()-m.at<8000);},
     ANIMS, COLORS, begin, end, leave, tick, players, puppets, xpFactor, scaleRate, scaleHp,
     battleHit,formCast,cast, hit, meleeHit, status, hurtShown, enemyAdded, enemyGone, enemyShot, pickupAdded, pickupGone, say,

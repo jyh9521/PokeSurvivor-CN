@@ -4,7 +4,9 @@ PokéSurvivor 的独立简体中文分支，提供单机游玩与浏览器本地
 
 ## NAS 自托管
 
-NAS 模式提供账号、浏览器与 NAS 双份存档、最多四人 WebSocket 联机和在线排行榜，不依赖 Firebase。使用随发行包提供的 Dockerfile 与 Compose 部署，详见 [Unraid 安装与反代说明](docs/UNRAID.md)。直接打开静态网页仍保留单机本地存档模式。
+NAS 模式提供账号、浏览器与 NAS 双份存档、最多八人房主权威 P2P 联机和在线排行榜，不依赖 Firebase。使用随发行包提供的 Dockerfile 与 Compose 部署，详见 [Unraid 安装与反代说明](docs/UNRAID.md)。直接打开静态网页仍保留单机本地存档模式。
+
+0.16.7 起战斗快照、命中事件和主机检查点只走 WebRTC；NAS 保留账号、存档、排行榜、房间与鉴权信令。主动转移房主会先验证新主机直连拓扑，再交接现有战斗；失败保留原主机。详见 [P2P 与原版生命成长验证](docs/HOST_P2P_0167.md)。
 
 ## 本机游玩
 
