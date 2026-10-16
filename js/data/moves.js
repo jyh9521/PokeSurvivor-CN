@@ -471,9 +471,10 @@
    * Instancia de movimiento en una run: los números base de `def` con todas
    * las mejoras de la escalera hasta `lvl` ya aplicadas.
    */
+  let instanceSerial=0;
   function instance(id, lvl = 1) {
     const def = BY_ID[id];
-    const s = Object.assign({}, def, { id, def, lvl, t: 0 });
+    const s = Object.assign({}, def, { id, def, lvl, t: 0, instanceId:"move-"+(++instanceSerial) });
     delete s.ups;
     for (let i = 0; i < lvl - 1; i++) applyMods(s, def.ups[i].m);
     return s;
@@ -603,8 +604,8 @@
   }
 
   function master(m){
-    if(!m.evolved||m.lvl<m.def.maxLvl)return false;
-    m.masteryBase ||= m.dmg;m.mastery=(m.mastery||0)+1;m.dmg=m.masteryBase*(1+.06*m.mastery);return true;
+    if(!m.evolved||m.lvl<m.def.maxLvl||(m.mastery||0)>=3)return false;
+    m.masteryBase ||= m.dmg;m.mastery=(m.mastery||0)+1;m.dmg=m.masteryBase*(1+.03*m.mastery);return true;
   }
 
   G.Moves = { master, ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,

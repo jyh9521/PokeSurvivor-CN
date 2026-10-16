@@ -236,6 +236,7 @@ G.Rift = (() => {
     if (pl.dead) pl.revive(0.3);
     G.Camera.x = pl.x; G.Camera.y = pl.y;
     G.Game.flash('#c9a6ff', 0.8);
+    if(a.phase==='won')G.RunGrowth.returned(pl,a.id);
     if (pl.bonds > 0) G.Game.offerBond();
   }
 

@@ -17,6 +17,7 @@ G.BattleMoves=[
  {id:'shadow-sneak',type:'ghost',kind:'dash',cd:1.15,dmg:27,radius:105,width:34},
  {id:'aqua-jet',type:'water',kind:'dash',cd:1,dmg:24,radius:115,width:38}
 ];
+G.PASSIVE_MAX_LEVEL=6;
 G.PassiveDefs=[
  {id:'vitality',name:'Vitality',desc:'Max HP +20 per level; recover the added HP.',stat:'maxhp',value:20},
  {id:'reflexes',name:'Reflexes',desc:'Attack cooldown -8% per level.',stat:'cooldown',value:.08},
@@ -35,3 +36,6 @@ G.PassiveDefs=[
  {id:'agility',name:'Agility',desc:'Movement speed +5% per level.',stat:'speed',value:.05},
  {id:'revenge',name:'Revenge',desc:'Taking HP damage or blocking arms counter moves for 2 seconds.',stat:'counter',value:1}
 ];
+
+// Six steps preserve the old three-step endpoints, including multiplicative stats.
+for(const d of G.PassiveDefs){d.legacyValue=d.value;d.value=d.stat==="cooldown"?1-Math.sqrt(1-d.value):["magnet","experience"].includes(d.stat)?Math.sqrt(1+d.value)-1:d.value/2;d.desc=["block","counter"].includes(d.stat)?(d.stat==="block"?"One block every 11/10/9/8/7/6 seconds; maximum one charge.":"Counter window +0.5 seconds and counter power +10% per level."):d.desc;}

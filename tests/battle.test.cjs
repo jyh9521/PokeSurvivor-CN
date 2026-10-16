@@ -20,16 +20,16 @@ test('same-typed species gain distinct pools, six-stat roles and trait sources i
  for(const p of [snorlax,blissey,steelix,scizor])assert.ok(G.BattleRules.TRAITS[p.trait.key]);
 });
 
-test('passives have four independent slots, three levels, no attack-slot cost and refuse unknown IDs',()=>{
+test('passives have four independent slots, six levels, no attack-slot cost and refuse unknown IDs',()=>{
  const {G,player}=scene(),p=player(),before=p.slots.length;
- for(const id of ['harden','light-screen','protect','double-team']){for(let i=0;i<3;i++)assert.equal(G.Battle.learn(p,id),true);assert.equal(G.Battle.learn(p,id),false);}
+ for(const id of ['harden','light-screen','protect','double-team']){for(let i=0;i<6;i++)assert.equal(G.Battle.learn(p,id),true);assert.equal(G.Battle.learn(p,id),false);}
  assert.equal(p.slots.length,before);assert.equal(G.Battle.learn(p,'calm-mind'),false);assert.equal(G.Battle.learn(p,'invalid'),false);
  let passive=false;for(let i=0;i<100;i++)passive||=G.LevelUp.offer(p).some(c=>c.type==='passive');assert.equal(passive,false,'capped passives do not reappear');
 });
 
 test('block absorbs one valid hit, refreshes on a timer without hoarding and arms counters',()=>{
  const {G,player}=scene(),p=player();G.Battle.learn(p,'protect');G.Battle.tick(p,0);assert.equal(p.battle.block,1);const hp=p.hp;p.hurt(20);assert.equal(p.hp,hp);assert.equal(p.battle.block,0);assert.ok(p.battle.counterT>0);
- p.hurt(20);assert.ok(p.hp<hp);G.Battle.tick(p,9);assert.equal(p.battle.block,0);G.Battle.tick(p,1);assert.equal(p.battle.block,1);G.Battle.tick(p,100);assert.equal(p.battle.block,1);
+ p.hurt(20);assert.ok(p.hp<hp);G.Battle.tick(p,10);assert.equal(p.battle.block,0);G.Battle.tick(p,1);assert.equal(p.battle.block,1);G.Battle.tick(p,100);assert.equal(p.battle.block,1);
 });
 
 test('dodge is bounded, does not consume block/shield, and pure damage bypasses avoidance and armor',()=>{
@@ -46,9 +46,9 @@ test('shields refresh rather than accumulate and invulnerable/zero hits never co
 test('all twelve passive effects are live, including offense, crit, mobility and conditional recovery',()=>{
  const {G,player,enemy}=scene(),p=player(),e=enemy();const physical={id:'tackle',type:'normal',kind:'melee',dmg:20},special={id:'ember',type:'fire',kind:'projectile',dmg:20};
  const a=G.Battle.damage(p,e,physical,100),b=G.Battle.damage(p,e,special,100);G.Battle.learn(p,'swords-dance');G.Battle.learn(p,'calm-mind');assert.ok(G.Battle.damage(p,e,physical,100)>a);assert.ok(G.Battle.damage(p,e,special,100)>b);
- G.Battle.learn(p,'focus-energy');assert.ok(G.Battle.crit(p)>=.06);G.Battle.learn(p,'agility');assert.ok(G.Battle.speed(p)>1);
+ G.Battle.learn(p,'focus-energy');assert.ok(G.Battle.crit(p)>=.03);G.Battle.learn(p,'agility');assert.ok(G.Battle.speed(p)>1);
  const q=player();G.Battle.learn(q,'ingrain');G.Battle.learn(q,'aqua-ring');q.hp=10;q.walking=true;G.Battle.tick(q,1);const moving=q.hp-10;q.hp=10;q.walking=false;G.Battle.tick(q,1);assert.ok(q.hp-10>moving);
- const r=player();G.Battle.learn(r,'revenge');r.hurt(1);assert.equal(r.battle.counterT,3);
+ const r=player();G.Battle.learn(r,'revenge');r.hurt(1);assert.equal(r.battle.counterT,2.5);
 });
 
 test('Mega uses real alternate stats, types and ability, expires cleanly, and is limited to eligible species',()=>{
@@ -106,8 +106,8 @@ test('per-skill layered effects are bounded and quality changes never alter comb
  for(let i=0;i<1000;i++)G.SkillVFX.cast(p,G.Moves.BY_ID.surf,true);assert.ok(G.SkillVFX.count<=100);assert.equal(e.hp,1000);G.SkillVFX.update(10);assert.equal(G.SkillVFX.count,0);
 });
 
-test('room protocol advertises version nine and rejects previous battle clients',async()=>{
- const os=require('node:os'),path=require('node:path'),{createApp}=require('../server/app.cjs'),dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-protocol5-')),app=createApp({dataDir:dir,campaigns:[]});try{await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+app.server.address().port,u=await app.store.credentials('BattleProtocol','password123',true),cookie='ps_nas='+app.store.session(u);assert.equal((await fetch(base+'/api/config').then(r=>r.json())).protocol,9);const r=await fetch(base+'/api/room/create',{method:'POST',headers:{origin:base,cookie,'content-type':'application/json'},body:JSON.stringify({protocol:8})});assert.equal(r.status,409);}finally{await app.close();fs.rmSync(dir,{recursive:true,force:true});}
+test('room protocol advertises version ten and rejects previous battle clients',async()=>{
+ const os=require('node:os'),path=require('node:path'),{createApp}=require('../server/app.cjs'),dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-protocol5-')),app=createApp({dataDir:dir,campaigns:[]});try{await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+app.server.address().port,u=await app.store.credentials('BattleProtocol','password123',true),cookie='ps_nas='+app.store.session(u);assert.equal((await fetch(base+'/api/config').then(r=>r.json())).protocol,10);const r=await fetch(base+'/api/room/create',{method:'POST',headers:{origin:base,cookie,'content-type':'application/json'},body:JSON.stringify({protocol:9})});assert.equal(r.status,409);}finally{await app.close();fs.rmSync(dir,{recursive:true,force:true});}
 });
 
 function network(s,uid){const {G,ctx}=s;let receive;const sent=[];G.Net={uid,on:f=>receive=f,onPeer:()=>{},interval:()=>.1,slow:()=>false,viaTurn:()=>false,send:(u,m)=>sent.push([u,m]),toHost:m=>sent.push(['host',m])};G.Flow={};G.TeamStats={create:()=>({snapshot:()=>[],hit:()=>{},ingest:()=>{}})};vm.runInContext(fs.readFileSync('js/net/coop.js','utf8'),ctx);const p=s.player();G.Coop.begin({host:'host',members:Array.from({length:8},(_,i)=>({uid:i?'u'+i:'host',name:'p'+i,dex:6}))},p,{choosing:()=>false});return {p,receive,sent};}
@@ -116,3 +116,5 @@ test('guest damage benefits require a host receipt, reject replays and never com
 
 test('learned counter and decoy support skills trigger without switching away from the main attack',()=>{const {G,player,enemy}=scene(),p=player(),e=enemy();p.addMove('counter');p.addMove('substitute');p.setActive(0);p.target=e;G.Combat.tick(.001,p,0);assert.equal(G.Combat.decoys().length,1);const hp=e.hp;p.activeMove().t=999;p.battle.counterT=2;G.Combat.tick(.01,p,0);assert.ok(e.hp<hp);assert.equal(p.battle.counterT,0);assert.equal(p.active,0);});
 test('only host-authorized guest decoys enter AI targeting, and ghost detonation never duplicates guest damage',()=>{const s=scene(),{G}=s,n=network(s,'host'),e=s.enemy();n.receive('u1',{k:'f',ev:[['c','substitute',1,0,0,[],[40,0,e.id,20]]]});assert.equal(G.Combat.decoys().length,1);G.Combat.updateFields(4);assert.equal(G.Combat.decoys().length,0);assert.equal(e.hp,1000);const p=n.p;let observed;G.SkillVFX.cast=actor=>observed={x:actor.target.x,y:actor.target.y};G.Combat.ghostCast(p,'earth-power',1,0,false,null,[200,40,999,20]);assert.deepEqual(observed,{x:200,y:40});assert.equal(p.target,undefined);});
+
+test('only authenticated host mastery messages mint pending points; replays and guest spoofing do nothing',()=>{const s=scene(),{G}=s,n=network(s,'u1');G.Game={player:n.p};const msg={k:'f',ev:[['mr','boss:123'],['mr','boss:123']]};n.receive('u2',msg);assert.equal(n.p.growth,undefined);n.receive('host',msg);assert.equal(n.p.growth.points,1);const m=n.p.activeMove();while(G.Moves.levelUp(m));G.Moves.evolve(m);assert.equal(G.RunGrowth.spend(n.p,m.instanceId),true);n.receive('host',msg);assert.equal(m.mastery,1);assert.equal(n.p.growth.points,0);const state=G.Battle.net(n.p);const puppet=G.Coop.mate('u2').pl;G.Battle.ingest(puppet,state);assert.equal(puppet.growthSummary.targets[0][0],m.instanceId);assert.equal(puppet.growthSummary.targets[0][3],1);});
