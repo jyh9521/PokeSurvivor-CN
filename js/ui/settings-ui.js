@@ -30,7 +30,8 @@ G.SettingsUI = (() => {
     $('scr-settings').classList.remove('hidden');
     render();
   }
-  function close() { $('scr-settings').classList.add('hidden'); }
+  function close() {
+    G.Gamepad?.cancelCapture(); $('scr-settings').classList.add('hidden'); }
   const isOpen = () => !$('scr-settings').classList.contains('hidden');
 
   // ---------------- pantalla completa ----------------
@@ -90,7 +91,7 @@ G.SettingsUI = (() => {
              <button class="btn small" id="set-full">${isFull() ? 'Salir' : 'Activar'}</button></div>`
            : iosTip() ? `<div class="set-row"><div class="grow"><b>Pantalla completa</b><small>${esc(IOS_TIP)}</small></div></div>` : '');
     } else if (tab === 'ctl') {
-      box.innerHTML = section('Mando','')+'<p class=sub data-pad-controls></p>'+toggle('gamepad','Activar mando','Pulsa un botón para detectar el mando. Los campos de texto siguen usando teclado.')+toggle('rumble','Vibración del mando','Vibra al recibir daño real.')+'<button class="btn small" data-rumble-test>'+G.T('Probar vibración')+'</button><p class=sub data-rumble-status role=status></p>'+section('Iconos del mando','')+'<select class=field data-pad-layout aria-label="'+esc(G.T('Iconos del mando'))+'">'+[['auto','Auto'],['xbox','Xbox'],['playstation','PlayStation'],['nintendo','Nintendo']].map(([v,n])=>'<option value="'+v+'" '+(G.Settings.get('padLayout')===v?'selected':'')+'>'+n+'</option>').join('')+'</select>'+section('En móvil o tablet')
+      box.innerHTML = section('Mando','')+padPanel()+'<p class=sub data-pad-controls></p>'+toggle('gamepad','Activar mando','Pulsa un botón para detectar el mando. Los campos de texto siguen usando teclado.')+toggle('rumble','Vibración del mando','Vibra al recibir daño real.')+'<button class="btn small" data-rumble-test>'+G.T('Probar vibración')+'</button><p class=sub data-rumble-status role=status></p>'+section('Iconos del mando','')+'<select class=field data-pad-layout aria-label="'+esc(G.T('Iconos del mando'))+'">'+[['auto','Auto'],['xbox','Xbox'],['playstation','PlayStation'],['nintendo','Nintendo']].map(([v,n])=>'<option value="'+v+'" '+(G.Settings.get('padLayout')===v?'selected':'')+'>'+n+'</option>').join('')+'</select>'+section('En móvil o tablet')
         + `<p class="sub">Arrastra para moverte; toca un ataque para cambiarlo y la esquina superior derecha para pausar. Puedes jugar en vertical u horizontal.</p>`
         + `<div class="set-row"><div class="grow"><b>Tamaño del joystick</b><small>Cuánto hay que arrastrar el dedo.</small></div></div>`
         + choice('stick', [[0.8, 'Pequeño'], [1, 'Normal'], [1.25, 'Grande']])
@@ -153,9 +154,26 @@ G.SettingsUI = (() => {
          </div><p class="note" id="set-msg"></p>`;
   }
 
-  const RUMBLE_TEXT={idle:'Vibración disponible. Prueba el mando.',playing:'Enviando vibración…',complete:'El navegador completó la orden. Comprueba si el mando vibró.',preempted:'La vibración fue interrumpida. Prueba otra vez.',error:'El navegador rechazó la vibración. Comprueba el modo del mando y la conexión.',unsupported:'Este navegador o conexión no expone vibración. Prueba USB o modo XInput.', 'no-pad':'No hay mando estándar conectado. Pulsa un botón del mando.',disabled:'Activa el mando y la vibración para probar.'};
-  function refreshRumble(){const el=document.querySelector('[data-rumble-status]');if(!el)return;const value=G.T(RUMBLE_TEXT[G.Gamepad.rumbleStatus().code]||RUMBLE_TEXT.idle);if(el.textContent!==value)el.textContent=value;}
+  const PAD_BINDINGS=[[0,'Confirm'],[1,'Back'],[2,'Reroll / Help'],[3,'Danger mark'],[4,'Previous attack'],[5,'Next attack'],[9,'Pause'],[10,'Activate special'],[11,'Switch special'],[12,'Up'],[13,'Down'],[14,'Left'],[15,'Right']];
+  function padPanel(){return '<p class="sub" data-pad-status role="status"></p><p class="sub" data-pad-live></p><div class="chips set-chips"><button class="btn small" data-pad-refresh>'+G.T('Detect controller')+'</button><button class="btn small" data-pad-export>'+G.T('Export controller diagnostics')+'</button></div><details class="pad-mapping"><summary tabindex="0">'+G.T('Calibrate controller')+'</summary><p class="sub">'+G.T('Generic USB controls are enabled. Calibrate only if buttons or axes differ.')+'</p><div class="chips set-chips">'+PAD_BINDINGS.map(([i,label])=>'<button class="btn small" data-pad-bind="'+i+'">'+G.T(label)+'</button>').join('')+'<button class="btn small" data-pad-axis="0">'+G.T('Move right')+'</button><button class="btn small" data-pad-axis="1">'+G.T('Move down')+'</button></div><p class="sub" data-pad-capture role="status"></p><button class="btn small" data-pad-cancel>'+G.T('Cancel calibration')+'</button> <button class="btn small" data-pad-reset>'+G.T('Reset controller mapping')+'</button></details>';}
+  function refreshPad(){const el=document.querySelector('[data-pad-status]');if(!el)return;const s=G.Gamepad.status();const text=G.T(!s.enabled?'Controller input is disabled.':!s.supported?'Gamepad API is unavailable. Open the HTTPS game page in Chrome.':s.error?'The browser blocked controller access.':!s.connected?'No controller exposed by the browser. Tap this page, then press a controller button.':s.mapping==='standard'?'Standard controller detected.':'Unmapped USB controller detected; generic controls are enabled.');if(el.textContent!==text)el.textContent=text;
+    const live=document.querySelector('[data-pad-live]'),value=s.connected?G.T('Buttons')+': '+s.buttons.length+' · '+G.T('Axes')+': '+s.axes.map((n,i)=>i+'='+n.toFixed(2)).join(' ')+' · '+G.T('Pressed')+': '+s.buttons.map((n,i)=>n>.5?i:null).filter(n=>n!==null).join(', '):'';if(live&&live.textContent!==value)live.textContent=value;
+    document.querySelectorAll('[data-pad-bind],[data-pad-axis],[data-pad-reset]').forEach(b=>b.disabled=!s.connected||!s.enabled);
+  }
+  function calibrate(type,target){const el=document.querySelector('[data-pad-capture]');const prompt=type==='axis'?target===0?'Release controls, then move the stick right.':'Release controls, then move the stick down.':'Release controls, then press the desired controller button.';
+    const started=G.Gamepad.beginCapture(type,({key,index,sign})=>{const all=structuredClone(G.Settings.get('padBindings')||{}),entry=all[key]||{buttons:{},axes:{}};entry[type==='axis'?'axes':'buttons']||={};entry[type==='axis'?'axes':'buttons'][target]=type==='axis'?{index,sign}:index;all[key]=entry;G.Settings.set('padBindings',all);if(el?.isConnected)el.textContent=G.T('Controller mapping saved.');});if(el)el.textContent=G.T(started?prompt:'Connect a controller and enable controller input first.');
+  }
+  function exportPad(){const data={format:1,version:G.APP_VERSION,controller:G.Gamepad.status(),userAgent:navigator.userAgent,visibility:document.visibilityState},url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='pokesurvivor-controller.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  const RUMBLE_TEXT={idle:'Vibración disponible. Prueba el mando.',playing:'Enviando vibración…',complete:'El navegador completó la orden. Comprueba si el mando vibró.',preempted:'La vibración fue interrumpida. Prueba otra vez.',error:'El navegador rechazó la vibración. Comprueba el modo del mando y la conexión.',unsupported:'Este navegador o conexión no expone vibración. Prueba USB o modo XInput.', 'no-pad':'No controller exposed by the browser. Tap this page, then press a controller button.',disabled:'Activa el mando y la vibración para probar.'};
+  function refreshRumble(){refreshPad();const el=document.querySelector('[data-rumble-status]');if(!el)return;const value=G.T(RUMBLE_TEXT[G.Gamepad.rumbleStatus().code]||RUMBLE_TEXT.idle);if(el.textContent!==value)el.textContent=value;}
   function wire(box) {
+    const detect=box.querySelector('[data-pad-refresh]');if(detect)detect.onclick=refreshPad;
+    const output=box.querySelector('[data-pad-export]');if(output)output.onclick=exportPad;
+    box.querySelectorAll('[data-pad-bind]').forEach(b=>b.onclick=()=>calibrate('button',Number(b.dataset.padBind)));
+    box.querySelectorAll('[data-pad-axis]').forEach(b=>b.onclick=()=>calibrate('axis',Number(b.dataset.padAxis)));
+    const cancel=box.querySelector('[data-pad-cancel]');if(cancel)cancel.onclick=()=>{G.Gamepad.cancelCapture();const el=box.querySelector('[data-pad-capture]');if(el)el.textContent=G.T('Calibration cancelled.');};
+    const reset=box.querySelector('[data-pad-reset]');if(reset)reset.onclick=()=>{G.Gamepad.cancelCapture();const key=G.Gamepad.status().key,all=structuredClone(G.Settings.get('padBindings')||{});delete all[key];G.Settings.set('padBindings',all);const el=box.querySelector('[data-pad-capture]');if(el)el.textContent=G.T('Controller mapping reset.');};
+
     const place=box.querySelector('[data-touch-layout]');if(place)place.onclick=()=>G.LayoutUI.open();
     const test=box.querySelector('[data-rumble-test]');if(test)test.onclick=async()=>{test.disabled=true;try{await G.Gamepad.rumble(1,true);}finally{if(test.isConnected)test.disabled=false;refreshRumble();}};
     refreshRumble();

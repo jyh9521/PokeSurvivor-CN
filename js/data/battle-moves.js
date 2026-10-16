@@ -18,6 +18,10 @@ G.BattleMoves=[
  {id:'aqua-jet',type:'water',kind:'dash',cd:1,dmg:24,radius:115,width:38}
 ];
 G.PassiveDefs=[
+ {id:'vitality',name:'Vitality',desc:'Max HP +20 per level; recover the added HP.',stat:'maxhp',value:20},
+ {id:'reflexes',name:'Reflexes',desc:'Attack cooldown -8% per level.',stat:'cooldown',value:.08},
+ {id:'magnet',name:'Pickup Magnet',desc:'Experience pickup radius +30% per level.',stat:'magnet',value:.3},
+ {id:'learning',name:'Fast Learning',desc:'Experience gained +12% per level.',stat:'experience',value:.12},
  {id:'harden',name:'Harden',desc:'Physical armor +25 per level.',stat:'armor',value:25},
  {id:'light-screen',name:'Light Screen',desc:'Special armor +25 per level.',stat:'ward',value:25},
  {id:'double-team',name:'Double Team',desc:'Dodge chance +5% per level; total capped at 30%.',stat:'dodge',value:.05},

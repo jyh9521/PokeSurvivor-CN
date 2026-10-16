@@ -531,7 +531,7 @@ G.Game = (() => {
       return;
     }
     if (state === 'levelup'||G.UI.isOpen('scr-levelup')) {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 4; i++) {
         if (G.Input.action('slots',i)) G.RunUI.pick(i);
       }
       if (G.Input.action('reroll')) G.RunUI.reroll();

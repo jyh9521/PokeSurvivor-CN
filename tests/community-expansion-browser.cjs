@@ -74,9 +74,13 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
     check('all eight real browsers start normal combat with seven remote players',await Promise.all(pages.map(p=>p.evaluate(()=>G.Coop.players().length===8))).then(v=>v.every(Boolean)));
     if(BATTLE)check('seven added species start and synchronize their multiplayer identities',await Promise.all(pages.slice(1).map((p,i)=>p.evaluate(d=>G.Game.player.dex===d,[593,668,865,999,1003,1008,1025][i]))).then(xs=>xs.every(Boolean))&&await a.evaluate(uids=>uids.every(uid=>!!G.Coop.mate(uid)?.pl&&G.SPRITE_META[G.Coop.mate(uid).pl.dex]),users.slice(1).map(u=>u.id)));
     await a.waitForTimeout(2200);const metrics=await a.evaluate(()=>G.NAS.networkMetrics());check('eight-player snapshot pacing caps at 10Hz and diagnostics separate actual paths',metrics.targetHz<=10&&(RELAY?metrics.directPeers===0&&metrics.relayPeers===7:metrics.directPeers>=3&&metrics.relayPeers>=4));
+    if(BATTLE){
+      for(const lane of [3,1]){await a.evaluate(()=>G.Coop.levelStart(G.Game.player.level));for(const p of pages)await p.locator('#scr-levelup').waitFor({state:'visible'});check('eight-player shared level exposes four fixed lanes '+lane,await Promise.all(pages.map(p=>p.locator('#cards .card').count())).then(xs=>xs.every(n=>n===4)));for(const p of pages)await p.locator('#cards .card').nth(lane).click();for(const p of pages)await p.waitForFunction(()=>G.Game.state==='playing');}
+      check('eight players resume after learning then upgrading their own passive',await Promise.all(pages.map(p=>p.evaluate(()=>Object.values(G.Game.player.passives).length===1&&Object.values(G.Game.player.passives)[0]===2))).then(xs=>xs.every(Boolean)));
+    }
     if(MELEE){
     // Controlled real-game fixtures: actual cast/host messages and actual enemy deaths.
-    for(const p of pages)await p.evaluate(()=>{const p=G.Game.player;p.slots=[];p.frozen=true;p.invuln=1e6;p.maxHp=100;p.hp=100;p.regenFlat=0;p.buffs.regen.n=0;});
+    for(const p of pages)await p.evaluate(()=>{const p=G.Game.player;p.slots=[];p.passives={};p.statsTaken={};p.frozen=true;p.invuln=1e6;p.maxHp=100;p.hp=100;p.regenFlat=0;p.buffs.regen.n=0;});
     const fixture=await a.evaluate(()=>{G.Spawner.update=()=>{};G.EnemyMgr.clear();const p=G.Game.player;return {x:p.x,y:p.y};});
     for(const p of pages)await p.evaluate(({x,y})=>{G.Game.player.x=x;G.Game.player.y=y;},fixture);
     const victimId=await a.evaluate(({x,y})=>{const e=new G.Enemy({dex:1,hp:1,spd:0,dmg:0,xp:0,behavior:'chaser'},x+35,y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},fixture);

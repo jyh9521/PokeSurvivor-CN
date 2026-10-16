@@ -525,8 +525,7 @@
    * vez la mejora de su condición (`needs`, un id de LevelUp.STATS). Sale una
    * carta dorada. Los potenciadores (buff) no evolucionan.
    */
-  const NEED_NAME = { hp: 'Vigor', atk: 'Potencia', spd: 'Carrera', cd: 'Reflejos', def: 'Coraza',
-                      rgn: 'Síntesis', mag: 'Imán', xp: 'Aprendizaje' };
+  const NEED_NAME = {hp:'Vitality',atk:'Swords Dance / Calm Mind',spd:'Agility',cd:'Reflexes',def:'Defensive passive',rgn:'Aqua Ring / Ingrain',mag:'Pickup Magnet',xp:'Fast Learning'};
   const EVO = {
     'tackle': ['Derribo', 'hp'],             'quick-attack': ['Velocidad Extrema', 'spd'],
     'body-slam': ['Gigaimpacto', 'atk'],     'hyper-voice': ['Alboroto', 'cd'],

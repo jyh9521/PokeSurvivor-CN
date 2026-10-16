@@ -1,6 +1,6 @@
 {
   "name": "pokesurvivor-cn",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "private": true,
   "description": "Simplified Chinese local and self-hosted NAS edition with dual saves, co-op and leaderboards",
   "scripts": {
@@ -29,7 +29,9 @@
     "test:battle:browser": "node tests/battle-browser.cjs",
     "test:battle:ui": "node tests/battle-ui-browser.cjs",
     "test:comfort": "node --test tests/comfort.test.cjs",
-    "test:comfort:browser": "node tests/comfort-browser.cjs"
+    "test:comfort:browser": "node tests/comfort-browser.cjs",
+    "test:progression:controller": "node --test tests/progression-controller.test.cjs",
+    "test:progression:controller:browser": "node tests/progression-controller-browser.cjs"
   },
   "devDependencies": {
     "javascript-obfuscator": "4.1.1",

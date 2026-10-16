@@ -6,6 +6,7 @@
  * Cada línea en español y en inglés.
  */
 G.CHANGELOG = [
+  {d:'2026-10-16',title:['Cuatro opciones y mandos USB','Four reward lanes and USB controllers'],chg:[['Las mejoras de partida se unifican como pasivas; cuatro categorías de cartas, evolución vinculada y detección/calibración de mandos USB sin mapa estándar.','Run upgrades merge into passives; four reward categories, updated evolution requirements and detection/calibration for unmapped USB controllers.']]},
   {d:'2026-10-16',title:['Nueve compañeros recuperados','Nine recovered partners'],new:[['Nueve Pokémon con animaciones reales, repertorios propios, estadísticas y variantes de aspecto identificadas.','Nine Pokémon with real animations, curated move pools, base stats and clearly labeled sprite variants.']]},
   {d:'2026-10-16',title:['Radar de seis estadísticas','Six-stat radar'],chg:[['La ficha de cada Pokémon muestra sus seis estadísticas en un radar con valores exactos y una escala común.','Pokémon details show six stats in a radar with exact values and a shared scale.']]},
   { d: '2026-10-16', title: ['Aprender sin cambiar de ataque', 'Learn without switching attacks'], chg: [['Aprender un movimiento conserva el ataque activo; cambia manualmente cuando quieras.', 'Learning a move keeps the current attack active; switch manually when you want.']] },
