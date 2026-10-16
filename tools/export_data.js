@@ -25,7 +25,7 @@ G.I18n.add = (d, lang = 'en', context = '') => {
   if (lang === 'zh-CN') Object.assign(context ? (ZH_CONTEXT[context] ||= {}) : ZH, d);
   add(d, lang, context);
 };
-for (const f of ['js/data/lang-en.js', 'js/data/lang-zh-cn.js', 'js/data/lang-zh-cn-names.js', 'js/core/settings.js', 'js/data/pokedex.js','js/data/battle-dex.js','js/core/battle-rules.js','js/data/battle-moves.js', 'js/data/sprites-meta.js', 'js/data/moves.js', 'js/data/types.js',
+for (const f of ['js/data/lang-en.js', 'js/data/lang-zh-cn.js', 'js/data/lang-zh-cn-names.js', 'js/core/settings.js', 'js/data/pokedex.js','js/data/battle-dex.js','js/core/battle-rules.js','js/core/battle-balance.js','js/data/special-data.js','js/core/special-rules.js','js/data/battle-moves.js','js/data/expansion-moves.js', 'js/data/sprites-meta.js', 'js/data/moves.js', 'js/data/types.js',
                  'js/data/items.js', 'js/data/achievements.js', 'js/data/changelog.js', 'js/world/tiles.js', 'js/data/funding.js']) {
   try { load(f); } catch (e) { console.warn('aviso', f, e.message); }
 }

@@ -80,7 +80,7 @@ test('all English keys have Chinese counterparts and preserve placeholders', () 
 });
 test('all species, moves, evolutions, items and release notes are translated', () => {
   const c = context();
-  c.load('js/core/util.js');
+  c.load('js/core/util.js');c.load('js/core/battle-balance.js');
   for (const f of ['pokedex', 'moves', 'items', 'changelog']) c.load(`js/data/${f}.js`);
   const T = c.G.T, han = /\p{Script=Han}/u;
   assert.equal(c.G.DEX.length, 975);

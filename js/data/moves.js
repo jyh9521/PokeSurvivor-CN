@@ -441,6 +441,8 @@
     const descriptions={wave:'A moving wave hits each enemy once.',mark:'Marks the ground, then detonates after a delay.',counter:'Automatically counterattack after taking damage or blocking.',decoy:'An automatic decoy distracts enemies and bursts after its lifetime.',beam:'A powerful long-range beam.',projectile:'Rapid penetrating seeds.',dash:'Dash through nearby enemies.'};
     const def={...extra,name:extra.name||names?.['7']||extra.id,desc:extra.desc||descriptions[extra.kind]||'A distinct moving attack.'},index=RAW.findIndex(m=>m.id===extra.id);if(index<0)RAW.push(def);else RAW[index]=def;
   }
+  for(const m of RAW)G.BattleBalance.tune(m);
+
   LADDERS.wave=[{t:'+40% daño',m:{dmg:1.4}},{t:'+25% alcance',m:{width:1.25,life:1.25}},{t:'-25% recarga',m:{cd:.75}},{t:'+50% daño',m:{dmg:1.5}}];
   LADDERS.mark=[{t:'+40% daño',m:{dmg:1.4}},{t:'+25% alcance',m:{radius:1.25}},{t:'-25% recarga',m:{cd:.75}},{t:'+50% daño',m:{dmg:1.5}}];
   LADDERS.counter=LADDERS.melee;LADDERS.decoy=LADDERS.mark;
@@ -577,7 +579,8 @@
   };
 
   Object.assign(EVO_MODS,{wave:EVO_MODS.aura,mark:EVO_MODS.aura,counter:EVO_MODS.melee,decoy:EVO_MODS.aura});
-  for(const m of G.BattleMoves||[]){const def=BY_ID[m.id];EVO[m.id]=[def.name+' +',def.damageClass==='physical'?'atk':'cd'];}
+  Object.assign(EVO_MODS,{curve:EVO_MODS.projectile,split:EVO_MODS.projectile,spiral:EVO_MODS.projectile,ricochet:EVO_MODS.projectile,rolling:EVO_MODS.projectile,lob:EVO_MODS.meteor});
+  for(const m of [...(G.BattleMoves||[]),...(G.ExpansionMoves||[])]){const def=BY_ID[m.id];if(!def?.specialOnly&&EVO_MODS[def.kind])EVO[m.id]=[def.name+' +',def.damageClass==='physical'?'atk':'cd'];}
 
   /** ¿Puede evolucionar ya? → { name, needs, needName, text, ready } o null */
   function evoInfo(m, statsTaken) {
@@ -599,6 +602,11 @@
     return true;
   }
 
-  G.Moves = { ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,
+  function master(m){
+    if(!m.evolved||m.lvl<m.def.maxLvl)return false;
+    m.masteryBase ||= m.dmg;m.mastery=(m.mastery||0)+1;m.dmg=m.masteryBase*(1+.06*m.mastery);return true;
+  }
+
+  G.Moves = { master, ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,
               EVO, NEED_NAME, evoInfo, evolve };
 })();

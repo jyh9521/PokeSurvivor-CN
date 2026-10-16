@@ -17,10 +17,9 @@ G.Spawner = (() => {
   const CAP = 64, ELITE_FROM = 0.85;
   // Menos Pokémon pero más fuertes (la pantalla no se satura): salen ~24% de
   // los de antes, cada uno con más vida, daño y experiencia.
-  const DENSITY = 0.24, DMG_K = 2.4, XP_K = 5.6;
-  // La resistencia extra crece con la run: al principio ×3,3 y hasta ×5
-  // hacia el minuto 6, cuando ya tienes ataques para tumbarlos.
-  const hpK = t => 3.3 + Math.min(1.7, t / 210);
+  const DENSITY = 0.24, DMG_K = G.BattleBalance.CONTACT_DAMAGE, XP_K = 5.6;
+  // One bounded density adjustment; time growth belongs to Enemies.scale.
+  const hpK = () => G.BattleBalance.DENSITY_HP;
   const SHINY_RATE = 1 / 4096;
   let acc = 0, bossIdx = 0, surgeT = 32, announce = null, announceT = 0, preloadT = 0;
   let forceShiny = 0;           // para pruebas: los N próximos salen shiny

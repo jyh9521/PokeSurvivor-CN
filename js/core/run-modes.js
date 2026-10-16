@@ -15,10 +15,11 @@ G.RunModes=(()=>{
   function activate(coop){
     if(coop)pending=null;
     if(!pending&&!coop?.experiment)return;
+    G.Progress?.resetNotices();
     active=pending?{kind:'challenge',...pending}:{kind:'experiment'};pending=null;
-    temporary=structuredClone(db.save);temporary.coins=0;temporary.tickets={t1:0,t10:0};temporary.pupg={};temporary.pspent={};temporary.pbind={};temporary.pban={};temporary.pity={};temporary.missions={};temporary.ach={};
+    temporary=structuredClone(db.save);temporary.coins=0;temporary.tickets={t1:0,t10:0};temporary.pupg={};temporary.pspent={};temporary.pbind={};temporary.pban={};temporary.pity={};temporary.missions={};
     if(active.kind==='challenge'){temporary.partner=active.dex;temporary.partnerShiny=false;temporary.owned={[active.dex]:{}};temporary.shiny={};}
   }
-  function end(){temporary=null;active=null;pending=null;}
+  function end(){G.Progress?.resetNotices();temporary=null;active=null;pending=null;}
   return {configure:value=>{pending=value;},activate,end,get pending(){return pending;},get active(){return active;}};
 })();

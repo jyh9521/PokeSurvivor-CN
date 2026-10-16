@@ -8,7 +8,7 @@ function scene(){
   Coop:{active:false,isHost:false,noteDamage:noop},VFX:{forMove:()=>({})},FX:new Proxy({slash:()=>slashes++},{get:(o,k)=>o[k]||noop}),Audio:{sfx:noop},Judgment:{noteDmg:noop},Weather:{mult:()=>1,speedFor:()=>1},Types:{mult:()=>1,label:()=>null},
   World:{propsInCircle:()=>[],nearestBreakable:()=>null,collide:()=>false,isLiquid:()=>false},Camera:{sees:()=>false,damage:noop},Gamepad:{rumble:noop},Input:{axis:()=>[0,0]},startMoveOf:()=>'tackle',Path:{dirFor:()=>[1,0]},Projectiles:{clearOrbs:noop,nearest:(all,x,y,r)=>all.find(e=>!e.dead&&Math.hypot(e.x-x,e.y-y)<r),all:()=>[]}};
  const ctx=vm.createContext({G,console,performance:{now:()=>now},Math,document:{addEventListener:noop}});
- for(const file of ['js/data/moves.js','js/entities/player.js','js/entities/enemy.js','js/systems/combat.js'])vm.runInContext(fs.readFileSync(file,'utf8'),ctx);
+ for(const file of ['js/core/battle-balance.js','js/data/moves.js','js/entities/player.js','js/entities/enemy.js','js/systems/combat.js'])vm.runInContext(fs.readFileSync(file,'utf8'),ctx);
  const player=()=>{const p=new G.Player(G.DEX_BY[1]);p.uid='host';p.addMove('tackle');p.cast=noop;return p;};
  const enemy=(x=30,y=0,hp=1000)=>{const e=new G.Enemy({dex:1,hp,spd:50,dmg:10,xp:0,behavior:'chaser'},x,y,{hp:1,spd:1,dmg:1});e.die=function(){this.dead=true;};G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e;};
  return {G,ctx,player,enemy,setNow:n=>now=n,get slashes(){return slashes;}};
@@ -16,7 +16,7 @@ function scene(){
 
 test('melee definitions add exact common tuning and all nine distinct roles',()=>{
  const {G}=scene(),m=G.Moves.BY_ID;
- assert.equal(m.tackle.cd,.45);assert.equal(m.tackle.radius,69);assert.ok(Math.abs(m.tackle.dmg-16*1.2*1.1)<.001);
+ assert.equal(m.tackle.cd,.45);assert.equal(m.tackle.radius,69);assert.ok(Math.abs(m.tackle.dmg-16*1.2*1.1*1.45)<.001);
  assert.equal(m['wing-attack'].combo,true);assert.equal(m['metal-claw'].shred,.15);assert.equal(m['bug-bite'].killHeal,.01);assert.equal(m.bite.killHeal,.01);assert.equal(m['karate-chop'].eliteBonus,1.3);assert.equal(m.lick.slow,.55);
  assert.ok(m['vine-whip'].radius>m.tackle.radius);assert.ok(m['body-slam'].stagger>.15);
  for(const d of G.Moves.ALL.filter(m=>m.kind==='melee')){assert.ok(d.arc<Math.PI*2);const a=G.Moves.instance(d.id);for(let i=1;i<d.maxLvl;i++)G.Moves.levelUp(a);const b=G.Moves.instance(d.id,d.maxLvl);assert.equal(a.dmg,b.dmg);assert.equal(a.cd,b.cd);G.Moves.evolve(a);assert.ok(a.arc>=Math.PI*2);}

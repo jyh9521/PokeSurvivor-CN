@@ -349,14 +349,17 @@ G.MenuUI = (() => {
   function banPicker(max) {
     const mon = G.DEX_BY[upgDex];
     const start = G.startMoveOf(upgDex);
-    const ids = G.Moves.poolFor(mon).filter(id => id !== start)
-      .sort((a, b) => G.Moves.BY_ID[a].name.localeCompare(G.Moves.BY_ID[b].name, 'es'));
     const list = banList();
+    const pool = G.Moves.poolFor(mon).filter(id => id !== start);
+    // Saved bans outside the current pool (or the new starter) remain removable.
+    const ids = [...new Set([...list,...pool])].filter(id=>typeof id==='string'&&/^[a-z0-9-]{1,64}$/.test(id))
+      .sort((a,b)=>Number(list.includes(b))-Number(list.includes(a))||(G.Moves.BY_ID[a]?.name||a).localeCompare(G.Moves.BY_ID[b]?.name||b,'es'));
     const el = document.createElement('div');
     el.className = 'panel ban-picker';
     el.innerHTML = `<p class="sub" style="margin:0 0 8px">Toca los movimientos que no quieres que te salgan en las cartas (${list.length}/${max}). El movimiento de inicio no se puede vetar.</p>
       <div class="ban-moves">${ids.map(id => { const d = G.Moves.BY_ID[id]; const on = list.includes(id);
-        return `<button class="chip ${on ? 'on ban' : ''}" data-id="${id}">${G.Icons.html('move:' + id, 16)} ${G.T(d.name, 'move')}${on ? ' ' + G.Icons.html('ban', 14) : ''}</button>`; }).join('')}</div>`;
+        return `<button class="chip ${on ? 'on ban' : ''}" data-id="${id}">${G.Icons.html(d?'move:'+id:'ban', 16)} ${d?G.T(d.name,'move'):G.T('Removed move')+': '+id}${on&&!pool.includes(id)?' · '+G.T('Outside current pool — remove block'):''}${on ? ' ' + G.Icons.html('ban', 14) : ''}</button>`; }).join('')}</div><button class="btn small ghost" data-clear-bans>${G.T('Clear all blocked moves')}</button>`;
+    el.querySelectorAll('[data-clear-bans]').forEach(b=>b.onclick=()=>{G.DB.save.pban[upgDex]=[];G.DB.commit();G.Audio.sfx('select');renderUpgrades();});
     el.querySelectorAll('[data-id]').forEach(b => {
       b.onclick = () => {
         const l = banList(), id = b.dataset.id, i = l.indexOf(id);

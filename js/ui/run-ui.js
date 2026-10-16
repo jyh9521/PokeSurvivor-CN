@@ -7,6 +7,7 @@ G.RunUI = (() => {
   function showLevelUp(level, list, cb, coop = false) {
     offerCb = cb; coopMode = coop;
     $('lvl-num').textContent = level;
+    $('lvl-growth').textContent = G.T('Level damage bonus')+' +'+Math.round((G.BattleBalance.offense({level})-1)*100)+'% · '+G.T('Same-type bonus')+' +20%';
     $('lvl-wait').textContent = '';
     $('lvl-wait').classList.toggle('hidden', !coop);
     $('cards').classList.remove('done');

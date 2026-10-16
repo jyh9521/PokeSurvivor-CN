@@ -430,6 +430,8 @@ KIND = {'es': {'projectile': 'Proyectil', 'melee': 'Cuerpo a cuerpo', 'beam': 'R
                'trail': 'Trail', 'cone': 'Spray'}}
 KIND['es'].update({'wave':'Ola móvil','mark':'Marca diferida','counter':'Contraataque automático','decoy':'Señuelo'})
 KIND['en'].update({'wave':'Moving wave','mark':'Delayed mark','counter':'Automatic counter','decoy':'Decoy'})
+KIND['en'].update({'curve':'Curving shot','split':'Splitting shot','spiral':'Spiral shot','ricochet':'Ricochet','rolling':'Rolling shot','lob':'Lob'})
+KIND['es'].update({'curve':'Disparo curvo','split':'Disparo dividido','spiral':'Espiral','ricochet':'Rebote','rolling':'Rodante','lob':'Lanzamiento'})
 
 def moves_page(lang):
     pid = 'moves'

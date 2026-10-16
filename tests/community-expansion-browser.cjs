@@ -80,7 +80,7 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
     }
     if(MELEE){
     // Controlled real-game fixtures: actual cast/host messages and actual enemy deaths.
-    for(const p of pages)await p.evaluate(()=>{const p=G.Game.player;p.slots=[];p.passives={};p.statsTaken={};p.frozen=true;p.invuln=1e6;p.maxHp=100;p.hp=100;p.regenFlat=0;p.buffs.regen.n=0;});
+    for(const p of pages)await p.evaluate(()=>{const p=G.Game.player;p.slots=[];G.Projectiles.clear();G.Combat.clearFields();p.passives={};p.statsTaken={};p.frozen=true;p.invuln=1e6;p.maxHp=100;p.hp=100;p.regenFlat=0;p.buffs.regen.n=0;});
     const fixture=await a.evaluate(()=>{G.Spawner.update=()=>{};G.EnemyMgr.clear();const p=G.Game.player;return {x:p.x,y:p.y};});
     for(const p of pages)await p.evaluate(({x,y})=>{G.Game.player.x=x;G.Game.player.y=y;},fixture);
     const victimId=await a.evaluate(({x,y})=>{const e=new G.Enemy({dex:1,hp:1,spd:0,dmg:0,xp:0,behavior:'chaser'},x+35,y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},fixture);

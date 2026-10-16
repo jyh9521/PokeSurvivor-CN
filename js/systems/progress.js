@@ -23,7 +23,7 @@
  */
 G.Progress = (() => {
   const TYPES = Object.keys(G.U.TYPE_NAME);
-  let achT = 0, toastQ = [], toastT = 0;
+  let achT = 0, toastQ = [], toastT = 0, toastNextT = 0;
 
   // ---------------- misiones ----------------
 
@@ -138,7 +138,7 @@ G.Progress = (() => {
 
   function event(kind, d = {}) {
     const s = G.DB.save;
-    if (!s) return;
+    if (!s || G.RunModes?.active) return;
     ensure(s);
     const S = s.stats;
     switch (kind) {
@@ -189,7 +189,7 @@ G.Progress = (() => {
 
   function checkAch() {
     const s = G.DB.save;
-    if (!s) return;
+    if (!s || G.RunModes?.active) return;
     achT = performance.now();
     s.ach = s.ach || {};
     for (const a of G.AchDefs.LIST) {
@@ -217,7 +217,12 @@ G.Progress = (() => {
 
   // ---------------- avisos ----------------
 
+  function resetNotices() {
+    toastQ=[];clearTimeout(toastT);clearTimeout(toastNextT);toastT=toastNextT=0;document.getElementById('ach-pop')?.classList.add('hidden');
+  }
+
   function notify(title, sub, ach) {
+    if(G.RunModes?.active)return;
     toastQ.push({ title, sub, ach });
     if (toastQ.length === 1) showNext();
   }
@@ -236,9 +241,9 @@ G.Progress = (() => {
     toastT = setTimeout(() => {
       el.classList.add('hidden');
       toastQ.shift();
-      setTimeout(showNext, 250);
+      toastNextT=setTimeout(showNext, 250);
     }, 2800);
   }
 
-  return { ensure, event, kill, claim, claimAll, reroll, checkAch, titles, pending, text, done, rewardText, grant };
+  return { resetNotices, ensure, event, kill, claim, claimAll, reroll, checkAch, titles, pending, text, done, rewardText, grant };
 })();

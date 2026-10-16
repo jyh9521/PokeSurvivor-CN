@@ -116,7 +116,7 @@ G.NAS = (() => {
     get mode(){return 'nas';},get fb(){return null;},get online(){return available&&!!user&&!guest;},get nameAccount(){return !!user;},get hasGoogle(){return false;},
     get user(){return user?.nick||user?.name||'Invitado';},get uid(){return user?.id;},get guest(){return guest;},get save(){return save;},get loggedIn(){return !!save;},get syncState(){return state;},get localReason(){return 'nas';},get storageOk(){return storageOk;}
   },['ready','onSync']);
-  async function action(route,b){try{if ((route==='room/create'||route==='room/member'||route==='room/ready') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,{...b,protocol:6});await refresh();return r;}catch(e){return {ok:false,error:e.message,status:e.status};}}
+  async function action(route,b){try{if ((route==='room/create'||route==='room/member'||route==='room/ready') && !(await flush())) return {ok:false,error:'请先同步存档并处理冲突。'};const r=await api(route,{...b,protocol:7});await refresh();return r;}catch(e){return {ok:false,error:e.message,status:e.status};}}
   async function refresh(){if(enabled)connect();if(!enabled)return oldSocial.refreshPresence();if(!user||guest)return;try{receiveSocial(await api('social'));available=true;}catch{available=false;}}
   const profile=()=>oldSocial.profileData();
   G.Social=proxy(oldSocial,{

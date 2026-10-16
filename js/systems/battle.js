@@ -13,16 +13,18 @@ G.Battle=(()=>{
   function damage(p,e,m,amount){ensure(p);const cls=rules.classify(m,data),s=formStats(p),index=cls==='physical'?1:3,old=Math.max(.1,p.mon.atk||1);
     let k=(.70+s[index]*.0055)/old;
     k*=1+passive(p,cls);
-    const own=types(p).includes(m.type);if(own)k*=1.12;
+    const actor=p.remote?G.Game?.player||p:p;
+    k*=G.BattleBalance.offense(actor);
+    const own=types(p).includes(m.type);if(own)k*=G.BattleBalance.STAB;
     if(trait(p).key==='adapt'&&own)k*=1.12;
     if(trait(p).key==='vigor'&&own&&p.hp/p.maxHp<.35)k*=1.2;
-    if(trait(p).key==='technician'&&(m.def?.dmg||m.dmg)<=18)k*=1.2;
+    if(trait(p).key==='technician'&&(m.def?.nativeDmg||m.nativeDmg||m.def?.dmg||m.dmg)<=18)k*=1.2;
     if(trait(p).key==='focus'&&cls==='special'||trait(p).key==='force'&&cls==='physical')k*=1.1;
     if(trait(p).key==='pressure'&&(e.boss||e.shiny||e.golden||e.elite))k*=1.15;
     k*=G.SpecialRuntime.damage(p,e,m);
     if(m.id==='counter')k*=(1.7+level(p,'revenge')*.2)*(1+Math.min(.35,(s[2]+passive(p,'armor'))/600));
     const enemyStats=data.species[e.dex]?.stats;
-    if(enemyStats&&cls!=='true'&&!m.ignoreArmor&&G.SpecialRuntime.ability(p)!=='piercing-drill')k*=1-rules.armor(enemyStats[cls==='physical'?2:4]);
+    if(enemyStats&&cls!=='true'&&!m.ignoreArmor&&G.SpecialRuntime.ability(p)!=='piercing-drill')k*=1-rules.armor(enemyStats[cls==='physical'?2:4]*.55);
     return Number.isFinite(amount)&&amount>0?amount*k:0;
   }
   function healLimited(p,fraction){const b=ensure(p);b.heals=b.heals.filter(h=>b.clock-h.at<1);const used=b.heals.reduce((n,h)=>n+h.f,0),f=Math.min(fraction,Math.max(0,.04-used));if(f>0){b.heals.push({at:b.clock,f});p.heal(p.maxHp*f);}}
