@@ -170,7 +170,7 @@ G.Combat = (() => {
   const elite = e => !!(e.elite || e.def?.elite || e.shiny || e.golden);
   function meleeBenefits(pl, m, killed, dealt) {
     if (pl.dead || pl.remote || !Number.isFinite(dealt) || !(dealt > 0)) return;
-    pl.meleeGuardT = 0.6;
+    pl.meleeGuardT = Math.max(pl.meleeGuardT||0,m.guardTime||0.6);
     if (m.haste) { pl.meleeHasteT = 0.6; pl.meleeHaste = m.haste; }
     pl.onDealt(dealt); pl.dmgDealt += dealt;
     G.Battle?.charge(pl,dealt,killed);
@@ -339,7 +339,7 @@ G.Combat = (() => {
     const target=pl.target,aim=pl.aim;
     if(m.kind==='decoy')for(const f of fields)if(f.owner===pl&&f.kind==='decoy')f.gone=true;
     const f={kind:m.kind,owner:pl,ghost,m,col:G.U.TYPE_COLOR[m.type],vis:G.VFX.forMove(m),x:pl.x,y:pl.y,t:0,r:m.radius||60,dmg:m.dmg*pl.atk,aim,hits:new Set(),life:m.kind==='mark'?m.delay:m.kind==='decoy'?m.dur:m.life};
-    if(m.kind==='mark'&&target){f.x=target.x;f.y=target.y;}
+    if(m.kind==='mark'&&target){f.x=target.x;f.y=target.y;if(m.lockTime)f.follow=target;}
     if(m.kind==='decoy'){f.x+=Math.cos(aim)*55;f.y+=Math.sin(aim)*55;f.decoy={x:f.x,y:f.y,r:12,level:pl.level,mon:pl.mon,types:pl.mon.types,dead:false,_vx:0,_vy:0};}
     fields.push(f);
     const same=fields.filter(f=>f.owner===pl&&['wave','mark','decoy'].includes(f.kind));for(const f of same.slice(0,Math.max(0,same.length-10)))f.gone=true;
@@ -403,11 +403,12 @@ G.Combat = (() => {
     const n = Math.max(1, m.count | 0);
     const near = G.EnemyMgr.queryCircle(pl.x, pl.y, reach(m)).filter(e => !e.dead);
     G.U.shuffle ? G.U.shuffle(near) : near.sort(() => Math.random() - 0.5);
+    const batch={hits:new Map()};
     for (let i = 0; i < n; i++) {
-      const e = near[i];
+      const e = near.length?near[i%near.length]:null;
       const x = e ? e.x + G.U.rand(-8, 8) : pl.x + G.U.rand(-140, 140);
       const y = e ? e.y + G.U.rand(-6, 6) : pl.y + G.U.rand(-110, 110);
-      fields.push({ kind: 'meteor', owner: pl, ghost, m, col, vis, x, y, t: -i * 0.09, fall: 0.5, r: m.radius, dmg: m.dmg * pl.atk });
+      fields.push({ kind: 'meteor', owner: pl, ghost, m, col, vis, x,y,t:-i*.04,fall:m.fall||.5,r:m.radius,dmg:m.dmg*pl.atk,follow:e,lockTime:m.lockTime||0,batch });
     }
   }
 
@@ -484,7 +485,10 @@ G.Combat = (() => {
   function blast(f, r, k = 1) {
     if (f.ghost) return;
     const pl = f.owner, m = f.m;
-    for (const e of G.EnemyMgr.queryCircle(f.x, f.y, r)) hit(pl, e, f.dmg * k, f.col, e.x - f.x, e.y - f.y, m.knock || 0, m);
+    for(const e of G.EnemyMgr.queryCircle(f.x,f.y,r)){
+      if(f.batch){const n=f.batch.hits.get(e.id)||0;if(n>=2)continue;f.batch.hits.set(e.id,n+1);}
+      hit(pl,e,f.dmg*k,f.col,e.x-f.x,e.y-f.y,m.knock||0,m);
+    }
     for (const p of G.World.propsInCircle(f.x, f.y, r)) G.World.damageProp(p, f.dmg * k, f.col);
   }
 
@@ -501,6 +505,9 @@ G.Combat = (() => {
       const f = fields[i];
       if(f.gone||f.owner?.dead){fields.splice(i,1);continue;}
       f.t += dt;
+      const lock=f.lockTime||f.m?.lockTime;
+      if(f.follow&&!f.follow.dead&&f.t<=lock){f.x=f.follow.x;f.y=f.follow.y;}
+      else if(f.follow&&f.t>lock)f.follow=null;
       if(['wave','mark','decoy'].includes(f.kind)){
         if(f.gone||!f.owner||f.owner.dead){fields.splice(i,1);continue;}
         if(f.kind==='wave'){
@@ -823,7 +830,7 @@ G.Combat = (() => {
       if (e.touchCd > 0 || e.staggerT > 0 || (e.remote && e.net?.st & 8) || e.behavior === 'thief') continue;
       e.touchCd = 0.55;
       e.strike(pl);
-      pl.hurt(e.dmg, e.atkType);
+      pl.hurt(e.dmg,e.atkType,false,'physical',G.BattleBalance.bodyContact(e)?'contact':'attack');
       if (pl.hasItem('rockyhelmet')) e.hurt(15 + pl.level * 4, '#9aa6b5', e.x - pl.x, e.y - pl.y, 80,null,pl.uid);
       const [nx, ny] = G.U.norm(e.x - pl.x, e.y - pl.y);
       e.kx += nx * 150; e.ky += ny * 150;

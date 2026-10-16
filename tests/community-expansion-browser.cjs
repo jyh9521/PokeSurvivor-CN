@@ -108,6 +108,13 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
     }
     if(BATTLE){
       for(const p of pages)await p.evaluate(()=>{const p=G.Game.player;p.slots=[];G.Combat.clearFields();G.Battle.init(p);});
+      const chargeId=await a.evaluate(()=>{const p=G.Game.player,e=new G.Enemy({dex:1,hp:1000000,spd:0,dmg:0,xp:0,behavior:'charger'},p.x+80,p.y,{hp:1,spd:1,dmg:1});e.phase='dash';e.pt=10;e.dx=1;e.dy=0;G.EnemyMgr.add(e);return e.id;});
+      await pages[1].waitForFunction(id=>!!(G.EnemyMgr.get(id)?.net?.st&16),chargeId,{timeout:10000});
+      check('charging enemy snapshots exclude the guest from ordinary contact protection',await pages[1].evaluate(id=>!G.BattleBalance.bodyContact(G.EnemyMgr.get(id)),chargeId));
+      await a.evaluate(id=>{const e=G.EnemyMgr.get(id);e.phase='walk';e.behavior='chase';},chargeId);
+      await pages[1].waitForFunction(id=>{const e=G.EnemyMgr.get(id);return e&&!(e.net.st&16);},chargeId,{timeout:10000});
+      check('ordinary movement snapshots restore the same contact classification on every peer',await pages[1].evaluate(id=>G.BattleBalance.bodyContact(G.EnemyMgr.get(id)),chargeId));
+      await a.evaluate(id=>{const e=G.EnemyMgr.get(id);e.dead=true;e.hp=0;},chargeId);
       const phaseId=await a.evaluate(()=>{const p=G.Game.player,e=new G.Enemy({dex:92,hp:1000000,spd:0,dmg:1,xp:0,behavior:'chase',stageChain:[92,93,94]},p.x+100,p.y,{hp:1,spd:1,dmg:1},true);e.shotDmg=()=>0;G.EnemyMgr.add(e);e.hp=e.maxHp*.6;return e.id;});
       await pages[1].waitForFunction(id=>G.EnemyMgr.get(id)?.dex===93&&G.EnemyMgr.get(id)?.bossStage===1,phaseId,{timeout:10000});
       check('a real host boss stage changes species and reaches guest snapshots',true);
@@ -159,7 +166,7 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
       for(const p of pages)await p.evaluate(()=>G.Game.player.bonds=0);
       await a.waitForFunction(()=>!G.Rift.inArena,null,{timeout:10000});await pages[1].waitForFunction(()=>!G.Rift.inArena,null,{timeout:10000});
     }
-    const last=pages[7];await last.evaluate(()=>{window.__testRoom=G.Social.room.id;window.__testRun=G.Game.st.time;});await last.context().setOffline(true);await last.evaluate(()=>window.__fixtureSockets.at(-1).close());await a.waitForFunction(()=>G.NAS.networkMetrics().reconnectingPeers>=1,null,{timeout:10000}).catch(async e=>{console.log('RECONNECT_DEBUG',JSON.stringify({host:await a.evaluate(()=>({metrics:G.NAS.networkMetrics(),members:G.Social.room?.members,state:G.Game.state})),last:await last.evaluate(()=>({state:G.Game.state,sockets:window.__fixtureSockets.map(s=>s.readyState)})),errors}));throw e;});await last.context().setOffline(false);await last.waitForFunction(()=>G.Social.room?.members.length===8&&G.NAS.networkMetrics().connected,{},{timeout:20000});
+    const last=pages[7];await last.evaluate(()=>{window.__testRoom=G.Social.room.id;window.__testRun=G.Game.st.time;});await last.evaluate(()=>new Promise(resolve=>{const ws=window.__fixtureSockets.at(-1);if(ws.readyState===3)return resolve();ws.addEventListener('close',()=>resolve(),{once:true});ws.close();}));await last.context().setOffline(true);await a.waitForFunction(()=>G.NAS.networkMetrics().reconnectingPeers>=1,null,{timeout:10000}).catch(async e=>{console.log('RECONNECT_DEBUG',JSON.stringify({host:await a.evaluate(()=>({metrics:G.NAS.networkMetrics(),members:G.Social.room?.members,state:G.Game.state})),last:await last.evaluate(()=>({state:G.Game.state,sockets:window.__fixtureSockets.map(s=>s.readyState)})),errors}));throw e;});await last.context().setOffline(false);await last.waitForFunction(()=>G.Social.room?.members.length===8&&G.NAS.networkMetrics().connected,{},{timeout:20000});
     check('same browser reconnects into the same normal room',await last.evaluate(()=>G.Social.room.id===window.__testRoom));
     await a.evaluate(()=>G.Game.quit());for(const p of pages)if(await p.evaluate(()=>G.Game.state!=='over'))await p.evaluate(()=>G.Game.quit());
     await a.waitForFunction(()=>!G.NAS.pending);for(const p of pages)await p.evaluate(()=>G.NAS.flush());

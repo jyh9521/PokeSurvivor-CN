@@ -1,6 +1,6 @@
 /* Combat tuning shared by source, production and authority. Values are run-only. */
 (function(factory){if(typeof module==='object'&&module.exports)module.exports=factory();else G.BattleBalance=factory();})(()=>{
-  const STAB=1.20,DENSITY_HP=1.65,CONTACT_DAMAGE=1.8;
+  const STAB=1.20,DENSITY_HP=1.65,CONTACT_DAMAGE=1.8,CONTACT_FACTOR=.60,CONTACT_CAP=.22,CONTACT_GRACE=.60;
   const level=p=>Math.max(1,Math.min(10000,Number.isFinite(p?.level)?p.level:1));
   const offense=p=>1+(level(p)-1)*.045;
   const enemyScale=t=>({hp:1+Math.min(1800,Math.max(0,t))/900,dmg:1+Math.max(0,t)/600,spd:1+Math.min(.35,Math.max(0,t)/1400)});
@@ -12,7 +12,14 @@
     m.nativeDmg=m.dmg;
     if(m.kind==='melee')m.dmg*=1.45;
     const floor=m.id==='leech-seed'?18:FLOORS[m.kind];if(floor&&budget(m)<floor)m.dmg*=floor/budget(m);
+    // Deliberate heavy/fast tradeoff: below the generic melee floor, but stronger per hit.
+    if(m.id==='body-slam'){m.dmg*=.78;m.radius=+(m.radius*1.15).toFixed(2);m.stagger=.25;}
+    if(m.id==='play-rough')m.dmg*=.72;
+    if(m.id==='tackle'){m.guardTime=.8;m.stagger=.2;}
+    if(m.kind==='meteor'){m.dmg*=1.35;m.radius=+(m.radius*1.15).toFixed(2);m.fall=.35;m.lockTime=.18;}
+    if(m.id==='leech-seed'){m.dmg*=1.15;m.delay=.55;m.radius=76;m.seedHeal=.012;m.lockTime=.2;}
     m.dmg=+m.dmg.toFixed(3);
   }
-  return{STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,FLOORS,budget,tune};
+  const bodyContact=e=>!e.judge&&(e.remote?!(e.net?.st&16):e.phase!=='dash'&&!e.jump&&!e.ai?.cast);
+  return{CONTACT_FACTOR,CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,FLOORS,budget,tune};
 });

@@ -30,7 +30,7 @@ test('range and exact circle-sector intersection include enemy bodies without th
 
 test('unreachable boss never steals aim from reachable enemies and damage occurs on actual cast',()=>{
  const {G,player,enemy}=scene(),p=player(),e=enemy(50),boss=enemy(250);boss.boss=true;p.target=boss;p.aim=Math.PI;
- assert.equal(G.Combat.meleeTarget(p,p.activeMove()),e);G.Combat.tick(.1,p,0);assert.ok(e.hp<1000);assert.equal(boss.hp,1000);assert.equal(p.target,e);assert.equal(p.meleeGuardT,.6);
+ assert.equal(G.Combat.meleeTarget(p,p.activeMove()),e);G.Combat.tick(.1,p,0);assert.ok(e.hp<1000);assert.equal(boss.hp,1000);assert.equal(p.target,e);assert.equal(p.meleeGuardT,.8);
 });
 
 test('guard survives ranged switch, never stacks and respects pure damage; expires with simulation time',()=>{
@@ -42,9 +42,9 @@ test('guard survives ranged switch, never stacks and respects pure damage; expir
 test('shared stagger cooldown across eight attackers prevents permanent control; elites resist and bosses ignore it',()=>{
  const {G,player,enemy}=scene(),p=player(),e=enemy(),m=p.activeMove();
  for(let i=0;i<8;i++)G.Combat.acceptMeleeHit(p,e,1,'#fff',1,0,m);
- assert.equal(e.staggerT,.15);assert.equal(e.staggerCd,.65);assert.ok(Math.hypot(e.kx,e.ky)<=60);
- e.update(.16,p);assert.equal(e.staggerT,0);G.Combat.acceptMeleeHit(p,e,1,'#fff',1,0,m);assert.equal(e.staggerT,0);
- e.shiny=true;e.staggerCd=0;e.applyMeleeControl(m,1,0);assert.equal(e.staggerT,.075);
+ assert.equal(e.staggerT,.2);assert.equal(e.staggerCd,.65);assert.ok(Math.hypot(e.kx,e.ky)<=60);
+ e.update(.21,p);assert.equal(e.staggerT,0);G.Combat.acceptMeleeHit(p,e,1,'#fff',1,0,m);assert.equal(e.staggerT,0);
+ e.shiny=true;e.staggerCd=0;e.applyMeleeControl(m,1,0);assert.equal(e.staggerT,.1);
  const boss=enemy();boss.boss=true;boss.applyMeleeControl(m,1,0);assert.equal(boss.staggerT,undefined);assert.equal(boss.kx,0);
 });
 

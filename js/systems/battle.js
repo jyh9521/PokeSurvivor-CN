@@ -32,7 +32,7 @@ G.Battle=(()=>{
   function charge(p,dealt,killed){if(p.battle&&!p.battle.used)p.battle.energy=Math.min(100,p.battle.energy+Math.min(1,dealt*.01)+(killed?1:0));}
   function accept(p,e,amount,col,dx,dy,knock,m,eff){if(!e||e.dead||e.remote||!Number.isFinite(amount)||amount<=0)return {dealt:0,killed:false};const hp=e.hp;e.hurt(amount,col,dx,dy,knock,eff,p.uid);const dealt=Math.max(0,hp-Math.max(0,e.hp)),killed=dealt>0&&e.dead;credit(p,m,dealt,killed);return {dealt,killed};}
   function deal(p,e,amount,col,dx,dy,knock,m,eff){const value=damage(p,e,m,amount);if(!(value>0))return;if(e.remote){G.Coop.battleHit(e,value,col,dx,dy,knock,m,eff);return;}return accept(p,e,value,col,dx,dy,knock,m,eff);}
-  function defend(p,amount,pure,cls,legacyReduction){const b=ensure(p);if(!Number.isFinite(amount)||amount<=0)return 0;
+  function defend(p,amount,pure,cls,legacyReduction,contact=false){const b=ensure(p);if(!Number.isFinite(amount)||amount<=0)return 0;
     if(pure)return Math.max(1,amount);
     amount*=G.SpecialRuntime.incoming(p,cls);
     const dodge=clamp(passive(p,'dodge')+(trait(p).key==='swift'?.05:0),0,.3);
@@ -42,6 +42,7 @@ G.Battle=(()=>{
     let reduction=1-(1-rules.armor(armor))*(1-legacyReduction);
     if(trait(p).key==='carapace'&&cls==='physical'||trait(p).key==='ward'&&cls==='special')reduction=1-(1-reduction)*.88;
     reduction=Math.min(.85,reduction);let d=Math.max(1,amount*(1-reduction));
+    if(contact)d=Math.min(d,p.maxHp*G.BattleBalance.CONTACT_CAP);
     const absorbed=Math.min(b.shield,d);b.shield-=absorbed;d-=absorbed;
     if(p.dex===778&&p.baseForm!=='busted'&&d>0){G.SpecialRuntime.base(p,'busted');p.trait=rules.trait(p.mon,data);visual(p);return Math.min(d,p.maxHp*.125);}
     if(trait(p).key==='sturdy'&&b.sturdyT<=0&&p.hp>=p.maxHp-.001&&d>=p.hp){d=p.hp-1;b.sturdyT=60;}
