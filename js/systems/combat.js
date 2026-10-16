@@ -814,7 +814,7 @@ G.Combat = (() => {
         if (Math.random() < 0.5) G.FX.sp('impact', p.vis ? p.vis.pal : 'normal', e.x, e.y - e.bodyH * 0.5, { life: 0.12, scale: 1 });
         if(!G.Battle){pl.dmgDealt += p.dmg*k;pl.onDealt(p.dmg*k);}
         // Distance/piercing trades coverage for damage, never the first single-target hit.
-        if(!p.orb&&!p.boom)p.dmg*=p.homing?.65:.78;
+        if(!p.orb&&!p.boom)p.dmg*=p.homing?.65:.88;
         if (p.burn) e.applyBurn(p.burn);
         if (p.poison) e.applyPoison(p.poison);
         if (p.slow) e.applySlow(p.slow);
@@ -834,7 +834,7 @@ G.Combat = (() => {
     if (pl.dead) return;
     for (const e of G.EnemyMgr.queryCircle(pl.x, pl.y, pl.r + 40)) {
       if (G.U.dist2(e.x, e.y, pl.x, pl.y) > (e.r + pl.r) * (e.r + pl.r)) continue;
-      if (e.touchCd > 0 || e.staggerT > 0 || (e.remote && e.net?.st & 8) || e.behavior === 'thief') continue;
+      if (e.jump || (e.remote && e.net?.st & 64) || e.touchCd > 0 || e.staggerT > 0 || (e.remote && e.net?.st & 8) || e.behavior === 'thief') continue;
       e.touchCd = 0.55;
       e.strike(pl);
       pl.hurt(e.dmg,e.atkType,false,'physical',G.BattleBalance.bodyContact(e)?'contact':'attack');

@@ -22,11 +22,13 @@ G.Spawner = (() => {
   const hpK = (t,def) => G.BattleBalance.normalHp(t)*G.BattleBalance.tierBlend(t,def.tier,G.Enemies.TIERS);
   const SHINY_RATE = 1 / 4096;
   let acc = 0, bossIdx = 0, surgeT = 32, announce = null, announceT = 0, preloadT = 0;
-  let pressureAt=30;
+  let pressureAt=30,releaseAt=-30,recovering=false;
+  const dueling=()=>!G.Rift?.inArena&&!G.Judgment?.active&&G.EnemyMgr.all().some(e=>e.boss&&!e.legend&&!e.judge&&!e.dead);
+  const capacity=()=>G.Rift?.inArena||G.Judgment?.active?CAP:dueling()?Math.min(32,12+4*Math.max(1,players.length)):G.BattleBalance.recoveryWindow(G.Game?.st?.time||0)?Math.min(48,24+4*Math.max(0,players.length-1)):CAP-1;
   let forceShiny = 0;           // para pruebas: los N próximos salen shiny
 
   function reset() {
-    pressureAt=30;
+    pressureAt=30;releaseAt=-30;recovering=false;players=[];
     acc = 0; bossIdx = 0; surgeT = 32; announce = null; announceT = 0; preloadT = 0;
     G.Enemies.rollRun();
     G.Sprites.preload(G.Enemies.upcomingDex(0, 80));
@@ -34,7 +36,7 @@ G.Spawner = (() => {
 
   /** Enemigos por segundo según el minuto de la run. */
   function rate(t) {
-    return (1.6 + t * 0.028 + Math.pow(t / 60, 1.6) * 0.5) * DENSITY;
+    return G.BattleBalance.waveRate(t);
   }
 
   function ringPoint(pl, angle) {
@@ -118,6 +120,14 @@ G.Spawner = (() => {
     preloadT -= dt;
     if (preloadT <= 0) { preloadT = 10; G.Sprites.preload(G.Enemies.upcomingDex(t, 60)); }
 
+    const recovery=G.BattleBalance.recoveryWindow(t);
+    if(recovery&&!recovering){
+      say(G.T('Wave easing: collect supplies before the next surge!'),3);
+      // One visible berry per living player and window, outside passive pickup
+      // range. No direct healing, no XP minting, no reward on repeated frames.
+      for(const p of players.filter(p=>!p.dead)){const d=Math.min(240,Math.max(110,p.magnet+36));for(let i=0;i<8;i++){const a=i*Math.PI/4,x=p.x+Math.cos(a)*d,y=p.y+Math.sin(a)*d;if(G.World.isFree(x,y,12)){G.Pickups.drop('heal',x,y);break;}}}
+    }
+    recovering=recovery;
     // Authored wave suppression: one visible delayed landing, not an extra swarm.
     // It persists if ordinary enemies are instantly cleared. Armor still applies.
     if(t>=pressureAt){pressureAt=t+(G.BattleBalance.pressureWindow(t)?12:24);for(const p of players.filter(p=>!p.dead)){
@@ -126,27 +136,30 @@ G.Spawner = (() => {
 
     // --- jefes ---
     const b = G.Enemies.BOSSES[bossIdx];
-    if (b && t >= b.at) { spawnBoss(anchor(), t, b); bossIdx++; }
+    if (b && t >= b.at && !G.EnemyMgr.bossAlive()) { spawnBoss(anchor(), b.at, b); bossIdx++; }
 
     // Combate de jefe: las oleadas bajan al 25% y no hay mareas, para que el
     // jefe sea un momento propio y se le pueda apuntar entre la multitud.
+    // Finite adds: existing enemies remain, but no endless refills during a duel.
     const bossFight = G.EnemyMgr.bossAlive();
+    if(bossFight)releaseAt=t;
+    const release=G.BattleBalance.curve(t-releaseAt,[[0,.25],[15,1]]),limit=capacity();
 
     // --- goteo normal ---
-    if (G.EnemyMgr.count < CAP) {
-      acc += rate(t) * G.Coop.scaleRate(players.length) * (bossFight ? 0.25 : 1) * dt;
+    if (G.EnemyMgr.count < limit) {
+      acc += rate(t) * G.Coop.scaleRate(players.length) * (bossFight ? 0 : release) * dt;
       let n = Math.floor(acc);
       acc -= n;
-      while (n-- > 0 && G.EnemyMgr.count < CAP) spawnOne(anchor(), t);
+      while (n-- > 0 && G.EnemyMgr.count < limit) spawnOne(anchor(), t);
     }
 
     // --- marea ---
-    if (!bossFight) surgeT -= dt;
-    if (surgeT <= 0) {
+    if (!bossFight && t-releaseAt>=15 && !G.BattleBalance.recoveryWindow(t)) surgeT -= dt;
+    if (surgeT <= 0 && !bossFight && !G.BattleBalance.recoveryWindow(t)) {
       surgeT = G.U.rand(38, 56);
       const base = Math.random() * 6.2832;
       const target = anchor();
-      const n = Math.min(CAP - G.EnemyMgr.count, Math.round((14 + Math.floor(t / 22)) * G.Coop.scaleRate(players.length) * 0.4));
+      const n = Math.min(limit - G.EnemyMgr.count, Math.round((14 + Math.floor(t / 22)) * G.Coop.scaleRate(players.length) * 0.4));
       for (let i = 0; i < n; i++) spawnOne(target, t, base + G.U.rand(-0.55, 0.55));
       say('¡Marea de Pokémon!', 2.2);
       G.Audio.sfx('surge');
@@ -155,8 +168,9 @@ G.Spawner = (() => {
 
   /** Unos cuantos de golpe desde un lado (al empezar una horda). */
   function burst(n) {
+    if(dueling())return;
     const base = Math.random() * 6.2832, target = anchor() || G.Game.player, t = G.Game.st.time;
-    for (let i = 0; i < n && G.EnemyMgr.count < CAP + 10; i++) spawnOne(target, t, base + G.U.rand(-0.6, 0.6));
+    for (let i = 0; i < n && G.EnemyMgr.count < capacity(); i++) spawnOne(target, t, base + G.U.rand(-0.6, 0.6));
   }
 
   /**
@@ -186,6 +200,6 @@ G.Spawner = (() => {
   /** Invitado en cooperativo: sólo corre el reloj del aviso. */
   function tickBanner(dt) { if (announceT > 0) announceT -= dt; }
 
-  return {checkpoint(s){if(!s)return {acc,bossIdx,surgeT,announce,announceT,preloadT,pressureAt};pressureAt=s.pressureAt??30;({acc,bossIdx,surgeT,announce,announceT,preloadT}=s);players=[];}, reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP,
+  return {checkpoint(s){if(!s)return {recovering,releaseAt,acc,bossIdx,surgeT,announce,announceT,preloadT,pressureAt};recovering=!!s.recovering;releaseAt=s.releaseAt??-30;pressureAt=s.pressureAt??30;({acc,bossIdx,surgeT,announce,announceT,preloadT}=s);players=[];}, reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP, capacity, dueling,
            debugForceShiny(n = 1) { forceShiny = n; } };
 })();

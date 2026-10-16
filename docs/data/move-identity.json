@@ -19,83 +19,6 @@
       "spirit-shackle"
     ],
     [
-      "hydro-pump",
-      "ice-beam"
-    ],
-    [
-      "vine-whip",
-      "lick"
-    ],
-    [
-      "razor-leaf",
-      "bonemerang",
-      "psycho-cut"
-    ],
-    [
-      "discharge",
-      "dazzling-gleam"
-    ],
-    [
-      "confusion",
-      "rock-throw",
-      "bullet-seed"
-    ],
-    [
-      "psybeam",
-      "flash-cannon",
-      "moongeist-beam"
-    ],
-    [
-      "psychic",
-      "leech-seed",
-      "stealth-rock",
-      "natures-madness"
-    ],
-    [
-      "bug-bite",
-      "bite"
-    ],
-    [
-      "rock-slide",
-      "hail",
-      "meteor-mash"
-    ],
-    [
-      "spikes",
-      "toxic-spikes"
-    ],
-    [
-      "air-slash",
-      "last-resort"
-    ],
-    [
-      "hyper-beam",
-      "photon-geyser"
-    ],
-    [
-      "shadow-sneak",
-      "aqua-jet",
-      "spectral-thief"
-    ]
-  ],
-  "currentSuspects": [
-    [
-      "tackle",
-      "wing-attack",
-      "body-slam",
-      "karate-chop",
-      "metal-claw"
-    ],
-    [
-      "quick-attack",
-      "aerial-ace"
-    ],
-    [
-      "water-gun",
-      "poison-sting",
-      "spirit-shackle"
-    ],
-    [
       "vine-whip",
       "lick"
     ],
@@ -144,6 +67,7 @@
       "spectral-thief"
     ]
   ],
+  "currentSuspects": [],
   "rows": [
     {
       "id": "tackle",
@@ -153,7 +77,7 @@
       "kind": "melee",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "impact",
+      "style": "shoulder",
       "range": 69,
       "trajectory": "melee",
       "projectile": "star",
@@ -185,7 +109,7 @@
       "kind": "dash",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "impact",
+      "style": "speed-lines",
       "range": 110,
       "trajectory": "dash",
       "projectile": "streak",
@@ -307,7 +231,7 @@
       "pierce": 0,
       "evolution": {
         "name": "大字爆炎",
-        "damage": 46.98,
+        "damage": 93.96,
         "cd": 0.39,
         "count": 5,
         "pierce": 3
@@ -421,7 +345,7 @@
       "kind": "projectile",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "drops",
+      "style": "water-stream",
       "range": 525,
       "trajectory": "projectile",
       "projectile": "drop",
@@ -438,7 +362,7 @@
       "pierce": 1,
       "evolution": {
         "name": "热水",
-        "damage": 36.54,
+        "damage": 73.08,
         "cd": 0.33,
         "count": 5,
         "pierce": 4
@@ -538,7 +462,7 @@
       "kind": "melee",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "vine",
+      "style": "whip-leaves",
       "range": 115.34,
       "trajectory": "melee",
       "projectile": "leaf",
@@ -570,7 +494,7 @@
       "kind": "boomerang",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "blades",
+      "style": "serrated-leaf",
       "range": 210,
       "trajectory": "boomerang",
       "projectile": "leaf",
@@ -678,7 +602,7 @@
       "pierce": 2,
       "evolution": {
         "name": "打雷",
-        "damage": 33.93,
+        "damage": 67.86,
         "cd": 0.30000000000000004,
         "count": 5,
         "pierce": 5
@@ -692,7 +616,7 @@
       "kind": "aura",
       "specialOnly": false,
       "cast": "Charge",
-      "style": "radial",
+      "style": "electric-burst",
       "range": 70,
       "trajectory": "aura",
       "projectile": "bolt",
@@ -783,7 +707,7 @@
       "kind": "beam",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "prism",
+      "style": "sine-prism",
       "range": 215,
       "trajectory": "beam",
       "projectile": "ring",
@@ -863,7 +787,7 @@
       "pierce": 0,
       "evolution": {
         "name": "污泥炸弹",
-        "damage": 46.98,
+        "damage": 93.96,
         "cd": 0.44999999999999996,
         "count": 5,
         "pierce": 3
@@ -942,7 +866,7 @@
       "kind": "melee",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "feather",
+      "style": "wings",
       "range": 83.95,
       "trajectory": "melee",
       "projectile": "wind",
@@ -974,7 +898,7 @@
       "kind": "melee",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "impact",
+      "style": "body-drop",
       "range": 76.7,
       "trajectory": "melee",
       "projectile": "star",
@@ -1036,7 +960,7 @@
       "kind": "projectile",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "needles",
+      "style": "barbed-sting",
       "range": 420,
       "trajectory": "projectile",
       "projectile": "needle",
@@ -1054,7 +978,7 @@
       "pierce": 0,
       "evolution": {
         "name": "毒击",
-        "damage": 26.622,
+        "damage": 53.244,
         "cd": 0.255,
         "count": 5,
         "pierce": 3
@@ -1134,7 +1058,7 @@
       "kind": "melee",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "jaws",
+      "style": "mandibles",
       "range": 63.25,
       "trajectory": "melee",
       "projectile": "needle",
@@ -1228,7 +1152,7 @@
       "kind": "projectile",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "rock",
+      "style": "tumble-rock",
       "range": 364,
       "trajectory": "projectile",
       "projectile": "rock",
@@ -1247,7 +1171,7 @@
       "pierce": 0,
       "evolution": {
         "name": "尖石攻击",
-        "damage": 62.63999999999999,
+        "damage": 125.27999999999999,
         "cd": 0.5249999999999999,
         "count": 5,
         "pierce": 3
@@ -1358,7 +1282,7 @@
       "kind": "melee",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "claw",
+      "style": "chop-plane",
       "range": 72.45,
       "trajectory": "melee",
       "projectile": "ball",
@@ -1421,7 +1345,7 @@
       "kind": "melee",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "tongue",
+      "style": "curl-tongue",
       "range": 69,
       "trajectory": "melee",
       "projectile": "shadow",
@@ -1470,7 +1394,7 @@
       "pierce": 2,
       "evolution": {
         "name": "潜灵奇袭",
-        "damage": 51.678000000000004,
+        "damage": 103.35600000000001,
         "cd": 0.495,
         "count": 5,
         "pierce": 5
@@ -1568,7 +1492,7 @@
       "kind": "aura",
       "specialOnly": false,
       "cast": "Charge",
-      "style": "radial",
+      "style": "star-flare",
       "range": 72,
       "trajectory": "aura",
       "projectile": "star",
@@ -1598,7 +1522,7 @@
       "kind": "melee",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "claw",
+      "style": "metal-talons",
       "range": 72.45,
       "trajectory": "melee",
       "projectile": "shard",
@@ -1630,7 +1554,7 @@
       "kind": "beam",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "prism",
+      "style": "metal-rail",
       "range": 220,
       "trajectory": "beam",
       "projectile": "shard",
@@ -1660,7 +1584,7 @@
       "kind": "melee",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "jaws",
+      "style": "closing-fangs",
       "range": 66.7,
       "trajectory": "melee",
       "projectile": "crescent",
@@ -1753,7 +1677,7 @@
       "kind": "boomerang",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "blades",
+      "style": "bone-return",
       "range": 230,
       "trajectory": "boomerang",
       "projectile": "crescent",
@@ -1785,7 +1709,7 @@
       "kind": "boomerang",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "blades",
+      "style": "psi-crescent",
       "range": 200,
       "trajectory": "boomerang",
       "projectile": "crescent",
@@ -1815,7 +1739,7 @@
       "kind": "mine",
       "specialOnly": false,
       "cast": "Charge",
-      "style": "spikes",
+      "style": "ground-spikes",
       "range": 60,
       "trajectory": "mine",
       "projectile": "star",
@@ -1845,7 +1769,7 @@
       "kind": "mine",
       "specialOnly": false,
       "cast": "Charge",
-      "style": "spikes",
+      "style": "poison-barbs",
       "range": 56,
       "trajectory": "mine",
       "projectile": "star",
@@ -2003,7 +1927,7 @@
       "kind": "dash",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "feather",
+      "style": "aerial-cross",
       "range": 120,
       "trajectory": "dash",
       "projectile": "wind",
@@ -2215,7 +2139,7 @@
       "kind": "wave",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "feather",
+      "style": "air-scissors",
       "range": 230,
       "trajectory": "wave",
       "projectile": "wind",
@@ -2277,7 +2201,7 @@
       "kind": "mark",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "seed",
+      "style": "root-seed",
       "range": 76,
       "trajectory": "mark",
       "projectile": "leaf",
@@ -2308,7 +2232,7 @@
       "kind": "mark",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "rock",
+      "style": "orbit-stones",
       "range": 70,
       "trajectory": "mark",
       "projectile": "rock",
@@ -2428,7 +2352,7 @@
       "kind": "beam",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "charge",
+      "style": "horizontal-charge",
       "range": 320,
       "trajectory": "beam",
       "projectile": "star",
@@ -2486,7 +2410,7 @@
       "kind": "projectile",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "seed",
+      "style": "seed-burst",
       "range": 400,
       "trajectory": "projectile",
       "projectile": "leaf",
@@ -2516,7 +2440,7 @@
       "kind": "dash",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "shadow",
+      "style": "shadow-steps",
       "range": 105,
       "trajectory": "dash",
       "projectile": "shadow",
@@ -2545,7 +2469,7 @@
       "kind": "dash",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "wave",
+      "style": "jet-wake",
       "range": 115,
       "trajectory": "dash",
       "projectile": "drop",
@@ -2603,7 +2527,7 @@
       "kind": "projectile",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "needles",
+      "style": "shackle-arrow",
       "range": 504,
       "trajectory": "projectile",
       "projectile": "shadow",
@@ -2621,7 +2545,7 @@
       "pierce": 2,
       "evolution": {
         "name": "缝影 +",
-        "damage": 109.62,
+        "damage": 219.24,
         "cd": 1.0499999999999998,
         "count": 5,
         "pierce": 5
@@ -2635,7 +2559,7 @@
       "kind": "wave",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "impact",
+      "style": "final-star",
       "range": 170,
       "trajectory": "wave",
       "projectile": "star",
@@ -2724,7 +2648,7 @@
       "kind": "beam",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "prism",
+      "style": "lunar-channel",
       "range": 340,
       "trajectory": "beam",
       "projectile": "shadow",
@@ -2784,7 +2708,7 @@
       "kind": "dash",
       "specialOnly": false,
       "cast": "Attack",
-      "style": "shadow",
+      "style": "spectral-hand",
       "range": 150,
       "trajectory": "dash",
       "projectile": "shadow",
@@ -2939,7 +2863,7 @@
       "kind": "mark",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "sigil",
+      "style": "guardian-jaws",
       "range": 68,
       "trajectory": "mark",
       "projectile": "star",
@@ -2968,7 +2892,7 @@
       "kind": "beam",
       "specialOnly": false,
       "cast": "Shoot",
-      "style": "charge",
+      "style": "rising-prism",
       "range": 310,
       "trajectory": "beam",
       "projectile": "ring",

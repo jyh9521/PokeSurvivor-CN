@@ -239,7 +239,7 @@ G.Player = class Player {
     const contact=!pure&&source==='contact'&&isClose;
     const close=isClose?(contact?G.BattleBalance.CONTACT_FACTOR:.75):1;
     if(!Number.isFinite(amount)||amount<=0)return;
-    const d = G.Battle?G.Battle.defend(this,amount,pure,damageClass,1-(1-this.reduction)*close,contact):pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
+    const d = G.Battle?G.Battle.defend(this,amount,pure,damageClass,1-(1-this.reduction)*close,!pure&&source==='contact'):pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
     if(!(d>0))return;
     const hpBefore=this.hp;
     this.hp -= d;
@@ -375,8 +375,9 @@ G.Player = class Player {
 
     // --- apuntado: enemigo más cercano; si no hay, hacia donde caminas ---
     // Prioridad de blanco según el ataque activo:
-    //   a distancia (proyectil, rayo): el jefe si está a tiro > lo que te toca > el más cercano
+    //   ranged: immediate body threat > reachable boss > nearest target
     //   cuerpo a cuerpo y el resto:   lo que te toca > el jefe > el más cercano
+    // Body threats are a real interruption cost; do not fire past them at a boss.
     // Con una horda encima casi siempre te toca algo; si eso ganara siempre,
     // los ataques a distancia no le darían nunca al jefe.
     // Sin enemigos, apunta a la roca o cofre más cercano.
@@ -386,11 +387,17 @@ G.Player = class Player {
     const threat = G.Projectiles.nearest(all, this.x, this.y, this.r + 24);
     const boss = all.find(e => e.boss && !e.dead && G.U.dist(this.x, this.y, e.x, e.y) < 330);
     const reachable = this.activeGroup().filter(m => m.kind === 'melee').map(m => G.Combat.meleeTarget(this,m)).find(Boolean);
-    const tg = reachable || (ranged ? boss || threat : threat || boss)
+    const tg = reachable || (threat || boss)
             || G.Projectiles.nearest(all, this.x, this.y, 520)
             || G.World.nearestBreakable(this.x, this.y, 200);
     this.target = tg;
-    if (tg) this.aim = Math.atan2(tg.y - this.y, tg.x - this.x);
+    if (tg) {
+      // Finite intercept lead: accurate single-target fire is earned by spacing,
+      // not unlimited homing. Immediate body threats always win over a boss.
+      const speed=ranged&&m.kind==='projectile'?m.speed:0;
+      const lead=speed?Math.min(.3,G.U.dist(this.x,this.y,tg.x,tg.y)/speed):0;
+      this.aim = Math.atan2(tg.y+(tg.net?.vy||tg._vy||0)*lead-this.y,tg.x+(tg.net?.vx||tg._vx||0)*lead-this.x);
+    }
     else if (this.walking) this.aim = this.moveAngle;
 
     // --- animación: mira al objetivo al atacar, si no a donde camina ---

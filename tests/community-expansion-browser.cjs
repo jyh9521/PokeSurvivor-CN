@@ -87,6 +87,22 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
       await pages[1].waitForFunction(id=>G.EnemyMgr.get(id)?.elite===true,eliteId);check('elite creation preserves identity on a real guest',await pages[1].evaluate(id=>G.EnemyMgr.get(id).elite,eliteId));
       await pages[1].evaluate(id=>G.EnemyMgr.get(id).elite=false,eliteId);await pages[1].waitForFunction(id=>G.EnemyMgr.get(id)?.elite===true,eliteId);check('authoritative snapshots repair the elite bit without confusing charge protection',await pages[1].evaluate(id=>!!(G.EnemyMgr.get(id).net.st&32),eliteId));await a.evaluate(id=>G.EnemyMgr.get(id).dead=true,eliteId);
     }
+    if(BATTLE){
+      for(const p of pages)await p.evaluate(()=>G.Hazards.clear());
+      const airborne=await a.evaluate(({x,y})=>{const e=new G.Enemy({dex:7,hp:9999,spd:0,dmg:9999,xp:0,behavior:'chase'},x,y,{hp:1,spd:1,dmg:1});e.jump={sx:x,sy:y,tx:x,ty:y,t:0,dur:100};G.EnemyMgr.add(e);return e.id;},fixture);
+      await pages[1].waitForFunction(id=>!!(G.EnemyMgr.get(id)?.net?.st&64),airborne);
+      await pages[1].evaluate(()=>{const p=G.Game.player;p.hp=p.maxHp=100;p.invuln=0;});await pages[1].waitForTimeout(400);
+      check('airborne enemy replicas do not cause pre-landing body damage',await pages[1].evaluate(()=>G.Game.player.hp===100));
+      await a.evaluate(id=>G.EnemyMgr.get(id).dead=true,airborne);await pages[1].waitForFunction(id=>!G.EnemyMgr.get(id),airborne);
+      await pages[1].evaluate(()=>G.Game.player.invuln=7);
+      await a.evaluate(({x,y})=>G.Hazards.add({kind:'beam',x,y,angle:0,len:200,w:100,delay:.8,dmg:9999,preview:true,color:'#ff6b6b'}),fixture);
+      await pages[1].waitForFunction(()=>G.Hazards.all.some(h=>h.preview));await pages[1].waitForTimeout(1000);
+      check('host warning previews round-trip without damage or clearing guest immunity',await pages[1].evaluate(()=>G.Game.player.hp===100&&G.Game.player.invuln>4));
+      await pages[1].evaluate(()=>G.Game.player.invuln=1e6);
+      const opening=await a.evaluate(({x,y})=>{const e=new G.Enemy({dex:1,hp:10000,spd:0,dmg:0,xp:0,behavior:'chase'},x+150,y,{hp:1,spd:1,dmg:1},true);e.openT=100;G.EnemyMgr.add(e);return e.id;},fixture);
+      await pages[1].waitForFunction(id=>!!(G.EnemyMgr.get(id)?.net?.st&128),opening);check('golden boss counterattack openings synchronize independently of airborne and elite bits',await pages[1].evaluate(id=>{const st=G.EnemyMgr.get(id).net.st;return !!(st&128)&&!(st&64)&&!(st&32);},opening));await a.evaluate(id=>G.EnemyMgr.get(id).dead=true,opening);
+      const retrain=pages[7];await retrain.evaluate(()=>{const p=G.Game.player;p.moves=[G.Moves.instance('tackle',5)];p.slots=[p.moves];p.active=0;p.passives={};p.statsTaken={};p.rerolls=0;p.rerollBonus=1;for(const id of ['harden','light-screen','calm-mind','iron-defense'])for(let i=0;i<6;i++)G.Battle.learn(p,id);const card=G.LevelUp.pool(p).find(c=>c.category==='passive-retrain'&&c.key.includes('calm-mind'));G.RunUI.showLevelUp(p.level,[card],c=>{c.apply(p);p.activeMove().t=999;});});await retrain.locator('#cards .card').first().click();await a.waitForFunction(uid=>G.Coop.mate(uid)?.pl.passives.vitality===1&&!G.Coop.mate(uid).pl.passives['calm-mind'],users[7].id);check('guest paid evolution retraining synchronizes the four-slot replacement without account migration',await retrain.evaluate(()=>G.Game.player.rerolls===1&&Object.keys(G.Game.player.passives).length===4));
+    }
     const victimId=await a.evaluate(({x,y})=>{const e=new G.Enemy({dex:1,hp:1,spd:0,dmg:0,xp:0,behavior:'chaser'},x+35,y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},fixture);
     const guest=pages[1];await guest.waitForFunction(id=>!!G.EnemyMgr.get(id),victimId);
     const cast=await guest.evaluate(id=>{const p=G.Game.player,e=G.EnemyMgr.get(id);p.hp=20;p.x=e.x-35;p.y=e.y;p.meleeHeals=[];p.meleeGuardT=0;p.slots=[[G.Moves.instance('bite')]];G.Combat.tick(.001,p,0);p.activeMove().t=999;return {hp:p.hp,id:e.id};},victimId);

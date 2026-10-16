@@ -40,13 +40,15 @@ G.Enemies = (() => {
     { from: 500, bst: [530, 620], hp: 250, spd: 72, dmg: 28, xp: 38, cast: 7 }
   ];
 
+  // Finite-growth late endpoints: measured low-offense duels exposed a 2x HP
+  // jump without comparable earned DPS. Preserve first three bosses and damage.
   // Franjas de jefe: minuto en que salen, PV base y franja de BST.
   const BOSS_SLOTS = [
     { at: 180, hp: 1400,  dmg: 34, xp: 220,  bst: [490, 545] },
     { at: 360, hp: 3200,  dmg: 42, xp: 420,  bst: [520, 580] },
     { at: 540, hp: 5600,  dmg: 48, xp: 680,  bst: [540, 600] },
-    { at: 720, hp: 9000,  dmg: 56, xp: 1000, bst: [580, 700] },
-    { at: 900, hp: 16000, dmg: 68, xp: 1800, bst: [600, 700] }
+    { at: 720, hp: 7000,  dmg: 56, xp: 1000, bst: [580, 700] },
+    { at: 900, hp: 8400, dmg: 68, xp: 1800, bst: [600, 700] }
   ];
 
   // Stats base aproximados a partir de los de juego (inverso de fetch_pokedex).

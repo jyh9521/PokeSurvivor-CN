@@ -2,6 +2,14 @@
  * Initially adapted from DabaoHuang/pokesurvivor PR #74; reviewed against this game.
  * Names are separately verified in lang-zh-cn-names.js. See docs/LOCALIZATION.md. */
 G.I18n.add({
+  "Boss exhausted: counterattack during the golden opening!": "首领出现疲劳：抓住金色破绽反击！",
+  "When passive slots block evolution, trade one reroll and a level reward to retrain a passive from level one.": "被动槽位锁住进化前置时，可以消耗1次重抽和本次升级奖励，放弃一项被动并从1级重修。",
+  "Evolution retraining": "进化前置重修",
+  "Forfeit all levels of the old passive; learn the new passive at 1/6. Costs this reward and one remaining reroll. Unlocks the active move evolution prerequisite.": "放弃原被动的全部等级，新被动从1/6开始。消耗本次升级奖励和1次剩余重抽，补足当前主动招式的进化前置。",
+  "Focused evolution: x3.6 damage, +2 shots and +2 pierce; damage still decays through targets.": "集中进化：伤害×3.6、弹数+2、穿透+2；穿过目标时伤害仍会衰减。",
+  "Long-run combat and distinct move silhouettes": "长局战斗与招式轮廓优化",
+  "Readable charges, finite wave pressure, boss focus windows and distinct silhouettes for 36 moves.": "冲锋提前锁定并显示路径，敌潮提供补给窗口，首领战限制支援干扰，36个招式使用独立轮廓与节奏。",
+  "Wave easing: collect supplies before the next surge!": "敌潮暂缓：收集补给，准备下一轮！",
   "Presión gradual de las oleadas": "波次压力平滑调整",
   "La vida normal recupera presión gradualmente; los nuevos tramos entran durante 20 segundos, sin saltos bruscos.": "普通怪生命逐步恢复压力；新档位用20秒平滑过渡，避免血量突然跳涨。",
   "Los élites ganan algo de vida y se identifican correctamente en cooperativo. Los jefes reciben ajustes moderados de vida, no más daño.": "精英小幅增加生命并正确同步联机身份；首领温和增加生命，不提高伤害。",

@@ -1,4 +1,4 @@
-/* Continuous seeded waves: real spawner, AI, drops, XP and four-lane rewards.
+/* Continuous seeded waves: real spawner, AI, drops, XP and earned rewards.
  * Headless open terrain and deterministic driving, NOT player win-rate evidence. */
 const fs=require('node:fs'),vm=require('node:vm');
 module.exports=function waves(scene,opt={}){
@@ -16,22 +16,24 @@ module.exports=function waves(scene,opt={}){
   const profiles={melee:{dex:68,passives:['vitality','harden','swords-dance','agility']},ranged:{dex:6,passives:['vitality','calm-mind','reflexes','harden']},sustain:{dex:3,preferred:'leech-seed',passives:['vitality','aqua-ring','harden','calm-mind']},tank:{dex:143,passives:['vitality','harden','light-screen','aqua-ring']},drain:{dex:114,passives:['vitality','aqua-ring','harden','calm-mind']}};
   const cfg=profiles[opt.profile||'melee'];
   const perks=G.Upgrades.perks(Object.fromEntries(G.Upgrades.LIST.map(u=>[u.id,opt.strong?u.max:opt.mid?Math.floor(u.max/2):0])));
-  const players=Array.from({length:opt.players||1},(_,i)=>{const p=new G.Player(G.DEX_BY[opt.dex||cfg.dex],perks);p.uid='p'+i;p.x=i*30;p.cast=noop;p.addMove(opt.move||G.Moves.startFor(p.mon));return p;});
+  const players=Array.from({length:opt.players||1},(_,i)=>{const p=new G.Player(G.DEX_BY[opt.dex||cfg.dex],perks);p.uid='p'+i;p.x=i*30;p.cast=noop;p.addMove(opt.move||G.Moves.startFor(p.mon));if(opt.policy==='planned'&&perks.startMoves>=2){const pool=G.Moves.poolFor(p.mon).filter(id=>!p.hasMove(id)&&G.Moves.BY_ID[id].kind!=='buff');if(pool.length)stream('starting:'+p.uid,()=>p.addMove(G.U.pick(pool)));p.setActive(0);}return p;});
+  if(opt.fixedBuild)for(const p of players){p.level=45;p.xpNext=G.Player.xpFor(45);const ids=opt.profile==='ranged'?['vitality','harden','calm-mind','aqua-ring']:opt.profile==='tank'?['vitality','harden','light-screen','aqua-ring']:['vitality','harden','swords-dance','aqua-ring'];for(const id of ids)for(let i=0;i<6;i++)G.Battle.learn(p,id);const m=p.activeMove();while(G.Moves.levelUp(m));if(G.Moves.evoInfo(m,p.statsTaken)?.ready)G.Moves.evolve(m);}
   G.Camera.sees=(x,y,pad=0)=>players.some(p=>G.U.dist2(p.x,p.y,x,y)<(330+pad)**2);
   G.Game={player:players[0],st:{time:0},everyone:()=>players};
   if(G.Telemetry)for(const p of players)G.Telemetry.start(p);
   if(opt.offense)G.BattleBalance.offense=p=>opt.offense==='linear35'?1+(p.level-1)*.035:1+Math.min(19,p.level-1)*.04+Math.max(0,p.level-20)*.02;
   if(opt.xpScale)G.BattleBalance.xpReward=()=>opt.xpScale;
   const xpAudit={supply:0,picked:0,gained:0,sources:{}};const originalDropXp=G.Pickups.dropXp;G.Pickups.dropXp=(x,y,value,boss,legend,plain)=>{xpAudit.supply+=value;const source=plain?"judgment":legend?"rift":boss?"boss":"normal";xpAudit.sources[source]=(xpAudit.sources[source]||0)+value;return originalDropXp(x,y,value,boss,legend,plain);};for(const p of players){const gain=p.gainXp.bind(p);p.gainXp=value=>{if(p===players[0]){xpAudit.picked+=value;xpAudit.gained+=value*p.xpMul;}return gain(value);};}
-  const milestones=[],bosses=[],choices=[],lifetimes=[],damage={taken:0,hits:0},spawns={normal:0,elite:0,boss:0};let kills=0,capSeconds=0,maxCount=0,travel=0,hazards=0,upgrades=0;
-  const add=G.EnemyMgr.add;G.EnemyMgr.add=e=>{e._born=t;spawns[e.boss?'boss':e.elite?'elite':'normal']++;if(e.boss){const row={at:+t.toFixed(2),hp:e.maxHp,dex:e.dex,chain:e.def.stageChain,firstHit:null,dead:null,stage:0};e._measure=row;bosses.push(row);}const hurt=e.hurt.bind(e);e.hurt=(...a)=>{if(e._measure&&e._measure.firstHit===null)e._measure.firstHit=+t.toFixed(2);return hurt(...a);};const die=e.die.bind(e);e.die=()=>{if(e.dead)return;kills++;if(e.boss){e._measure.dead=+t.toFixed(2);e._measure.stage=e.bossStage||0;}else lifetimes.push({at:t,life:t-e._born});stream('loot',die);};return add(e);};
-  for(const p of players){const hurt=p.hurt.bind(p);p.hurt=(...a)=>{const hp=p.hp;hurt(...a);if(p.hp<hp){damage.taken+=hp-p.hp;damage.hits++;}};}
+  const damageSources={},recentDamage=[];const milestones=[],bosses=[],choices=[],lifetimes=[],damage={taken:0,hits:0},spawns={normal:0,elite:0,boss:0};let kills=0,capSeconds=0,maxCount=0,travel=0,hazards=0,upgrades=0;
+  const add=G.EnemyMgr.add;G.EnemyMgr.add=e=>{e._born=t;spawns[e.boss?'boss':e.elite?'elite':'normal']++;if(e.boss){const row={at:+t.toFixed(2),hp:e.maxHp,dex:e.dex,chain:e.def.stageChain,firstHit:null,dead:null,stage:0,damage:0,hits:0,maxHit:0,lastHit:null,maxGap:0};e._measure=row;bosses.push(row);}const hurt=e.hurt.bind(e);e.hurt=(...a)=>{if(e._measure&&e._measure.firstHit===null)e._measure.firstHit=+t.toFixed(2);const before=e.hp,result=hurt(...a);if(e._measure){const row=e._measure;row.damage+=Math.max(0,before-e.hp);row.hits++;row.maxHit=Math.max(row.maxHit,a[0]);if(row.lastHit!==null)row.maxGap=Math.max(row.maxGap,t-row.lastHit);row.lastHit=t;}return result;};const die=e.die.bind(e);e.die=()=>{if(e.dead)return;kills++;if(e.boss){e._measure.dead=+t.toFixed(2);e._measure.stage=e.bossStage||0;}else lifetimes.push({at:t,life:t-e._born});stream('loot',die);};return add(e);};
+  for(const p of players){const hurt=p.hurt.bind(p);p.hurt=(...a)=>{const hp=p.hp;hurt(...a);if(p.hp<hp){damage.taken+=hp-p.hp;damage.hits++;const key=(a[4]||"other")+":"+(a[1]||"untyped")+":"+(a[3]||"physical");damageSources[key]=(damageSources[key]||0)+hp-p.hp;recentDamage.push({time:+t.toFixed(2),key,amount:+(hp-p.hp).toFixed(2),hp:+p.hp.toFixed(2)});if(recentDamage.length>40)recentDamage.shift();}};}
   const h=G.Hazards.add;G.Hazards.add=(...a)=>{hazards++;return h(...a);};
   const choose=p=>stream('reward:'+p.uid,()=>chooseCard(p));
-  function chooseCard(p){const offered=G.LevelUp.offer(p).filter(c=>!c.disabled);if(!offered.length)return;
+  function chooseCard(p){let offered=G.LevelUp.offer(p).filter(c=>!c.disabled);if(!offered.length)return;
     // Select only actual offered cards; no forced skill levels or evolution prerequisites.
-    const primary=c=>c.moveId===p.activeMove()?.id;
-    const score=c=>c.type==='new'&&c.moveId===cfg.preferred?110:c.type==='evo'?(primary(c)?100:1):c.type==='up'?(primary(c)?90:1):c.type==='mastery'?(primary(c)?40:1):c.type==='passive'?(cfg.passives.includes(c.passiveId)?75-cfg.passives.indexOf(c.passiveId)*4:5):c.type==='new'?-1:0;
+    const primary=c=>c.moveId===p.slots[0]?.[0]?.id;
+    const score=c=>c.type==='new'&&c.moveId===cfg.preferred?110:c.type==='evo'?(primary(c)?100:1):c.type==='up'?(primary(c)?90:1):c.type==='mastery'?(primary(c)?40:1):c.type==='passive'?(cfg.passives.includes(c.passiveId)?75-cfg.passives.indexOf(c.passiveId)*4:opt.policy==='planned'?-10:5):c.type==='new'?(opt.policy==='planned'?0:-1):0;
+    if(opt.policy==='planned'){while(Math.max(...offered.map(score))<70&&p.rerolls<1+p.rerollBonus){p.rerolls++;offered=G.LevelUp.offer(p).filter(c=>!c.disabled);}}
     offered.sort((a,b)=>score(b)-score(a));const c=offered[0];c.apply(p);if(c.type==='new'&&c.moveId===cfg.preferred)p.active=p.slots.findIndex(g=>g.some(m=>m.id===c.moveId));upgrades++;if(p===players[0])choices.push({time:+t.toFixed(1),level:p.level,key:c.key});
   }
   let owner=players[0];const desired=()=>{const p=owner;if(opt.idle)return[0,0];
@@ -42,9 +44,13 @@ module.exports=function waves(scene,opt={}){
     if(near.length>=4||p.hp<p.maxHp*.3&&near.length){let x=0,y=0;for(const e of near){const d=Math.max(10,G.U.dist(p.x,p.y,e.x,e.y));x+=(p.x-e.x)/d**2;y+=(p.y-e.y)/d**2;}return G.U.norm(x,y);}
     const orb=G.Pickups.all().filter(o=>['xp','xpBig','heal','magnet','item'].includes(o.kind)).sort((a,b)=>G.U.dist2(p.x,p.y,a.x,a.y)-G.U.dist2(p.x,p.y,b.x,b.y))[0];
     const boss=alive.find(e=>e.boss);
+    if(opt.policy==='planned'){
+      const heal=G.Pickups.all().filter(o=>o.kind==='heal'&&G.U.dist2(p.x,p.y,o.x,o.y)<300**2).sort((a,b)=>G.U.dist2(p.x,p.y,a.x,a.y)-G.U.dist2(p.x,p.y,b.x,b.y))[0];if(heal&&p.hp<p.maxHp*.65)return G.U.norm(heal.x-p.x,heal.y-p.y);
+      const target=boss||alive[0];if(target){const base=p.slots[0]?.[0],k=m=>G.Types.mult(m.type,target.types)*m.dmg/m.cd;let best=base;if(base&&G.Types.mult(base.type,target.types)<.5)best=p.slots.map(g=>g[0]).filter(m=>!m.autoSupport).sort((a,b)=>k(b)-k(a))[0]||base;p.setActive(Math.max(0,p.slots.findIndex(g=>g[0]===best))); }
+    }
     if(orb&&!boss&&G.U.dist(p.x,p.y,orb.x,orb.y)<220)return G.U.norm(orb.x-p.x,orb.y-p.y);
     const e=boss||alive.sort((a,b)=>G.U.dist2(p.x,p.y,a.x,a.y)-G.U.dist2(p.x,p.y,b.x,b.y))[0];if(!e)return[0,0];
-    const m=p.activeMove(),d=G.U.dist(p.x,p.y,e.x,e.y),range=m.kind==='melee'?Math.max(e.r+p.r+12,m.radius*.65):120,[dx,dy]=G.U.norm(e.x-p.x,e.y-p.y);return d>range?[dx,dy]:d<range*.7?[-dx,-dy]:[-dy,dx];
+    const m=p.activeMove(),d=G.U.dist(p.x,p.y,e.x,e.y),range=m.kind==='melee'?Math.max(e.r+p.r+12,m.radius*.65):['spacing','planned'].includes(opt.policy)?Math.min(260,(m.speed*m.life||m.radius||300)*.65):120,[dx,dy]=G.U.norm(e.x-p.x,e.y-p.y);return d>range?[dx,dy]:d<range*.7?[-dx,-dy]:[-dy,dx];
   };
   G.Input.axis=()=>{const p=owner;if(opt.idle)return[0,0];if(t<(p._driveAt||0))return p._driveAxis;p._driveAt=t+.12;
     const goal=desired(),dirs=[goal,...Array.from({length:12},(_,i)=>[Math.cos(i*Math.PI/6),Math.sin(i*Math.PI/6)])],enemies=G.EnemyMgr.all().filter(e=>!e.dead&&G.U.dist2(p.x,p.y,e.x,e.y)<220**2),shots=G.Projectiles.all().filter(o=>!o.friendly&&G.U.dist2(p.x,p.y,o.x,o.y)<250**2);
@@ -56,11 +62,11 @@ module.exports=function waves(scene,opt={}){
       if(score>bestScore){best=dir;bestScore=score;}
     }p._driveAxis=best;return best;
   };
-  stream('spawn',()=>G.Spawner.reset());const dt=1/(opt.fps||30),duration=opt.seconds||1200;let error=null;
-  try{for(let f=0;f<duration/dt;f++){t=f*dt;s.time(t*1000);G.Game.st.time=t;if(players.every(p=>p.dead))break;
-    stream('spawn',()=>G.Spawner.update(dt,players,t));
+  stream('spawn',()=>G.Spawner.reset());const from=opt.from||0;if(from){const checkpoint=G.Spawner.checkpoint();G.Spawner.checkpoint({...checkpoint,bossIdx:G.Enemies.BOSSES.filter(b=>b.at<from).length,pressureAt:from+6});}const dt=1/(opt.fps||30),duration=opt.seconds||1200;let error=null;
+  try{for(let f=0;f<duration/dt;f++){t=from+f*dt;s.time(t*1000);G.Game.st.time=t;if(players.every(p=>p.dead))break;
     for(const p of players){if(p.dead)continue;owner=p;const x=p.x,y=p.y;p.update(dt);travel+=Math.hypot(p.x-x,p.y-y);}
-    G.EnemyMgr.update(dt,players);
+    stream('spawn',()=>G.Spawner.update(dt,players,t));
+    G.EnemyMgr.update(dt,[...players,...(G.Combat.decoys?.()||[])]);G.EnemyMgr.rebuildGrid();
     for(const p of players){if(p.dead)continue;G.Combat.tick(dt,p,t);}G.Projectiles.update(dt,players[0],G.EnemyMgr.all());for(const p of players)if(!p.dead)G.Combat.resolve(dt,p,t);G.Combat.updateFields(dt);G.Hazards.update(dt);
     G.Pickups.update(dt,players,(o,p)=>{if(o.kind==='xp'||o.kind==='xpBig'){for(const q of players){const n=q.gainXp(o.value/(1+.6*(players.length-1)));for(let i=0;i<n;i++)choose(q);}}else if(o.kind==='heal')p.heal(p.maxHp*.3);else if(o.kind==='magnet')G.Pickups.pullAll();else if(o.kind==='item'){const rank=id=>({shellbell:100,leftovers:95,assaultvest:80,quickclaw:70,choiceband:65,luckyegg:60,focussash:55,choicescarf:50,rockyhelmet:40,amuletcoin:5,lifeorb:-1}[id]||0);if(rank(o.value)>rank(p.item))p.equip(o.value);}else if(o.kind==='bomb')for(const e of G.EnemyMgr.all())if(!e.dead&&G.Camera.sees(e.x,e.y))e.hurt(60+players[0].level*14,'#fff',e.x-p.x,e.y-p.y,160);});
     if(G.RunGrowth)for(const p of players){const target=G.RunGrowth.targets(p).find(t=>p.activeGroup().includes(t.move));if(target)G.RunGrowth.spend(p,target.instanceId);}
@@ -68,5 +74,5 @@ module.exports=function waves(scene,opt={}){
     const count=G.EnemyMgr.count;maxCount=Math.max(maxCount,count);if(count>=G.Spawner.CAP)capSeconds+=dt;
     if(f%Math.round(60/dt)===0)milestones.push({time:Math.round(t),level:players[0].level,xp:players[0].xp,xpAudit:{...xpAudit,sources:{...xpAudit.sources}},xpUnpicked:G.Pickups.all().filter(o=>["xp","xpBig"].includes(o.kind)).reduce((n,o)=>n+o.value,0),hp:+players[0].hp.toFixed(1),maxHp:players[0].maxHp,alive:players.filter(p=>!p.dead).length,enemies:count,kills,damageTaken:+damage.taken.toFixed(1),moves:players[0].moves.map(m=>({id:m.id,lv:m.lvl,evolved:!!m.evolved,mastery:m.mastery||0})),passives:{...players[0].passives}});
   }}catch(e){error=e.stack;}
-  return{profile:opt.profile||'melee',seed:opt.seed||17,players:players.length,strong:!!opt.strong,mid:!!opt.mid,perks,idle:!!opt.idle,fps:1/dt,requested:duration,seconds:+t.toFixed(2),alive:players.filter(p=>!p.dead).length,levels:players.map(p=>p.level),hp:players.map(p=>+p.hp.toFixed(1)),kills,spawns,maxCount,capSeconds:+capSeconds.toFixed(1),damageTaken:+damage.taken.toFixed(1),hitsTaken:damage.hits,travel:Math.round(travel),hazards,upgrades,bosses,milestones,choices,lifetimes,xpAudit,telemetry:G.Telemetry?.report(players[0]),error};
+  return{profile:opt.profile||'melee',seed:opt.seed||17,players:players.length,strong:!!opt.strong,mid:!!opt.mid,perks,idle:!!opt.idle,policy:opt.policy||'legacy',fixedBuild:!!opt.fixedBuild,from,fps:1/dt,requested:duration,seconds:+t.toFixed(2),alive:players.filter(p=>!p.dead).length,levels:players.map(p=>p.level),hp:players.map(p=>+p.hp.toFixed(1)),kills,spawns,maxCount,capSeconds:+capSeconds.toFixed(1),damageTaken:+damage.taken.toFixed(1),hitsTaken:damage.hits,damageSources,recentDamage,travel:Math.round(travel),hazards,upgrades,bosses,milestones,choices,lifetimes,xpAudit,telemetry:G.Telemetry?.report(players[0]),error};
 };

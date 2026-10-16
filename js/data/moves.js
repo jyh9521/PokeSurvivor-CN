@@ -584,11 +584,12 @@
   for(const m of [...(G.BattleMoves||[]),...(G.ExpansionMoves||[])]){const def=BY_ID[m.id];if(!def?.specialOnly&&EVO_MODS[def.kind])EVO[m.id]=[def.name+' +',def.damageClass==='physical'?'atk':'cd'];}
 
   /** ¿Puede evolucionar ya? → { name, needs, needName, text, ready } o null */
+  const focusedEvolution=m=>m.kind==='projectile'&&(m.def.count||1)===1&&!m.def.homing;
   function evoInfo(m, statsTaken) {
     const e = EVO[m.id];
     if (!e || m.evolved || m.lvl < m.def.maxLvl || !EVO_MODS[m.kind]) return null;
     const [name, needs] = e;
-    return { name, needs, needName: NEED_NAME[needs], text: EVO_MODS[m.kind].t,
+    return { name, needs, needName: NEED_NAME[needs], text: focusedEvolution(m)?G.T('Focused evolution: x3.6 damage, +2 shots and +2 pierce; damage still decays through targets.'):EVO_MODS[m.kind].t,
              ready: !!(statsTaken && statsTaken[needs]) };
   }
 
@@ -597,6 +598,10 @@
     const e = EVO[m.id];
     if (!e || m.evolved) return false;
     applyMods(m, EVO_MODS[m.kind].m);
+    // Finite evolution endpoint for narrow non-homing starter shots. These lost
+    // unlimited mastery but still paid the full pierce/spread cost. Melee,
+    // homing, beams and naturally multi-shot attacks keep their own endpoints.
+    if(focusedEvolution(m))m.dmg*=2;
     m.baseName = m.name;
     m.name = e[0];
     m.evolved = true;

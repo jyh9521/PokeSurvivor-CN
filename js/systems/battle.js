@@ -4,11 +4,28 @@ G.Battle=(()=>{
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const level=(p,id)=>clamp(Math.floor(p.passives?.[id]||0),0,G.PASSIVE_MAX_LEVEL);
   const legacyLevel=(p,id)=>level(p,id)/2;
+  const keys={maxhp:'hp',physical:'atk',special:'atk',speed:'spd',cooldown:'cd',armor:'def',ward:'def',shield:'def',block:'def',root:'rgn',regen:'rgn',magnet:'mag',experience:'xp'};
+  const passiveKey=stat=>keys[stat];
   const passive=(p,stat)=>(G.PassiveDefs||[]).reduce((n,d)=>n+(d.stat===stat?level(p,d.id)*d.value:0),0);
   function init(p){p.baseForm=p.mon.formKey||'';p.baseStats=p.mon.formStats||rules.stats(p.mon,data);p.trait=rules.trait(p.mon,data);p.role=rules.role(p.mon,data);const entry=data.species[p.dex],form=G.SpecialRules.megas(p.dex,p.baseForm)[0];p.megaTrait=form?rules.trait(p.mon,{species:{[p.dex]:{...entry,stats:form.stats,ability:form.ability||entry.ability}}}):p.trait;p.passives={};p.battle={energy:0,choice:'z',megaKey:form?.key||'',used:false,form:null,remaining:0,shield:0,block:0,blockT:0,shieldT:0,counterT:0,sturdyT:0,heals:[],clock:0,formBonus:0,regen:0};visual(p);}
   function trait(p){return p.battle?.form==='mega'?p.megaTrait:p.trait;}
   function ensure(p){if(!p.battle)init(p);return p.battle;}
-  function learn(p,id){const d=G.PassiveDefs.find(d=>d.id===id);if(!d)return false;ensure(p);const n=level(p,id);if(n>=G.PASSIVE_MAX_LEVEL||!n&&Object.keys(p.passives).length>=4)return false;p.passives[id]=n+1;if(d.stat==='maxhp')p.addMaxHp(d.value);if(d.stat==='cooldown')p.cdMul*=1-d.value;if(d.stat==='magnet')p.magnet*=1+d.value;if(d.stat==='experience')p.xpMul*=1+d.value;const keys={maxhp:'hp',physical:'atk',special:'atk',speed:'spd',cooldown:'cd',armor:'def',ward:'def',shield:'def',block:'def',root:'rgn',regen:'rgn',magnet:'mag',experience:'xp'};if(keys[d.stat]){p.statsTaken||={};p.statsTaken[keys[d.stat]]=(p.statsTaken[keys[d.stat]]||0)+1;}return true;}
+  function learn(p,id){const d=G.PassiveDefs.find(d=>d.id===id);if(!d)return false;ensure(p);const n=level(p,id);if(n>=G.PASSIVE_MAX_LEVEL||!n&&Object.keys(p.passives).length>=4)return false;p.passives[id]=n+1;if(d.stat==='maxhp')p.addMaxHp(d.value);if(d.stat==='cooldown')p.cdMul*=1-d.value;if(d.stat==='magnet')p.magnet*=1+d.value;if(d.stat==='experience')p.xpMul*=1+d.value;if(keys[d.stat]){p.statsTaken||={};p.statsTaken[keys[d.stat]]=(p.statsTaken[keys[d.stat]]||0)+1;}return true;}
+  function retrain(p,oldId,newId,expected){
+    const old=G.PassiveDefs.find(d=>d.id===oldId),next=G.PassiveDefs.find(d=>d.id===newId),n=level(p,oldId),ev=G.Moves.evoInfo(p.activeMove(),p.statsTaken);
+    if(p.remote||p.dead||!old||!next||!n||n!==expected||Object.keys(p.passives).length!==4||p.passives[newId]||p.rerolls>=1+p.rerollBonus||!ev||ev.ready||passiveKey(next.stat)!==ev.needs)return false;
+    // Pay with an existing reroll AND this level reward; forfeit every old level.
+    // Reverse only the removed passive's own contribution, never permanent perks.
+    const ratio=p.hp/p.maxHp;delete p.passives[oldId];
+    if(old.stat==='maxhp'){p.maxHp=Math.max(1,p.maxHp-n*old.value);p.hp=Math.min(p.hp,p.maxHp*ratio);}
+    if(old.stat==='cooldown')p.cdMul/=Math.pow(1-old.value,n);
+    if(old.stat==='magnet')p.magnet/=Math.pow(1+old.value,n);
+    if(old.stat==='experience')p.xpMul/=Math.pow(1+old.value,n);
+    const key=passiveKey(old.stat);if(key)p.statsTaken[key]=Math.max(0,(p.statsTaken[key]||0)-n);
+    if(old.stat==='block')p.battle.block=0;
+    if(old.stat==='shield')p.battle.shield=Math.min(p.battle.shield,p.maxHp*passive(p,'shield'));
+    p.rerolls++;return learn(p,newId);
+  }
   function types(p){const b=p.battle;if(b?.form==='mega')return G.SpecialRuntime.entry(p)?.types||p.mon.types;return p.mon.types;}
   function formStats(p){return p.battle?.form==='mega'?G.SpecialRuntime.entry(p)?.stats||p.baseStats:p.baseStats;}
   function damage(p,e,m,amount){ensure(p);const cls=rules.classify(m,data),s=formStats(p),index=cls==='physical'?1:3,old=Math.max(.1,p.mon.atk||1);
@@ -43,7 +60,7 @@ G.Battle=(()=>{
     let reduction=1-(1-rules.armor(armor))*(1-legacyReduction);
     if(trait(p).key==='carapace'&&cls==='physical'||trait(p).key==='ward'&&cls==='special')reduction=1-(1-reduction)*.88;
     reduction=Math.min(.85,reduction);let d=Math.max(1,amount*(1-reduction));
-    if(contact)d=Math.min(d,p.maxHp*G.BattleBalance.CONTACT_CAP);
+    if(contact){const close=p.meleeGuardT>0||p.activeGroup().some(m=>m.kind==='melee');d=Math.min(d,p.maxHp*(close?G.BattleBalance.CONTACT_CAP:G.BattleBalance.RANGED_CONTACT_CAP));}
     const absorbed=Math.min(b.shield,d);b.shield-=absorbed;d-=absorbed;G.Telemetry?.add(p,'shield',absorbed);
     if(p.dex===778&&p.baseForm!=='busted'&&d>0){G.SpecialRuntime.base(p,'busted');p.trait=rules.trait(p.mon,data);visual(p);return Math.min(d,p.maxHp*.125);}
     if(trait(p).key==='sturdy'&&b.sturdyT<=0&&p.hp>=p.maxHp-.001&&d>=p.hp){d=p.hp-1;b.sturdyT=60;}
@@ -77,5 +94,5 @@ G.Battle=(()=>{
   }
   function net(p){const b=p.battle;return b?[b.form||'',Math.round(b.remaining*10)/10,Math.round(b.energy),b.used?1:0,Math.round(b.shield),b.block,Object.entries(p.passives||{}),p.baseForm||'',b.megaKey||'',[(b.zBoost||0),(b.terrainT||0),b.fieldType||'',(b.maxBuffT||0),!!b.maxAtk,!!b.maxSpa,!!b.maxSpeed,!!b.maxDef,(b.guardT||0)],b.choice,b.rechargePending?1:0,b.uses||0,G.RunGrowth?.net(p)]:null;}
   function ingest(p,a){if(!p.remote||!Array.isArray(a))return;const b=ensure(p);if(a[7]!==p.baseForm)G.SpecialRuntime.base(p,a[7]);const m=G.SpecialRules.mega(p.dex,a[8],p.baseForm);b.megaKey=m?.key||G.SpecialRules.megas(p.dex,p.baseForm)[0]?.key||'';const f=Array.isArray(a[9])?a[9]:[];b.zBoost=clamp(+f[0]||0,0,20);b.terrainT=clamp(+f[1]||0,0,12);b.fieldType=typeof f[2]==='string'?f[2]:'';b.maxBuffT=clamp(+f[3]||0,0,8);[b.maxAtk,b.maxSpa,b.maxSpeed,b.maxDef]=f.slice(4,8).map(Boolean);b.guardT=clamp(+f[8]||0,0,2);b.form=['mega','max'].includes(a[0])?a[0]:null;b.remaining=clamp(Number(a[1])||0,0,30);b.energy=clamp(Number(a[2])||0,0,100);b.used=!!a[3];b.shield=clamp(Number(a[4])||0,0,1e6);b.block=a[5]?1:0;p.passives={};for(const row of (Array.isArray(a[6])?a[6]:[]).slice(0,4))if(Array.isArray(row)&&G.PassiveDefs.some(d=>d.id===row[0])&&Number.isInteger(row[1])&&row[1]>0&&row[1]>0)p.passives[row[0]]=clamp(row[1],1,G.PASSIVE_MAX_LEVEL);b.choice=["mega","max","z"].includes(a[10])?a[10]:"z";b.rechargePending=!!a[11];b.uses=clamp(a[12]|0,0,100);p.growthSummary=a[13]||null;visual(p);}
-  return {trait,init,learn,damage,deal,accept,credit,charge,defend,speed,crit,tick,activate,available,endForm,visual,net,ingest,types,level,passive,stats:p=>formStats(p)};
+  return {trait,init,learn,retrain,passiveKey,damage,deal,accept,credit,charge,defend,speed,crit,tick,activate,available,endForm,visual,net,ingest,types,level,passive,stats:p=>formStats(p)};
 })();

@@ -1,6 +1,6 @@
 /* Combat tuning shared by source, production and authority. Values are run-only. */
 (function(factory){if(typeof module==='object'&&module.exports)module.exports=factory();else G.BattleBalance=factory();})(()=>{
-  const STAB=1.20,DENSITY_HP=1.65,CONTACT_DAMAGE=1.8,CONTACT_FACTOR=.60,CONTACT_CAP=.22,CONTACT_GRACE=.60;
+  const STAB=1.20,DENSITY_HP=1.65,CONTACT_DAMAGE=1.8,CONTACT_FACTOR=.60,CONTACT_CAP=.22,RANGED_CONTACT_CAP=.30,CONTACT_GRACE=.60;
   const level=p=>Math.max(1,Math.min(10000,Number.isFinite(p?.level)?p.level:1));
   const offense=p=>1+(level(p)-1)*.045;
   const enemyScale=t=>({hp:1+Math.min(1800,Math.max(0,t))/900,dmg:1+Math.max(0,t)/600,spd:1+Math.min(.35,Math.max(0,t)/1400)});
@@ -11,6 +11,9 @@
   const ELITE_HP=1.75;
   const xpReward=t=>curve(t,[[0,4.2],[180,4.2],[600,1.4],[1800,1.4]]);
   const pressureWindow=t=>(t>=180&&t<300)||(t>=720&&t<900)||(t>=1440&&t<1620);
+  const recoveryWindow=t=>t>=300&&(t-300)%90>=(pressureWindow(t)?72:60);
+  // Finite builds need finite throughput and authored collection windows.
+  const waveRate=t=>Math.min(10,(1.6+t*.028+Math.pow(t/60,1.6)*.5)*.24)*(recoveryWindow(t)?.2:1);
   // Only newly unlocked tiers blend over 20 seconds; old-tier species are unchanged.
   function tierBlend(t,index,tiers){if(!Number.isInteger(index)||index<1||!tiers?.[index])return 1;const tr=tiers[index],x=Math.max(0,Math.min(1,(t-tr.from)/20));return tiers[index-1].hp/tr.hp+(1-tiers[index-1].hp/tr.hp)*x*x*(3-2*x);}
   // Per-target planning floors, not total multi-target DPS or simulated hit rates.
@@ -30,5 +33,5 @@
     m.dmg=+m.dmg.toFixed(3);
   }
   const bodyContact=e=>!e.judge&&(e.remote?!(e.net?.st&16):e.phase!=='dash'&&!e.jump&&!e.ai?.cast);
-  return{CONTACT_FACTOR,CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,tierBlend,FLOORS,budget,tune};
+  return{CONTACT_FACTOR,CONTACT_CAP,RANGED_CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,recoveryWindow,waveRate,tierBlend,FLOORS,budget,tune};
 });

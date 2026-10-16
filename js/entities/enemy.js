@@ -101,7 +101,7 @@
     hurt(amount, color = '#fff', dirX = 0, dirY = 0, knock = 0, eff = null, source = null) {
       if (this.dead) return;
       this.firstHitAt??=G.Game?.st?.time||0;this.hitCount=(this.hitCount||0)+1;
-      const d = Math.max(1, Math.round(amount));
+      let d = Math.max(1, Math.round(amount));
       // Copia de un enemigo del anfitrión: el golpe se le manda a él, que es
       // quien decide si cae. Aquí sólo se ve (número, destello y animación).
       if (this.remote) {
@@ -110,6 +110,9 @@
         this.showHurt(d, color, dirX, dirY, eff);
         return;
       }
+      // Only the authority applies an authored counterattack window. Replicas
+      // send ordinary damage; the host multiplies once and confirms real credit.
+      if(this.boss&&!this.legend&&!this.judge&&this.openT>0){amount*=5;d=Math.max(1,Math.round(amount));}
       // Escudo: absorbe primero.
       if (this.shield > 0) {
         const a = Math.min(this.shield, d);
@@ -374,14 +377,18 @@
         this.pt -= dt;
         if (this.phase === 'walk') {
           if (dist < 200 && this.pt <= 0) {
-            this.phase = 'aim'; this.pt = 0.55;
+            // Lock the visible corridor at wind-up START. Tracking until the
+            // last frame made the .55s charge cosmetic and lethal to kiting.
+            const warning=G.Hazards.add({ownerId:this.id,ownerStage:0,kind:'beam',x:this.x,y:this.y,angle:Math.atan2(dy,dx),len:spd*3.4*.42+this.r,w:this.r*2,delay:.55,end:.42,dmg:0,preview:true,type:this.atkType,color:'#ff6b6b'});
+            if(!warning){this.pt=.25;return;}
+            this.dx=dx;this.dy=dy;this.phase = 'aim'; this.pt = .55;
+            vx=vy=0;animBase='Idle';
             this.anim.play('Charge', { speed: 1.6 });
           }
         } else if (this.phase === 'aim') {
           vx = vy = 0; animBase = 'Idle';
           if (this.pt <= 0) {
             this.phase = 'dash'; this.pt = 0.42;
-            this.dx = dx; this.dy = dy;
             this.anim.play('Attack', { speed: 1.4 });
             G.FX.ring(this.x, this.y, this.r, this.r * 2.4, '#ff6b6b', 0.25, 2);
           }
@@ -403,6 +410,7 @@
         }
       }
 
+      this._vx=vx;this._vy=vy;
       // --- integración ---
       const ox = this.x, oy = this.y;
       this.x += this.kx * dt; this.y += this.ky * dt;
@@ -455,6 +463,7 @@
       if (!this.ai) this.bossInit();
       if(G.BossStages?.tick(this,dt))return [0,0,'Idle'];
       const ai = this.ai;
+      if(this.openT>0){this.openT=Math.max(0,this.openT-dt);return [0,0,'Idle'];}
       if (!this.def.stageChain && !ai.fury && this.hp < this.maxHp * 0.5) this.enrage();
       const k = ai.fury ? 1.25 : 1;
       if (ai.cast) return this.bossCast(dt, pl);
@@ -471,6 +480,8 @@
         if (dist < 170) { vx = -ddx * spd; vy = -ddy * spd; }
         else if (dist < 300) { vx = -ddy * spd * 0.55 * ai.side; vy = ddx * spd * 0.55 * ai.side; }   // te rodea
       }
+      ai.pursuitT=Math.max(0,(ai.pursuitT||0)-dt);
+      if(!this.legend&&!this.judge&&dist>240&&dist<800&&ai.cd<=0&&ai.pursuitT<=0){this.bossStart('pursuit',pl);ai.pursuitT=6;return [0,0,'Idle'];}
       if (ai.cd <= 0) {
         let id = null;
         if (ai.mode === 'close') {
@@ -511,6 +522,13 @@
                           delay: c.wind + c.dur, dmg: this.dmg * 1.2, type, color: col });
           this.anim.play('Charge', { speed: 1.3 });
           break;
+        case 'pursuit': { // Locked, visible landing; finite lead closes a kite loop.
+          const lead=.35,vx=pl._vx||0,vy=pl._vy||0,k=Math.min(1,100/(Math.hypot(vx,vy)*lead||1)),tx=pl.x+vx*lead*k,ty=pl.y+vy*lead*k;
+          const warning=G.Hazards.add({ownerId:this.id,ownerStage:this.bossStage||0,kind:'zone',x:tx,y:ty,r:82,delay:.95,dmg:this.dmg*1.25,type,color:col});
+          ai.cast=null;ai.cd=2;
+          if(warning){this.jump={sx:this.x,sy:this.y,tx,ty,t:-.5,dur:.45};this.anim.play('Charge',{speed:1.4});}
+          return;
+        }
         case 'leap':       // salto y caída sobre ti
           this.jump = { sx: this.x, sy: this.y, tx: pl.x, ty: pl.y, t: -0.5 * f, dur: 0.65 };
           G.Hazards.add({ ownerId:this.id,ownerStage:this.bossStage||0, kind: 'zone', x: pl.x, y: pl.y, r: 82, delay: 0.5 * f + 0.65, dmg: this.dmg * 1.25, type, color: col });
@@ -565,10 +583,23 @@
       return [0, 0, 'Idle'];
     }
 
+    bossOpening(){
+      if(!this.boss||this.legend||this.judge)return;
+      this.bossCasts=(this.bossCasts||0)+1;
+      if(this.bossCasts<8)return;
+      this.openT=2;
+      G.FX.ring(this.x,this.y,this.r,this.r+28,'#ffe080',.6,3);
+      if(!this.exhaustedAnnounced){this.exhaustedAnnounced=true;G.Spawner?.say?.(G.T('Boss exhausted: counterattack during the golden opening!'),3);}
+    }
+
     bossEnd() {
       const ai = this.ai;
       ai.cast = null;
+      // A ranged stance ends after one cast, not 7-9 walking seconds PLUS
+      // unlimited frozen cast time. The next approach exposes a melee window.
+      if(ai.mode==='far')ai.modeT=0;
       ai.cd = G.U.rand(1.3, 2.0);
+      this.bossOpening();
       if (ai.fury && Math.random() < 0.35) ai.cd = 0.3;    // encadena otro
       return [0, 0, 'Idle'];
     }
@@ -642,7 +673,7 @@
     }
 
     castShields() {
-      const near = G.EnemyMgr.queryCircle(this.x, this.y, 160).filter(e => !e.dead)
+      const near = G.EnemyMgr.queryCircle(this.x, this.y, 160).filter(e => !e.dead && !e.boss && !e.legend && !e.judge)
         .sort((a, b) => G.U.dist2(a.x, a.y, this.x, this.y) - G.U.dist2(b.x, b.y, this.x, this.y)).slice(0, 6);
       for (const e of near) { e.shield = Math.max(e.shield, e.maxHp * 0.35); e.shieldT = 8; }
       this.anim.play('Charge');
@@ -651,14 +682,15 @@
     }
 
     summon() {
+      if(G.Spawner.dueling?.())return;
       this.minions = this.minions.filter(m => !m.dead && G.EnemyMgr.get(m.id));
       // Con el tope general de enemigos (menos Pokémon en pantalla), con un pequeño margen.
-      if (this.minions.length >= 4 || G.EnemyMgr.count > G.Spawner.CAP + 15) return;
+      if (this.minions.length >= 4 || G.EnemyMgr.count >= (G.Spawner.capacity?.()||G.Spawner.CAP)) return;
       const dex = this.def.minion || this.dex;
       const mon = G.DEX_BY[dex];
       const def = { dex, name: mon ? mon.name : '', hp: Math.round(this.def.hp * 0.35), spd: Math.round(this.def.spd * 1.1),
                     dmg: Math.round(this.def.dmg * 0.6), xp: Math.max(1, Math.round(this.def.xp * 0.25)), behavior: 'chase' };
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 2 && G.EnemyMgr.count < (G.Spawner.capacity?.()||G.Spawner.CAP); i++) {
         const a = Math.random() * 6.2832;
         const m = new Enemy(def, this.x + Math.cos(a) * 30, this.y + Math.sin(a) * 22, this.sc || { hp: 1, spd: 1, dmg: 1 });
         G.EnemyMgr.add(m);
@@ -694,6 +726,7 @@
       this.anim.dir = G.Sprites.dirFromAngle(Math.atan2(j.ty - j.sy, j.tx - j.sx));
       if (k >= 1) {
         this.jump = null; this.jumpLift = 0;
+        this.bossOpening();
         if (!this.flying) G.World.collide(this);
         this.anim.play('Attack', { speed: 1.4 });
       }
@@ -731,6 +764,11 @@
 
       if (this.dead) return;
 
+      if(this.openT>0||(this.remote&&this.net?.st&128)){
+        ctx.save();ctx.strokeStyle='#ffe080';ctx.lineWidth=3;ctx.beginPath();
+        ctx.ellipse(this.x,this.y,this.r+16,(this.r+16)*.55,0,0,Math.PI*2);
+        ctx.moveTo(this.x-9,this.y-this.bodyH-23);ctx.lineTo(this.x-2,this.y-this.bodyH-15);ctx.lineTo(this.x+9,this.y-this.bodyH-28);ctx.stroke();ctx.restore();
+      }
       // Escudo: burbuja azul.
       if (this.shield > 0 || (this.net && this.net.st & 4)) {
         ctx.save();

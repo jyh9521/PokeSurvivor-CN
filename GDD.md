@@ -1,3 +1,5 @@
+> 中文社区版0.16.5的当前战斗补充与实测见docs/BALANCE_0165_REPORT.md；以下历史设计记录继续保留。
+
 # GDD — PokéSurvivor · Mundo Misterioso
 
 > Documento de diseño vivo. Refleja el estado **actual** del juego; al final hay
