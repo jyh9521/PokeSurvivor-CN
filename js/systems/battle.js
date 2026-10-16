@@ -52,14 +52,14 @@ G.Battle=(()=>{
   function charge(p,dealt,killed){if(p.battle&&!p.battle.used)p.battle.energy=Math.min(100,p.battle.energy+Math.min(1,dealt*.01)+(killed?1:0));}
   function accept(p,e,amount,col,dx,dy,knock,m,eff){if(!e||e.dead||e.remote||!Number.isFinite(amount)||amount<=0)return {dealt:0,killed:false};const hp=e.hp;e.hurt(amount,col,dx,dy,knock,eff,p.uid);const dealt=Math.max(0,hp-Math.max(0,e.hp)),killed=dealt>0&&e.dead;credit(p,m,dealt,killed);return {dealt,killed};}
   function deal(p,e,amount,col,dx,dy,knock,m,eff){const value=damage(p,e,m,amount);if(!(value>0))return;if(e.remote){G.Coop.battleHit(e,value,col,dx,dy,knock,m,eff);return;}return accept(p,e,value,col,dx,dy,knock,m,eff);}
-  function defend(p,amount,pure,cls,legacyReduction,contact=false){const b=ensure(p);if(!Number.isFinite(amount)||amount<=0)return 0;
+  function defend(p,amount,pure,cls,legacyReduction,contact=false,pressure=false){const b=ensure(p);if(!Number.isFinite(amount)||amount<=0)return 0;
     if(pure)return Math.max(1,amount);
     amount*=G.SpecialRuntime.incoming(p,cls);
     const dodge=clamp(passive(p,'dodge')+(trait(p).key==='swift'?.05:0),0,.3);
     if(Math.random()<dodge){G.Telemetry?.add(p,'dodges');G.FX.dmgText(p.x,p.y-p.bodyH,G.T('Dodged'),'#b9e6ff');return 0;}
     if(b.block>0){G.Telemetry?.add(p,'blocks');b.block=0;b.counterT=2+legacyLevel(p,'revenge');G.FX.ring(p.x,p.y,8,45,'#c8e9ff',.25,2);G.FX.dmgText(p.x,p.y-p.bodyH,G.T('Blocked'),'#c8e9ff');return 0;}
     const s=formStats(p),armor=s[cls==='special'?4:2]+passive(p,cls==='special'?'ward':'armor');
-    let reduction=1-(1-rules.armor(armor))*(1-legacyReduction);
+    let reduction=1-(1-rules.armor(armor*(pressure?G.BattleBalance.PRESSURE.armorFactor:1)))*(1-legacyReduction);
     if(trait(p).key==='carapace'&&cls==='physical'||trait(p).key==='ward'&&cls==='special')reduction=1-(1-reduction)*.88;
     reduction=Math.min(.85,reduction);let d=Math.max(1,amount*(1-reduction));
     if(contact){const close=p.meleeGuardT>0||p.activeGroup().some(m=>m.kind==='melee');d=Math.min(d,p.maxHp*(close?G.BattleBalance.CONTACT_CAP:G.BattleBalance.RANGED_CONTACT_CAP));}
@@ -71,7 +71,7 @@ G.Battle=(()=>{
   function speed(p){const mobility=p.battle?.form==='mega'?Math.round(78+formStats(p)[5]*.42)/Math.round(78+p.baseStats[5]*.42):1;return G.SpecialRuntime.speed(p)*mobility*(1+passive(p,'speed'))*(trait(p)?.key==='swift'?1.08:1);}
   function crit(p){return clamp(p.critChance+passive(p,'crit'),0,.6);}
   function tick(p,dt){const b=ensure(p);b.clock+=dt;G.SpecialRuntime.tick(p,dt);
-    for(const k of ['blockT','shieldT','counterT','sturdyT'])b[k]=Math.max(0,b[k]-dt);
+    for(const k of ['blockT','shieldT','counterT','sturdyT','pressureT'])b[k]=Math.max(0,(b[k]||0)-dt);
     if(p.dead){b.zBoost=b.terrainT=b.maxBuffT=b.guardT=0;endForm(p);return;}
     if(!b.used&&!b.form)b.energy=Math.min(100,b.energy+dt*.8);
     const blockLv=level(p,'protect'),interval=blockLv?12-blockLv:trait(p).key==='guard'?12:0;

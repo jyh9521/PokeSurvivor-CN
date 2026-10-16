@@ -22,7 +22,7 @@ G.Hazards = (() => {
     list.push(o);
     if (!fromNet && G.Coop.isHost) {
       G.Coop.broadcast(['hz', { kind: o.kind, x: Math.round(o.x), y: Math.round(o.y), r: o.r, angle: o.angle, len: o.len, w: o.w,
-                                delay: o.delay, dmg: Math.round(o.dmg), type: o.type, damageClass:o.damageClass, color: o.color, ownerId:o.ownerId,ownerStage:o.ownerStage,pct: o.pct, pure: o.pure, vis: o.vis,preview:!!o.preview,end:o.end }]);
+                                delay: o.delay, dmg: o.dmg, type: o.type, damageClass:o.damageClass, color: o.color, ownerId:o.ownerId,ownerStage:o.ownerStage,pressure:!!o.pressure,pct: o.pct, pure: o.pure, vis: o.vis,preview:!!o.preview,end:o.end }]);
     }
     return o;
   }
@@ -48,8 +48,8 @@ G.Hazards = (() => {
         if(!h.preview)detonate(h);
         if (!h.preview && pl && !pl.dead && inside(h, pl.x, pl.y, pl.r)) {
           G.Telemetry?.add(pl,"hazardHits");pl.invuln = 0;
-          pl.hurt(h.pct ? Math.max(h.dmg, pl.maxHp * h.pct) : h.dmg, h.type, !!h.pure, h.damageClass||'special');
-        }
+          pl.hurt(h.pct ? Math.max(h.dmg, pl.maxHp * h.pct) : h.dmg, h.type, !!h.pure, h.damageClass||'special',h.pressure?'pressure':'');
+        }else if(h.pressure&&pl)G.Telemetry?.add(pl,"pressureAvoided");
       }
       if (h.hit && h.t >= h.delay + h.end) list.splice(i, 1);
     }

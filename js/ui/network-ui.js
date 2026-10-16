@@ -4,7 +4,7 @@ G.NetworkUI=(()=>{
   let button,panel;
   function update(){
     if(!button)return;button.hidden=!G.NAS?.enabled||!G.NAS.user||G.DB.guest;
-    if(button.hidden){panel.hidden=true;return;}const m=G.NetworkQuality.session(G.NAS.networkMetrics(),G.Social.room,G.Social.uid);
+    if(button.hidden){panel.hidden=true;return;}const m=G.NetworkQuality.session(G.NAS.networkMetrics(),G.Social.room,G.Social.uid,!!G.Game.player&&!G.Coop.active&&!['ui','over'].includes(G.Game.state));
     const q=G.NetworkQuality.describe(m),path={nas:'NAS connection',failed:'Connection failed',turn:'Cloudflare TURN',connecting:'P2P connecting',direct:'P2P direct',relay:'Relé NAS',mixed:'Mixto'},reasons={offline:'Sin conexión al NAS',reconnecting:'Compañero reconectando',queue:'Cola de red',fps:'FPS local bajo',latency:'Latencia alta',stable:'Conexión estable'};
     const value=(q.rttMs==null?'—':Math.round(q.rttMs)+' ms');button.querySelector('[data-latency]').textContent=T(path[q.transport])+' '+value;button.dataset.health=q.level;button.title=T(reasons[q.reason])+' · '+T(q.transport==='direct'?'RTT directo WebRTC':m.peerRttMs!=null?'Peer RTT over P2P':'RTT navegador ↔ NAS');button.setAttribute('aria-label',button.title+': '+T(path[q.transport])+' '+value);if(panel.hidden)return;panel.querySelector('[data-network-retry]').hidden=!G.Social.room;panel.querySelector('[data-network-exit]').hidden=!G.Social.room;
     panel.querySelector('[data-network="quality"]').textContent=T(reasons[q.reason])+' · '+T('La frecuencia se adapta a la cola; los eventos tienen prioridad.');

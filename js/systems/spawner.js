@@ -100,6 +100,7 @@ G.Spawner = (() => {
   function spawnBoss(pl, t, b) {
     const [x, y] = ringPoint(pl, Math.random() * 6.2832);
     const e = new G.Enemy(b, x, y, scaled(G.Enemies.bossScale(t), G.Coop.scaleHp(players.length) * (players.length > 1 ? 1.4 : 1)), true);
+    e.xp=Math.round(e.xp*G.BattleBalance.XP.boss);
     if (rollShiny(b.dex)) e.makeShiny();
     G.EnemyMgr.add(e);
     say('¡' + e.name + (e.shiny ? ' shiny' : '') + ' salvaje apareció!', 3.2);
@@ -131,7 +132,7 @@ G.Spawner = (() => {
     // Authored wave suppression: one visible delayed landing, not an extra swarm.
     // It persists if ordinary enemies are instantly cleared. Armor still applies.
     if(t>=pressureAt){pressureAt=t+(G.BattleBalance.pressureWindow(t)?8:16);for(const p of players.filter(p=>!p.dead)){
-      G.Hazards.add({kind:'zone',x:p.x,y:p.y,r:68,delay:1.8,dmg:12*(1+t/600),type:'normal',damageClass:'special',color:'#ffb74d'});
+      G.Hazards.add({kind:'zone',x:p.x,y:p.y,r:G.BattleBalance.PRESSURE.radius,delay:G.BattleBalance.PRESSURE.delay,dmg:12*(1+t/600),pct:G.BattleBalance.pressureRate(t),pressure:true,type:null,damageClass:'special',color:'#ffb74d'});
     }say(G.T('Wave pressure: leave the orange marker!'),1.5);}
 
     // --- jefes ---

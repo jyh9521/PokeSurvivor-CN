@@ -82,7 +82,7 @@ G.Player = class Player {
 
   // (×2 y luego ×4 el 2026-10-10: se subía de nivel demasiado rápido.)
   static xpFor(level) {
-    return Math.floor((8 + level * 6 + Math.pow(level, 1.75) * 1.6) * 4);
+    return G.BattleBalance.xpFor(level);
   }
 
   cy() { return this.y; }
@@ -227,6 +227,7 @@ G.Player = class Player {
    */
   hurt(amount, type = null, pure = false, damageClass = 'physical', source = '') {
     if (this.invuln > 0 || this.dead) return;
+    if(source==='pressure'){if(this.battle.pressureT>0)return;this.battle.pressureT=G.BattleBalance.PRESSURE.cooldown;}
     let eff = null;
     if (type) {
       const k = G.Types.mult(type, G.Battle?.types(this)||this.mon.types);
@@ -239,7 +240,7 @@ G.Player = class Player {
     const contact=!pure&&source==='contact'&&isClose;
     const close=isClose?(contact?G.BattleBalance.CONTACT_FACTOR:.75):1;
     if(!Number.isFinite(amount)||amount<=0)return;
-    const d = G.Battle?G.Battle.defend(this,amount,pure,damageClass,1-(1-this.reduction)*close,!pure&&source==='contact'):pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
+    const d = G.Battle?G.Battle.defend(this,amount,pure,damageClass,1-(1-this.reduction)*close,!pure&&source==='contact',source==='pressure'):pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
     if(!(d>0))return;
     const hpBefore=this.hp;
     this.hp -= d;
@@ -255,7 +256,7 @@ G.Player = class Player {
       G.FX.dmgText(this.x, this.y - this.bodyH - 16, '¡Banda Focus!', '#ff9a3d', true);
       G.FX.ring(this.x, this.y, 6, 70, '#ff9a3d', 0.5, 4);
     }
-    const lost=hpBefore-Math.max(0,this.hp);
+    const lost=hpBefore-Math.max(0,this.hp);if(source==='pressure')G.Telemetry?.add(this,'pressureDamage',lost);
     if(lost>0&&!this.remote){G.Telemetry?.add(this,pure?"true":damageClass,lost);G.Camera.damage(lost/this.maxHp);G.Gamepad?.rumble(lost/this.maxHp);}
     if (this.hp <= 0) {
       this.hp = 0; this.dead = true;
@@ -283,7 +284,7 @@ G.Player = class Player {
     let leveled = 0;
     while (this.xp >= this.xpNext) {
       this.xp -= this.xpNext;
-      this.level++;
+      this.level++;G.Telemetry?.event(this,'level',{level:this.level,xpMultiplier:this.xpMul,catchup:1});
       this.xpNext = Player.xpFor(this.level);
       leveled++;
     }

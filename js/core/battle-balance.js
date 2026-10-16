@@ -9,7 +9,13 @@
   const normalHp=t=>DENSITY_HP*curve(t,[[0,1.05],[160,1.25],[500,1.65],[900,2],[1800,2.5]]);
   const bossHp=t=>curve(t,[[0,1.05],[180,1.05],[360,1.1],[540,1.15],[720,1.2],[900,1.25],[1800,1.35]]);
   const ELITE_HP=1.75;
-  const xpReward=t=>curve(t,[[0,4.2],[180,4.2],[600,1.4],[1800,1.4]]);
+  // XP points per level; shared team XP applies permanent wisdom once at pickup.
+  const XP={"need":[[1,1],[48,1],[60,2],[80,5]],"reward":[[0,4.2],[180,4.2],[600,1.4],[1200,2.8],[1800,4.2]],"boss":2,"catchup":false};
+  const xpFor=l=>{l=Math.max(1,Math.min(10000,Math.floor(Number.isFinite(l)?l:1)));return Math.floor((8+l*6+l**1.75*1.6)*4*curve(l,XP.need));};
+  const xpReward=t=>curve(t,XP.reward);
+  const PRESSURE={armorFactor:.65,radius:68,delay:1.8,cooldown:1};
+  const pressureRate=t=>curve(t,[[0,.08],[180,.08],[600,.13],[1200,.18],[1800,.23]]);
+  const pressureDamage=(t,p)=>Math.max(12*(1+Math.max(0,t)/600),Math.max(0,p.maxHp)*pressureRate(t));
   const pressureWindow=t=>(t>=180&&t<300)||(t>=720&&t<900)||(t>=1440&&t<1620);
   const recoveryWindow=t=>t>=300&&(t-300)%90>=(pressureWindow(t)?72:60);
   // Finite builds need finite throughput and authored collection windows.
@@ -33,5 +39,5 @@
     m.dmg=+m.dmg.toFixed(3);
   }
   const bodyContact=e=>!e.judge&&(e.remote?!(e.net?.st&16):e.phase!=='dash'&&!e.jump&&!e.ai?.cast);
-  return{CONTACT_FACTOR,CONTACT_CAP,RANGED_CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,recoveryWindow,waveRate,tierBlend,FLOORS,budget,tune};
+  return{XP,xpFor,PRESSURE,pressureRate,pressureDamage,CONTACT_FACTOR,CONTACT_CAP,RANGED_CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,recoveryWindow,waveRate,tierBlend,FLOORS,budget,tune};
 });

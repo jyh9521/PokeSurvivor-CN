@@ -1,7 +1,7 @@
 /* Identifier-free quality classification and hysteretic per-peer snapshot pacing. */
 (function(factory){if(typeof module==='object'&&module.exports)module.exports=factory();else G.NetworkQuality=factory();})(()=>{
   // Account transport and gameplay transport have different lifetimes.
-  function session(m,room,uid){const multiplayer=!!room?.members?.some(p=>p.uid!==uid);return multiplayer?{...m,multiplayer:true}:{...m,multiplayer:false,p2pOnly:false,directPeers:0,turnPeers:0,relayPeers:0,connectedPeers:0,connectingPeers:0,reconnectingPeers:0,peerRttMs:null,peerLinks:[]};}
+  function session(m,room,uid,soloRun=false){const multiplayer=!soloRun&&!!room?.members?.some(p=>p.uid!==uid);return multiplayer?{...m,multiplayer:true}:{...m,multiplayer:false,p2pOnly:false,directPeers:0,turnPeers:0,relayPeers:0,connectedPeers:0,connectingPeers:0,reconnectingPeers:0,peerRttMs:null,peerLinks:[]};}
   function describe(m){
     const paths=(m.peerLinks||[]).filter(p=>['direct','turn'].includes(p.mode)).map(p=>p.path?.rttMs).filter(Number.isFinite);
     const transport=m.multiplayer===false?'nas':m.turnPeers?(m.directPeers?'mixed':'turn'):m.p2pOnly&&!m.directPeers?((m.peerLinks||[]).some(p=>p.mode==='failed')?'failed':'connecting'):m.directPeers?(m.relayPeers?'mixed':'direct'):'relay';

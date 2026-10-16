@@ -5,7 +5,7 @@ G.RunUI = (() => {
 
   let masteryBox,masteryDone;
   function growthBox(){if(!masteryBox){masteryBox=document.createElement('section');masteryBox.id='level-mastery';$('cards').after(masteryBox);}return masteryBox;}
-  function renderMastery(done){const box=growthBox(),p=G.Game.player;box.hidden=false;box.replaceChildren();const body=document.createElement('div');box.append(body);G.BattleUI.renderGrowth(body,p,true,()=>G.UI.isOpen('scr-levelup')&&!!masteryDone);const next=document.createElement('button');next.className='btn gold';next.dataset.masteryDone='';next.textContent=G.T('Continue · keep unspent mastery');next.onclick=()=>{if(!masteryDone)return;const cb=masteryDone;masteryDone=null;box.hidden=true;cb();};box.append(next);}
+  function renderMastery(done){const box=growthBox(),p=G.Game.player;box.hidden=false;box.replaceChildren();const body=document.createElement('div');box.append(body);G.BattleUI.renderGrowth(body,p,true,()=>G.UI.isOpen('scr-levelup')&&!!masteryDone);const next=document.createElement('button');next.className='btn gold';next.dataset.masteryDone='';next.dataset.uiBack='';next.textContent=G.T('Continue · keep unspent mastery');next.onclick=()=>{if(!masteryDone)return;const cb=masteryDone;masteryDone=null;box.hidden=true;cb();};box.append(next);(box.querySelector('[data-mastery-instance]:not([disabled])')||next).focus({preventScroll:true});}
   function showMastery(cb){offers=null;offerCb=null;masteryDone=cb;$('cards').replaceChildren();$('lvl-reroll').classList.add('hidden');$('lvl-wait').textContent='';$('lvl-num').textContent=G.Game.player.level;G.UI.show('scr-levelup');renderMastery(cb);}
   /** @param coop  en grupo: tras elegir, se queda esperando a los demás */
   function showLevelUp(level, list, cb, coop = false) {

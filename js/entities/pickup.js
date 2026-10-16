@@ -70,8 +70,8 @@ G.Pickups = (() => {
   function pullAll() { for (const o of list) o.pulled = true; }
 
   /** @param plain  sólo la experiencia (los legendarios de la Sentencia de Arceus) */
-  function dropXp(x, y, value, boss = false, legend = false, plain = false) {
-    G.Telemetry?.supply(value,plain?"judgment":legend?"rift":boss?"boss":"normal");
+  function dropXp(x, y, value, boss = false, legend = false, plain = false, source) {
+    G.Telemetry?.supply(value,source||(plain?"judgment":legend?"rift":boss?"boss":"normal"));
     if (boss) {
       // Los jefes revientan en un montón de orbes grandes + recompensas.
       for (let i = 0; i < 14; i++) {

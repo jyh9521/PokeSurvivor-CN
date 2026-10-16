@@ -1068,3 +1068,9 @@ body.touch #battle-shortcuts kbd{display:inline-block!important}
 #battle-controls.spent .battle-actions{grid-column:1/-1}#battle-controls.spent #battle-shortcuts{visibility:hidden}#battle-controls.spent #battle-activate{white-space:normal;font-size:9px;line-height:12px;overflow-wrap:anywhere}#pause-growth{margin-top:12px;max-height:36vh;overflow:auto}#pause-growth .growth-move{display:block;width:100%;white-space:normal;text-align:left;margin:6px 0;font-size:12px;line-height:1.5}.move-power{color:#a6edff;font-size:12px;margin-top:5px}.dot.play{border-radius:0;background:#ffd23f}.rank-presence.play{color:#ffd23f!important}.hall-invite{min-width:110px;box-shadow:0 0 0 2px #ffd23f55}.invite-pop{z-index:100;left:50%;right:auto;bottom:auto;top:30%;transform:translateX(-50%);width:min(520px,90vw);box-sizing:border-box;border:3px solid #ffd23f;box-shadow:0 0 0 100vmax #0008;padding:22px}.invite-pop .btn{min-height:44px}
 
 #battle-info{grid-row:4}#battle-controls.spent #battle-info{grid-row:4}.conn.play{color:#ffd23f}
+/* Independent mastery shares the level layer and remains navigable on small screens. */
+#level-mastery{margin-top:12px;border-top:2px solid #87c9ff;padding-top:10px}
+#level-mastery>div{max-height:34vh;overflow:auto;overscroll-behavior:contain}
+#level-mastery .growth-move{display:block;width:100%;white-space:normal;text-align:left;margin:6px 0;font-size:12px;line-height:1.5}
+#level-mastery>[data-mastery-done]{display:block;width:100%;margin-top:10px;min-height:44px}
+#cards.done:has(+ #level-mastery:not([hidden])) .card:not(.picked){display:none}
