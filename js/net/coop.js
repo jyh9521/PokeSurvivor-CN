@@ -39,6 +39,7 @@ G.Coop = (() => {
   const mates = new Map();              // uid -> { uid, name, color, pl, connected, q:[], flushT, xpMul }
   let outEv = [];                       // invitado: eventos para el anfitrión
   let flushT = 0;
+  let meleeSeq = 0, meleeAck = 0;
   let hitFrom = null;                   // invitado cuyo golpe se está aplicando (no repetirle el número)
   let api = {};                         // callbacks del juego (game.js)
   let waiting = new Set();              // subida de nivel: quién falta por elegir
@@ -67,6 +68,7 @@ G.Coop = (() => {
    * @param cb    { levelStart(lv), resume(), waiting(names), over(data), lost(msg), team(t), shiny(dex) }
    */
   function begin(cfg, pl, cb) {
+    meleeSeq=0; meleeAck=0;
     active = true;reconnecting.clear();marks.clear();pingAt=-Infinity;
     me = G.Net.uid; hostUid = cfg.host;
     host = me === hostUid;
@@ -172,7 +174,7 @@ G.Coop = (() => {
       if (e.dead || G.U.dist2(e.x, e.y, near.x, near.y) > r2n) continue;
       const a = ANIMS.indexOf(e.anim.cur);
       out.push([e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
-                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0),e.anim.serial||0,Math.round((e.anim.elapsed||0)*10)/10,Math.round(e.anim.speed*100)/100]);
+                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0) | (e.staggerT > 0 ? 8 : 0),e.anim.serial||0,Math.round((e.anim.elapsed||0)*10)/10,Math.round(e.anim.speed*100)/100]);
     }
     return out;
   }
@@ -274,6 +276,21 @@ G.Coop = (() => {
           hitFrom = null;
           break;
         }
+        case 'mh': {
+          if (!Number.isSafeInteger(ev[1]) || ev[1] <= (m.meleeSeen || 0)) break;
+          m.meleeSeen=ev[1];
+          const e=G.EnemyMgr.get(ev[2]), def=G.Moves.BY_ID[ev[7]];
+          if (!e || e.dead || e.remote || def?.kind !== 'melee' || !Number.isFinite(ev[3]) || ev[3]<=0 || !Number.isFinite(ev[5]) || !Number.isFinite(ev[6])) break;
+          const move=G.Moves.instance(def.id,Math.max(1,Math.min(def.maxLvl,ev[8]|0)));
+          if (ev[9]) G.Moves.evolve(move);
+          // No local damage prediction for melee: send confirmed hit feedback to the attacker too.
+          hitFrom=null;
+          const eff=['crit','super','weak'].includes(ev[10])?ev[10]:null;
+          const result=G.Combat.acceptMeleeHit(m.pl,e,ev[3],ev[4],ev[5],ev[6],move,eff);
+          hitFrom=null;
+          if (result.dealt>0) m.q.push(['mb',ev[1],move.id,result.killed,result.dealt]);
+          break;
+        }
         case 's': {
           const e = G.EnemyMgr.get(ev[1]);
           if (!e || e.dead) break;
@@ -366,7 +383,7 @@ G.Coop = (() => {
         break;
       case 'ed': G.EnemyMgr.removeRemote(ev[1], true); break;
       case 'eg': G.EnemyMgr.removeRemote(ev[1], false); break;
-      case 'hn': { const e = G.EnemyMgr.get(ev[1]); if (e && !e.dead) e.showHurt(ev[2], ev[3]); break; }
+      case 'hn': { const e = G.EnemyMgr.get(ev[1]); if (e && !e.dead) e.showHurt(ev[2], ev[3],0,0,ev[4] || null); break; }
       case 'es':
         G.Projectiles.spawn({ x: ev[1], y: ev[2], vx: ev[3], vy: ev[4], dmg: ev[5], r: ev[6], life: ev[7],
                               friendly: false, color: '#ff7a9e', vis: G.VFX.forType(ev[8]), mtype: ev[8] });
@@ -384,6 +401,13 @@ G.Coop = (() => {
         break;
       case 'pb': G.World.breakAt(ev[1], ev[2]); break;
       case 'say': G.Spawner.say(ev[1], ev[2]); break;
+      case 'mb': {
+        if (!Number.isSafeInteger(ev[1]) || ev[1]<=meleeAck) break;
+        meleeAck=ev[1];
+        const m=G.Moves.BY_ID[ev[2]];
+        if (m?.kind==='melee') G.Combat.meleeBenefits(local,m,ev[3]===true,ev[4]);
+        break;
+      }
       case 'heal': if (!local.dead) { local.heal(local.maxHp * ev[1]); G.FX.ring(local.x, local.y, 6, 60, '#5fe08a', 0.4, 3); } break;
       case 'lu': if (!ev[2] || ev[2] > seenSeq) { seenSeq = ev[2] || seenSeq; api.levelStart(ev[1]); } break;
       case 'lw': api.waiting(ev[1]); break;
@@ -414,8 +438,13 @@ G.Coop = (() => {
   function hit(e, d, color, dx, dy, knock) { outEv.push(['h', e.id, d, color, r1(dx), r1(dy), knock || 0]); }
   function status(e, kind, val) { outEv.push(['s', e.id, kind, val]); }
 
+  function meleeHit(e,d,color,dx,dy,m,eff=null) {
+    if (!active || host || !Number.isFinite(d) || d<=0) return;
+    outEv.push(['mh',++meleeSeq,e.id,d,color,r1(dx),r1(dy),m.id,m.lvl,m.evolved?1:0,eff]);
+  }
+
   // anfitrión
-  function hurtShown(e, d, color) { emitNear(['hn', e.id, d, color], e.x, e.y, hitFrom); }
+  function hurtShown(e, d, color, eff=null) { emitNear(['hn', e.id, d, color, eff], e.x, e.y, hitFrom); }
   function enemyAdded(e) {
     emit(['ne', e.id, e.dex, r1(e.x), r1(e.y), e.boss ? 1 : 0, e.shiny ? 1 : 0, Math.ceil(e.maxHp), r2(e.dmg), e.behavior]);
   }
@@ -518,7 +547,7 @@ G.Coop = (() => {
     rescued,noteDamage(e,uid,damage,killed){if(active&&host)teamStats?.hit(e.id,uid,damage,killed);},get teamStats(){return teamStats?.snapshot()||[];},
     ping,get marks(){return [...marks.values()].filter(m=>performance.now()-m.at<8000);},
     ANIMS, COLORS, begin, end, leave, tick, players, puppets, xpFactor, scaleRate, scaleHp,
-    cast, hit, status, hurtShown, enemyAdded, enemyGone, enemyShot, pickupAdded, pickupGone, say,
+    cast, hit, meleeHit, status, hurtShown, enemyAdded, enemyGone, enemyShot, pickupAdded, pickupGone, say,
     propBroken, collected, shinyCaught, levelStart, localPicked, over, holdStart, holdEnd,
     /** Anfitrión: evento para todos. Invitado: evento para el anfitrión. */
     broadcast(ev) { emit(ev); },

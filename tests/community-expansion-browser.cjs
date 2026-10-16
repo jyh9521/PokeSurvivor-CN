@@ -2,8 +2,8 @@
  * Controlled combat inputs do not represent public-network/device acceptance. */
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {chromium}=require('playwright'),{createApp}=require('../server/app.cjs');
-const RELAY=process.env.PS_RELAY_ONLY==='1';
-const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,'artifacts/challenge-rewards',RELAY?'relay':'mixed');fs.mkdirSync(OUT,{recursive:true});
+const RELAY=process.env.PS_RELAY_ONLY==='1',MELEE=process.env.PS_MELEE==='1';
+const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,MELEE?'artifacts/melee-rebalance':'artifacts/challenge-rewards',RELAY?'relay':'mixed');fs.mkdirSync(OUT,{recursive:true});
 (async()=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-expansion-browser-')),root=path.join(dir,'web');fs.mkdirSync(root);for(const n of ['js','css','assets'])fs.cpSync(path.join(ROOT,n),path.join(root,n),{recursive:true});for(const n of ['sw.js','version.json','manifest.webmanifest'])fs.copyFileSync(path.join(ROOT,n),path.join(root,n));fs.copyFileSync(path.join(ROOT,'dev.html'),path.join(root,'index.html'));
   let clockOffset=0;const app=createApp({dataDir:dir,root,campaigns:[],clock:()=>Date.now()+clockOffset});let browser;const checks=[],errors=[];const check=(n,v)=>{assert.ok(v,n);checks.push(n);console.log('PASS',n);};
   try{await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+app.server.address().port;browser=await chromium.launch({channel:'chrome',headless:true,args:['--disable-background-timer-throttling','--disable-renderer-backgrounding','--disable-backgrounding-occluded-windows']});
@@ -54,12 +54,40 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,'artifacts/challenge-
     for(const p of pages)await p.evaluate(()=>G.Social.setReady(true));const snapshots=users.map(u=>app.store.getSave(u.id));const browserSnapshots=await Promise.all(pages.map(p=>p.evaluate(()=>JSON.stringify(G.DB.save))));await a.waitForFunction(()=>!document.getElementById('lobby-start').disabled);await a.locator('#lobby-start').click();for(const p of pages)await p.waitForFunction(()=>G.Coop.active&&G.Game.state==='playing'&&!G.RunModes.active);
     check('all eight real browsers start normal combat with seven remote players',await Promise.all(pages.map(p=>p.evaluate(()=>G.Coop.players().length===8))).then(v=>v.every(Boolean)));
     await a.waitForTimeout(2200);const metrics=await a.evaluate(()=>G.NAS.networkMetrics());check('eight-player snapshot pacing caps at 10Hz and diagnostics separate actual paths',metrics.targetHz<=10&&(RELAY?metrics.directPeers===0&&metrics.relayPeers===7:metrics.directPeers>=3&&metrics.relayPeers>=4));
-    const last=pages[7];await last.evaluate(()=>{window.__testRoom=G.Social.room.id;window.__testRun=G.Game.st.time;});await last.context().setOffline(true);await last.evaluate(()=>window.__fixtureSockets.at(-1).close());await a.waitForFunction(()=>G.NAS.networkMetrics().reconnectingPeers>=1);await last.context().setOffline(false);await last.waitForFunction(()=>G.Social.room?.members.length===8&&G.NAS.networkMetrics().connected,{},{timeout:20000});
+    if(MELEE){
+    // Controlled real-game fixtures: actual cast/host messages and actual enemy deaths.
+    for(const p of pages)await p.evaluate(()=>{const p=G.Game.player;p.slots=[];p.frozen=true;p.invuln=1e6;p.maxHp=100;p.hp=100;p.regenFlat=0;p.buffs.regen.n=0;});
+    const fixture=await a.evaluate(()=>{G.Spawner.update=()=>{};G.EnemyMgr.clear();const p=G.Game.player;return {x:p.x,y:p.y};});
+    for(const p of pages)await p.evaluate(({x,y})=>{G.Game.player.x=x;G.Game.player.y=y;},fixture);
+    const victimId=await a.evaluate(({x,y})=>{const e=new G.Enemy({dex:1,hp:1,spd:0,dmg:0,xp:0,behavior:'chaser'},x+35,y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},fixture);
+    const guest=pages[1];await guest.waitForFunction(id=>!!G.EnemyMgr.get(id),victimId);
+    const cast=await guest.evaluate(id=>{const p=G.Game.player,e=G.EnemyMgr.get(id);p.hp=20;p.x=e.x-35;p.y=e.y;p.meleeHeals=[];p.meleeGuardT=0;p.slots=[[G.Moves.instance('bite')]];G.Combat.tick(.001,p,0);p.activeMove().t=999;return {hp:p.hp,id:e.id};},victimId);
+    check('guest does not predict kill healing before host confirms',cast.hp===20);
+    await guest.waitForFunction(()=>G.Game.player.hp===21,null,{timeout:10000}).catch(async e=>{console.log('MELEE_DEBUG',JSON.stringify({guest:await guest.evaluate(id=>({hp:G.Game.player.hp,heals:G.Game.player.meleeHeals,dead:G.Game.player.dead,state:G.Game.state,enemy:G.EnemyMgr.get(id)?.hp,errors:window.__fixtureErrors}),victimId),host:await a.evaluate(id=>({enemy:G.EnemyMgr.get(id)?.hp,dead:G.EnemyMgr.get(id)?.dead,seen:G.Coop.mates.map(m=>({uid:m.uid,seen:m.meleeSeen}))}),victimId),errors}));throw e;});
+    check('real guest melee cast credits exactly one host-confirmed kill heal',await a.evaluate(id=>!G.EnemyMgr.get(id)||G.EnemyMgr.get(id).dead,victimId));
+    await guest.evaluate(()=>{const p=G.Game.player;p.slots=[[G.Moves.instance('ember')]];p.activeMove().t=999;});
+    check('confirmed melee guard survives a switch to ranged',await guest.evaluate(()=>G.Game.player.meleeGuardT>0));
+    const hp=await guest.evaluate(()=>G.Game.player.hp);await guest.evaluate(()=>{const e={id:987654,remote:true};const m=G.Moves.instance('bite');G.Coop.meleeHit(e,100,'#fff',1,0,m);});await guest.waitForTimeout(250);
+    check('missing or already dead targets never grant additional heal',await guest.evaluate(()=>G.Game.player.hp)===hp);
+    const controlId=await a.evaluate(({x,y})=>{const e=new G.Enemy({dex:1,hp:100000,spd:0,dmg:0,xp:0,behavior:'chaser'},x+35,y,{hp:1,spd:1,dmg:1});G.EnemyMgr.add(e);G.EnemyMgr.rebuildGrid();return e.id;},fixture);
+    for(const p of pages)await p.waitForFunction(id=>!!G.EnemyMgr.get(id),controlId);
+    // Keep the controlled target alive while all eight players swing both combo strikes.
+    await Promise.all(pages.map(p=>p.evaluate(id=>{const p=G.Game.player,e=G.EnemyMgr.get(id);p.x=e.x-35;p.y=e.y;p.slots=[[G.Moves.instance('metal-claw')]];p.activeMove().cd=.16;p.atkMul=1;p.baseAtk=1;},controlId)));
+    await a.waitForTimeout(1500);
+    const effects=await a.evaluate(id=>{const e=G.EnemyMgr.get(id);return {hp:e.hp,shred:e.meleeShredT,kx:e.kx,ky:e.ky,cd:e.staggerCd};},controlId);
+    check('eight-player real combo damage and shared non-stacking shred reach the authority',effects.hp<100000&&effects.shred>0&&effects.shred<=2);
+    check('eight-player melee knockback remains bounded',Math.hypot(effects.kx,effects.ky)<=60.001);
+    for(const p of pages)await p.evaluate(()=>{G.Game.player.slots=[];G.Combat.clearFields();});
+    await a.waitForTimeout(900);
+    check('shared stagger expires even after eight-player pressure',await a.evaluate(id=>!(G.EnemyMgr.get(id).staggerT>0),controlId));
+    await a.screenshot({animations:'disabled',path:path.join(OUT,'melee-eight-player.png')});
+    }
+    const last=pages[7];await last.evaluate(()=>{window.__testRoom=G.Social.room.id;window.__testRun=G.Game.st.time;});await last.context().setOffline(true);await last.evaluate(()=>window.__fixtureSockets.at(-1).close());await a.waitForFunction(()=>G.NAS.networkMetrics().reconnectingPeers>=1,null,{timeout:10000}).catch(async e=>{console.log('RECONNECT_DEBUG',JSON.stringify({host:await a.evaluate(()=>({metrics:G.NAS.networkMetrics(),members:G.Social.room?.members,state:G.Game.state})),last:await last.evaluate(()=>({state:G.Game.state,sockets:window.__fixtureSockets.map(s=>s.readyState)})),errors}));throw e;});await last.context().setOffline(false);await last.waitForFunction(()=>G.Social.room?.members.length===8&&G.NAS.networkMetrics().connected,{},{timeout:20000});
     check('same browser reconnects into the same normal room',await last.evaluate(()=>G.Social.room.id===window.__testRoom));
     await a.evaluate(()=>G.Game.quit());for(const p of pages)if(await p.evaluate(()=>G.Game.state!=='over'))await p.evaluate(()=>G.Game.quit());
     await a.waitForFunction(()=>!G.NAS.pending);for(const p of pages)await p.evaluate(()=>G.NAS.flush());
     check('normal eight-player settlement saves real rewards for all members',users.every((u,i)=>app.store.getSave(u.id).rev>snapshots[i].rev&&app.store.getSave(u.id).save.stats.runs===snapshots[i].save.stats.runs+1));
     check('normal eight-player results enter existing group leaderboard',(await a.evaluate(()=>G.NAS.api('ranking?mode=g'))).rows.some(r=>r.uids.length===8));
-    check('all tested pages remain free of runtime errors',errors.length===0);fs.writeFileSync(path.join(OUT,'browser-results.json'),JSON.stringify({checks,errors,relayOnly:RELAY,metrics},null,2));console.log('PASS COMMUNITY_EXPANSION_BROWSER: '+checks.length+' checks; errors=0');
+    check('all tested pages remain free of runtime errors',errors.length===0);fs.writeFileSync(path.join(OUT,'browser-results.json'),JSON.stringify({checks,errors,relayOnly:RELAY,metrics},null,2));console.log((MELEE?'PASS MELEE_EIGHT_BROWSER: ':'PASS COMMUNITY_EXPANSION_BROWSER: ')+checks.length+' checks; errors=0');
   }finally{if(browser)await browser.close();await app.close();fs.rmSync(dir,{recursive:true,force:true});}
 })().catch(e=>{console.error(e);process.exitCode=1;});

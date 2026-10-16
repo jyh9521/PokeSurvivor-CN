@@ -125,7 +125,7 @@
         this.kx += nx * knock;
         this.ky += ny * knock;
       }
-      if (G.Coop.isHost) G.Coop.hurtShown(this, d, color);
+      if (G.Coop.isHost) G.Coop.hurtShown(this, d, color, eff);
       if (this.hp <= 0) this.die();
     }
 
@@ -138,6 +138,25 @@
       G.FX.spark(this.x, this.y - this.bodyH * 0.5, color, dirX, dirY, 3);
       if (!(this.remote&&this.net?.pose) && !this.anim.busy() && this.phase !== 'dash') this.anim.play('Hurt');
       G.Audio.sfx('hit');
+    }
+
+    applyMeleeControl(m, dx, dy) {
+      if (this.remote || this.dead) return;
+      if (m.shred) { this.meleeShredT = 2; }
+      if (this.boss || this.legend || this.judge) return;
+      const elite = this.elite || this.def?.elite || this.shiny || this.golden;
+      if (!(this.staggerCd > 0)) {
+        this.staggerT = (m.stagger || 0.15) * (elite ? 0.5 : 1);
+        this.staggerCd = 0.65;
+      }
+      if (m.knock && !(this.meleeKnockCd > 0)) {
+        const [nx,ny] = G.U.norm(dx,dy);
+        const impulse = Math.min(45,m.knock);
+        this.kx += nx*impulse; this.ky += ny*impulse;
+        const speed=Math.hypot(this.kx,this.ky);
+        if (speed>60) { this.kx*=60/speed; this.ky*=60/speed; }
+        this.meleeKnockCd = 0.35;
+      }
     }
 
     applySlow(factor, dur = 1.2) {
@@ -253,6 +272,7 @@
       if (this.touchCd > 0) this.touchCd -= dt;
       this.bob += dt * 6;
 
+      for (const key of ['staggerT','staggerCd','meleeKnockCd','meleeShredT']) this[key]=Math.max(0,(this[key]||0)-dt);
       // --- estados ---
       if (this.slowT > 0) { this.slowT -= dt; if (this.slowT <= 0) this.slow = 0; }
       if (this.burn > 0) {
@@ -267,6 +287,10 @@
       }
       if (this.dead) return;
 
+      if (this.staggerT > 0) {
+        // Pause AI, attacks and locomotion; keep statuses and control gates ticking.
+        this.anim.loop('Idle'); return;
+      }
       // --- terreno ---
       let terrainMul = 1;
       // (El legendario está en su casa: su arena no le afecta. Los de Arceus, tampoco.)

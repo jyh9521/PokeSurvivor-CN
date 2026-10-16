@@ -1,6 +1,6 @@
 {
   "name": "pokesurvivor-cn",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "description": "Simplified Chinese local and self-hosted NAS edition with dual saves, co-op and leaderboards",
   "scripts": {
@@ -13,7 +13,7 @@
     "test:reproducible": "node tools/check-repeat-build.cjs",
     "test:transaction": "node tools/verify-local-transaction.cjs",
     "start:nas": "node server/start.cjs",
-    "test:nas": "node --test tests/nas-backend.test.cjs tests/nas-rewards.test.cjs tests/coop-rift.test.cjs tests/relay-health.test.cjs tests/community-features.test.cjs tests/playability.test.cjs tests/gamepad.test.cjs tests/interaction.test.cjs tests/haptics.test.cjs tests/community-polish.test.cjs tests/portrait.test.cjs tests/click-move.test.cjs tests/touch-layout.test.cjs tests/static-delivery.test.cjs tests/server-management.test.cjs tests/community-expansion.test.cjs tests/challenge-rewards.test.cjs",
+    "test:nas": "node --test tests/nas-backend.test.cjs tests/nas-rewards.test.cjs tests/coop-rift.test.cjs tests/relay-health.test.cjs tests/community-features.test.cjs tests/playability.test.cjs tests/gamepad.test.cjs tests/interaction.test.cjs tests/haptics.test.cjs tests/community-polish.test.cjs tests/portrait.test.cjs tests/click-move.test.cjs tests/touch-layout.test.cjs tests/static-delivery.test.cjs tests/server-management.test.cjs tests/community-expansion.test.cjs tests/challenge-rewards.test.cjs tests/melee.test.cjs",
     "test:nas:browser": "node tests/nas-browser.cjs",
     "backup:nas": "node server/backup.cjs",
     "test:nas:production": "node tests/nas-production.cjs",
@@ -23,7 +23,7 @@
     "test:touch:browser": "node tests/touch-layout-browser.cjs",
     "test:management:browser": "node tests/server-management-browser.cjs",
     "test:loading:browser": "node tests/loading-browser.cjs",
-    "test:expansion": "node --test tests/community-expansion.test.cjs tests/challenge-rewards.test.cjs",
+    "test:expansion": "node --test tests/community-expansion.test.cjs tests/challenge-rewards.test.cjs tests/melee.test.cjs",
     "test:expansion:browser": "node tests/community-expansion-browser.cjs"
   },
   "devDependencies": {

@@ -15,6 +15,7 @@
 G.Combat = (() => {
   let ghost = false;
   let fields = [];
+  let meleeBursts = [];
 
   // ---------------- ejecutar el movimiento activo ----------------
 
@@ -30,7 +31,12 @@ G.Combat = (() => {
     m.t -= dt;
     if (m.t > 0) return;
     // Los ataques que necesitan blanco esperan a tenerlo (no gastes animación al aire).
-    if (needsTarget(m) && !(pl.target && G.U.dist(pl.x, pl.y, pl.target.x, pl.target.y) <= reach(m))) {
+    if (m.kind === 'melee') {
+      const target = meleeTarget(pl, m);
+      if (target) { pl.target = target; pl.aim = Math.atan2(target.y - pl.y, target.x - pl.x); }
+      else { m.t = 0.05; return; }
+    }
+    if (m.kind !== 'melee' && needsTarget(m) && !(pl.target && G.U.dist(pl.x, pl.y, pl.target.x, pl.target.y) <= reach(m))) {
       m.t = 0.05;
       return;
     }
@@ -66,7 +72,7 @@ G.Combat = (() => {
   const TARGETED = ['melee', 'beam', 'projectile', 'boomerang', 'chain', 'meteor', 'dash', 'cone'];
   function needsTarget(m) { return TARGETED.includes(m.kind); }
   function reach(m) {
-    if (m.kind === 'melee') return m.radius + 30;
+    if (m.kind === 'melee') return m.radius;
     if (m.kind === 'beam') return m.radius + 20;
     if (m.kind === 'boomerang') return m.radius + 40;
     if (m.kind === 'chain') return 280;
@@ -125,18 +131,79 @@ G.Combat = (() => {
     return Math.abs(((a - aim + Math.PI * 3) % 6.2832) - Math.PI) <= half;
   }
 
-  function melee(pl, m) {
-    const col = G.U.TYPE_COLOR[m.type];
-    const half = Math.min(m.arc, 6.2832) / 2;
-    G.FX.slash(pl.x, pl.y - G.LIFT * 0.5, pl.aim, m.radius, m.arc, col, G.VFX.forMove(m));
-    if (ghost) return;
+  function meleeInRange(pl, m, e) {
+    return !!e && !e.dead && G.U.dist2(pl.x, pl.y, e.x, e.y) <= (m.radius + (e.r || 0)) ** 2;
+  }
 
+  function meleeTarget(pl, m) {
+    // Preserve contact-threat priority, but never let an unreachable boss steal aim.
+    const enemies = G.EnemyMgr.queryCircle(pl.x, pl.y, m.radius).filter(e => meleeInRange(pl, m, e));
+    const dist = e => G.U.dist(pl.x, pl.y, e.x, e.y) - (e.r || 0);
+    return enemies.filter(e => dist(e) <= pl.r + 24).sort((a,b) => dist(a)-dist(b))[0]
+      || enemies.find(e => e.boss)
+      || enemies.sort((a,b) => dist(a)-dist(b))[0]
+      || (() => { const p = G.World.nearestBreakable(pl.x, pl.y, m.radius); return meleeInRange(pl,m,p) ? p : null; })();
+  }
+
+  function meleeContains(pl, m, e, aim = pl.aim) {
+    if (!meleeInRange(pl, m, e)) return false;
+    const half = Math.min(m.arc, Math.PI * 2) / 2;
+    if (half >= Math.PI || inArc(pl.x, pl.y, e.x, e.y, aim, half)) return true;
+    // A body overlapping either boundary ray is also a real hit.
+    const r = e.r || 0;
+    return [aim-half, aim+half].some(a => segDist2(pl.x,pl.y,pl.x+Math.cos(a)*m.radius,pl.y+Math.sin(a)*m.radius,e.x,e.y) <= r*r);
+  }
+
+  const elite = e => !!(e.elite || e.def?.elite || e.shiny || e.golden);
+  function meleeBenefits(pl, m, killed, dealt) {
+    if (pl.dead || pl.remote || !Number.isFinite(dealt) || !(dealt > 0)) return;
+    pl.meleeGuardT = 0.6;
+    if (m.haste) { pl.meleeHasteT = 0.6; pl.meleeHaste = m.haste; }
+    pl.onDealt(dealt); pl.dmgDealt += dealt;
+    if (killed && m.killHeal) {
+      // Rolling one-second window, shared by all bite skills and both combo hits.
+      const now = performance.now();
+      pl.meleeHeals = (pl.meleeHeals || []).filter(h => now-h.at < 1000);
+      const used = pl.meleeHeals.reduce((sum,h) => sum+h.fraction,0);
+      const fraction = Math.min(m.killHeal, Math.max(0, 0.04-used));
+      if (fraction > 0) { pl.meleeHeals.push({at:now,fraction}); pl.heal(pl.maxHp*fraction); }
+    }
+  }
+
+  /** Only the enemy authority calls this: damage, control and death are one operation. */
+  function acceptMeleeHit(pl, e, dmg, col, dx, dy, m, eff = null) {
+    if (!e || e.dead || e.remote || !Number.isFinite(dmg) || dmg <= 0) return {dealt:0,killed:false};
+    const before = e.hp;
+    const bonus = m.eliteBonus && (e.boss || elite(e)) ? m.eliteBonus : 1;
+    const shred = e.meleeShredT > 0 ? 1.15 : 1;
+    e.hurt(dmg * bonus * shred, col, dx, dy, 0, eff, pl.uid);
+    const dealt = Math.max(0, before-Math.max(0,e.hp)), killed = dealt > 0 && e.dead;
+    if (dealt > 0) {
+      if (!e.dead) {
+        e.applyMeleeControl(m, dx, dy);
+        if (m.slow) e.applySlow(m.slow);
+      }
+      meleeBenefits(pl,m,killed,dealt);
+    }
+    return {dealt,killed};
+  }
+
+  function melee(pl, m, followup = false, aim = pl.aim) {
+    const col = G.U.TYPE_COLOR[m.type];
+    G.FX.slash(pl.x, pl.y - G.LIFT * 0.5, aim, m.radius, m.arc, col, G.VFX.forMove(m));
+    if (m.combo && !followup) meleeBursts.push({pl,m:{...m},aim,t:0.09,ghost});
+    if (ghost || pl.dead) return;
+    const fraction = m.combo ? (followup ? 0.45 : 0.55) : 1;
     for (const e of G.EnemyMgr.queryCircle(pl.x, pl.y, m.radius)) {
-      if (!inArc(pl.x, pl.y, e.x, e.y, pl.aim, half)) continue;
-      hit(pl, e, m.dmg * pl.atk, col, e.x - pl.x, e.y - pl.y, m.knock || 0, m);
+      if (!meleeContains(pl,m,e,aim)) continue;
+      const crit = isCrit(pl);
+      const dmg = m.dmg * pl.atk * fraction * typeK(m.type,e) * (crit ? CRIT_MUL : 1);
+      const eff = crit ? 'crit' : G.Types.label(G.Types.mult(m.type,e.types));
+      if (e.remote) G.Coop.meleeHit(e,dmg,col,e.x-pl.x,e.y-pl.y,m,eff);
+      else acceptMeleeHit(pl,e,dmg,col,e.x-pl.x,e.y-pl.y,m,eff);
     }
     for (const p of G.World.propsInCircle(pl.x, pl.y, m.radius)) {
-      if (inArc(pl.x, pl.y, p.x, p.y, pl.aim, half)) G.World.damageProp(p, m.dmg * pl.atk, col);
+      if (meleeContains(pl,m,p,aim)) G.World.damageProp(p,m.dmg*pl.atk*fraction,col);
     }
   }
 
@@ -359,6 +426,14 @@ G.Combat = (() => {
   }
 
   function updateFields(dt) {
+    for (let i=meleeBursts.length-1;i>=0;i--) {
+      const b=meleeBursts[i]; b.t-=dt;
+      if (b.pl.dead) { meleeBursts.splice(i,1); continue; }
+      if (b.t>0) continue;
+      meleeBursts.splice(i,1);
+      const previous=ghost; ghost=b.ghost;
+      try { melee(b.pl,b.m,true,b.aim); } finally { ghost=previous; }
+    }
     for (let i = fields.length - 1; i >= 0; i--) {
       const f = fields[i];
       f.t += dt;
@@ -463,7 +538,7 @@ G.Combat = (() => {
     }
   }
 
-  function clearFields(owner) { fields = owner ? fields.filter(f => f.owner !== owner) : []; }
+  function clearFields(owner) { fields = owner ? fields.filter(f => f.owner !== owner) : []; meleeBursts = owner ? meleeBursts.filter(b => b.pl !== owner) : []; }
 
   function orbit(pl, m, dt, now, isGhost = false) {
     const col = G.U.TYPE_COLOR[m.type];
@@ -661,7 +736,7 @@ G.Combat = (() => {
     if (pl.dead) return;
     for (const e of G.EnemyMgr.queryCircle(pl.x, pl.y, pl.r + 40)) {
       if (G.U.dist2(e.x, e.y, pl.x, pl.y) > (e.r + pl.r) * (e.r + pl.r)) continue;
-      if (e.touchCd > 0 || e.behavior === 'thief') continue;
+      if (e.touchCd > 0 || e.staggerT > 0 || (e.remote && e.net?.st & 8) || e.behavior === 'thief') continue;
       e.touchCd = 0.55;
       e.strike(pl);
       pl.hurt(e.dmg, e.atkType);
@@ -671,6 +746,6 @@ G.Combat = (() => {
     }
   }
 
-  return { tick, resolve, ghostCast, ghostOrbit, updateFields, drawGroundFields, drawAirFields, clearFields,
+  return { meleeTarget, meleeInRange, meleeContains, acceptMeleeHit, meleeBenefits, tick, resolve, ghostCast, ghostOrbit, updateFields, drawGroundFields, drawAirFields, clearFields,
            get fieldCount() { return fields.length; } };
 })();

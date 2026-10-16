@@ -124,7 +124,7 @@
   const RAW = [
     // ---------------- NORMAL (pool común a todos) ----------------
     { id: 'tackle', name: 'Placaje', type: 'normal', kind: 'melee',
-      desc: 'Embiste en arco a todo lo que tengas delante.',
+      desc: 'Golpe pesado en arco amplio; protege al acertar.',
       cd: 0.50, dmg: 13, radius: 48, arc: 1.7, knock: 90 },
 
     { id: 'quick-attack', name: 'Ataque Rápido', type: 'normal', kind: 'dash',
@@ -179,7 +179,7 @@
 
     // ---------------- PLANTA ----------------
     { id: 'vine-whip', name: 'Látigo Cepa', type: 'grass', kind: 'melee',
-      desc: 'Látigos de largo alcance en arco amplio.',
+      desc: 'Látigo de largo alcance con barrido amplio.',
       cd: 0.62, dmg: 16, radius: 68, arc: 1.3, knock: 60 },
 
     { id: 'razor-leaf', name: 'Hoja Afilada', type: 'grass', kind: 'boomerang',
@@ -236,12 +236,12 @@
       cd: 0.26, dmg: 13, count: 3, radius: 72, speed: 2.8, size: 8, knock: 40 },
 
     { id: 'wing-attack', name: 'Ataque Ala', type: 'flying', kind: 'melee',
-      desc: 'Barrido de alas amplio que empuja.',
+      desc: 'Dos golpes rápidos; +12% velocidad durante 0,6 s al acertar.',
       cd: 0.55, dmg: 14, radius: 58, arc: 1.9, knock: 70 },
 
     // ---------------- NORMAL (extra) ----------------
     { id: 'body-slam', name: 'Golpe Cuerpo', type: 'normal', kind: 'melee',
-      desc: 'Placaje con todo el peso: lento, corto y brutal.',
+      desc: 'Golpe pesado y amplio con mayor interrupción.',
       cd: 0.95, dmg: 30, radius: 46, arc: 2.2, knock: 140 },
 
     { id: 'hyper-voice', name: 'Vozarrón', type: 'normal', kind: 'nova',
@@ -264,7 +264,7 @@
 
     // ---------------- BICHO ----------------
     { id: 'bug-bite', name: 'Picadura', type: 'bug', kind: 'melee',
-      desc: 'Mordisco rápido en arco corto.',
+      desc: 'Al matar recupera 1% de vida máxima; comparte un límite de 4% por segundo con Mordisco.',
       cd: 0.42, dmg: 11, radius: 44, arc: 1.6, knock: 40 },
 
     { id: 'string-shot', name: 'Disparo Demora', type: 'bug', kind: 'mine',
@@ -295,7 +295,7 @@
 
     // ---------------- LUCHA ----------------
     { id: 'karate-chop', name: 'Golpe Kárate', type: 'fighting', kind: 'melee',
-      desc: 'Golpe seco y potente al frente.',
+      desc: 'Golpe frontal; +30% daño contra élites y jefes.',
       cd: 0.5, dmg: 18, radius: 50, arc: 1.2, knock: 110 },
 
     { id: 'aura-sphere', name: 'Esfera Aural', type: 'fighting', kind: 'projectile',
@@ -304,7 +304,7 @@
 
     // ---------------- FANTASMA ----------------
     { id: 'lick', name: 'Lengüetazo', type: 'ghost', kind: 'melee',
-      desc: 'Lametazo espectral que paraliza un poco.',
+      desc: 'Frena un 55% e interrumpe brevemente; los jefes ignoran la interrupción.',
       cd: 0.48, dmg: 12, radius: 48, arc: 1.8, slow: 0.4 },
 
     { id: 'shadow-ball', name: 'Bola Sombra', type: 'ghost', kind: 'projectile',
@@ -331,7 +331,7 @@
 
     // ---------------- ACERO ----------------
     { id: 'metal-claw', name: 'Garra Metal', type: 'steel', kind: 'melee',
-      desc: 'Zarpazo de acero en arco.',
+      desc: 'Dos zarpazos; el blanco recibe +15% daño cuerpo a cuerpo durante 2 s, sin acumular.',
       cd: 0.5, dmg: 15, radius: 50, arc: 1.6, knock: 60 },
 
     { id: 'flash-cannon', name: 'Foco Resplandor', type: 'steel', kind: 'beam',
@@ -340,7 +340,7 @@
 
     // ---------------- SINIESTRO ----------------
     { id: 'bite', name: 'Mordisco', type: 'dark', kind: 'melee',
-      desc: 'Dentellada rápida que hace retroceder.',
+      desc: 'Al matar recupera 1% de vida máxima; comparte un límite de 4% por segundo con Picadura.',
       cd: 0.45, dmg: 14, radius: 46, arc: 1.5, knock: 70 },
 
     { id: 'dark-pulse', name: 'Pulso Umbrío', type: 'dark', kind: 'nova',
@@ -409,6 +409,30 @@
     m.dmg = Math.round(m.dmg * 1.2);
     m.radius = Math.round(m.radius * 1.25);
     if (m.arc) m.arc = Math.min(3, +(m.arc * 1.25).toFixed(2));
+  }
+
+  // 0.11: additional tuning relative to the already-buffed 0.10 definitions.
+  const meleeRoles = {
+    tackle: { dmg: 1.1, arc: 0.2 },
+    'body-slam': { dmg: 1.1, arc: 0.3, stagger: 0.22 },
+    'vine-whip': { radius: 1.18, arc: 0.35 },
+    'wing-attack': { combo: true, haste: 0.12 },
+    'metal-claw': { combo: true, shred: 0.15 },
+    'bug-bite': { killHeal: 0.01 },
+    bite: { killHeal: 0.01 },
+    'karate-chop': { eliteBonus: 1.3 },
+    lick: { slow: 0.55, stagger: 0.2 }
+  };
+  for (const m of RAW) {
+    if (m.kind !== 'melee') continue;
+    const role = meleeRoles[m.id] || {};
+    m.dmg = +(m.dmg * 1.2 * (role.dmg || 1)).toFixed(2);
+    m.cd = +(m.cd * 0.9).toFixed(3);
+    m.radius = +(m.radius * 1.15 * (role.radius || 1)).toFixed(2);
+    m.arc = Math.min(Math.PI * 2, m.arc + Math.PI / 6 + (role.arc || 0));
+    for (const k of ['combo', 'haste', 'shred', 'killHeal', 'eliteBonus', 'slow', 'stagger']) {
+      if (role[k] !== undefined) m[k] = role[k];
+    }
   }
 
   // Pool de movimientos por tipo. El pool `normal` lo tienen todos.

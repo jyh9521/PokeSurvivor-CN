@@ -71,6 +71,7 @@ G.Player = class Player {
     this.slowT = 0;            // pegado por una trampa
     this.item = null;          // objeto equipado (data/items.js), uno por run
     this.sashT = -999;         // última vez que salvó la Banda Focus
+    this.meleeGuardT=0; this.meleeHasteT=0; this.meleeHaste=0; this.meleeHeals=[];
     this.bellHeal = 0;         // curación pendiente del Cascabel Concha
     this.statsTaken = {};      // mejoras de stat cogidas (condición de evolución)
   }
@@ -88,7 +89,7 @@ G.Player = class Player {
   // ---------------- stats efectivos ----------------
   get atk() { return this.baseAtk * this.atkMul * (1 + this.buffs.atk.n * this.buffs.atk.amount); }
   get spd() {
-    const s = this.baseSpd * this.spdMul * (1 + this.buffs.spd.n * this.buffs.spd.amount) * (this.slowT > 0 ? 0.5 : 1);
+    const s = this.baseSpd * (this.meleeHasteT > 0 ? 1 + this.meleeHaste : 1) * this.spdMul * (1 + this.buffs.spd.n * this.buffs.spd.amount) * (this.slowT > 0 ? 0.5 : 1);
     const w = G.Weather.speedFor(this.mon.types);
     const slow = this.inLiquid ? G.World.liquidEffect(this.mon.types).slow || 1 : 1;
     return s * slow * w;
@@ -233,7 +234,7 @@ G.Player = class Player {
     }
     // Con un ataque cuerpo a cuerpo activo se recibe un 25 % menos: hay que
     // estar encima de los enemigos para pegar (iban muy por detrás).
-    const close = this.activeGroup().some(m => m.kind === 'melee') ? 0.75 : 1;
+    const close = this.meleeGuardT > 0 || this.activeGroup().some(m => m.kind === 'melee') ? 0.75 : 1;
     if(!Number.isFinite(amount)||amount<=0)return;
     const d = pure ? Math.max(1, amount) : Math.max(1, amount * (1 - this.reduction) * close);
     const hpBefore=this.hp;
@@ -319,6 +320,8 @@ G.Player = class Player {
     if (this.invuln > 0) this.invuln -= dt;
     if (this.flash > 0) this.flash -= dt;
     if (this.attackFace > 0) this.attackFace -= dt;
+    this.meleeGuardT = Math.max(0,(this.meleeGuardT || 0)-dt);
+    this.meleeHasteT = Math.max(0,(this.meleeHasteT || 0)-dt);
 
     for (const k in this.buffs) {
       const b = this.buffs[k];
@@ -372,7 +375,8 @@ G.Player = class Player {
     const ranged = !!m && (m.kind === 'projectile' || m.kind === 'beam');
     const threat = G.Projectiles.nearest(all, this.x, this.y, this.r + 24);
     const boss = all.find(e => e.boss && !e.dead && G.U.dist(this.x, this.y, e.x, e.y) < 330);
-    const tg = (ranged ? boss || threat : threat || boss)
+    const reachable = this.activeGroup().filter(m => m.kind === 'melee').map(m => G.Combat.meleeTarget(this,m)).find(Boolean);
+    const tg = reachable || (ranged ? boss || threat : threat || boss)
             || G.Projectiles.nearest(all, this.x, this.y, 520)
             || G.World.nearestBreakable(this.x, this.y, 200);
     this.target = tg;
