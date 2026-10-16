@@ -1,0 +1,11 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),vm=require('node:vm');
+const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
+test('complete additive sheets match pinned source manifest, geometry and original author records',()=>{
+ const manifest=JSON.parse(fs.readFileSync('assets/pokemon/extra-animation-sources.json','utf8')),G={};vm.runInNewContext(fs.readFileSync('js/data/extra-animations.js','utf8'),{G});
+ assert.equal(manifest.revision,'392fc81d5190ceca40c08ef4c754f226458b5f59');assert.equal(manifest.inspected.length,966);assert.ok(manifest.sources.length>1000);const files=new Set();
+ for(const row of manifest.sources){const b=fs.readFileSync(row.file);assert.equal(hash(b),row.sha256,row.file);assert.equal(b.toString('hex',0,8),'89504e470d0a1a0a');const parts=row.file.split('/'),dex=parts[2],shiny=parts[3]==='s',name=path.basename(row.file,'.png'),m=G.EXTRA_ANIMATIONS[dex][shiny?'sa':'a'][name];assert.ok(m,row.file);assert.equal(b.readUInt32BE(16)%m.w,0,row.file);assert.equal(b.readUInt32BE(16)/m.w,m.n,row.file);assert.equal(b.readUInt32BE(20)/m.h,m.r,row.file);assert.equal(m.d.length,m.n,row.file);assert.ok(m.d.every(d=>Number.isFinite(d)&&d>0));assert.ok(m.ax>=0&&m.ax<m.w&&m.ay>=0&&m.ay<m.h,row.file);assert.equal(hash(fs.readFileSync(path.join(path.dirname(row.file),'credits.txt'))),row.creditsSha256,row.file);assert.match(row.source,/^sprite\/\d{4}\//);files.add(row.file);}
+ assert.equal(files.size,manifest.sources.length);assert.match(fs.readFileSync('assets/pokemon/EXTRA-LICENSE.md','utf8'),/Attribution-NonCommercial 4.0/);assert.ok(fs.statSync('assets/pokemon/extra-credit-names.txt').size>100);assert.match(fs.readFileSync('CREDITS.md','utf8'),/EXTRA-CREDITS/);
+});
+test('extra metadata loads before sprite engine and does not expand enemy preload list',()=>{
+ const html=fs.readFileSync('dev.html','utf8');assert.ok(html.indexOf('js/data/extra-animations.js')<html.indexOf('js/core/sprites.js'));const G={SPRITE_META:{},EXTRA_ANIMATIONS:{}};vm.runInNewContext(fs.readFileSync('js/core/sprites.js','utf8'),{G});assert.equal(G.Sprites.ANIMS.length,7);assert.equal(G.Sprites.EXTRA.length,5);
+});

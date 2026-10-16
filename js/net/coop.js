@@ -22,7 +22,7 @@
  *   anfitrión -> todos     { k:'start', seed, host, members:[{uid,name,dex,shiny}] }
  */
 G.Coop = (() => {
-  const ANIMS = ['Idle', 'Walk', 'Attack', 'Shoot', 'Charge', 'Hurt', 'Faint'];
+  const ANIMS = ['Idle', 'Walk', 'Attack', 'Shoot', 'Charge', 'Hurt', 'Faint','Strike','Swing','Double','Hop','Rotate'];
   const COLORS = ['#ffcb3d', '#5fc8ff', '#7ee07a', '#ff8ad8'];
   // Mensajes por segundo: 15 directo, 4 por el TURN de Cloudflare (se paga por
   // GB: era 7 y se iban unos 110 GB al día, el 12-10-2026) y 3 por el relé de
@@ -139,12 +139,12 @@ G.Coop = (() => {
     const m = g.find(x => x.kind === 'orbit') || g[0];
     return [r1(local.x), r1(local.y), r2(local.moveAngle), local.walking ? 1 : 0, r1(local.hp), r1(local.maxHp),
             local.dead ? 1 : 0, m ? m.id : '', m ? m.lvl : 1, r1(local.magnet), r2(local.aim), r2(local.xpMul),
-            r2(local.reviveT || 0), api.choosing && api.choosing() ? 1 : 0, doneSeq];
+            r2(local.reviveT || 0), api.choosing && api.choosing() ? 1 : 0, doneSeq,local.anim?.snapshot?.()||null];
   }
 
   function readState(a) {
     return { x: a[0], y: a[1], ang: a[2], walk: a[3], hp: a[4], maxHp: a[5], dead: a[6], mv: a[7], ml: a[8],
-             mag: a[9], aim: a[10], xpMul: a[11], rev: a[12], ch: a[13], ld: a[14] };
+             mag: a[9], aim: a[10], xpMul: a[11], rev: a[12], ch: a[13], ld: a[14],pose:a[15],poseAt:performance.now() };
   }
 
   // ---------------- envío ----------------
@@ -172,7 +172,7 @@ G.Coop = (() => {
       if (e.dead || G.U.dist2(e.x, e.y, near.x, near.y) > r2n) continue;
       const a = ANIMS.indexOf(e.anim.cur);
       out.push([e.id, r1(e.x), r1(e.y), Math.ceil(e.hp), a < 0 ? 0 : a, e.anim.dir,
-                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0)]);
+                (e.burn > 0 ? 1 : 0) | (e.poison > 0 ? 2 : 0) | (e.shield > 0 ? 4 : 0),e.anim.serial||0,Math.round((e.anim.elapsed||0)*10)/10,Math.round(e.anim.speed*100)/100]);
     }
     return out;
   }
@@ -283,8 +283,8 @@ G.Coop = (() => {
           break;
         }
         case 'c':
-          G.Combat.ghostCast(m.pl, ev[1], ev[2], ev[3], ev[4]);
-          emit(['c', from, ev[1], ev[2], ev[3], ev[4]], from);
+          G.Combat.ghostCast(m.pl, ev[1], ev[2], ev[3], ev[4],ev[5]);
+          emit(['c', from, ev[1], ev[2], ev[3], ev[4],ev[5]], from);
           break;
         case 'pb':
           G.World.breakAt(ev[1], ev[2]);
@@ -355,7 +355,7 @@ G.Coop = (() => {
       } else { n.vx = 0; n.vy = 0; }
       n.x = a[1]; n.y = a[2]; n.age = 0; n.last = now;
       e.hp = Math.min(e.maxHp, a[3]);
-      n.anim = a[4]; n.dir = a[5]; n.st = a[6];
+      n.anim = a[4]; n.dir = a[5]; n.st = a[6];n.pose=Number.isSafeInteger(a[7])?[a[7],ANIMS[a[4]],a[8],a[9],a[4]>1?1:0,a[4]===6?1:0,a[4]===0?'Idle':'Walk',1,a[5]]:null;n.poseAt=now;
     }
   }
 
@@ -371,7 +371,7 @@ G.Coop = (() => {
         G.Projectiles.spawn({ x: ev[1], y: ev[2], vx: ev[3], vy: ev[4], dmg: ev[5], r: ev[6], life: ev[7],
                               friendly: false, color: '#ff7a9e', vis: G.VFX.forType(ev[8]), mtype: ev[8] });
         break;
-      case 'c': { const m = mates.get(ev[1]); if (m) G.Combat.ghostCast(m.pl, ev[2], ev[3], ev[4], ev[5]); break; }
+      case 'c': { const m = mates.get(ev[1]); if (m) G.Combat.ghostCast(m.pl, ev[2], ev[3], ev[4], ev[5],ev[6]); break; }
       case 'mark':marks.set(ev[1],{uid:ev[1],kind:ev[2],x:ev[3],y:ev[4],at:performance.now()});break;
       case 'item': api.item(ev[1]); break;
       case 'pk': G.Pickups.addRemote(ev[1], ev[2], ev[3], ev[4], ev[5]); break;
@@ -406,8 +406,8 @@ G.Coop = (() => {
   /** Tu ataque: los demás lo repiten como fantasma. */
   function cast(pl, m) {
     if (!active || pl !== local) return;
-    if (host) emit(['c', me, m.id, m.lvl, r2(pl.aim), m.evolved ? 1 : 0]);
-    else outEv.push(['c', m.id, m.lvl, r2(pl.aim), m.evolved ? 1 : 0]);
+    if (host) emit(['c', me, m.id, m.lvl, r2(pl.aim), m.evolved ? 1 : 0,pl.anim.snapshot()]);
+    else outEv.push(['c', m.id, m.lvl, r2(pl.aim), m.evolved ? 1 : 0,pl.anim.snapshot()]);
   }
 
   // invitado

@@ -101,6 +101,7 @@ G.Player = class Player {
     if (this.slots.length >= this.maxMoves || this.hasMove(id)) return false;
     const m = G.Moves.instance(id, 1);
     this.moves.push(m);
+    G.Sprites.prepareAction(this.dex,m,this.shiny);
     const group = [m];
     this.slots.push(group);
     this.arrange();
@@ -198,25 +199,22 @@ G.Player = class Player {
    * Lo llama combat.js al lanzar un movimiento. Elige la animación de PMD y la
    * acelera si la recarga es más corta que la animación, para que encadene.
    */
-  cast(m) {
+  cast(m, remotePose = null) {
     // Vidasfera: cada ataque cuesta un poco de vida (nunca te deja KO).
     if (this.hasItem('lifeorb') && m.kind !== 'orbit' && m.kind !== 'trail' && !this.remote) {
       this.hp = Math.max(1, this.hp - Math.max(1, this.maxHp * 0.01));
     }
-    const anim = { melee: 'Attack', beam: 'Shoot', projectile: 'Shoot', nova: 'Attack',
-                   aura: 'Charge', buff: 'Charge', orbit: 'Charge', boomerang: 'Shoot', chain: 'Shoot',
-                   mine: 'Charge', meteor: 'Charge', turret: 'Charge', dash: 'Attack', trail: 'Walk', cone: 'Shoot' }[m.kind] || 'Attack';
+    const anim = G.Sprites.actionFor(this.dex,m,this.shiny);
     // Las familias nuevas suenan como la parecida de las de siempre.
     const SND = { boomerang: 'projectile', chain: 'beam', mine: 'nova', meteor: 'nova', turret: 'buff', dash: 'melee', trail: 'aura', cone: 'projectile' };
     // El rastro no suena a cada charco (sería un zumbido constante).
     if (m.kind !== 'trail') G.Audio.sfx('shot', { kind: SND[m.kind] || m.kind, type: m.type });
     if (m.kind === 'trail') return;
-    // No reinicies una animación que va por la mitad: se vería a tirones.
-    if (this.anim.busy() && this.anim.progress() < 0.65) return;
-    const meta = G.Sprites.animMeta(this.dex, anim);
+    if(this.remote&&(remotePose||this.net?.pose)){if(remotePose)this.anim.sync(remotePose);return;}
+    const meta = G.Sprites.animMeta(this.dex, anim,this.shiny);
     const len = meta ? meta.d.reduce((a, b) => a + b, 0) / 60 : 0.4;
     const cd = Math.max(0.12, m.cd * this.cdMul);
-    this.anim.play(anim, { speed: Math.max(1, len / (cd * 0.9)) });
+    this.anim.request(anim, { speed: Math.min(3,Math.max(1, len / (cd * 0.9))) });
     this.attackFace = 0.35;
   }
 
@@ -340,6 +338,7 @@ G.Player = class Player {
     const slide = this.inLiquid && G.World.liquidEffect(this.mon.types).slide;
     this.svx = slide ? G.U.damp(this.svx || 0, ax * s * 1.15, 1.6, dt) : ax * s;
     this.svy = slide ? G.U.damp(this.svy || 0, ay * s * 1.15, 1.6, dt) : ay * s;
+    const animX=this.x,animY=this.y;
     this.x += this.svx * dt;
     this.y += this.svy * dt;
     G.World.collide(this);
@@ -381,9 +380,10 @@ G.Player = class Player {
     else if (this.walking) this.aim = this.moveAngle;
 
     // --- animación: mira al objetivo al atacar, si no a donde camina ---
-    const face = this.attackFace > 0 || !this.walking ? this.aim : this.moveAngle;
+    const face = this.anim.busy() || this.attackFace > 0 || !this.walking ? this.aim : this.moveAngle;
     this.anim.dir = G.Sprites.dirFromAngle(face);
-    this.anim.loop(this.walking ? 'Walk' : 'Idle', this.walking ? s / 110 : 1);
+    const visualSpeed=Math.hypot(this.x-animX,this.y-animY)/Math.max(.001,dt);
+    this.anim.loop(visualSpeed>2?'Walk':'Idle',visualSpeed>2?Math.max(.35,Math.min(2.5,visualSpeed/110)):1);
   }
 
   /** Vuelve a levantarse (lo revive un compañero en cooperativo). */
@@ -430,7 +430,8 @@ G.Player = class Player {
     this.walking = !!n.walk;
     this.moveAngle = n.ang;
     this.aim = n.aim;
-    const face = this.attackFace > 0 || !this.walking ? this.aim : this.moveAngle;
+    const face = this.anim.busy() || this.attackFace > 0 || !this.walking ? this.aim : this.moveAngle;
+    if(n.pose){this.anim.sync(n.pose,(performance.now()-n.poseAt)/1000);return;}
     this.anim.dir = G.Sprites.dirFromAngle(face);
     this.anim.loop(this.walking ? 'Walk' : 'Idle', this.walking ? this.baseSpd / 110 : 1);
   }

@@ -12,6 +12,21 @@
 G.Sprites = (() => {
   /** Unidades de mundo por píxel de arte. Tiles y sprites comparten escala. */
   const PX = 2;
+  const EXTRA=['Strike','Swing','Double','Hop','Rotate'];
+  for(const [dex,entry] of Object.entries(G.EXTRA_ANIMATIONS||{})){
+    const m=G.SPRITE_META[dex];if(!m)continue;Object.assign(m.a,entry.a);
+    if(m.sh){m.sa||={};m.sm||=[];for(const name of Object.keys(entry.a)){if(entry.sa[name])m.sa[name]=entry.sa[name];else if(!m.sm.includes(name))m.sm.push(name);}}
+  }
+  const totalCache=new WeakMap(),total=m=>{if(!m)return 1;let n=totalCache.get(m);if(!n){n=m.d.slice(0,m.n).reduce((a,b)=>a+b,0)||1;totalCache.set(m,n);}return n;};
+  const mobile=()=>G.Settings?.get('quality')==='potato'||(typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches);
+  function actionFor(dex,move,shiny=false){
+    const m=meta(dex);if(!m)return 'Attack';
+    const special={'swords-dance':['Rotate','Charge'],'dragon-dance':['Rotate','Charge'],'body-slam':['Hop','Attack'],'wing-attack':['Swing','Attack'],'vine-whip':['Swing','Attack'],'karate-chop':['Strike','Attack'],'metal-claw':['Strike','Attack']};
+    const kinds={melee:['Strike','Attack'],dash:['Hop','Attack'],nova:['Swing','Shoot','Attack'],boomerang:['Swing','Shoot'],chain:['Double','Shoot'],buff:['Charge'],aura:['Charge'],trail:['Walk'],orbit:['Charge'],mine:['Charge'],meteor:['Charge'],turret:['Charge']};
+    return (special[move.id]||kinds[move.kind]||['Shoot','Attack']).find(a=>{const g=shiny&&m.sa?.[a]||m.a[a];return has(m,a,shiny)&&(!EXTRA.includes(a)||!mobile()||g.w*g.h*g.n*g.r*4<=8*1024*1024);})||'Attack';
+  }
+  function prepareAction(dex,move,shiny=false){const a=actionFor(dex,move,shiny);if(EXTRA.includes(a))sheet(dex,a,shiny);}
+
   const sheets = new Map();          // "dex/Anim[/s]" -> {img, ready, failed}
 
   function meta(dex) { return G.SPRITE_META[dex] || null; }
@@ -37,6 +52,7 @@ G.Sprites = (() => {
     x.fillStyle = '#ffffff';
     x.fillRect(0, 0, c.width, c.height);
     whites.set(img, c);
+    for(const s of sheets.values())if(s.img===img){s.whiteBytes=c.width*c.height*4;evict(s);break;}
     return c;
   }
 
@@ -68,14 +84,17 @@ G.Sprites = (() => {
   // Hojas en memoria como mucho. Antes no se soltaba ninguna: en partidas de
   // más de una hora pasaban cientos de especies, se llenaba la memoria gráfica
   // y la pantalla se quedaba en negro hasta que el navegador recargaba la página.
-  const MAX_SHEETS = 200, IDLE_MS = 20000;   // ~0,66 MB cada una ya dibujada: ~130 MB
-  function evict(now) {
-    const old = [...sheets].filter(([, s]) => now - s.at > IDLE_MS).sort((a, b) => a[1].at - b[1].at);
-    const drop = old.slice(0, Math.max(sheets.size - Math.floor(MAX_SHEETS * 0.75), 0));
-    for (const [k, s] of drop) {
-      sheets.delete(k);
-      s.img.onload = s.img.onerror = null;
-      s.img.src = '';                 // suelta la imagen decodificada
+  const MAX_SHEETS = 200;
+  const budget=()=> (G.Settings?.get('quality')==='potato'?32:mobile()?64:128)*1024*1024;
+  const bytes=s=>(s.bytes||0)+(s.whiteBytes||0);
+  function cacheStats(){return {sheets:sheets.size,bytes:[...sheets.values()].reduce((n,s)=>n+bytes(s),0),budget:budget()};}
+  function evict(protect){
+    let size=cacheStats().bytes;
+    const old=[...sheets].filter(([,s])=>s!==protect).sort((a,b)=>a[1].at-b[1].at);
+    for(const [key,s] of old){
+      if(sheets.size<MAX_SHEETS&&size<=budget())break;
+      size-=bytes(s);sheets.delete(key);whites.delete(s.img);
+      s.img.onload=s.img.onerror=null;s.img.src='';s.ready=false;
     }
   }
 
@@ -93,15 +112,17 @@ G.Sprites = (() => {
       if (s.failed && performance.now() > s.retryAt) { s.failed = false; s.img.src = s.src + '?r=' + s.tries; }
       return s;
     }
-    if (sheets.size >= MAX_SHEETS) evict(now);
+    if (sheets.size >= MAX_SHEETS) evict(null);
     s = { ready: false, failed: false, img: new Image(), tries: 0, retryAt: 0, at: now,
-          src: `assets/pokemon/${dex}/${shiny ? 's/' : ''}${name}.png` };
-    s.img.onload = () => { s.ready = true; };
+          src: `assets/pokemon/${dex}/${shiny ? 's/' : ''}${animMeta(dex,name,shiny)?.file||name+'.png'}` };
+    s.img.onload = () => { s.ready = true;s.bytes=s.img.width*s.img.height*4;evict(s); };
     s.img.onerror = () => { s.failed = true; s.retryAt = performance.now() + 1000 * Math.min(8, 2 ** s.tries++); };
     s.img.src = s.src;
     sheets.set(k, s);
     return s;
   }
+
+  G.Settings?.on?.(key=>{if(key==='quality')evict(null);});
 
   const ANIMS = ['Idle', 'Walk', 'Attack', 'Shoot', 'Charge', 'Hurt', 'Faint'];
 
@@ -168,60 +189,52 @@ G.Sprites = (() => {
       this.once = false;
       this.hold = false;       // se queda en el último fotograma (Faint)
       this.done = false;
-      this.dir = 0;
+      this.dir = 0;this.serial=0;this.elapsed=0;this.baseSpeed=1;this.loops={};this.pending=null;this.remoteSerial=-1;this.remotePose=null;
       // Las hojas se cargan al dibujarse por primera vez; la run las precarga
       // todas con preload() para que no parpadeen al primer ataque.
     }
 
     loop(anim, speed = 1) {
-      this.base = anim;
-      if (!this.once && this.cur !== anim) this._start(anim, false);
-      if (!this.once) this.speed = speed;
+      this.base=animName(this.dex,anim,this.shiny)||'Idle';this.baseSpeed=Math.max(.1,Math.min(6,Number(speed)||1));
+      if(!this.once){if(this.cur!==this.base)this._start(this.base,false);this.speed=this.baseSpeed;}
     }
-
-    /** opts: { speed, hold } */
-    play(anim, opts = {}) {
-      this._start(anim, true);
-      this.speed = opts.speed || 1;
-      this.hold = !!opts.hold;
+    play(anim,opts={}) {this.pending=null;this._start(anim,true);this.speed=Math.max(.1,Math.min(6,Number(opts.speed)||1));this.hold=!!opts.hold;}
+    request(anim,opts={}) {
+      if(this.hold&&this.cur==='Faint')return false;
+      const next={anim,speed:Math.max(1,Math.min(3,Number(opts.speed)||1))};
+      if(this.busy()){this.pending=next;return false;}
+      this.play(next.anim,{speed:next.speed});return true;
     }
-
-    /** ¿Está sonando una animación de una vez sin terminar? */
-    busy() { return this.once && !this.done; }
-
-    /** Progreso 0..1 de la animación actual. */
-    progress() {
-      const m = animMeta(this.dex, this.cur, this.shiny);
-      if (!m) return 1;
-      let total = 0, before = 0;
-      for (let i = 0; i < m.n; i++) { if (i < this.frame) before += m.d[i]; total += m.d[i]; }
-      return total ? (before + this.t) / total : 1;
+    busy(){return this.once&&!this.done;}
+    progress(){const m=animMeta(this.dex,this.cur,this.shiny);return m?Math.min(1,this.elapsed/total(m)):1;}
+    _seek(value){const m=animMeta(this.dex,this.cur,this.shiny);if(!m)return;
+      this.elapsed=Math.max(0,value);let t=this.once?Math.min(this.elapsed,total(m)-.0001):this.elapsed%total(m);
+      if(!this.once)this.elapsed=t;let frame=0;while(frame<m.n-1&&t>=m.d[frame])t-=m.d[frame++];this.frame=frame;this.t=t;
     }
-
-    _start(anim, once) {
-      this.cur = animName(this.dex, anim, this.shiny) || 'Idle';
-      this.frame = 0; this.t = 0;
-      this.once = once; this.done = false;
+    _start(anim,once){if(!this.once)this.loops[this.cur]=this.elapsed;
+      this.cur=animName(this.dex,anim,this.shiny)||'Idle';this.once=once;this.done=false;this.hold=false;this.serial++;this._seek(once?0:this.loops[this.cur]||0);
     }
-
-    update(dt) {
-      const m = animMeta(this.dex, this.cur, this.shiny);
-      if (!m || this.done) return;
-      this.t += dt * 60 * this.speed;
-      while (this.t >= m.d[this.frame]) {
-        this.t -= m.d[this.frame];
-        this.frame++;
-        if (this.frame >= m.n) {
-          if (this.once) {
-            if (this.hold) { this.frame = m.n - 1; this.done = true; return; }
-            // Vuelve a la animación de fondo.
-            this._start(this.base, false);
-            this.speed = 1;
-            return;
-          }
-          this.frame = 0;
-        }
+    update(dt){if(this.done||!Number.isFinite(dt)||dt<=0)return;let remaining=Math.min(1,dt);
+      while(remaining>0){const m=animMeta(this.dex,this.cur,this.shiny);if(!m)return;
+        if(!this.once){this._seek(this.elapsed+remaining*60*this.speed);return;}
+        const seconds=Math.max(0,(total(m)-this.elapsed)/(60*this.speed)),used=Math.min(remaining,seconds);
+        const base=animMeta(this.dex,this.base,this.shiny);if(base)this.loops[this.base]=((this.loops[this.base]||0)+used*60*this.baseSpeed)%total(base);
+        this._seek(this.elapsed+used*60*this.speed);remaining-=used;
+        if(used<seconds-1e-8)return;
+        if(this.hold){this.frame=m.n-1;this.elapsed=total(m);this.done=true;this.pending=null;return;}
+        const next=this.pending;this.pending=null;if(next)this.play(next.anim,{speed:next.speed});else{this._start(this.base,false);this.speed=this.baseSpeed;}
       }
+    }
+    snapshot(){return [this.serial,this.cur,Math.round(this.elapsed*10)/10,Math.round(this.speed*100)/100,this.once?1:0,this.hold?1:0,this.base,Math.round(this.baseSpeed*100)/100,this.dir];}
+    sync(pose,age=0){
+      if(!Array.isArray(pose)||pose.length!==9||pose===this.remotePose)return false;
+      const [seq,name,phase,speed,once,hold,base,baseSpeed,dir]=pose;
+      if(!Number.isSafeInteger(seq)||seq<0||seq<this.remoteSerial||![...ANIMS,...EXTRA].includes(name)||!['Walk','Idle'].includes(base)||!Number.isFinite(phase)||phase<0||phase>60000||!Number.isFinite(speed)||speed<.1||speed>6||!Number.isFinite(baseSpeed)||baseSpeed<.1||baseSpeed>6||![0,1].includes(once)||![0,1].includes(hold)||!Number.isInteger(dir)||dir<0||dir>7)return false;
+      this.remotePose=pose;this.base=base;this.baseSpeed=baseSpeed;this.dir=dir;
+      const target=phase+(Number.isFinite(age)?Math.max(0,Math.min(.25,age)):0)*60*speed,nameHere=animName(this.dex,name,this.shiny);
+      if(seq!==this.remoteSerial){this.remoteSerial=seq;this.pending=null;this._start(name,!!once);this.speed=speed;this.hold=!!hold;this._seek(target);if(once&&target>=total(animMeta(this.dex,name,this.shiny)))this.update(.00001);}
+      else if(this.cur===nameHere&&!this.done){this.speed=speed;const delta=target-this.elapsed;if(delta>3)this._seek(this.elapsed+Math.min(1.5,delta));}
+      return true;
     }
 
     /** Dibuja con los pies en (x, y). opts: { flash, alpha } */
@@ -266,6 +279,6 @@ G.Sprites = (() => {
     }
   }
 
-  return { PX, meta, hasShiny, hovers, white, animMeta, sheet, preload, dirFromAngle, bodyRadius, bodyHeight,
+  return { cacheStats,actionFor,prepareAction,EXTRA,PX, meta, hasShiny, hovers, white, animMeta, sheet, preload, dirFromAngle, bodyRadius, bodyHeight,
            drawShadow, Animator, ANIMS, get sheetCount() { return sheets.size; } };
 })();

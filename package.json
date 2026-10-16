@@ -1,6 +1,6 @@
 {
   "name": "pokesurvivor-cn",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "private": true,
   "description": "Simplified Chinese local and self-hosted NAS edition with dual saves, co-op and leaderboards",
   "scripts": {

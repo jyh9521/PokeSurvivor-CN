@@ -502,7 +502,7 @@ G.Combat = (() => {
   }
 
   /** Repite el ataque de un compañero sólo para verlo (sin daño). */
-  function ghostCast(pl, id, lvl, aim, evolved) {
+  function ghostCast(pl, id, lvl, aim, evolved, pose) {
     const def = G.Moves.BY_ID[id];
     if (!def || def.kind === 'orbit') return;
     const m = G.Moves.instance(id, lvl);
@@ -510,7 +510,7 @@ G.Combat = (() => {
     pl.aim = aim;
     ghost = true;
     try {
-      pl.cast(m);
+      pl.cast(m,pose);
       run(pl, m);
     } finally { ghost = false; }
   }

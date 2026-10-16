@@ -1,5 +1,13 @@
 # Créditos
 
+## Additional complete actions (0.8.1)
+
+The additive Strike, Swing, Double, Hop and Rotate sheets retain all source frames.
+See [per-variant original authors and pinned source](assets/pokemon/EXTRA-CREDITS.md),
+[author names](assets/pokemon/extra-credit-names.txt) and
+[source hashes](assets/pokemon/extra-animation-sources.json).
+The existing authors below and the original asset license remain unchanged.
+
 ## Sprites
 
 Los sprites estilo *Pokémon Mundo Misterioso* vienen de

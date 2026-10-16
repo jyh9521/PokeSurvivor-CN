@@ -3,3 +3,6 @@
 *.cjs text eol=lf
 *.cmd text eol=crlf
 *.sh text eol=lf
+
+# Preserve the pinned upstream TSV, including empty trailing contact fields.
+assets/pokemon/extra-credit-names.txt -whitespace
