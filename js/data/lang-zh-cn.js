@@ -1311,3 +1311,7 @@ G.I18n.add({"Switch special": "切换招式"},"zh-CN");
 G.I18n.add({"Mixed regions": "混合卡池", "All regions": "全部地区", "All regions share this pool; mixed pity is separate.": "全部地区混合抽取，保底独立累计。", "Mixed pity: {x} / {x}": "混合卡池距离上次传说：{x} / {x}", "Physical · scales with Attack": "物理 · 物攻加成", "Special · scales with Special Attack": "特殊 · 特攻加成", "Random BGM": "随机BGM", "Shuffle local menu and battle music; off restores the original soundtrack.": "随机播放本地菜单与战斗配乐；关闭后恢复默认音乐。", "WebRTC interface available": "页面WebRTC接口可用", "WebRTC interface missing on this page": "当前页面缺少WebRTC接口"},"zh-CN");
 
 G.I18n.add({"Controles compactos, repertorios y música": "构筑、音乐与联机优化", "Controles especiales más pequeños y editables en móvil, ataques iniciales acordes a sus estadísticas, clasificación física/especial, banner mixto y música CC0 aleatoria opcional.": "特殊强化框缩小并接入手机布局编辑；初始招式匹配优势能力，技能卡标明物理／特殊；新增混合卡池与随机音乐开关。", "Ancho estable de cartas en móvil y confirmaciones de red sin esperar el temporizador.": "修正手机升级框宽度变化，网络确认不再等待定时器。"},"zh-CN");
+
+G.I18n.add({"Learn without switching attacks": "学习招式不再自动切换", "Learning a move keeps the current attack active; switch manually when you want.": "学习新招式后继续使用当前招式，需要时手动切换。"},"zh-CN");
+
+G.I18n.add({"Aprender sin cambiar de ataque": "学习招式不再自动切换", "Aprender un movimiento conserva el ataque activo; cambia manualmente cuando quieras.": "学习新招式后继续使用当前招式，需要时手动切换。"},"zh-CN");

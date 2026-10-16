@@ -6,4 +6,4 @@ G.NAS_DISCOVERY = true;
 G.PROJECT_REPO = 'https://github.com/jyh9521/PokeSurvivor-CN';
 G.PROJECT_CONTACT = 'nowaytoh@gmail.com';
 
-G.APP_VERSION = "0.13.0";
+G.APP_VERSION = "0.13.1";
