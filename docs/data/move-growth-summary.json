@@ -1,0 +1,2101 @@
+{
+  "baseline": "be7581e322bf7b99f4eac039c01b693b6119c23f",
+  "version": "0.18.0",
+  "protocol": 17,
+  "saveSchema": 3,
+  "attacks": 93,
+  "staticCasesPerVersion": 7056,
+  "dynamicCasesPerVersion": 5022,
+  "staticModel": "12s native static casts, collisions AND status ticking; level1 neutral matchup, no crit/items/weather; 68 physical /65 special axes. Single/boss nominalHP10000, elite4000: diagnostic health restored after each hit; percent poison uses nominal maxHP. Crowd fixed12 anchored slots HP180 replenished, KPS for that fixture. Cast IDs attached only by the harness; delayed fields/projectiles retain their originating cast. Numeric equivalence against the uninstrumented run is asserted. Average targets is unique directly damaged target slots per originating cast, DoT excluded. Orbit has no discrete cast: target count null; animation cadence and per-window contacts reported separately. Native movement disabled so control is duration, not escape value. Geometry is not effective coverage. Counter armed. Five non-learnable legacy buffs separately audited, not eligible for evolution/training/mastery. Not a win rate. Crowd layout is fixed across all stages: 6 targets at radius40 and 6 at100.",
+  "dynamicModel": "Native moving/12-enemy surround/boss AI, 24s limit, open terrain, seed17, two offensive stat axes 68/65, playerL41. All nine move stages explicitly rebuilt; no invulnerability, revive or reset. KPS uses actual scenario elapsed, finite non-replenished targets; not human win rates.",
+  "config": {
+    "trainingRate": 0.05,
+    "trainingMax": 12,
+    "masteryRate": 0.03,
+    "masteryMax": 3,
+    "ladders": {
+      "projectile": [
+        {
+          "dmg": 1.15
+        },
+        {
+          "pierce": 1,
+          "speed": 1.12
+        },
+        {
+          "cd": 0.9
+        },
+        {
+          "dmg": 1.18,
+          "size": 1.08
+        }
+      ],
+      "melee": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "cd": 0.9
+        },
+        {
+          "dmg": 1.18,
+          "arc": 1.25
+        }
+      ],
+      "beam": [
+        {
+          "dmg": 1.16
+        },
+        {
+          "radius": 1.12,
+          "width": 1.12
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "dmg": 1.18
+        }
+      ],
+      "orbit": [
+        {
+          "dmg": 1.15
+        },
+        {
+          "radius": 1.1,
+          "speed": 1.12
+        },
+        {
+          "dmg": 1.18
+        },
+        {
+          "count": 1
+        }
+      ],
+      "nova": [
+        {
+          "count": 2
+        },
+        {
+          "dmg": 1.16
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "pierce": 1
+        }
+      ],
+      "aura": [
+        {
+          "radius": 1.12
+        },
+        {
+          "dmg": 1.18
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "dmg": 1.16
+        }
+      ],
+      "boomerang": [
+        {
+          "dmg": 1.16
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "count": 1
+        }
+      ],
+      "chain": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "count": 1
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "dmg": 1.16
+        }
+      ],
+      "mine": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "cd": 0.9
+        },
+        {
+          "count": 1
+        }
+      ],
+      "meteor": [
+        {
+          "dmg": 1.16
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "count": 1
+        }
+      ],
+      "turret": [
+        {
+          "dmg": 1.15
+        },
+        {
+          "rate": 0.9
+        },
+        {
+          "range": 1.15
+        },
+        {
+          "dmg": 1.18
+        }
+      ],
+      "dash": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "width": 1.15,
+          "dmg": 1.12
+        }
+      ],
+      "trail": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "dur": 1.18
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "dmg": 1.16
+        }
+      ],
+      "cone": [
+        {
+          "count": 1
+        },
+        {
+          "dmg": 1.16
+        },
+        {
+          "life": 1.12
+        },
+        {
+          "pierce": 1
+        }
+      ],
+      "buff": [
+        {
+          "amount": 1.12
+        },
+        {
+          "dur": 1.15
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "stacks": 1
+        }
+      ],
+      "wave": [
+        {
+          "dmg": 1.16
+        },
+        {
+          "width": 1.12
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "life": 1.12
+        }
+      ],
+      "mark": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "dmg": 1.16
+        }
+      ],
+      "curve": [
+        {
+          "dmg": 1.15
+        },
+        {
+          "life": 1.1
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "count": 1
+        }
+      ],
+      "split": [
+        {
+          "dmg": 1.15
+        },
+        {
+          "pierce": 1
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "count": 1
+        }
+      ],
+      "spiral": [
+        {
+          "dmg": 1.15
+        },
+        {
+          "life": 1.1
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "count": 1
+        }
+      ],
+      "ricochet": [
+        {
+          "dmg": 1.15
+        },
+        {
+          "pierce": 1
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "speed": 1.12
+        }
+      ],
+      "rolling": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "size": 1.12
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "pierce": 1
+        }
+      ],
+      "lob": [
+        {
+          "dmg": 1.16
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "count": 1
+        }
+      ]
+    },
+    "routes": {
+      "water-gun": [
+        {
+          "dmg": 1.15
+        },
+        {
+          "pierce": 1
+        },
+        {
+          "cd": 0.9
+        },
+        {
+          "speed": 1.15,
+          "size": 1.12
+        }
+      ],
+      "thunderbolt": [
+        {
+          "dmg": 1.2
+        },
+        {
+          "radius": 1.1,
+          "count": 1
+        },
+        {
+          "cd": 0.9
+        },
+        {
+          "dmg": 1.2
+        }
+      ],
+      "razor-leaf": [
+        {
+          "dmg": 1.16
+        },
+        {
+          "radius": 1.18
+        },
+        {
+          "speed": 1.12
+        },
+        {
+          "count": 1
+        }
+      ],
+      "bulldoze": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "radius": 1.15
+        },
+        {
+          "cd": 0.94
+        },
+        {
+          "slow": 1.12
+        }
+      ],
+      "hydro-pump": [
+        {
+          "dmg": 1.22
+        },
+        {
+          "width": 1.18
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "cd": 0.94
+        }
+      ],
+      "ice-beam": [
+        {
+          "dmg": 1.16
+        },
+        {
+          "width": 1.12
+        },
+        {
+          "radius": 1.15
+        },
+        {
+          "cd": 0.92
+        }
+      ],
+      "flash-cannon": [
+        {
+          "dmg": 1.2
+        },
+        {
+          "radius": 1.15
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "width": 1.12
+        }
+      ],
+      "psybeam": [
+        {
+          "width": 1.18
+        },
+        {
+          "dmg": 1.16
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "radius": 1.15
+        }
+      ],
+      "ember": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "speed": 1.15
+        },
+        {
+          "cd": 0.9
+        },
+        {
+          "pierce": 1
+        }
+      ],
+      "poison-sting": [
+        {
+          "cd": 0.92
+        },
+        {
+          "pierce": 1
+        },
+        {
+          "dmg": 1.18
+        },
+        {
+          "speed": 1.15
+        }
+      ],
+      "rock-throw": [
+        {
+          "dmg": 1.22
+        },
+        {
+          "size": 1.15
+        },
+        {
+          "pierce": 1
+        },
+        {
+          "cd": 0.94
+        }
+      ],
+      "shadow-ball": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "pierce": 1
+        },
+        {
+          "size": 1.12
+        },
+        {
+          "cd": 0.92
+        }
+      ],
+      "spirit-shackle": [
+        {
+          "dmg": 1.16
+        },
+        {
+          "life": 1.12
+        },
+        {
+          "pierce": 1
+        },
+        {
+          "cd": 0.92
+        }
+      ],
+      "thunder-shock": [
+        {
+          "cd": 0.92
+        },
+        {
+          "dmg": 1.15
+        },
+        {
+          "speed": 1.12
+        },
+        {
+          "pierce": 1
+        }
+      ],
+      "body-slam": [
+        {
+          "dmg": 1.22
+        },
+        {
+          "radius": 1.1
+        },
+        {
+          "cd": 0.94
+        },
+        {
+          "knock": 1.15
+        }
+      ],
+      "karate-chop": [
+        {
+          "dmg": 1.2
+        },
+        {
+          "radius": 1.1
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "dmg": 1.15
+        }
+      ],
+      "metal-claw": [
+        {
+          "dmg": 1.16
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "cd": 0.9
+        },
+        {
+          "arc": 1.25
+        }
+      ],
+      "wing-attack": [
+        {
+          "radius": 1.12
+        },
+        {
+          "dmg": 1.16
+        },
+        {
+          "cd": 0.9
+        },
+        {
+          "arc": 1.2
+        }
+      ],
+      "lick": [
+        {
+          "radius": 1.12
+        },
+        {
+          "dmg": 1.15
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "arc": 1.25
+        }
+      ],
+      "bite": [
+        {
+          "dmg": 1.2
+        },
+        {
+          "radius": 1.1
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "arc": 1.2
+        }
+      ],
+      "bug-bite": [
+        {
+          "cd": 0.92
+        },
+        {
+          "radius": 1.12
+        },
+        {
+          "dmg": 1.18
+        },
+        {
+          "arc": 1.2
+        }
+      ],
+      "aqua-jet": [
+        {
+          "dmg": 1.18
+        },
+        {
+          "speed": 1.15
+        },
+        {
+          "cd": 0.92
+        },
+        {
+          "width": 1.18
+        }
+      ]
+    },
+    "evolution": {
+      "projectile": {
+        "dmg": 1.8,
+        "count": 1,
+        "pierce": 1,
+        "size": 1.1
+      },
+      "melee": {
+        "dmg": 1.9,
+        "radius": 1.15,
+        "arc": 9
+      },
+      "beam": {
+        "dmg": 1.8,
+        "width": 1.25,
+        "radius": 1.1
+      },
+      "orbit": {
+        "dmg": 1.7,
+        "count": 1
+      },
+      "nova": {
+        "dmg": 1.6,
+        "count": 3
+      },
+      "aura": {
+        "dmg": 1.8,
+        "radius": 1.18
+      },
+      "boomerang": {
+        "dmg": 1.8,
+        "radius": 1.18
+      },
+      "chain": {
+        "dmg": 1.7,
+        "count": 2
+      },
+      "mine": {
+        "dmg": 1.8,
+        "count": 1
+      },
+      "meteor": {
+        "dmg": 1.7,
+        "count": 1
+      },
+      "turret": {
+        "dmg": 1.8,
+        "rate": 0.9
+      },
+      "dash": {
+        "dmg": 1.9,
+        "width": 1.18
+      },
+      "trail": {
+        "dmg": 1.8,
+        "radius": 1.15
+      },
+      "cone": {
+        "dmg": 1.7,
+        "count": 2
+      },
+      "wave": {
+        "dmg": 1.6,
+        "width": 1.25,
+        "life": 1.08
+      },
+      "focused": {
+        "dmg": 3.6,
+        "pierce": 1,
+        "size": 1.1,
+        "cd": 1.15
+      },
+      "water-gun": {
+        "dmg": 3.6,
+        "pierce": 2,
+        "size": 1.3,
+        "cd": 1.15
+      },
+      "thunderbolt": {
+        "dmg": 1.7,
+        "count": 2,
+        "radius": 1.15,
+        "slow": 0.22
+      },
+      "razor-leaf": {
+        "dmg": 1.8,
+        "count": 1,
+        "radius": 1.12,
+        "cd": 1.12
+      }
+    }
+  },
+  "anomalies": [
+    {
+      "id": "ember",
+      "dex": 68,
+      "stage": 5,
+      "single": 1,
+      "crowd": 1.5173553719008266,
+      "packet": 1,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        0.468,
+        0.468
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "fire-spin",
+      "dex": 68,
+      "stage": 3,
+      "single": 0.7463556851311953,
+      "crowd": 1.1163658991910392,
+      "packet": 1,
+      "count": [
+        3,
+        3
+      ],
+      "radius": [
+        62,
+        68.2
+      ],
+      "cd": [
+        0.3,
+        0.3
+      ],
+      "reason": "Geometry crosses fixed target lanes; orbit radius shifts its ring outward, not a filled-area DPS bonus."
+    },
+    {
+      "id": "fire-spin",
+      "dex": 65,
+      "stage": 3,
+      "single": 0.7227602905569008,
+      "crowd": 1.1054365733113674,
+      "packet": 1,
+      "count": [
+        3,
+        3
+      ],
+      "radius": [
+        62,
+        68.2
+      ],
+      "cd": [
+        0.3,
+        0.3
+      ],
+      "reason": "Geometry crosses fixed target lanes; orbit radius shifts its ring outward, not a filled-area DPS bonus."
+    },
+    {
+      "id": "razor-leaf",
+      "dex": 68,
+      "stage": 5,
+      "single": 1,
+      "crowd": 2.5,
+      "packet": 1,
+      "count": [
+        2,
+        3
+      ],
+      "radius": [
+        247.79999999999998,
+        247.79999999999998
+      ],
+      "cd": [
+        0.9,
+        0.9
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "razor-leaf",
+      "dex": 65,
+      "stage": 5,
+      "single": 1,
+      "crowd": 2.4999999999999996,
+      "packet": 1,
+      "count": [
+        2,
+        3
+      ],
+      "radius": [
+        247.79999999999998,
+        247.79999999999998
+      ],
+      "cd": [
+        0.9,
+        0.9
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "confusion",
+      "dex": 65,
+      "stage": 5,
+      "single": 1.1724137931034484,
+      "crowd": 1.5618729096989965,
+      "packet": 1.1799999999999997,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        0.522,
+        0.522
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "psychic",
+      "dex": 65,
+      "stage": 5,
+      "single": 1.1538461538461537,
+      "crowd": 1.528066528066528,
+      "packet": 1.16,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        71.68,
+        71.68
+      ],
+      "cd": [
+        1.748,
+        1.748
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "sludge",
+      "dex": 68,
+      "stage": 3,
+      "single": 1,
+      "crowd": 1.6569767441860466,
+      "packet": 1,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        0.6,
+        0.6
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "sludge",
+      "dex": 65,
+      "stage": 3,
+      "single": 1,
+      "crowd": 1.6438127090301005,
+      "packet": 1,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        0.6,
+        0.6
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "bulldoze",
+      "dex": 68,
+      "stage": 3,
+      "single": 1,
+      "crowd": 2.142857142857143,
+      "packet": 1,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        80,
+        92
+      ],
+      "cd": [
+        0.7,
+        0.7
+      ],
+      "reason": "Geometry crosses fixed target lanes; orbit radius shifts its ring outward, not a filled-area DPS bonus."
+    },
+    {
+      "id": "bulldoze",
+      "dex": 65,
+      "stage": 3,
+      "single": 1,
+      "crowd": 2.1375,
+      "packet": 1,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        80,
+        92
+      ],
+      "cd": [
+        0.7,
+        0.7
+      ],
+      "reason": "Geometry crosses fixed target lanes; orbit radius shifts its ring outward, not a filled-area DPS bonus."
+    },
+    {
+      "id": "string-shot",
+      "dex": 68,
+      "stage": 5,
+      "single": 0.8333333333333333,
+      "crowd": 1.25,
+      "packet": 1,
+      "count": [
+        2,
+        3
+      ],
+      "radius": [
+        62.720000000000006,
+        62.720000000000006
+      ],
+      "cd": [
+        0.9900000000000001,
+        0.9900000000000001
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "string-shot",
+      "dex": 65,
+      "stage": 5,
+      "single": 0.8333333333333334,
+      "crowd": 1.0598984771573605,
+      "packet": 1,
+      "count": [
+        2,
+        3
+      ],
+      "radius": [
+        62.720000000000006,
+        62.720000000000006
+      ],
+      "cd": [
+        0.9900000000000001,
+        0.9900000000000001
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "rock-throw",
+      "dex": 68,
+      "stage": 4,
+      "single": 1,
+      "crowd": 1.8024691358024691,
+      "packet": 1,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        0.7,
+        0.7
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "rock-throw",
+      "dex": 65,
+      "stage": 4,
+      "single": 1,
+      "crowd": 1.8682926829268294,
+      "packet": 1,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        0.7,
+        0.7
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "psycho-cut",
+      "dex": 68,
+      "stage": 5,
+      "single": 1,
+      "crowd": 2.5,
+      "packet": 1,
+      "count": [
+        2,
+        3
+      ],
+      "radius": [
+        224.00000000000003,
+        224.00000000000003
+      ],
+      "cd": [
+        0.7360000000000001,
+        0.7360000000000001
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "psycho-cut",
+      "dex": 65,
+      "stage": 5,
+      "single": 1,
+      "crowd": 2.4895209580838324,
+      "packet": 1,
+      "count": [
+        2,
+        3
+      ],
+      "radius": [
+        224.00000000000003,
+        224.00000000000003
+      ],
+      "cd": [
+        0.7360000000000001,
+        0.7360000000000001
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "aerial-ace",
+      "dex": 65,
+      "stage": 5,
+      "single": 1.1111111111111112,
+      "crowd": 1.5384615384615385,
+      "packet": 1.12,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        134.4,
+        134.4
+      ],
+      "cd": [
+        0.6900000000000001,
+        0.6900000000000001
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "bubble-beam",
+      "dex": 68,
+      "stage": 5,
+      "single": 1,
+      "crowd": 1.5223435948361468,
+      "packet": 1,
+      "count": [
+        8,
+        8
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        0.65,
+        0.65
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "bubble-beam",
+      "dex": 65,
+      "stage": 5,
+      "single": 1,
+      "crowd": 1.5282758620689656,
+      "packet": 1,
+      "count": [
+        8,
+        8
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        0.65,
+        0.65
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "stealth-rock",
+      "dex": 65,
+      "stage": 5,
+      "single": 1.1666666666666667,
+      "crowd": 1.6153846153846154,
+      "packet": 1.16,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        78.4,
+        78.4
+      ],
+      "cd": [
+        2.116,
+        2.116
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "explosion",
+      "dex": 68,
+      "stage": 3,
+      "single": 1,
+      "crowd": 1.75,
+      "packet": 1,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        115,
+        128.8
+      ],
+      "cd": [
+        3.5,
+        3.5
+      ],
+      "reason": "Geometry crosses fixed target lanes; orbit radius shifts its ring outward, not a filled-area DPS bonus."
+    },
+    {
+      "id": "explosion",
+      "dex": 65,
+      "stage": 3,
+      "single": 1,
+      "crowd": 1.6419753086419753,
+      "packet": 1,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        115,
+        128.8
+      ],
+      "cd": [
+        3.5,
+        3.5
+      ],
+      "reason": "Geometry crosses fixed target lanes; orbit radius shifts its ring outward, not a filled-area DPS bonus."
+    },
+    {
+      "id": "explosion",
+      "dex": 65,
+      "stage": 5,
+      "single": 1.1666666666666665,
+      "crowd": 1.5789473684210527,
+      "packet": 1.16,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        128.8,
+        128.8
+      ],
+      "cd": [
+        3.22,
+        3.22
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "play-rough",
+      "dex": 68,
+      "stage": 5,
+      "single": 1.180722891566265,
+      "crowd": 1.8,
+      "packet": 1.18,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        109.76,
+        109.76
+      ],
+      "cd": [
+        1.08,
+        1.08
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "natures-madness",
+      "dex": 65,
+      "stage": 5,
+      "single": 1.1666666666666667,
+      "crowd": 1.6153846153846154,
+      "packet": 1.16,
+      "count": [
+        1,
+        1
+      ],
+      "radius": [
+        76.16000000000001,
+        76.16000000000001
+      ],
+      "cd": [
+        2.116,
+        2.116
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "seed-bomb",
+      "dex": 68,
+      "stage": 5,
+      "single": 1.5,
+      "crowd": 1.512432709561651,
+      "packet": 1,
+      "count": [
+        2,
+        3
+      ],
+      "radius": [
+        80.64000000000001,
+        80.64000000000001
+      ],
+      "cd": [
+        1.564,
+        1.564
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "dragon-darts",
+      "dex": 68,
+      "stage": 5,
+      "single": 1.5,
+      "crowd": 1.5360360360360361,
+      "packet": 1,
+      "count": [
+        2,
+        3
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.1960000000000002,
+        1.1960000000000002
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "dragon-darts",
+      "dex": 65,
+      "stage": 5,
+      "single": 1.5,
+      "crowd": 1.5663430420711975,
+      "packet": 1,
+      "count": [
+        2,
+        3
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.1960000000000002,
+        1.1960000000000002
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "mystical-fire",
+      "dex": 68,
+      "stage": 2,
+      "single": null,
+      "crowd": 1.1150845253576074,
+      "packet": 1.15,
+      "count": [
+        4,
+        4
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.7,
+        1.7
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "mystical-fire",
+      "dex": 68,
+      "stage": 3,
+      "single": null,
+      "crowd": 1,
+      "packet": 1,
+      "count": [
+        4,
+        4
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.7,
+        1.7
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "mystical-fire",
+      "dex": 68,
+      "stage": 4,
+      "single": null,
+      "crowd": 1.110204081632653,
+      "packet": 1.0869565217391304,
+      "count": [
+        4,
+        4
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.7,
+        1.564
+      ],
+      "reason": "Recharge changes discrete cast opportunities within 12 seconds; compare actual castHz."
+    },
+    {
+      "id": "mystical-fire",
+      "dex": 68,
+      "stage": 5,
+      "single": null,
+      "crowd": 1.286764705882353,
+      "packet": 1,
+      "count": [
+        4,
+        5
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.564,
+        1.564
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    },
+    {
+      "id": "mystical-fire",
+      "dex": 65,
+      "stage": 2,
+      "single": null,
+      "crowd": 1.1806836679327184,
+      "packet": 1.15,
+      "count": [
+        4,
+        4
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.7,
+        1.7
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "mystical-fire",
+      "dex": 65,
+      "stage": 3,
+      "single": null,
+      "crowd": 1,
+      "packet": 1,
+      "count": [
+        4,
+        4
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.7,
+        1.7
+      ],
+      "reason": "Per-hit threshold, status accumulation or integer damage quantization; compare direct/status DPS and dynamic results."
+    },
+    {
+      "id": "mystical-fire",
+      "dex": 65,
+      "stage": 4,
+      "single": null,
+      "crowd": 1.1130514705882353,
+      "packet": 1.0869565217391304,
+      "count": [
+        4,
+        4
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.7,
+        1.564
+      ],
+      "reason": "Recharge changes discrete cast opportunities within 12 seconds; compare actual castHz."
+    },
+    {
+      "id": "mystical-fire",
+      "dex": 65,
+      "stage": 5,
+      "single": null,
+      "crowd": 1.2960363336085878,
+      "packet": 1,
+      "count": [
+        4,
+        5
+      ],
+      "radius": [
+        0,
+        0
+      ],
+      "cd": [
+        1.564,
+        1.564
+      ],
+      "reason": "Additional trajectories change lane coverage and kill thresholds; no simultaneous packet-damage grant."
+    }
+  ],
+  "dynamicSummary": [
+    {
+      "stage": 1,
+      "kind": "moving",
+      "before": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 157,
+        "meanDamageTaken": 0
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 160,
+        "meanDamageTaken": 0
+      }
+    },
+    {
+      "stage": 1,
+      "kind": "surround",
+      "before": {
+        "cases": 186,
+        "alive": 130,
+        "cleared": 12,
+        "meanDamageTaken": 83.13978494623655
+      },
+      "after": {
+        "cases": 186,
+        "alive": 129,
+        "cleared": 12,
+        "meanDamageTaken": 83.5295698924731
+      }
+    },
+    {
+      "stage": 1,
+      "kind": "boss",
+      "before": {
+        "cases": 186,
+        "alive": 184,
+        "cleared": 8,
+        "meanDamageTaken": 5.710215053763439
+      },
+      "after": {
+        "cases": 186,
+        "alive": 184,
+        "cleared": 8,
+        "meanDamageTaken": 5.711182795698924
+      }
+    },
+    {
+      "stage": 2,
+      "kind": "moving",
+      "before": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 163,
+        "meanDamageTaken": 0
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 167,
+        "meanDamageTaken": 0
+      }
+    },
+    {
+      "stage": 2,
+      "kind": "surround",
+      "before": {
+        "cases": 186,
+        "alive": 127,
+        "cleared": 25,
+        "meanDamageTaken": 82.83225806451611
+      },
+      "after": {
+        "cases": 186,
+        "alive": 129,
+        "cleared": 20,
+        "meanDamageTaken": 83.19892473118279
+      }
+    },
+    {
+      "stage": 2,
+      "kind": "boss",
+      "before": {
+        "cases": 186,
+        "alive": 184,
+        "cleared": 9,
+        "meanDamageTaken": 6.870537634408603
+      },
+      "after": {
+        "cases": 186,
+        "alive": 184,
+        "cleared": 9,
+        "meanDamageTaken": 5.803602150537632
+      }
+    },
+    {
+      "stage": 3,
+      "kind": "moving",
+      "before": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 165,
+        "meanDamageTaken": 0
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 170,
+        "meanDamageTaken": 0
+      }
+    },
+    {
+      "stage": 3,
+      "kind": "surround",
+      "before": {
+        "cases": 186,
+        "alive": 135,
+        "cleared": 35,
+        "meanDamageTaken": 80.06881720430106
+      },
+      "after": {
+        "cases": 186,
+        "alive": 129,
+        "cleared": 25,
+        "meanDamageTaken": 82.53763440860214
+      }
+    },
+    {
+      "stage": 3,
+      "kind": "boss",
+      "before": {
+        "cases": 186,
+        "alive": 184,
+        "cleared": 9,
+        "meanDamageTaken": 6.0088172043010735
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 9,
+        "meanDamageTaken": 4.789999999999998
+      }
+    },
+    {
+      "stage": 4,
+      "kind": "moving",
+      "before": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 165,
+        "meanDamageTaken": 0
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 170,
+        "meanDamageTaken": 0
+      }
+    },
+    {
+      "stage": 4,
+      "kind": "surround",
+      "before": {
+        "cases": 186,
+        "alive": 141,
+        "cleared": 47,
+        "meanDamageTaken": 77.93172043010752
+      },
+      "after": {
+        "cases": 186,
+        "alive": 129,
+        "cleared": 27,
+        "meanDamageTaken": 82.64999999999999
+      }
+    },
+    {
+      "stage": 4,
+      "kind": "boss",
+      "before": {
+        "cases": 186,
+        "alive": 182,
+        "cleared": 12,
+        "meanDamageTaken": 5.898602150537635
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 9,
+        "meanDamageTaken": 4.380591397849461
+      }
+    },
+    {
+      "stage": 5,
+      "kind": "moving",
+      "before": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 170,
+        "meanDamageTaken": 0
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 170,
+        "meanDamageTaken": 0
+      }
+    },
+    {
+      "stage": 5,
+      "kind": "surround",
+      "before": {
+        "cases": 186,
+        "alive": 157,
+        "cleared": 100,
+        "meanDamageTaken": 71.84193548387096
+      },
+      "after": {
+        "cases": 186,
+        "alive": 132,
+        "cleared": 32,
+        "meanDamageTaken": 82.00645161290322
+      }
+    },
+    {
+      "stage": 5,
+      "kind": "boss",
+      "before": {
+        "cases": 186,
+        "alive": 182,
+        "cleared": 28,
+        "meanDamageTaken": 6.1950537634408605
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 9,
+        "meanDamageTaken": 4.720161290322579
+      }
+    },
+    {
+      "stage": "evolved",
+      "kind": "moving",
+      "before": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 179,
+        "meanDamageTaken": 0
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 171,
+        "meanDamageTaken": 0
+      }
+    },
+    {
+      "stage": "evolved",
+      "kind": "surround",
+      "before": {
+        "cases": 186,
+        "alive": 176,
+        "cleared": 157,
+        "meanDamageTaken": 50.57473118279569
+      },
+      "after": {
+        "cases": 186,
+        "alive": 158,
+        "cleared": 97,
+        "meanDamageTaken": 71.57365591397848
+      }
+    },
+    {
+      "stage": "evolved",
+      "kind": "boss",
+      "before": {
+        "cases": 186,
+        "alive": 182,
+        "cleared": 106,
+        "meanDamageTaken": 5.2515591397849475
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 35,
+        "meanDamageTaken": 4.012419354838708
+      }
+    },
+    {
+      "stage": "training",
+      "kind": "moving",
+      "before": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 181,
+        "meanDamageTaken": 0
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 174,
+        "meanDamageTaken": 0
+      }
+    },
+    {
+      "stage": "training",
+      "kind": "surround",
+      "before": {
+        "cases": 186,
+        "alive": 181,
+        "cleared": 165,
+        "meanDamageTaken": 36.08548387096774
+      },
+      "after": {
+        "cases": 186,
+        "alive": 169,
+        "cleared": 135,
+        "meanDamageTaken": 63.13978494623656
+      }
+    },
+    {
+      "stage": "training",
+      "kind": "boss",
+      "before": {
+        "cases": 186,
+        "alive": 185,
+        "cleared": 161,
+        "meanDamageTaken": 2.671075268817205
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 74,
+        "meanDamageTaken": 2.7234946236559154
+      }
+    },
+    {
+      "stage": "mastery",
+      "kind": "moving",
+      "before": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 180,
+        "meanDamageTaken": 0
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 172,
+        "meanDamageTaken": 0
+      }
+    },
+    {
+      "stage": "mastery",
+      "kind": "surround",
+      "before": {
+        "cases": 186,
+        "alive": 176,
+        "cleared": 158,
+        "meanDamageTaken": 47.13817204301075
+      },
+      "after": {
+        "cases": 186,
+        "alive": 159,
+        "cleared": 102,
+        "meanDamageTaken": 70.51505376344086
+      }
+    },
+    {
+      "stage": "mastery",
+      "kind": "boss",
+      "before": {
+        "cases": 186,
+        "alive": 183,
+        "cleared": 120,
+        "meanDamageTaken": 5.191989247311828
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 42,
+        "meanDamageTaken": 3.7458064516129035
+      }
+    },
+    {
+      "stage": "full",
+      "kind": "moving",
+      "before": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 181,
+        "meanDamageTaken": 0
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 176,
+        "meanDamageTaken": 0
+      }
+    },
+    {
+      "stage": "full",
+      "kind": "surround",
+      "before": {
+        "cases": 186,
+        "alive": 181,
+        "cleared": 166,
+        "meanDamageTaken": 35.70645161290322
+      },
+      "after": {
+        "cases": 186,
+        "alive": 170,
+        "cleared": 136,
+        "meanDamageTaken": 61.41182795698924
+      }
+    },
+    {
+      "stage": "full",
+      "kind": "boss",
+      "before": {
+        "cases": 186,
+        "alive": 185,
+        "cleared": 166,
+        "meanDamageTaken": 2.876129032258065
+      },
+      "after": {
+        "cases": 186,
+        "alive": 186,
+        "cleared": 79,
+        "meanDamageTaken": 2.898118279569894
+      }
+    }
+  ],
+  "receipts": {
+    "final-baseline": "b231c4f6e40c7d3f0095db861406b0e904691fc7a0a6d3b112569a08935b33bd",
+    "final-selected": "f4b7a225ebda08f205b4f8d3f2e08a00df9edcb034b45daa6e2241e61c304c35",
+    "baseline-all-dynamic": "b70b22926bffb759eae1342cba91e1aafa3a685e9871f16ccc3d1d7e0c98d24a",
+    "release-all-dynamic": "9eb9cd3177e164102876e06cd56c98536cc9c316c39538260c48121cdc8e2c4b"
+  },
+  "codeCommit": "3d1959ec626076a66ccde2077fed081126bb14a1",
+  "scopeUnchangedExports": 45,
+  "unitTests": {
+    "baseline": 324,
+    "modified": 341
+  },
+  "releasePackage": {
+    "file": "PokeSurvivor-CN-local-0.1.0.zip",
+    "bytes": 156774568,
+    "sha256": "8271e87916e230665a7382571df4a5186ced7ff894c7d22bcc2337b9e3ecb358",
+    "files": 24107,
+    "upstream": "537440510dcdadf8ed711ec3dea7ae795533a662",
+    "simplifiedChinese": "a23065deefa1dd4d23557c7b10f6d8d99af42dbc"
+  },
+  "performance": [
+    {
+      "file": "full-frame-baseline-repeat.json",
+      "frames": 1035,
+      "callbackP50": 7,
+      "callbackP95": 9.799999998882413,
+      "rafGapP95": 16.700000000000728,
+      "rafFps": 86.1071092494358,
+      "enemies": 64,
+      "projectiles": 300,
+      "canvas": [
+        1025,
+        576
+      ],
+      "quality": "low",
+      "cpuThrottle": 4,
+      "viewport": [
+        1366,
+        768
+      ],
+      "errors": [],
+      "baselineCommit": "be7581e322bf7b99f4eac039c01b693b6119c23f",
+      "command": [
+        "tools/measure-full-frame.cjs",
+        "baseline",
+        "baseline-repeat"
+      ],
+      "driverSha256": "41cf06140310d90176d887dee5dbddd3bbf9487607656edf08fa1e136940179a",
+      "scenario": "Actual Game.loop including simulation, terrain, props, sprites, projectiles, VFX, HUD; fixed terrain seed 1701; 64 living enemies and 300 bullets; 4x CPU throttle"
+    },
+    {
+      "file": "full-frame-baseline.json",
+      "frames": 1097,
+      "callbackP50": 6.599999999627471,
+      "callbackP95": 8.900000000372529,
+      "rafGapP95": 16.700000000000728,
+      "rafFps": 91.33333333333331,
+      "enemies": 64,
+      "projectiles": 300,
+      "canvas": [
+        1025,
+        576
+      ],
+      "quality": "low",
+      "cpuThrottle": 4,
+      "viewport": [
+        1366,
+        768
+      ],
+      "errors": [],
+      "baselineCommit": "be7581e322bf7b99f4eac039c01b693b6119c23f",
+      "command": [
+        "tools/measure-full-frame.cjs",
+        "baseline",
+        "baseline"
+      ],
+      "driverSha256": "41cf06140310d90176d887dee5dbddd3bbf9487607656edf08fa1e136940179a",
+      "scenario": "Actual Game.loop including simulation, terrain, props, sprites, projectiles, VFX, HUD; fixed terrain seed 1701; 64 living enemies and 300 bullets; 4x CPU throttle"
+    },
+    {
+      "file": "full-frame-modified-repeat.json",
+      "frames": 1096,
+      "callbackP50": 6.599999999627471,
+      "callbackP95": 9.5,
+      "rafGapP95": 16.700000000000728,
+      "rafFps": 91.25,
+      "enemies": 64,
+      "projectiles": 300,
+      "canvas": [
+        1025,
+        576
+      ],
+      "quality": "low",
+      "cpuThrottle": 4,
+      "viewport": [
+        1366,
+        768
+      ],
+      "errors": [],
+      "baselineCommit": "be7581e322bf7b99f4eac039c01b693b6119c23f",
+      "command": [
+        "tools/measure-full-frame.cjs",
+        "modified",
+        "modified-repeat"
+      ],
+      "driverSha256": "41cf06140310d90176d887dee5dbddd3bbf9487607656edf08fa1e136940179a",
+      "scenario": "Actual Game.loop including simulation, terrain, props, sprites, projectiles, VFX, HUD; fixed terrain seed 1701; 64 living enemies and 300 bullets; 4x CPU throttle"
+    },
+    {
+      "file": "full-frame-modified.json",
+      "frames": 1062,
+      "callbackP50": 6.800000000745058,
+      "callbackP95": 9.699999999254942,
+      "rafGapP95": 16.700000000000728,
+      "rafFps": 88.41740347836233,
+      "enemies": 64,
+      "projectiles": 300,
+      "canvas": [
+        1025,
+        576
+      ],
+      "quality": "low",
+      "cpuThrottle": 4,
+      "viewport": [
+        1366,
+        768
+      ],
+      "errors": [],
+      "baselineCommit": "be7581e322bf7b99f4eac039c01b693b6119c23f",
+      "command": [
+        "tools/measure-full-frame.cjs",
+        "modified",
+        "modified"
+      ],
+      "driverSha256": "41cf06140310d90176d887dee5dbddd3bbf9487607656edf08fa1e136940179a",
+      "scenario": "Actual Game.loop including simulation, terrain, props, sprites, projectiles, VFX, HUD; fixed terrain seed 1701; 64 living enemies and 300 bullets; 4x CPU throttle"
+    }
+  ]
+}
