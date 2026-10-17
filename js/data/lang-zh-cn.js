@@ -2,6 +2,8 @@
  * Initially adapted from DabaoHuang/pokesurvivor PR #74; reviewed against this game.
  * Names are separately verified in lang-zh-cn-names.js. See docs/LOCALIZATION.md. */
 G.I18n.add({
+'El regreso de una grieta termina para todos aunque otro jugador ya esté repartiendo maestría.':'队友开始分配精通时，其他人的裂隙返回也能正常完成，不再冻结在结算途中。','Los ataques Max de cuerpo a cuerpo golpean con ondas finitas y ya no dejan campos inválidos.':'近战极巨招式使用有速度和寿命的推进波，正常造成伤害并清除无效场地。',
+"Equilibrio por fases y progreso seguro":"分阶段平衡与安全成长","La presión de oleada escala con la vida, pero conserva defensas, escudos y avisos evitables.":"波次压制随生命成长，但仍经过防御、护盾并能通过走位规避。","Clima, altares y ataque permanente usan presupuestos separados; se muestran los valores efectivos sin quitar compras.":"天气、祭坛与永久攻击采用独立预算，显示实际收益，保留已购强化等级。","Las oleadas tardías limitan la acumulación de un solo tipo; la vida común cooperativa se calibra aparte de los jefes.":"后期波次限制单一主属性长期积压；普通怪多人生命与首领分开校准。","Las instantáneas antiguas no pueden liberar una elección de recompensa nueva; la maestría se reparte con espera segura.":"旧快照不会提前解除新奖励选择；精通分配使用安全的全队等待。",
  'Effective permanent attack':'永久攻击实际生效','Purchased ranks retained; item and altar attack budgets add up to +70%.':'购买等级保留；道具与祭坛攻击加法合计最多+70%。','+4% presupuesto de ataque':'原始攻击预算 +4%',
  'daño ×1,5':'伤害 ×1.5',
  'Crecimiento y cooperación':'成长与联机交互','El diagnóstico individual identifica NAS; la maestría se reparte durante la subida de nivel y al regresar de una grieta, con espera cooperativa.':'单人诊断明确显示NAS；精通可在升级和裂隙返回时安全分配，联机全员协调等待。',

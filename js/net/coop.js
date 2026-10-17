@@ -121,8 +121,9 @@ G.Coop = (() => {
 
   // ---------------- escalado de dificultad ----------------
 
-  const scaleRate = n => 1 + 0.75 * Math.max(0, n - 1);
-  const scaleHp = n => 1 + 0.3 * Math.max(0, n - 1);
+  const scaleRate = n => G.BattleBalance?.coopRate(n)??(1+.75*Math.max(0,n-1));
+  const scaleHp = n => G.BattleBalance?.coopBossHp(n)??(1+.3*Math.max(0,n-1));
+  const scaleHpNormal=n=>G.BattleBalance.coopNormalHp(n);
 
   // ---------------- arranque / fin ----------------
 
@@ -637,7 +638,7 @@ G.Coop = (() => {
   return {
     transferHost,roomChanged,get transferring(){return !!handoff;},rescued,noteDamage(e,uid,damage,killed){if(active&&host)teamStats?.hit(e.id,uid,damage,killed);},get teamStats(){return teamStats?.snapshot()||[];},
     ping,get marks(){return [...marks.values()].filter(m=>performance.now()-m.at<8000);},
-    ANIMS, COLORS, begin, end, leave, tick, players, puppets, xpFactor, scaleRate, scaleHp,
+    ANIMS, COLORS, begin, end, leave, tick, players, puppets, xpFactor, scaleRate, scaleHp,scaleHpNormal,
     battleHit,formCast,cast, hit, meleeHit, status, hurtShown, enemyAdded, enemyGone, enemyShot, pickupAdded, pickupGone, say,
     propBroken, collected, shinyCaught, levelStart, localPicked, over, holdStart, holdEnd,
     /** Anfitrión: evento para todos. Invitado: evento para el anfitrión. */

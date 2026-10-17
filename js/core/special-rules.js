@@ -1,5 +1,5 @@
 /* Pure identity, eligibility and move conversion rules. No rendering or clocks. */
-(function(factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('../data/special-data.js'));else G.SpecialRules=factory(G.SpecialData);})(data=>{
+(function(factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('../data/special-data.js'),require('./battle-balance.js'));else G.SpecialRules=factory(G.SpecialData,G.BattleBalance);})((data,balance)=>{
  const variants=(dex)=>data.variants.filter(v=>v.dex===dex);
  const variant=(dex,key)=>variants(dex).find(v=>v.key===key)||null;
  const megas=(dex,key='')=>data.megas.filter(m=>m.dex===dex&&(!m.requires||m.requires===key));
@@ -30,6 +30,6 @@
   return {...m,...own,id:own?.id||'z-'+type,name:own?.name||(status?'Z-Support':Z_NAMES[type]),type,kind:own?.kind||(status?'guard':Z_KINDS[type]),damageClass:m.damageClass==='physical'?'physical':'special',specialOnly:true,exclusive:!!own,cd:999,dmg:Math.min(240,Math.max(100,(m.def?.dmg||m.dmg||20)*2.8)),radius:260,width:100,speed:250,life:1.3,count:7,size:8,pierce:4,spread:.18,delay:.65,dur:8,knock:own?.kind==='rolling'?35:0};
  }
  const MAX_NAMES={normal:'Max Strike',fire:'Max Flare',water:'Max Geyser',electric:'Max Lightning',grass:'Max Overgrowth',ice:'Max Hailstorm',fighting:'Max Knuckle',poison:'Max Ooze',ground:'Max Quake',flying:'Max Airstream',psychic:'Max Mindstorm',bug:'Max Flutterby',rock:'Max Rockfall',ghost:'Max Phantasm',dragon:'Max Wyrmwind',dark:'Max Darkness',steel:'Max Steelspike',fairy:'Max Starfall'};
- function maxMove(m){const status=m.damageClass==='status'||m.kind==='stance'||m.id==='substitute';return {...m,id:'max-'+(status?'guard':m.type),name:status?'Max Guard':MAX_NAMES[m.type],maxType:m.type,kind:status?'guard':m.kind==='melee'||m.kind==='counter'?'wave':m.kind,radius:(m.radius||90)*1.35,width:(m.width||35)*1.35,dmg:(m.dmg||20)*1.35,count:Math.min(8,m.count||1),maxConverted:true};}
+ function maxMove(m){const status=m.damageClass==='status'||m.kind==='stance'||m.id==='substitute';return {...m,id:'max-'+(status?'guard':m.type),name:status?'Max Guard':MAX_NAMES[m.type],maxType:m.type,kind:status?'guard':m.kind==='melee'||m.kind==='counter'?'wave':m.kind,...(['melee','counter'].includes(m.kind)?{speed:Number.isFinite(m.speed)&&m.speed>0?m.speed:balance.MAX_WAVE.speed,life:Number.isFinite(m.life)&&m.life>0?m.life:balance.MAX_WAVE.life}:{}),radius:(m.radius||90)*1.35,width:(m.width||35)*1.35,dmg:(m.dmg||20)*1.35,count:Math.min(8,m.count||1),maxConverted:true};}
  return {variants,variant,megas,mega,maxAllowed,original,zMove,maxMove,Z,Z_NAMES,MAX_NAMES,data};
 });

@@ -86,7 +86,7 @@ G.Battle=(()=>{
   }
   function available(p,kind){return kind==='z'||kind==='max'&&G.SpecialRules.maxAllowed(p.dex,p.baseForm)||kind==='mega'&&G.SpecialRules.megas(p.dex,p.baseForm).length>0;}
   function activate(p,kind){const b=ensure(p);if(kind==='mega'){const m=G.SpecialRules.mega(p.dex,b.megaKey,p.baseForm)||G.SpecialRules.megas(p.dex,p.baseForm)[0];if(m){b.megaKey=m.key;p.megaTrait=rules.trait({...p.mon,formAbility:m.ability?.id||''},{species:{[p.dex]:{...data.species[p.dex],stats:m.stats,ability:m.ability}}});}}if(p.remote||p.dead||b.used||b.form||b.energy<100||!available(p,kind)||kind==='z'&&!p.activeMove())return false;
-    b.used=true;b.energy=0;b.choice=kind;b.uses=(b.uses||0)+1;G.Telemetry?.event(p,"special-use",{kind,uses:b.uses});
+    b.used=true;b.energy=0;b.choice=kind;b.uses=(b.uses||0)+1;G.Telemetry?.event(p,"special-use",{form:kind,uses:b.uses});
     if(kind==='z'){const cast=G.Combat.special(p,'z');G.Coop.formCast?.(p,'z',cast);}
     else{b.form=kind;b.remaining=kind==='mega'?30:20;if(kind==='mega'){b.formBonus=Math.round((G.SpecialRuntime.entry(p).stats[0]-p.baseStats[0])*.45);const total=Math.max(1,p.maxHp+b.formBonus);p.hp=p.hp/p.maxHp*total;p.maxHp=total;}if(kind==='max'){b.formBonus=Math.round(p.maxHp*.5);const ratio=(p.maxHp+b.formBonus)/p.maxHp;p.maxHp+=b.formBonus;p.hp*=ratio;}}
     if(kind!=='z')G.SkillVFX?.form(p,kind);visual(p);return true;

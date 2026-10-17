@@ -2,7 +2,7 @@
  * Headless open terrain and deterministic driving, NOT player win-rate evidence. */
 const fs=require('node:fs'),vm=require('node:vm');
 module.exports=function waves(scene,opt={}){
-  const s=scene(),{G,ctx}=s,noop=()=>{};if(opt.balance?.type)Object.assign(G.BattleBalance.TYPE,opt.balance.type);if(opt.balance?.layers)Object.assign(G.BattleBalance.LAYERS,opt.balance.layers);if(opt.balance?.xp)Object.assign(G.BattleBalance.XP,opt.balance.xp);if(opt.balance?.pressure)Object.assign(G.BattleBalance.PRESSURE,opt.balance.pressure);let state=(opt.seed||17)>>>0,t=0;
+  const s=scene(),{G,ctx}=s,noop=()=>{};if(opt.balance?.composition&&G.BattleBalance.COMPOSITION)Object.assign(G.BattleBalance.COMPOSITION,opt.balance.composition);if(opt.balance?.coop&&G.BattleBalance.COOP)Object.assign(G.BattleBalance.COOP,opt.balance.coop);if(opt.balance?.type)Object.assign(G.BattleBalance.TYPE,opt.balance.type);if(opt.balance?.layers)Object.assign(G.BattleBalance.LAYERS,opt.balance.layers);if(opt.balance?.xp)Object.assign(G.BattleBalance.XP,opt.balance.xp);if(opt.balance?.pressure)Object.assign(G.BattleBalance.PRESSURE,opt.balance.pressure);let state=(opt.seed||17)>>>0,t=0;
   const rng=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};ctx.Math.random=rng;
   ctx.window={G};vm.runInContext(fs.readFileSync('js/core/util.js','utf8'),ctx,{filename:'js/core/util.js'});
   // Paired versions keep reward/spawn/loot sequences independent of combat RNG
@@ -11,8 +11,8 @@ module.exports=function waves(scene,opt={}){
   G.U.rand=(a,b)=>a+(b-a)*rng();G.U.randInt=(a,b)=>Math.floor(a+rng()*(b-a+1));G.U.pick=a=>a[Math.floor(rng()*a.length)];G.U.shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
   G.VFX.forType=()=>({});G.Camera.sees=()=>true;G.Camera.outerRadius=()=>330;G.Camera.kick=noop;
   G.Path.dirFor=(e,p)=>G.U.norm(p.x-e.x,p.y-e.y);G.Progress={event:noop,kill:noop};G.Rift={inArena:false};G.Judgment.active=false;
-  G.Events={golden:false,bag:()=>null};G.Coop.scaleRate=n=>1+.75*Math.max(0,n-1);G.Coop.scaleHp=n=>1+.3*Math.max(0,n-1);
-  for(const file of ['js/data/types.js','js/data/upgrades.js','js/data/items.js','js/data/enemies.js','js/systems/hazards.js','js/entities/pickup.js','js/systems/spawner.js'])vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
+  G.Events={golden:false,bag:()=>null};G.Coop.scaleRate=n=>G.BattleBalance.coopRate?.(n)??(1+.75*Math.max(0,n-1));G.Coop.scaleHp=n=>G.BattleBalance.coopBossHp?.(n)??(1+.3*Math.max(0,n-1));G.Coop.scaleHpNormal=n=>G.BattleBalance.coopNormalHp?.(n)??G.Coop.scaleHp(n);
+  for(const file of ['js/data/types.js','js/data/upgrades.js','js/data/items.js','js/data/enemies.js','js/systems/hazards.js','js/entities/pickup.js','js/systems/spawner.js',...(opt.weather?['js/systems/weather.js']:[]),...(opt.altar?['js/systems/interact.js']:[])])vm.runInContext(fs.readFileSync(file,'utf8'),ctx,{filename:file});
   const profiles={melee:{dex:68,passives:['vitality','harden','swords-dance','agility']},ranged:{dex:6,passives:['vitality','calm-mind','reflexes','harden']},sustain:{dex:3,preferred:'leech-seed',passives:['vitality','aqua-ring','harden','calm-mind']},tank:{dex:143,passives:['vitality','harden','light-screen','aqua-ring']},drain:{dex:114,passives:['vitality','aqua-ring','harden','calm-mind']}};
   const cfg=profiles[opt.profile||'melee'];
   const perks=G.Upgrades.perks(Object.fromEntries(G.Upgrades.LIST.map(u=>[u.id,opt.strong?u.max:opt.mid?Math.floor(u.max/2):0])));
@@ -21,12 +21,13 @@ module.exports=function waves(scene,opt={}){
   G.Camera.sees=(x,y,pad=0)=>players.some(p=>G.U.dist2(p.x,p.y,x,y)<(330+pad)**2);
   G.Game={player:players[0],st:{time:0},everyone:()=>players};
   if(G.Telemetry)for(const p of players)G.Telemetry.start(p);
+  require('./party-combat-fixture.cjs').install(G,players);
   if(opt.offense)G.BattleBalance.offense=p=>opt.offense==='linear35'?1+(p.level-1)*.035:1+Math.min(19,p.level-1)*.04+Math.max(0,p.level-20)*.02;
   if(opt.xpScale)G.BattleBalance.xpReward=()=>opt.xpScale;
   const xpAudit={supply:0,picked:0,gained:0,sources:{}};const originalDropXp=G.Pickups.dropXp;G.Pickups.dropXp=(x,y,value,boss,legend,plain,category)=>{xpAudit.supply+=value;const source=category||(plain?"judgment":legend?"rift":boss?"boss":"normal");xpAudit.sources[source]=(xpAudit.sources[source]||0)+value;return originalDropXp(x,y,value,boss,legend,plain,category);};for(const p of players){const gain=p.gainXp.bind(p);p.gainXp=value=>{if(p===players[0]){xpAudit.picked+=value;xpAudit.gained+=value*p.xpMul;}return gain(value);};}
-  const damageSources={},recentDamage=[];const milestones=[],bosses=[],choices=[],lifetimes=[],damage={taken:0,hits:0},spawns={normal:0,elite:0,boss:0};let kills=0,capSeconds=0,maxCount=0,travel=0,hazards=0,upgrades=0;
+  const damageSources={},recentDamage=[],damageByPlayer={};const milestones=[],bosses=[],choices=[],lifetimes=[],damage={taken:0,hits:0},spawns={normal:0,elite:0,boss:0};let kills=0,capSeconds=0,maxCount=0,travel=0,hazards=0,upgrades=0;
   const add=G.EnemyMgr.add;G.EnemyMgr.add=e=>{e._born=t;spawns[e.boss?'boss':e.elite?'elite':'normal']++;if(e.boss){const row={at:+t.toFixed(2),hp:e.maxHp,dex:e.dex,chain:e.def.stageChain,firstHit:null,dead:null,stage:0,damage:0,hits:0,maxHit:0,lastHit:null,maxGap:0};e._measure=row;bosses.push(row);}const hurt=e.hurt.bind(e);e.hurt=(...a)=>{if(e._measure&&e._measure.firstHit===null)e._measure.firstHit=+t.toFixed(2);const before=e.hp,result=hurt(...a);if(e._measure){const row=e._measure;row.damage+=Math.max(0,before-e.hp);row.hits++;row.maxHit=Math.max(row.maxHit,a[0]);if(row.lastHit!==null)row.maxGap=Math.max(row.maxGap,t-row.lastHit);row.lastHit=t;}return result;};const die=e.die.bind(e);e.die=()=>{if(e.dead)return;kills++;if(e.boss){e._measure.dead=+t.toFixed(2);e._measure.stage=e.bossStage||0;}else lifetimes.push({at:t,life:t-e._born});stream('loot',die);};return add(e);};
-  for(const p of players){const hurt=p.hurt.bind(p);p.hurt=(...a)=>{const hp=p.hp;hurt(...a);if(p.hp<hp){damage.taken+=hp-p.hp;damage.hits++;const key=(a[4]||"other")+":"+(a[1]||"untyped")+":"+(a[3]||"physical");damageSources[key]=(damageSources[key]||0)+hp-p.hp;recentDamage.push({time:+t.toFixed(2),key,amount:+(hp-p.hp).toFixed(2),hp:+p.hp.toFixed(2)});if(recentDamage.length>40)recentDamage.shift();}};}
+  for(const p of players){const hurt=p.hurt.bind(p);p.hurt=(...a)=>{const hp=p.hp;hurt(...a);if(p.hp<hp){damage.taken+=hp-p.hp;damageByPlayer[p.uid]=(damageByPlayer[p.uid]||0)+hp-p.hp;damage.hits++;const key=(a[4]||"other")+":"+(a[1]||"untyped")+":"+(a[3]||"physical");damageSources[key]=(damageSources[key]||0)+hp-p.hp;recentDamage.push({time:+t.toFixed(2),key,amount:+(hp-p.hp).toFixed(2),hp:+p.hp.toFixed(2)});if(recentDamage.length>40)recentDamage.shift();}};}
   const h=G.Hazards.add;G.Hazards.add=(...a)=>{hazards++;return h(...a);};
   const choose=p=>stream('reward:'+p.uid,()=>chooseCard(p));
   function chooseCard(p){let offered=G.LevelUp.offer(p).filter(c=>!c.disabled);if(!offered.length)return;
@@ -36,6 +37,7 @@ module.exports=function waves(scene,opt={}){
     if(opt.policy==='planned'){while(Math.max(...offered.map(score))<70&&p.rerolls<1+p.rerollBonus){p.rerolls++;offered=G.LevelUp.offer(p).filter(c=>!c.disabled);}}
     offered.sort((a,b)=>score(b)-score(a));const c=offered[0];c.apply(p);if(c.type==='new'&&c.moveId===cfg.preferred)p.active=p.slots.findIndex(g=>g.some(m=>m.id===c.moveId));upgrades++;if(p===players[0])choices.push({time:+t.toFixed(1),level:p.level,key:c.key});
   }
+  if(opt.weather)G.Weather.force(opt.weather,Math.min(180,opt.seconds||60));if(opt.altar)for(const p of players)p.addPower(G.Interact.POWERS.find(d=>d.id===opt.altar),25);if(opt.form)for(const p of players){p.battle.energy=100;G.Battle.activate(p,opt.form);}
   let owner=players[0];const desired=()=>{const p=owner;if(opt.idle)return[0,0];
     const hazard=G.Hazards.all.find(h=>!h.hit&&G.Hazards.inside(h,p.x,p.y,p.r+22));if(hazard){if(hazard.kind==='beam')return[-Math.sin(hazard.angle),Math.cos(hazard.angle)];const dir=G.U.norm(p.x-hazard.x,p.y-hazard.y);return dir[0]||dir[1]?dir:[1,0];}
     const shot=G.Projectiles.all().find(o=>!o.friendly&&G.U.dist2(p.x,p.y,o.x,o.y)<110**2&&(p.x-o.x)*o.vx+(p.y-o.y)*o.vy>0);if(shot){const cross=(p.x-shot.x)*(-shot.vy)+(p.y-shot.y)*shot.vx;return G.U.norm(-shot.vy*(cross<0?-1:1),shot.vx*(cross<0?-1:1));}
@@ -63,7 +65,7 @@ module.exports=function waves(scene,opt={}){
     }p._driveAxis=best;return best;
   };
   stream('spawn',()=>G.Spawner.reset());const from=opt.from||0;if(from){const checkpoint=G.Spawner.checkpoint();G.Spawner.checkpoint({...checkpoint,bossIdx:G.Enemies.BOSSES.filter(b=>b.at<from).length,pressureAt:from+6});}const dt=1/(opt.fps||30),duration=opt.seconds||1200;let error=null;
-  try{for(let f=0;f<duration/dt;f++){t=from+f*dt;s.time(t*1000);G.Game.st.time=t;if(players.every(p=>p.dead))break;
+  try{for(let f=0;f<duration/dt;f++){t=from+f*dt;s.time(t*1000);G.Game.st.time=t;if(opt.weather)G.Weather.update(dt,t,players[0]);if(players.every(p=>p.dead))break;
     for(const p of players){if(p.dead)continue;owner=p;const x=p.x,y=p.y;p.update(dt);travel+=Math.hypot(p.x-x,p.y-y);}
     stream('spawn',()=>G.Spawner.update(dt,players,t));
     G.EnemyMgr.update(dt,[...players,...(G.Combat.decoys?.()||[])]);G.EnemyMgr.rebuildGrid();
@@ -74,5 +76,5 @@ module.exports=function waves(scene,opt={}){
     const count=G.EnemyMgr.count;maxCount=Math.max(maxCount,count);if(count>=G.Spawner.CAP)capSeconds+=dt;
     if(f%Math.round(60/dt)===0)milestones.push({time:Math.round(t),level:players[0].level,xp:players[0].xp,xpAudit:{...xpAudit,sources:{...xpAudit.sources}},xpUnpicked:G.Pickups.all().filter(o=>["xp","xpBig"].includes(o.kind)).reduce((n,o)=>n+o.value,0),hp:+players[0].hp.toFixed(1),maxHp:players[0].maxHp,alive:players.filter(p=>!p.dead).length,enemies:count,kills,damageTaken:+damage.taken.toFixed(1),moves:players[0].moves.map(m=>({id:m.id,lv:m.lvl,evolved:!!m.evolved,mastery:m.mastery||0,training:m.training||0})),passives:{...players[0].passives}});
   }}catch(e){error=e.stack;}
-  return{profile:opt.profile||'melee',seed:opt.seed||17,players:players.length,strong:!!opt.strong,mid:!!opt.mid,perks,idle:!!opt.idle,policy:opt.policy||'legacy',fixedBuild:!!opt.fixedBuild,from,fps:1/dt,requested:duration,seconds:+t.toFixed(2),alive:players.filter(p=>!p.dead).length,levels:players.map(p=>p.level),hp:players.map(p=>+p.hp.toFixed(1)),kills,spawns,maxCount,capSeconds:+capSeconds.toFixed(1),damageTaken:+damage.taken.toFixed(1),hitsTaken:damage.hits,damageSources,recentDamage,travel:Math.round(travel),hazards,upgrades,bosses,milestones,choices,lifetimes,xpAudit,telemetry:G.Telemetry?.report(players[0]),error};
+  return{profile:opt.profile||'melee',seed:opt.seed||17,players:players.length,strong:!!opt.strong,mid:!!opt.mid,perks,weather:opt.weather||null,altar:opt.altar||null,form:opt.form||null,idle:!!opt.idle,policy:opt.policy||'legacy',fixedBuild:!!opt.fixedBuild,from,fps:1/dt,requested:duration,seconds:+t.toFixed(2),alive:players.filter(p=>!p.dead).length,levels:players.map(p=>p.level),hp:players.map(p=>+p.hp.toFixed(1)),kills,spawns,maxCount,capSeconds:+capSeconds.toFixed(1),damageTaken:+damage.taken.toFixed(1),hitsTaken:damage.hits,damageSources,recentDamage,perPlayer:players.map((p,i)=>({index:i,level:p.level,hp:p.hp,maxHp:p.maxHp,dead:p.dead,damage:p.dmgDealt,taken:damageByPlayer[p.uid]||0,xpGained:p.telemetry?.totals.xpGained||0,pressureDamage:p.telemetry?.totals.pressureDamage||0,pressureAvoided:p.telemetry?.totals.pressureAvoided||0,skills:p.telemetry?.skills||{}})),travel:Math.round(travel),hazards,upgrades,bosses,milestones,choices,lifetimes,xpAudit,telemetry:G.Telemetry?.report(players[0]),error};
 };

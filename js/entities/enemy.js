@@ -696,6 +696,7 @@
                     dmg: Math.round(this.def.dmg * 0.6), xp: Math.max(1, Math.round(this.def.xp * 0.25)), behavior: 'chase' };
       for (let i = 0; i < 2 && G.EnemyMgr.count < (G.Spawner.capacity?.()||G.Spawner.CAP); i++) {
         const a = Math.random() * 6.2832;
+        if(!G.BattleBalance.compositionAllows({...def,types:G.DEX_BY[def.dex]?.types},G.BattleBalance.census(G.EnemyMgr.all()),G.Game?.everyone?.().length||1,!!G.Events?.bag?.(),G.Game?.st?.time||0))break;
         const m = new Enemy(def, this.x + Math.cos(a) * 30, this.y + Math.sin(a) * 22, this.sc || { hp: 1, spd: 1, dmg: 1 });
         G.EnemyMgr.add(m);
         this.minions.push(m);

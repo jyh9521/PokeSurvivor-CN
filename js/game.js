@@ -437,6 +437,7 @@ G.Game = (() => {
   function offerMastery(){masteryPending=true;}
   function maybeMastery(){if(!masteryPending||!pl||pl.dead||G.Rift.inArena||!['playing','held'].includes(state)||['scr-bond','scr-item','scr-levelup','scr-pause'].some(G.UI.isOpen))return;
     masteryPending=false;if(!G.RunGrowth.state(pl).points)return;
+    if(!G.RunGrowth.targets(pl).length){G.UI.toast(G.T('Mastery points')+' '+G.RunGrowth.state(pl).points+' · '+G.T('Awaiting evolution'));return;}
     state='choice';if(G.Coop.active)G.Coop.holdStart();
     G.RunUI.showMastery(()=>{G.RunUI.closeLevelUp();if(state==='choice')state=holdBy.length||awayBy?'held':'playing';if(G.Coop.active)G.Coop.holdEnd();afterLevelUp();});
   }
@@ -620,7 +621,11 @@ G.Game = (() => {
 
     maybeMastery();
     if (state === 'playing') update(dt);
-    else if (pl && state !== 'ui') { G.FX.update(dt * 0.25); pl.anim.update(dt * 0.25); }
+    else if (pl && state !== 'ui') {
+      // A teammate may finish the rift countdown first and hold the world for
+      // settlement. Let terminal returns finish, never advance an active fight.
+      if(G.Coop.active&&G.Rift.arena&&G.Rift.arena.phase!=='fight')G.Rift.update(dt,pl,time);
+      G.FX.update(dt * 0.25); pl.anim.update(dt * 0.25); }
     // La red se atiende siempre (también con las cartas de nivel abiertas).
     if (G.Coop.active && pl && state !== 'ui' && state !== 'over') G.Coop.tick(dt);
 

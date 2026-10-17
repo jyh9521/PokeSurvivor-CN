@@ -33,7 +33,11 @@
     "test:progression:controller": "node --test tests/progression-controller.test.cjs",
     "test:special": "node --test tests/enemy-healing.test.cjs tests/special-expansion.test.cjs",
     "test:special:browser": "node tests/special-expansion-browser.cjs",
-    "test:progression:controller:browser": "node tests/progression-controller-browser.cjs"
+    "test:progression:controller:browser": "node tests/progression-controller-browser.cjs",
+    "test:balance:v2": "node --test tests/balance-v2*.test.cjs tests/run-growth.test.cjs tests/coop-rift.test.cjs",
+    "test:balance:v2:browser": "node tests/balance-v2-browser.cjs",
+    "measure:balance:v2": "node tools/measure-party-v2.cjs . artifacts/balance-v2/party-replay.json selected",
+    "report:balance:v2": "node tools/report-balance-v2.cjs"
   },
   "devDependencies": {
     "javascript-obfuscator": "4.1.1",

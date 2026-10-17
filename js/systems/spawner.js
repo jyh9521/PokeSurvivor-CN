@@ -80,11 +80,13 @@ G.Spawner = (() => {
   }
 
   function spawnOne(pl, t, angle) {
-    const def = G.U.pick(G.Enemies.bagAt(t));
+    const counts=G.BattleBalance.census(G.EnemyMgr.all()),horde=!!G.Events?.bag?.();
+    const bag=G.Enemies.bagAt(t).filter(d=>G.BattleBalance.compositionAllows({...d,types:G.DEX_BY[d.dex]?.types},counts,players.length,horde,t));
+    if(!bag.length)return null;const def=G.U.pick(bag);
     const pt = freePoint(pl, angle == null ? Math.random() * 6.2832 : angle, isFlyer(def));
     if (!pt) return null;
     const shiny = rollShiny(def.dex);
-    const e = new G.Enemy(def, pt[0], pt[1], scaled(G.Enemies.scale(t), G.Coop.scaleHp(players.length) * hpK(t,def)));
+    const e = new G.Enemy(def, pt[0], pt[1], scaled(G.Enemies.scale(t), (G.Coop.scaleHpNormal?.(players.length)??G.Coop.scaleHp(players.length)) * hpK(t,def)));
     e.dmg *= DMG_K; e.xp = Math.round(e.xp * G.BattleBalance.xpReward(t));
     if (G.EnemyMgr.count >= CAP * ELITE_FROM) { e.elite=true; e.maxHp = e.hp = Math.round(e.maxHp * G.BattleBalance.ELITE_HP); e.dmg *= 1.25; e.xp = Math.round(e.xp * 1.6); }
     if (shiny) e.makeShiny();

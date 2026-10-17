@@ -10,6 +10,14 @@
   const cooldown=x=>Math.max(LAYERS.cooldownMin,Number.isFinite(x)&&x>0?x:1);
   const movement=x=>Math.min(LAYERS.speedMax,Math.max(0,Number.isFinite(x)?x:1));
   const attackEff=a=>{a=Math.max(.001,Number.isFinite(a)?a:100);return LAYERS.alphaAtk===1?a:100*(a/100)**LAYERS.alphaAtk;};
+  const MAX_WAVE={speed:250,life:1}; // px/s and seconds for melee Max conversions only.
+  const COOP={rateSlope:.75,bossSlope:.30,normalSlope:.15};
+  const party=n=>Math.max(1,Math.min(8,Math.floor(Number.isFinite(n)?n:1)));
+  const coopRate=n=>1+COOP.rateSlope*(party(n)-1),coopBossHp=n=>1+COOP.bossSlope*(party(n)-1),coopNormalHp=n=>1+COOP.normalSlope*(party(n)-1);
+  const COMPOSITION={enabled:true,from:900,roles:false,ranged:12,rangedExtra:2,rangedMax:20,support:4,supportMax:6,eachSupport:2,primaryType:32};
+  const ranged=b=>['ranged','fan','beamer','zoner'].includes(b),support=b=>['healer','shielder','summoner'].includes(b);
+  function census(enemies){const c={ranged:0,support:0,behaviors:{},types:{}};for(const e of enemies){if(e.dead||e.boss||e.legend||e.judge)continue;c.behaviors[e.behavior]=(c.behaviors[e.behavior]||0)+1;const type=e.types?.[0];if(type)c.types[type]=(c.types[type]||0)+1;if(ranged(e.behavior))c.ranged++;if(support(e.behavior))c.support++;}return c;}
+  function compositionAllows(def,c,n=1,horde=false,time=Infinity){if(!COMPOSITION.enabled||time<COMPOSITION.from)return true;const b=def.behavior,type=def.types?.[0];return !(COMPOSITION.roles&&ranged(b)&&c.ranged>=Math.min(COMPOSITION.rangedMax,COMPOSITION.ranged+COMPOSITION.rangedExtra*(party(n)-1))||COMPOSITION.roles&&support(b)&&(c.support>=Math.min(COMPOSITION.supportMax,COMPOSITION.support+party(n)-1)||(c.behaviors[b]||0)>=COMPOSITION.eachSupport)||!horde&&type&&(c.types[type]||0)>=COMPOSITION.primaryType);}
   const level=p=>Math.max(1,Math.min(10000,Number.isFinite(p?.level)?p.level:1));
   const offense=p=>1+(level(p)-1)*.045;
   const enemyScale=t=>({hp:1+Math.min(1800,Math.max(0,t))/900,dmg:1+Math.max(0,t)/600,spd:1+Math.min(.35,Math.max(0,t)/1400)});
@@ -48,5 +56,5 @@
     m.dmg=+m.dmg.toFixed(3);
   }
   const bodyContact=e=>!e.judge&&(e.remote?!(e.net?.st&16):e.phase!=='dash'&&!e.jump&&!e.ai?.cast);
-  return{cooldown,movement,permanentBonus,temporaryAttack,LAYERS,attackEff,TYPE,WEATHER,ALTAR,XP,xpFor,PRESSURE,pressureRate,pressureDamage,CONTACT_FACTOR,CONTACT_CAP,RANGED_CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,recoveryWindow,waveRate,tierBlend,FLOORS,budget,tune};
+  return{MAX_WAVE,COOP,coopRate,coopBossHp,coopNormalHp,COMPOSITION,census,compositionAllows,cooldown,movement,permanentBonus,temporaryAttack,LAYERS,attackEff,TYPE,WEATHER,ALTAR,XP,xpFor,PRESSURE,pressureRate,pressureDamage,CONTACT_FACTOR,CONTACT_CAP,RANGED_CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,recoveryWindow,waveRate,tierBlend,FLOORS,budget,tune};
 });

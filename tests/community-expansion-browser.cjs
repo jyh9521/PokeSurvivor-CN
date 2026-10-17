@@ -174,7 +174,7 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
       check('form and passive state never enters the persistent wallet/save schema',users.every(u=>{const s=app.store.getSave(u.id).save;return !s.battle&&!s.passives&&!s.form;}));
     }
     if(BATTLE){
-      await Promise.all(pages.map(p=>p.evaluate(()=>{G.Game.player.battle.used=true;G.Game.player.battle.energy=0;G.Battle.endForm(G.Game.player);G.Game.player.bonds=0;})));
+      await Promise.all(pages.map(p=>p.evaluate(()=>{G.Game.player.battle.used=true;G.Game.player.battle.energy=0;G.Battle.endForm(G.Game.player);G.Game.player.bonds=0;const m=G.Moves.instance('tackle',5);G.Moves.evolve(m);G.Game.player.moves=[m];G.Game.player.slots=[[m]];G.Game.player.active=0;})));
       await a.evaluate(()=>{G.Rift.debugArena('fire','starter',6);const e=G.EnemyMgr.get(G.Rift.arena.bossId);e.xp=0;window.__starterBoss=e.id;});
       await pages[1].waitForFunction(()=>G.Rift.arena?.kind==='starter'&&G.Rift.arena.dex===6,null,{timeout:10000});
       check('a starter rift enters the whole eight-player party with its own identity',await a.evaluate(()=>{const e=G.EnemyMgr.get(window.__starterBoss);return e.dex===4&&!e.legend;}));
@@ -192,6 +192,9 @@ const ROOT=path.resolve(__dirname,'..'),OUT=path.join(ROOT,BATTLE?'artifacts/bat
       await a.evaluate(()=>{G.Coop.broadcast(['mr','boss:browser-eight']);G.RunGrowth.reward(G.Game.player,'boss:browser-eight');G.Coop.broadcast(['mr','boss:browser-eight']);});
       await Promise.all(pages.map(p=>p.waitForFunction(()=>G.RunGrowth.state(G.Game.player).points===2,null,{timeout:10000})));
       check('host mastery reward reaches all eight once despite duplicate messages',true);
+      const heldAt=await a.evaluate(()=>G.Game.st.time);await a.waitForTimeout(400);check('rift settlement allocation freezes danger until everyone can return',await a.evaluate(t=>G.Game.st.time===t,heldAt));
+      for(let round=0;round<5;round++){for(const p of pages){const done=p.locator('#level-mastery [data-mastery-done]');if(await done.isVisible())await done.click();}if((await Promise.all(pages.map(p=>p.evaluate(()=>G.Game.state==='playing')))).every(Boolean))break;await a.waitForTimeout(200);}
+      await Promise.all(pages.map(p=>p.waitForFunction(()=>G.Game.state==='playing',null,{timeout:10000})));check('all eight safely defer mastery and resume the same run without a return deadlock',true);
 
     }
     const last=pages[7];await last.evaluate(()=>{window.__testRoom=G.Social.room.id;window.__testRun=G.Game.st.time;});await last.evaluate(()=>new Promise(resolve=>{const ws=window.__fixtureSockets.at(-1);if(ws.readyState===3)return resolve();ws.addEventListener('close',()=>resolve(),{once:true});ws.close();}));await last.context().setOffline(true);await a.waitForFunction(()=>G.NAS.networkMetrics().reconnectingPeers>=1,null,{timeout:10000}).catch(async e=>{console.log('RECONNECT_DEBUG',JSON.stringify({host:await a.evaluate(()=>({metrics:G.NAS.networkMetrics(),members:G.Social.room?.members,state:G.Game.state})),last:await last.evaluate(()=>({state:G.Game.state,sockets:window.__fixtureSockets.map(s=>s.readyState)})),errors}));throw e;});await last.context().setOffline(false);await last.waitForFunction(()=>G.Social.room?.members.length===8&&G.NAS.networkMetrics().connected,{},{timeout:20000});

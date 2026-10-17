@@ -79,7 +79,7 @@ G.RunUI = (() => {
     const p=G.Game.player;
     const applied=c.apply(p);const confirmed={...c,apply:()=>applied};
     const complete=()=>{if(!coopMode)G.UI.hide('scr-levelup');cb(confirmed);};
-    if(G.RunGrowth.state(p).points){masteryDone=complete;G.UI.show('scr-levelup');renderMastery(complete);}else complete();
+    if(G.RunGrowth.state(p).points&&G.RunGrowth.targets(p).length){masteryDone=complete;G.UI.show('scr-levelup');renderMastery(complete);}else{if(G.RunGrowth.state(p).points)G.UI.toast(G.T('Awaiting evolution'));complete();}
   }
 
   /** Cooperativo: quién falta por elegir. */

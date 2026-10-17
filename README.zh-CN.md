@@ -1,3 +1,5 @@
+> 当前0.17.0：安全精通、成长/压制分层、多人普通HP独立预算；协议16、存档schema3，生命+20无上限保留。完整实测、否决候选与未验证事项见[战斗平衡V2报告](docs/BALANCE_V2_REPORT.md)。下文旧版本段落保留为历史记录。
+
 # PokéSurvivor 中文本地版
 
 见 [主说明](README.md)、[游玩说明](README-LOCAL.md) 和 [本地发行维护](docs/LOCAL_EDITION.md)。
