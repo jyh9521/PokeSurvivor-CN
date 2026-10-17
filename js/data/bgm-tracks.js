@@ -1,4 +1,4 @@
-/* Original CC0 loops by hyperpixel; see assets/music/credits.json. */
+/* Local CC0 tracks: credits.json (imported) and originals.json (project compositions). */
 G.BGM_TRACKS={
   "menu": [
     {
@@ -12,6 +12,14 @@ G.BGM_TRACKS={
     {
       "title": "19 Party day encampment",
       "file": "assets/music/19.ogg"
+    },
+    {
+      "title": "Lantern Garden",
+      "file": "assets/music/lantern-garden.wav"
+    },
+    {
+      "title": "Harbor Lights",
+      "file": "assets/music/harbor-lights.wav"
     }
   ],
   "battle": [
@@ -30,6 +38,18 @@ G.BGM_TRACKS={
     {
       "title": "28 Robot morning training",
       "file": "assets/music/28.ogg"
+    },
+    {
+      "title": "Canopy Run",
+      "file": "assets/music/canopy-run.wav"
+    },
+    {
+      "title": "Crystal Current",
+      "file": "assets/music/crystal-current.wav"
+    },
+    {
+      "title": "Ember Trail",
+      "file": "assets/music/ember-trail.wav"
     }
   ],
   "boss": [
@@ -40,6 +60,10 @@ G.BGM_TRACKS={
     {
       "title": "33 Robot night alert",
       "file": "assets/music/33.ogg"
+    },
+    {
+      "title": "Summit Trial",
+      "file": "assets/music/summit-trial.wav"
     }
   ]
 };

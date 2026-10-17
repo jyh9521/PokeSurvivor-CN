@@ -690,3 +690,31 @@ G.I18n.add({"Switch special": "Switch special"},"en");
 G.I18n.add({"Mixed regions": "Mixed regions", "All regions": "All regions", "All regions share this pool; mixed pity is separate.": "All regions share this pool; mixed pity is separate.", "Mixed pity: {x} / {x}": "Mixed pity: {x} / {x}", "Physical · scales with Attack": "Physical · scales with Attack", "Special · scales with Special Attack": "Special · scales with Special Attack", "Random BGM": "Random BGM", "Shuffle local menu and battle music; off restores the original soundtrack.": "Shuffle local menu and battle music; off restores the original soundtrack.", "WebRTC interface available": "WebRTC interface available", "WebRTC interface missing on this page": "WebRTC interface missing on this page"},"en");
 
 G.I18n.add({"Controles compactos, repertorios y música": "Compact controls, learnsets and music", "Controles especiales más pequeños y editables en móvil, ataques iniciales acordes a sus estadísticas, clasificación física/especial, banner mixto y música CC0 aleatoria opcional.": "Smaller editable touch special controls, stat-matched starting moves, physical/special labels, mixed-region gacha and optional random CC0 music.", "Ancho estable de cartas en móvil y confirmaciones de red sin esperar el temporizador.": "Stable mobile upgrade cards and network acknowledgements without timer waits."},"en");
+
+G.I18n.add({
+  "Daño por impacto": "Damage per hit",
+  "Recarga": "Cooldown",
+  "Frecuencia máxima": "Maximum cast frequency",
+  "Cantidad": "Count",
+  "Perforaciones": "Pierce",
+  "Radio / alcance": "Radius / reach",
+  "Grosor": "Width",
+  "Tamaño": "Size",
+  "Velocidad del ataque": "Attack travel speed",
+  "Vida del proyectil": "Projectile lifetime",
+  "Duración": "Duration",
+  "Intervalo de torreta": "Turret firing interval",
+  "Potencia de apoyo": "Support strength",
+  "Acumulaciones": "Stacks",
+  "Arco": "Arc (degrees)",
+  "Ralentización": "Slow strength",
+  "Retroceso": "Knockback",
+  "Special ready! Choose one this cycle · V / L3": "Special ready! Choose one this cycle · V / L3",
+  "A short piercing water jet. The caster does not dash or gain invulnerability.": "A short piercing water jet. The caster does not dash or gain invulnerability."
+}, "en");
+
+G.I18n.add({"Training adds 5 percentage points to evolved damage; training and mastery add, not multiply.":"Training adds 5 percentage points to evolved damage; training and mastery add, not multiply."}, "en");
+
+G.I18n.add({"Objetivos de cadena":"Chain target limit","Orbes":"Orbs","Meteoros":"Meteors","Minas":"Mines","Torretas simultáneas":"Simultaneous turrets","Alcance de torreta":"Turret targeting reach"}, "en");
+
+G.I18n.add({"¡Especial listo! Elige uno por ciclo · V / L3":"Special ready! Choose one this cycle · V / L3","El entrenamiento añade 5 puntos porcentuales al daño evolucionado; entrenamiento y maestría se suman.":"Training adds 5 percentage points to evolved damage; training and mastery add, not multiply.","Un chorro corto de agua perforante; no desplaza al usuario ni otorga invulnerabilidad.":"A short piercing water jet. The caster does not dash or gain invulnerability."}, "en");

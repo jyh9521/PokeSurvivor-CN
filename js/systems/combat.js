@@ -56,6 +56,9 @@ G.Combat = (() => {
   }
 
   function run(pl, m) {
+    // One immutable modifier snapshot per cast. Delayed fields must not mix
+    // stored pre-upgrade damage with a later training/mastery normalization.
+    m={...m};
     m=G.SpecialRuntime?.move(pl,m)||m;if(pl.battle?.form==='max'&&!m.specialOnly){m=G.SpecialRules.maxMove(m);if(!ghost)G.SpecialRuntime.maxEffect(pl,m);}
     G.SkillVFX?.cast(pl,m,ghost);
     switch (m.kind) {
@@ -98,7 +101,7 @@ G.Combat = (() => {
   }
 
   function payload(m) {
-    return { burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, knock: m.knock || 0, mtype: m.type, moveId: m.id, damageClass:m.damageClass, moveData:{training:Math.min(12,m.training||0),instanceId:m.instanceId,id:m.id,type:m.type,kind:m.kind,damageClass:m.damageClass,ignoreArmor:m.ignoreArmor,skinBoost:m.skinBoost,stealShield:m.stealShield,dmg:m.dmg} };
+    return { burn: m.burn || 0, poison: m.poison || 0, slow: m.slow || 0, knock: m.knock || 0, mtype: m.type, moveId: m.id, damageClass:m.damageClass, moveData:{nativeDmg:m.def?.nativeDmg||m.nativeDmg||m.def?.dmg||m.dmg,specialOnly:!!m.specialOnly,mastery:Math.max(0,Math.min(3,m.mastery||0)),training:Math.min(12,m.training||0),instanceId:m.instanceId,id:m.id,type:m.type,kind:m.kind,damageClass:m.damageClass,ignoreArmor:m.ignoreArmor,skinBoost:m.skinBoost,stealShield:m.stealShield,dmg:m.dmg} };
   }
 
   /** Tabla de tipos × clima para un ataque de tipo `type` contra `e`. */
@@ -110,7 +113,9 @@ G.Combat = (() => {
     const n = Math.max(1, m.count | 0);
     const spread = m.spread || 0;
     for (let i = 0; i < n; i++) {
-      const off = n === 1 ? 0 : (i / (n - 1) - 0.5) * spread * n;
+      // Always retain an aimed centre shot. Even volleys must not turn an
+      // accurate single shot into two misses just because count increased.
+      const off = i===0?0:Math.ceil(i/2)*(i%2?1:-1)*spread;
       const a = pl.aim + off + G.U.rand(-0.03, 0.03);
       G.Projectiles.spawn(Object.assign({
         x: pl.x + Math.cos(a) * 3, y: pl.y + Math.sin(a) * 3,
@@ -299,7 +304,7 @@ G.Combat = (() => {
     const n = Math.max(1, m.count | 0), spread = m.spread || 0.5;
     const out = m.radius / m.speed;                       // segundos de ida
     for (let i = 0; i < n; i++) {
-      const a = pl.aim + (n === 1 ? 0 : (i / (n - 1) - 0.5) * spread * Math.min(n, 3));
+      const a = pl.aim + (i===0?0:Math.ceil(i/2)*(i%2?1:-1)*spread);
       G.Projectiles.spawn(Object.assign({
         x: pl.x, y: pl.y, vx: Math.cos(a) * m.speed, vy: Math.sin(a) * m.speed,
         dmg: m.dmg * pl.atk, r: m.size, life: out * 4 + 1.5, pierce: 999, color: col,
@@ -358,7 +363,7 @@ G.Combat = (() => {
     const selector=cast?Object.assign(Object.create(pl),{baseForm:packet[7]}):pl;
     const m=G.SpecialRules.zMove(selector,active),before=ghost;ghost=visualOnly;
     try{
-      G.SkillVFX?.form(actor,'z');G.FX.dmgText(actor.x,actor.y-actor.bodyH-10,G.T(m.name),G.U.TYPE_COLOR[m.type]);
+      G.SkillVFX?.z(actor,m,visualOnly);G.FX.dmgText(actor.x,actor.y-actor.bodyH-10,G.T(m.name),G.U.TYPE_COLOR[m.type]);
       if(m.kind==='boost'){if(!visualOnly)pl.battle.zBoost=20;G.SkillVFX?.cast(actor,{...m,kind:'aura'});}
       else if(m.kind==='guardian'){
         G.SkillVFX?.cast(actor,m);
@@ -641,7 +646,8 @@ G.Combat = (() => {
     const col = G.U.TYPE_COLOR[m.type];
     const want = Math.max(1, m.count | 0);
     // Cada movimiento de órbita tiene sus orbes (puede haber dos en un vínculo).
-    const mine = p => p.orb && p.owner === pl && p.mid === m.id;
+    const orbitKey=isGhost?m.id:(m.instanceId||m.id);
+    const mine = p => p.orb && p.owner === pl && p.mid === orbitKey;
     const orbs = G.Projectiles.all().filter(mine);
     // Si cambia el número de orbes (al mejorar el movimiento), se reparten
     // todos por igual a partir de donde va el primero, sin saltos.
@@ -651,7 +657,7 @@ G.Combat = (() => {
 
     for (let i = orbs.length; i < want; i++) {
       G.Projectiles.spawnOrb({
-        owner: pl, ghost: isGhost, mid: m.id,
+        owner: pl, ghost: isGhost, mid: orbitKey,
         x: pl.x, y: pl.y, r: m.size, color: col, vis: G.VFX.forMove(m),
         dmg: m.dmg * pl.atk,
         oa: (i / want) * 6.2832, orad: m.radius, ospeed: m.speed,

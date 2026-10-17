@@ -1074,3 +1074,8 @@ body.touch #battle-shortcuts kbd{display:inline-block!important}
 #level-mastery .growth-move{display:block;width:100%;white-space:normal;text-align:left;margin:6px 0;font-size:12px;line-height:1.5}
 #level-mastery>[data-mastery-done]{display:block;width:100%;margin-top:10px;min-height:44px}
 #cards.done:has(+ #level-mastery:not([hidden])) .card:not(.picked){display:none}
+
+/* Non-modal shared-charge reminder, does not intercept movement or focus. */
+#special-ready-alert{position:fixed;z-index:65;top:82px;left:50%;transform:translateX(-50%);max-width:min(90vw,620px);padding:12px 18px;border:2px solid #ffe175;border-radius:12px;background:#192744ee;color:#fff0a8;font-weight:800;text-align:center;pointer-events:none;box-shadow:0 0 20px #ffd23f55;}
+#special-ready-alert[hidden]{display:none;}
+@media(max-width:600px){#special-ready-alert{top:70px;font-size:12px;padding:8px 12px;}}

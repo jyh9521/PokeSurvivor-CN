@@ -28,98 +28,9 @@
  *   mods aditivos        -> count, pierce, stacks
  */
 (() => {
-  const LADDERS = {
-    projectile: [
-      { t: '+1 proyectil',                  m: { count: 1, spread: 1.4 } },
-      { t: '+45% daño',                     m: { dmg: 1.45 } },
-      { t: '-25% recarga',                  m: { cd: 0.75 } },
-      { t: '+1 proyectil y +1 perforación',   m: { count: 1, pierce: 1, spread: 1.2 } }
-    ],
-    melee: [
-      { t: '+40% daño',                     m: { dmg: 1.40 } },
-      { t: '+25% alcance',                  m: { radius: 1.25 } },
-      { t: '-25% recarga',                  m: { cd: 0.75 } },
-      { t: 'Golpea en 360° y +50% daño',    m: { arc: 9, dmg: 1.50 } }
-    ],
-    beam: [
-      { t: '+45% daño',                     m: { dmg: 1.45 } },
-      { t: '+30% alcance y grosor',         m: { radius: 1.30, width: 1.30 } },
-      { t: '-25% recarga',                  m: { cd: 0.75 } },
-      { t: '+50% daño',                     m: { dmg: 1.50 } }
-    ],
-    orbit: [
-      { t: '+1 orbe',                       m: { count: 1 } },
-      { t: '+55% daño',                     m: { dmg: 1.55 } },
-      { t: '+25% radio y gira más rápido',  m: { radius: 1.25, speed: 1.35 } },
-      { t: '+1 orbe y +55% daño',           m: { count: 1, dmg: 1.55 } }
-    ],
-    nova: [
-      { t: '+4 proyectiles',                m: { count: 4 } },
-      { t: '+40% daño',                     m: { dmg: 1.40 } },
-      { t: '-25% recarga',                  m: { cd: 0.75 } },
-      { t: '+4 proyectiles y +1 perforación', m: { count: 4, pierce: 1 } }
-    ],
-    aura: [
-      { t: '+30% radio',                    m: { radius: 1.30 } },
-      { t: '+45% daño',                     m: { dmg: 1.45 } },
-      { t: 'Golpea un 40% más a menudo',    m: { cd: 0.70 } },
-      { t: '+30% radio y +50% daño',        m: { radius: 1.30, dmg: 1.50 } }
-    ],
-    boomerang: [
-      { t: '+1 bumerán',                    m: { count: 1 } },
-      { t: '+45% daño',                     m: { dmg: 1.45 } },
-      { t: '+30% alcance',                  m: { radius: 1.30 } },
-      { t: '+1 bumerán y +40% daño',        m: { count: 1, dmg: 1.40 } }
-    ],
-    chain: [
-      { t: '+2 saltos',                     m: { count: 2 } },
-      { t: '+45% daño',                     m: { dmg: 1.45 } },
-      { t: '-25% recarga',                  m: { cd: 0.75 } },
-      { t: '+2 saltos y +40% daño',         m: { count: 2, dmg: 1.40 } }
-    ],
-    mine: [
-      { t: '+1 mina',                       m: { count: 1 } },
-      { t: '+50% daño',                     m: { dmg: 1.50 } },
-      { t: '+30% radio de explosión',       m: { radius: 1.30 } },
-      { t: '+1 mina y -25% recarga',        m: { count: 1, cd: 0.75 } }
-    ],
-    meteor: [
-      { t: '+1 meteoro',                    m: { count: 1 } },
-      { t: '+45% daño',                     m: { dmg: 1.45 } },
-      { t: '+30% radio',                    m: { radius: 1.30 } },
-      { t: '+2 meteoros y -20% recarga',    m: { count: 2, cd: 0.80 } }
-    ],
-    turret: [
-      { t: '+50% daño',                     m: { dmg: 1.50 } },
-      { t: 'Dispara un 35% más rápido',     m: { rate: 0.74 } },
-      { t: '+1 a la vez',                   m: { count: 1 } },
-      { t: '+50% duración y +40% daño',     m: { dur: 1.50, dmg: 1.40 } }
-    ],
-    dash: [
-      { t: '+40% daño',                     m: { dmg: 1.40 } },
-      { t: '+30% distancia',                m: { radius: 1.30 } },
-      { t: '-25% recarga',                  m: { cd: 0.75 } },
-      { t: '+60% daño y más ancho',         m: { dmg: 1.60, width: 1.40 } }
-    ],
-    trail: [
-      { t: '+40% daño',                     m: { dmg: 1.40 } },
-      { t: '+40% duración',                 m: { dur: 1.40 } },
-      { t: 'Charcos un 30% más grandes',    m: { radius: 1.30 } },
-      { t: '+50% daño y +30% radio',        m: { dmg: 1.50, radius: 1.30 } }
-    ],
-    cone: [
-      { t: '+3 disparos',                   m: { count: 3 } },
-      { t: '+40% daño',                     m: { dmg: 1.40 } },
-      { t: '+30% alcance',                  m: { life: 1.30 } },
-      { t: '+3 disparos y +1 perforación',  m: { count: 3, pierce: 1 } }
-    ],
-    buff: [
-      { t: '+1 acumulación máxima',         m: { stacks: 1 } },
-      { t: '+40% potencia',                 m: { amount: 1.40 } },
-      { t: '+50% duración',                 m: { dur: 1.50 } },
-      { t: '+1 acumulación y +40% potencia', m: { stacks: 1, amount: 1.40 } }
-    ]
-  };
+  const growth=G.BattleBalance.MOVE_GROWTH;
+  const LADDERS=Object.fromEntries(Object.entries(growth.ladders).map(([k,steps])=>[k,steps.map(m=>({m}))]));
+  LADDERS.counter=LADDERS.melee;LADDERS.decoy=LADDERS.mark;
 
   const RAW = [
     // ---------------- NORMAL (pool común a todos) ----------------
@@ -443,9 +354,6 @@
   }
   for(const m of RAW)G.BattleBalance.tune(m);
 
-  LADDERS.wave=[{t:'+40% daño',m:{dmg:1.4}},{t:'+25% alcance',m:{width:1.25,life:1.25}},{t:'-25% recarga',m:{cd:.75}},{t:'+50% daño',m:{dmg:1.5}}];
-  LADDERS.mark=[{t:'+40% daño',m:{dmg:1.4}},{t:'+25% alcance',m:{radius:1.25}},{t:'-25% recarga',m:{cd:.75}},{t:'+50% daño',m:{dmg:1.5}}];
-  LADDERS.counter=LADDERS.melee;LADDERS.decoy=LADDERS.mark;
   for(const m of RAW)if(G.BattleRules)m.damageClass=G.BattleRules.classify(m,G.BattleDex);
 
   // Pool de movimientos por tipo. El pool `normal` lo tienen todos.
@@ -454,7 +362,8 @@
 
   const BY_ID = {};
   for (const m of RAW) {
-    m.ups = LADDERS[m.kind]||LADDERS.projectile;
+    // Data may provide a four-step route; the kind ladder remains the fallback.
+    m.ups = m.upgrades?.map(m=>({m})) || growth.routes[m.id]?.map(m=>({m})) || LADDERS[m.kind]||LADDERS.projectile;
     m.maxLvl = m.ups.length + 1;
     BY_ID[m.id] = m;
   }
@@ -474,13 +383,14 @@
   let instanceSerial=0;
   function instance(id, lvl = 1) {
     const def = BY_ID[id];
+    lvl=Math.max(1,Math.min(def.maxLvl,Number.isFinite(lvl)?Math.floor(lvl):1));
     const s = Object.assign({}, def, { id, def, lvl, t: 0, instanceId:"move-"+(++instanceSerial) });
     delete s.ups;
     for (let i = 0; i < lvl - 1; i++) applyMods(s, def.ups[i].m);
     return s;
   }
 
-  const MULT = ['dmg', 'cd', 'speed', 'radius', 'dur', 'amount', 'arc', 'width', 'spread', 'life', 'size', 'rate'];
+  const MULT = ['dmg', 'cd', 'speed', 'radius', 'range', 'dur', 'amount', 'arc', 'width', 'spread', 'life', 'size', 'rate','slow','knock'];
   const ADD = ['count', 'pierce', 'stacks'];
 
   function applyMods(s, m) {
@@ -489,6 +399,8 @@
       else if (ADD.includes(k)) s[k] = (s[k] || 0) + m[k];
       else s[k] = m[k];
     }
+    // Combat clamps homing penetration to one; keep the data/card truthful too.
+    if(s.homing&&['projectile','nova'].includes(s.kind))s.pierce=Math.min(1,s.pierce||0);
   }
 
   /** Sube de nivel una instancia ya creada. */
@@ -501,7 +413,17 @@
 
   /** Texto de la próxima mejora, para la carta de subida de nivel. */
   function nextUpText(s) {
-    return s.lvl >= s.def.maxLvl ? null : s.def.ups[s.lvl - 1].t;
+    if(s.lvl>=s.def.maxLvl)return null;
+    const next={...s};applyMods(next,s.def.ups[s.lvl-1].m);return changeText(s,next);
+  }
+  const growthFactor=m=>G.BattleBalance.moveGrowthFactor(m);
+  const round=n=>Math.round(n*100)/100;
+  function changeText(a,b){
+    const labels={dmg:'Daño por impacto',cd:'Recarga',count:({chain:'Objetivos de cadena',orbit:'Orbes',meteor:'Meteoros',mine:'Minas',turret:'Torretas simultáneas'})[a.kind]||'Cantidad',pierce:'Perforaciones',radius:'Radio / alcance',range:'Alcance de torreta',width:'Grosor',size:'Tamaño',speed:'Velocidad del ataque',life:'Vida del proyectil',dur:'Duración',rate:'Intervalo de torreta',amount:'Potencia de apoyo',stacks:'Acumulaciones',arc:'Arco',slow:'Ralentización',knock:'Retroceso'};
+    const parts=[];for(const [k,label]of Object.entries(labels)){
+      let x=a[k]||0,y=b[k]||0;if(k==='dmg'){x*=growthFactor(a);y*=growthFactor(b);}if(k==='arc'){x=Math.min(Math.PI*2,x)*180/Math.PI;y=Math.min(Math.PI*2,y)*180/Math.PI;}
+      if(Math.abs(x-y)<1e-8)continue;parts.push(G.T(label)+': '+round(x)+' → '+round(y)+(k==='cd'?'s · '+G.T('Frecuencia máxima')+': '+round(1/x)+' → '+round(1/y)+'/s':''));
+    }return parts.join(' · ');
   }
 
   /** Movimiento inicial según el tipo principal (si el Pokémon no trae uno). */
@@ -562,34 +484,20 @@
     'bubble-beam': ['Acua Cola', 'atk'],     'hex': ['Poltergeist', 'mag']
   };
   // Lo que gana al evolucionar, según cómo funcione.
-  const EVO_MODS = {
-    projectile: { t: '×1,8 daño, +2 proyectiles, +2 perforación y más grandes', m: { dmg: 1.8, count: 2, pierce: 2, size: 1.3, spread: 1.1 } },
-    melee:      { t: '×1,9 daño, más alcance y golpea en 360°', m: { dmg: 1.9, radius: 1.3, arc: 9 } },
-    beam:       { t: '×1,8 daño, rayo un 50% más grueso y más largo', m: { dmg: 1.8, width: 1.5, radius: 1.2, cd: 0.85 } },
-    orbit:      { t: '+2 orbes, ×1,7 daño y más radio', m: { count: 2, dmg: 1.7, radius: 1.15 } },
-    nova:       { t: '+6 proyectiles, ×1,6 daño y +1 perforación', m: { count: 6, dmg: 1.6, pierce: 1 } },
-    aura:       { t: '×1,8 daño y un 35% más de radio', m: { dmg: 1.8, radius: 1.35 } },
-    boomerang:  { t: '×1,8 daño, +1 bumerán y más alcance', m: { dmg: 1.8, count: 1, radius: 1.2, size: 1.2 } },
-    chain:      { t: '×1,7 daño y +3 saltos', m: { dmg: 1.7, count: 3, radius: 1.2 } },
-    mine:       { t: '×1,8 daño, +2 minas y explosión más grande', m: { dmg: 1.8, count: 2, radius: 1.25 } },
-    meteor:     { t: '×1,7 daño, +2 meteoros y más radio', m: { dmg: 1.7, count: 2, radius: 1.2 } },
-    turret:     { t: '×1,8 daño, +1 a la vez y dispara más rápido', m: { dmg: 1.8, count: 1, rate: 0.8 } },
-    dash:       { t: '×1,9 daño, más distancia y menos recarga', m: { dmg: 1.9, radius: 1.25, cd: 0.8 } },
-    trail:      { t: '×1,8 daño, charcos más grandes y duraderos', m: { dmg: 1.8, radius: 1.25, dur: 1.3 } },
-    cone:       { t: '×1,7 daño, +4 disparos y +1 perforación', m: { dmg: 1.7, count: 4, pierce: 1 } }
-  };
-
-  Object.assign(EVO_MODS,{wave:EVO_MODS.aura,mark:EVO_MODS.aura,counter:EVO_MODS.melee,decoy:EVO_MODS.aura});
+  const EVO_MODS=Object.fromEntries(Object.entries(growth.evolution).filter(([k])=>LADDERS[k]).map(([k,m])=>[k,{m}]));
+  Object.assign(EVO_MODS,{mark:EVO_MODS.aura,counter:EVO_MODS.melee,decoy:EVO_MODS.aura});
   Object.assign(EVO_MODS,{curve:EVO_MODS.projectile,split:EVO_MODS.projectile,spiral:EVO_MODS.projectile,ricochet:EVO_MODS.projectile,rolling:EVO_MODS.projectile,lob:EVO_MODS.meteor});
   for(const m of [...(G.BattleMoves||[]),...(G.ExpansionMoves||[])]){const def=BY_ID[m.id];if(!def?.specialOnly&&EVO_MODS[def.kind])EVO[m.id]=[def.name+' +',def.damageClass==='physical'?'atk':'cd'];}
 
   /** ¿Puede evolucionar ya? → { name, needs, needName, text, ready } o null */
   const focusedEvolution=m=>m.kind==='projectile'&&(m.def.count||1)===1&&!m.def.homing;
+  const evolutionMods=m=>growth.evolution[m.id]|| (focusedEvolution(m)?growth.evolution.focused:EVO_MODS[m.kind]?.m);
   function evoInfo(m, statsTaken, level = 1) {
     const e = EVO[m.id];
     if (!e || m.evolved || m.lvl < m.def.maxLvl || !EVO_MODS[m.kind]) return null;
     const [name, needs] = e;
-    return { name, needs, needName: NEED_NAME[needs], text: focusedEvolution(m)?G.T('Focused evolution: x3.6 damage, +2 shots and +2 pierce; damage still decays through targets.'):EVO_MODS[m.kind].t,
+    const preview={...m};applyMods(preview,evolutionMods(m));
+    return { name, needs, needName: NEED_NAME[needs], text:changeText(m,preview),
              ready: !!(statsTaken && statsTaken[needs]) || level >= 12, experience: !(statsTaken && statsTaken[needs]) && level >= 12 };
   }
 
@@ -597,11 +505,7 @@
   function evolve(m) {
     const e = EVO[m.id];
     if (!e || m.evolved) return false;
-    applyMods(m, EVO_MODS[m.kind].m);
-    // Finite evolution endpoint for narrow non-homing starter shots. These lost
-    // unlimited mastery but still paid the full pierce/spread cost. Melee,
-    // homing, beams and naturally multi-shot attacks keep their own endpoints.
-    if(focusedEvolution(m))m.dmg*=2;
+    applyMods(m, evolutionMods(m));
     m.baseName = m.name;
     m.name = e[0];
     m.evolved = true;
@@ -609,11 +513,11 @@
   }
 
   function master(m){
-    if(!m.evolved||m.lvl<m.def.maxLvl||(m.mastery||0)>=3)return false;
-    m.masteryBase ||= m.dmg;m.mastery=(m.mastery||0)+1;m.dmg=m.masteryBase*(1+.03*m.mastery);return true;
+    if(!m.evolved||m.lvl<m.def.maxLvl||(m.mastery||0)>=growth.masteryMax)return false;
+    m.masteryBase ||= m.dmg;m.mastery=(m.mastery||0)+1;m.dmg=m.masteryBase*(1+growth.masteryRate*m.mastery);return true;
   }
 
-  function powerText(m){const value=Math.round((m.dmg||0)*(1+.05*Math.min(12,m.training||0))*100)/100;return G.T('Power')+' '+value+' · '+G.T('Cooldown')+' '+Math.round((m.cd||0)*100)/100+'s'+((m.count||1)>1?' · '+G.T('Projectiles')+' '+m.count:'')+' · '+G.T('Per hit, before player stats and enemy defenses');}
-  G.Moves = { powerText, master, ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,
+  function powerText(m){const value=round((m.dmg||0)*growthFactor(m));return G.T('Power')+' '+value+' · '+G.T('Cooldown')+' '+round(m.cd||0)+'s'+((m.count||1)>1?' · '+G.T(({chain:'Objetivos de cadena',orbit:'Orbes',meteor:'Meteoros',mine:'Minas',turret:'Torretas simultáneas'})[m.kind]||'Projectiles')+' '+m.count:'')+' · '+G.T('Per hit, before player stats and enemy defenses');}
+  G.Moves = { growthFactor,changeText,LADDERS,EVO_MODS,ROUTES:growth.routes,powerText, master, ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,
               EVO, NEED_NAME, evoInfo, evolve };
 })();

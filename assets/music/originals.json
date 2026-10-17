@@ -1,0 +1,61 @@
+{
+  "license": "CC0-1.0",
+  "author": "PokeSurvivor-CN contributors",
+  "source": "tools/generate-original-music.cjs; original procedural compositions, no external samples",
+  "tracks": [
+    {
+      "title": "Lantern Garden",
+      "file": "assets/music/lantern-garden.wav",
+      "group": "menu",
+      "bpm": 92,
+      "duration": 62.608695652173914,
+      "bytes": 2761088,
+      "sha256": "c250d66901ab3f82e906df0d89465a056b098372d30601b62f0d8f5692ded495"
+    },
+    {
+      "title": "Harbor Lights",
+      "file": "assets/music/harbor-lights.wav",
+      "group": "menu",
+      "bpm": 104,
+      "duration": 55.38461538461538,
+      "bytes": 2442506,
+      "sha256": "01e3c77028194a74308794a595caa2f5c71b76e6536ff321853d34d284565544"
+    },
+    {
+      "title": "Canopy Run",
+      "file": "assets/music/canopy-run.wav",
+      "group": "battle",
+      "bpm": 128,
+      "duration": 45,
+      "bytes": 1984544,
+      "sha256": "64e5786a01d8ef0758f7d03393557e56ad6e071310f0e25bce1aabf35fdfadd4"
+    },
+    {
+      "title": "Crystal Current",
+      "file": "assets/music/crystal-current.wav",
+      "group": "battle",
+      "bpm": 116,
+      "duration": 49.65517241379311,
+      "bytes": 2189838,
+      "sha256": "adc63bfb11022110f1553aa9778a7da59dd40943a883175b9b90e4f96f2dbae1"
+    },
+    {
+      "title": "Ember Trail",
+      "file": "assets/music/ember-trail.wav",
+      "group": "battle",
+      "bpm": 140,
+      "duration": 41.14285714285714,
+      "bytes": 1814444,
+      "sha256": "bfec282fbd32ad47bb82e6506e855e6de5cd30a7cf382f079bc54110920585b3"
+    },
+    {
+      "title": "Summit Trial",
+      "file": "assets/music/summit-trial.wav",
+      "group": "boss",
+      "bpm": 152,
+      "duration": 37.89473684210526,
+      "bytes": 1671202,
+      "sha256": "f3e3cb770b834a0cce614c85ee26a9832c703d269a476904760521541f02badf"
+    }
+  ]
+}

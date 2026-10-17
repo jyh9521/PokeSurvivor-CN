@@ -41,6 +41,75 @@
   function tierBlend(t,index,tiers){if(!Number.isInteger(index)||index<1||!tiers?.[index])return 1;const tr=tiers[index],x=Math.max(0,Math.min(1,(t-tr.from)/20));return tiers[index-1].hp/tr.hp+(1-tiers[index-1].hp/tr.hp)*x*x*(3-2*x);}
   // Per-target planning floors, not total multi-target DPS or simulated hit rates.
   // Preserve timing/coverage/utility and never reduce an existing move.
+  // Move modifiers: ratios for geometric/scalar fields, integer increments for
+  // count/pierce/stacks. Distances are pixels, timings seconds; no final-DPS cap.
+  const MOVE_GROWTH={trainingRate:.05,trainingMax:12,masteryRate:.03,masteryMax:3,
+    ladders:{
+      projectile:[{dmg:1.15},{pierce:1,speed:1.12},{cd:.90},{dmg:1.18,size:1.08}],
+      melee:[{dmg:1.18},{radius:1.12},{cd:.90},{dmg:1.18,arc:1.25}],
+      beam:[{dmg:1.16},{radius:1.12,width:1.12},{cd:.92},{dmg:1.18}],
+      orbit:[{dmg:1.15},{radius:1.10,speed:1.12},{dmg:1.18},{count:1}],
+      nova:[{count:2},{dmg:1.16},{cd:.92},{pierce:1}],
+      aura:[{radius:1.12},{dmg:1.18},{cd:.92},{dmg:1.16}],
+      boomerang:[{dmg:1.16},{radius:1.12},{cd:.92},{count:1}],
+      chain:[{dmg:1.18},{count:1},{cd:.92},{dmg:1.16}],
+      mine:[{dmg:1.18},{radius:1.12},{cd:.90},{count:1}],
+      meteor:[{dmg:1.16},{radius:1.12},{cd:.92},{count:1}],
+      turret:[{dmg:1.15},{rate:.90},{range:1.15},{dmg:1.18}],
+      dash:[{dmg:1.18},{radius:1.12},{cd:.92},{width:1.15,dmg:1.12}],
+      trail:[{dmg:1.18},{dur:1.18},{radius:1.12},{dmg:1.16}],
+      cone:[{count:1},{dmg:1.16},{life:1.12},{pierce:1}],
+      buff:[{amount:1.12},{dur:1.15},{cd:.92},{stacks:1}],
+      wave:[{dmg:1.16},{width:1.12},{cd:.92},{life:1.12}],
+      mark:[{dmg:1.18},{radius:1.12},{cd:.92},{dmg:1.16}],
+      curve:[{dmg:1.15},{life:1.10},{cd:.92},{count:1}],
+      split:[{dmg:1.15},{pierce:1},{cd:.92},{count:1}],
+      spiral:[{dmg:1.15},{life:1.10},{cd:.92},{count:1}],
+      ricochet:[{dmg:1.15},{pierce:1},{cd:.92},{speed:1.12}],
+      rolling:[{dmg:1.18},{size:1.12},{cd:.92},{pierce:1}],
+      lob:[{dmg:1.16},{radius:1.12},{cd:.92},{count:1}]
+    },
+    routes:{
+      'water-gun':[{dmg:1.15},{pierce:1},{cd:.90},{speed:1.15,size:1.12}],
+      'thunderbolt':[{dmg:1.20},{radius:1.10,count:1},{cd:.90},{dmg:1.20}],
+      'razor-leaf':[{dmg:1.16},{radius:1.18},{speed:1.12},{count:1}],
+      'bulldoze':[{dmg:1.18},{radius:1.15},{cd:.94},{slow:1.12}],
+      'hydro-pump':[{dmg:1.22},{width:1.18},{radius:1.12},{cd:.94}],
+      'ice-beam':[{dmg:1.16},{width:1.12},{radius:1.15},{cd:.92}],
+      'flash-cannon':[{dmg:1.20},{radius:1.15},{cd:.92},{width:1.12}],
+      'psybeam':[{width:1.18},{dmg:1.16},{cd:.92},{radius:1.15}],
+      'ember':[{dmg:1.18},{speed:1.15},{cd:.90},{pierce:1}],
+      'poison-sting':[{cd:.92},{pierce:1},{dmg:1.18},{speed:1.15}],
+      'rock-throw':[{dmg:1.22},{size:1.15},{pierce:1},{cd:.94}],
+      'shadow-ball':[{dmg:1.18},{pierce:1},{size:1.12},{cd:.92}],
+      'spirit-shackle':[{dmg:1.16},{life:1.12},{pierce:1},{cd:.92}],
+      'thunder-shock':[{cd:.92},{dmg:1.15},{speed:1.12},{pierce:1}],
+      'body-slam':[{dmg:1.22},{radius:1.10},{cd:.94},{knock:1.15}],
+      'karate-chop':[{dmg:1.20},{radius:1.10},{cd:.92},{dmg:1.15}],
+      'metal-claw':[{dmg:1.16},{radius:1.12},{cd:.90},{arc:1.25}],
+      'wing-attack':[{radius:1.12},{dmg:1.16},{cd:.90},{arc:1.20}],
+      'lick':[{radius:1.12},{dmg:1.15},{cd:.92},{arc:1.25}],
+      'bite':[{dmg:1.20},{radius:1.10},{cd:.92},{arc:1.20}],
+      'bug-bite':[{cd:.92},{radius:1.12},{dmg:1.18},{arc:1.20}],
+      'aqua-jet':[{dmg:1.18},{speed:1.15},{cd:.92},{width:1.18}]
+    },
+    // Evolution keeps the established damage identity; parallel free bonuses
+    // are trimmed. Focused shots retain one aimed stream, not five simultaneous
+    // shots; 15% longer recharge pays for the established x3.6 packet identity.
+    evolution:{
+      projectile:{dmg:1.8,count:1,pierce:1,size:1.10},melee:{dmg:1.9,radius:1.15,arc:9},
+      beam:{dmg:1.8,width:1.25,radius:1.10},orbit:{dmg:1.7,count:1},nova:{dmg:1.6,count:3},
+      aura:{dmg:1.8,radius:1.18},boomerang:{dmg:1.8,radius:1.18},chain:{dmg:1.7,count:2},
+      mine:{dmg:1.8,count:1},meteor:{dmg:1.7,count:1},turret:{dmg:1.8,rate:.9},
+      dash:{dmg:1.9,width:1.18},trail:{dmg:1.8,radius:1.15},cone:{dmg:1.7,count:2},
+      wave:{dmg:1.6,width:1.25,life:1.08},
+      focused:{dmg:3.6,pierce:1,size:1.1,cd:1.15},
+      'water-gun':{dmg:3.6,pierce:2,size:1.3,cd:1.15},
+      'thunderbolt':{dmg:1.7,count:2,radius:1.15,slow:.22},
+      'razor-leaf':{dmg:1.8,count:1,radius:1.12,cd:1.12}
+    }
+  };
+  const moveGrowthFactor=m=>{const b=m.specialOnly?0:MOVE_GROWTH.masteryRate*Math.max(0,Math.min(MOVE_GROWTH.masteryMax,m.mastery||0));return(1+MOVE_GROWTH.trainingRate*Math.max(0,Math.min(MOVE_GROWTH.trainingMax,m.training||0))+b)/(1+b);};
   const FLOORS={melee:66,dash:36,beam:30,wave:26,mark:24,rolling:30,projectile:30,curve:30,split:30,spiral:30,ricochet:30,lob:28,nova:14,chain:24,aura:23,boomerang:38,cone:32,mine:30,meteor:32};
   function budget(m){let hits=1;if(['projectile','curve','split','spiral','ricochet','lob','mine','meteor'].includes(m.kind))hits=Math.min(2,m.count||1);if(m.kind==='cone')hits=Math.min(3,m.count||1);if(m.kind==='boomerang')hits=2*Math.min(2,m.count||1);return m.dmg*hits/m.cd;}
   function tune(m){if(!m.dmg||m.specialOnly||m.kind==='buff')return;
@@ -56,5 +125,5 @@
     m.dmg=+m.dmg.toFixed(3);
   }
   const bodyContact=e=>!e.judge&&(e.remote?!(e.net?.st&16):e.phase!=='dash'&&!e.jump&&!e.ai?.cast);
-  return{MAX_WAVE,COOP,coopRate,coopBossHp,coopNormalHp,COMPOSITION,census,compositionAllows,cooldown,movement,permanentBonus,temporaryAttack,LAYERS,attackEff,TYPE,WEATHER,ALTAR,XP,xpFor,PRESSURE,pressureRate,pressureDamage,CONTACT_FACTOR,CONTACT_CAP,RANGED_CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,recoveryWindow,waveRate,tierBlend,FLOORS,budget,tune};
+  return{MOVE_GROWTH,moveGrowthFactor,MAX_WAVE,COOP,coopRate,coopBossHp,coopNormalHp,COMPOSITION,census,compositionAllows,cooldown,movement,permanentBonus,temporaryAttack,LAYERS,attackEff,TYPE,WEATHER,ALTAR,XP,xpFor,PRESSURE,pressureRate,pressureDamage,CONTACT_FACTOR,CONTACT_CAP,RANGED_CONTACT_CAP,CONTACT_GRACE,bodyContact,STAB,DENSITY_HP,CONTACT_DAMAGE,level,offense,enemyScale,curve,normalHp,bossHp,ELITE_HP,xpReward,pressureWindow,recoveryWindow,waveRate,tierBlend,FLOORS,budget,tune};
 });

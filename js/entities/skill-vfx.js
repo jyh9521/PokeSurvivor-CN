@@ -55,12 +55,19 @@ G.SkillVFX=(()=>{
     'jet-wake'(c,r,q){polygon(c,[[0,-18],[r,0],[0,18],[r*.25,0]]);for(let j=0;j<3;j++){c.moveTo(-j*12,0);c.arc(-j*12,0,5+j*2,-1.3,1.3);}},
     'spectral-hand'(c,r,q){c.moveTo(0,12);c.lineTo(r*.5,12);for(let j=0;j<4;j++){c.lineTo(r*.5+j*8,-20+(j%2)*5);c.lineTo(r*.5+j*8+4,3);}c.lineTo(r+10,15);c.lineTo(r*.6,30);c.lineTo(0,20);}
   };
-  function push(e){const quality=G.Settings.get('quality'),cap=quality==='potato'?10:[16,50,100][G.Settings.fx||0];if(effects.length>=cap)effects.shift();effects.push(e);}
+  function push(e){const quality=G.Settings.get('quality'),cap=quality==='potato'?10:[16,50,100][G.Settings.fx||0];if(effects.length>=cap){const i=effects.findIndex(x=>x.kind!=='z-burst');if(i>=0)effects.splice(i,1);else if(e.kind!=='z-burst')return;else effects.shift();}effects.push(e);}
   function cast(p,m,ghost=false){push({x:m.kind==='mark'&&p.target?p.target.x:p.x,y:(m.kind==='mark'&&p.target?p.target.y:p.y)-G.LIFT*.5,aim:p.aim,type:m.type,kind:style(m),id:m.id,seed:hash(m.id),r:Math.min(130,m.radius||60),t:0,life:m.kind==='mark'?(m.delay||.6):.45,ghost});}
+  function z(p,m,ghost=false){push({x:p.x,y:p.y-G.LIFT,aim:0,type:m.type,kind:'z-burst',id:m.id,seed:0,r:175,t:0,life:1.1,ghost});if(!ghost){G.Camera.kick?.(.18);G.Audio.sfx('legend');}}
   function form(p,kind){push({x:p.x,y:p.y-G.LIFT,aim:0,type:kind==='mega'?'psychic':kind==='max'?'dark':'electric',kind:'form',id:kind,seed:17,r:95,t:0,life:1,ghost:p.remote});}
   function update(dt){for(const e of effects)e.t+=dt;effects=effects.filter(e=>e.t<e.life);}
   function draw(ctx){const low=G.Settings.fx===0;
     for(const e of effects){if(!G.Camera.sees(e.x,e.y,e.r+40))continue;const q=e.t/e.life,k=e.kind,n=low?4:6+e.seed%5,r=e.r*(.25+q*.75);ctx.save();ctx.translate(e.x,e.y);ctx.rotate(e.aim);ctx.globalAlpha=(1-q)*(G.Settings.get(e.ghost?'allyShotOpacity':'ownShotOpacity')??.55);ctx.strokeStyle=G.U.TYPE_COLOR[e.type]||'#fff';ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=2;ctx.beginPath();
+      if(k==='z-burst'){
+        ctx.globalAlpha=(1-q)*(e.ghost?.6:.95);ctx.strokeStyle='#fff0a8';ctx.lineWidth=low?3:4;
+        for(const scale of [1,.65]){ctx.moveTo(r*scale,0);ctx.ellipse(0,0,r*scale,r*scale*.65,0,0,Math.PI*2);}ctx.stroke();ctx.beginPath();ctx.strokeStyle=G.U.TYPE_COLOR[e.type]||'#fff';
+        for(let j=0;j<(low?6:12);j++){const a=j*Math.PI*2/(low?6:12)+q*.8;ctx.moveTo(Math.cos(a)*r*.45,Math.sin(a)*r*.45);ctx.lineTo(Math.cos(a)*r*1.15,Math.sin(a)*r*1.15);}ctx.stroke();
+        ctx.font='bold '+Math.round(40+q*25)+'px sans-serif';ctx.textAlign='center';ctx.fillStyle='#fff0a8';ctx.fillText('Z',0,18);ctx.restore();continue;
+      }
       if(glyphs[k]){glyphs[k](ctx,r,q);ctx.stroke();ctx.restore();continue;}
       for(let i=0;i<n;i++){const a=i/n*Math.PI*2+q*(1+e.seed%3),x=Math.cos(a)*r,y=Math.sin(a)*r*.55;
         if(k==='pressure-jet'){const xx=r*i/n;ctx.moveTo(xx,-8-q*6);ctx.lineTo(xx+12,8+q*6);ctx.moveTo(xx+8,-8-q*6);ctx.lineTo(xx+20,8+q*6);}
@@ -96,5 +103,5 @@ G.SkillVFX=(()=>{
     if(b.form){ctx.strokeStyle=b.form==='max'?'#ff647c':'#df99ff';const radius=p.r*(b.form==='max'?2.6:2);ctx.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4+performance.now()/900;ctx.moveTo(p.x+Math.cos(a)*radius,p.y+Math.sin(a)*radius*.5);ctx.lineTo(p.x+Math.cos(a)*(radius+7),p.y+Math.sin(a)*(radius+7)*.5);}ctx.stroke();ctx.font='bold 10px sans-serif';ctx.fillStyle=ctx.strokeStyle;ctx.textAlign='center';ctx.fillText(b.form==='max'?G.T('Dynamax'):'Mega',p.x,p.y-p.bodyH-15);}
     ctx.restore();
   }
-  return {cast,form,style,update,draw,drawPlayer,clear(){effects=[];},get count(){return effects.length;}};
+  return {z,cast,form,style,update,draw,drawPlayer,clear(){effects=[];},get count(){return effects.length;}};
 })();

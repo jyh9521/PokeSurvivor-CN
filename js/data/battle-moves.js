@@ -15,7 +15,7 @@ G.BattleMoves=[
  {id:'dragon-pulse',type:'dragon',kind:'wave',cd:1.8,dmg:30,radius:240,width:70,speed:220,life:1.2},
  {id:'bullet-seed',type:'grass',kind:'projectile',cd:.7,dmg:7,count:4,spread:.08,pierce:1,speed:400,life:1,size:4},
  {id:'shadow-sneak',type:'ghost',kind:'dash',cd:1.15,dmg:27,radius:105,width:34},
- {id:'aqua-jet',type:'water',kind:'dash',cd:1,dmg:24,radius:115,width:38}
+ {id:'aqua-jet',type:'water',kind:'wave',cd:1,dmg:36,radius:115,width:38,speed:420,life:.55,desc:'Un chorro corto de agua perforante; no desplaza al usuario ni otorga invulnerabilidad.'}
 ];
 G.PASSIVE_MAX_LEVEL=6;
 G.PassiveDefs=[

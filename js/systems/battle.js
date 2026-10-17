@@ -34,7 +34,9 @@ G.Battle=(()=>{
     k*=1+passive(p,cls);
     const actor=p.remote?G.Game?.player||p:p;
     k*=G.BattleBalance.offense(actor);
-    k*=1+.05*Math.min(12,Math.max(0,m.training||0));
+    // m.dmg already contains (1 + mastery); compensate that representation
+    // before combining training + mastery, including delayed payloads.
+    k*=G.BattleBalance.moveGrowthFactor(m);
     const own=types(p).includes(m.type);if(own)k*=G.BattleBalance.STAB;
     if(trait(p).key==='adapt'&&own)k*=1.12;
     if(trait(p).key==='vigor'&&own&&p.hp/p.maxHp<.35)k*=1.2;

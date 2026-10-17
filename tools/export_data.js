@@ -32,6 +32,9 @@ for (const f of ['js/data/lang-en.js', 'js/data/lang-zh-cn.js', 'js/data/lang-zh
 const moves = Object.values(G.Moves.BY_ID).filter(m=>m.kind!=='buff'&&!m.specialOnly).map(m => {
   const inst = G.Moves.instance(m.id, m.maxLvl || 5);
   const evo = G.Moves.evoInfo(inst, {});
+  // Numeric upgrade descriptions are composed by the runtime, not static
+  // percentage literals. Export the same property labels through each locale.
+  if(evo){const translate=G.T;try{for(const dict of [EN,ZH]){G.T=s=>{if(!Object.hasOwn(dict,s))throw Error('Missing move property translation: '+s);return dict[s];};dict[evo.text]=G.Moves.evoInfo(inst,{}).text;}}finally{G.T=translate;}}
   return { id: m.id, name: m.name, type: m.type, kind: m.kind, desc: m.desc, maxLvl: m.maxLvl, evo: evo ? { name: evo.name, needs: evo.needName, text: evo.text } : null };
 });
 const out = {

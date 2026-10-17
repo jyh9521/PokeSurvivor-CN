@@ -304,8 +304,9 @@ G.Audio = (() => {
   function nextTrack(group){let bag=bags.get(group);if(!bag?.length){bag=(G.BGM_TRACKS?.[group]||[]).slice();for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}if(bag.length>1&&bag[bag.length-1].file===lastTracks.get(group))[bag[0],bag[bag.length-1]]=[bag[bag.length-1],bag[0]];bags.set(group,bag);}const track=bag.pop();if(track)lastTracks.set(group,track.file);return track;}
   async function startRandom(name){if(loading===name)return;const group=name==='village'?'menu':/boss|rift|judge|arceus/i.test(name)?'boss':'battle',track=nextTrack(group);if(!track){startSong(name,true);return;}
     const token=generation;loading=name;const controller=loadingController=new AbortController();try{let buffer=buffers.get(track.file);if(!buffer){const response=await fetch(track.file,{signal:controller.signal});if(!response.ok)throw Error('audio-http');buffer=await ctx.decodeAudioData(await response.arrayBuffer());if(token!==generation)return;buffers.set(track.file,buffer);while(buffers.size>2)buffers.delete(buffers.keys().next().value);}
-      if(token!==generation||wanted!==name||!G.Settings.get('randomBgm'))return;loading=null;loadingController=null;musicError='';const bus=ctx.createGain();bus.gain.setValueAtTime(.0001,ctx.currentTime);bus.gain.linearRampToValueAtTime(.65,ctx.currentTime+.35);bus.connect(musicBus);const source=ctx.createBufferSource();source.buffer=buffer;source.connect(bus);const entry=current={name,file:track.file,source,bus};source.onended=()=>{if(current!==entry)return;current=null;bus.disconnect();startSong(wanted);};source.start();
+      if(token!==generation||wanted!==name||!G.Settings.get('randomBgm'))return;loading=null;loadingController=null;musicError='';const bus=ctx.createGain();bus.gain.setValueAtTime(.0001,ctx.currentTime);bus.gain.linearRampToValueAtTime(.65,ctx.currentTime+.35);bus.connect(musicBus);const source=ctx.createBufferSource();source.buffer=buffer;source.connect(bus);const entry=current={name,file:track.file,title:track.title,source,bus,endAt:ctx.currentTime+buffer.duration};source.onended=()=>finishRandom(entry);source.start();
     }catch(e){if(token!==generation)return;loading=null;loadingController=null;musicError=e.name==='AbortError'?'aborted':'load-failed';startSong(name,true);}}
+  function finishRandom(entry){if(current!==entry)return;entry.source.onended=null;try{entry.source.stop();}catch{}entry.bus.disconnect();current=null;startSong(wanted);}
   function startSong(name,original=false) {
     if(!ctx||!name)return;if(!original&&G.Settings?.get('randomBgm')&&G.BGM_TRACKS){startRandom(name);return;}
     if (!ctx || !G.MUSIC[name]) return;
@@ -340,8 +341,11 @@ G.Audio = (() => {
   // Planificador: programa con 150 ms de antelación.
   setInterval(() => {
     if (!ctx || !current || ctx.state !== 'running') return;
-    const c = current;if(!c.song)return;const sd = 60 / c.song.bpm / 4;
+    const c = current;if(c.source){if(ctx.currentTime>=c.endAt+.5)finishRandom(c);return;}if(!c.song)return;const sd = 60 / c.song.bpm / 4;
     while (c.next < ctx.currentTime + 0.15) {
+      // A failed decode used to fall back to an endlessly repeating synth song.
+      // Retry the next shuffled asset after this full phrase, never every frame.
+      if(c.step>=c.song.steps&&G.Settings?.get('randomBgm')){stopCurrent();startSong(wanted);return;}
       const i = c.step % c.song.steps;
       // Swing: retrasa las corcheas a contratiempo.
       const t = c.next + (i % 4 === 2 ? c.song.swing * sd : 0);
@@ -515,7 +519,7 @@ G.Audio = (() => {
     canPlay() { return !!ctx && ctx.state === 'running'; },
     get settings() { return settings; },
     get running() { return !!ctx && ctx.state === 'running'; },
-    get musicStatus(){return {scene:wanted,file:current?.file||null,loading:loading!==null,cached:buffers.size,random:!!G.Settings?.get('randomBgm'),error:musicError};},
+    get musicStatus(){return {scene:wanted,file:current?.file||null,title:current?.title||null,loading:loading!==null,cached:buffers.size,random:!!G.Settings?.get('randomBgm'),error:musicError};},
     get track() { return current && current.name; }
   };
 })();

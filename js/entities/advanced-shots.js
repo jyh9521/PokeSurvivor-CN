@@ -3,8 +3,8 @@ G.AdvancedShots=(()=>{
  const kinds=new Set(['curve','split','spiral','ricochet','rolling']);
  function fire(p,m,ghost){const n=Math.min(8,Math.max(1,m.count||1));for(let i=0;i<n;i++){
   if(G.Projectiles.all().filter(q=>q.owner===p&&!q.orb).length>=80||G.Projectiles.count>=480)break;
-  const a=p.aim+(i-(n-1)/2)*.16,sp=m.speed||220;
-  G.Projectiles.spawn({x:p.x,y:p.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,dmg:m.dmg*p.atk,r:m.size||6,life:m.life||1.6,pierce:m.pierce||3,color:G.U.TYPE_COLOR[m.type],vis:G.VFX.forMove(m),hits:new Set(),owner:p,ghost,mtype:m.type,moveId:m.id,damageClass:m.damageClass,ignoreArmor:m.ignoreArmor,skinBoost:m.skinBoost,burn:m.burn||0,slow:m.slow||0,knock:m.knock||0,trajectory:m.kind,turn:i%2?-1:1,bounces:0,child:false});
+  const a=p.aim+(i===0?0:Math.ceil(i/2)*(i%2?1:-1)*.16),sp=m.speed||220;
+  G.Projectiles.spawn({x:p.x,y:p.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,moveData:{nativeDmg:m.def?.nativeDmg||m.nativeDmg||m.def?.dmg||m.dmg,id:m.id,instanceId:m.instanceId,type:m.type,kind:m.kind,damageClass:m.damageClass,training:m.training||0,mastery:m.mastery||0,ignoreArmor:m.ignoreArmor,skinBoost:m.skinBoost,dmg:m.dmg},dmg:m.dmg*p.atk,r:m.size||6,life:m.life||1.6,pierce:m.pierce||3,color:G.U.TYPE_COLOR[m.type],vis:G.VFX.forMove(m),hits:new Set(),owner:p,ghost,mtype:m.type,moveId:m.id,damageClass:m.damageClass,ignoreArmor:m.ignoreArmor,skinBoost:m.skinBoost,burn:m.burn||0,slow:m.slow||0,knock:m.knock||0,trajectory:m.kind,turn:i%2?-1:1,bounces:0,child:false});
  }}
  function step(p,dt,enemies){if(!kinds.has(p.trajectory))return;
   if(p.trajectory==='curve'||p.trajectory==='spiral'){

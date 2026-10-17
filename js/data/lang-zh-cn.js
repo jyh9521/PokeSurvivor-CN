@@ -1382,3 +1382,42 @@ G.I18n.add({'Independent TURN connections':'独立 TURN 中继连接','Retry con
 G.I18n.add({'Conexión de respaldo y reintento':'备用连接与连接重试','La conexión directa pasa a TURN independiente si falla. La sala muestra el progreso, un límite de espera y botones de reintento, sin retransmitir combate por NAS.':'直连失败后尝试独立 TURN 备用连接。大厅显示连接进度、等待时限和重试按钮；战斗不经 NAS 中继。','Se conserva el anfitrión de la partida y su transferencia; las conexiones de respaldo se identifican como TURN.':'保留房主权威与战斗主机交接，备用链路明确标注为 TURN。'},'zh-CN');
 
 G.I18n.add({'Retry all connections':'重试全部连接'},'zh-CN');
+
+G.I18n.add({
+  "Daño por impacto": "每次命中伤害",
+  "Recarga": "冷却时间",
+  "Frecuencia máxima": "理论最高施放频率",
+  "Cantidad": "数量",
+  "Perforaciones": "穿透次数",
+  "Radio / alcance": "半径／攻击距离",
+  "Grosor": "宽度",
+  "Tamaño": "尺寸",
+  "Velocidad del ataque": "攻击飞行速度",
+  "Vida del proyectil": "弹幕存续时间",
+  "Duración": "持续时间",
+  "Intervalo de torreta": "炮台射击间隔",
+  "Potencia de apoyo": "辅助效果强度",
+  "Acumulaciones": "层数",
+  "Arco": "攻击角度（度）",
+  "Ralentización": "减速强度",
+  "Retroceso": "击退强度",
+  "Special ready! Choose one this cycle · V / L3": "特殊招式已就绪！本轮任选其一 · V / L3",
+  "A short piercing water jet. The caster does not dash or gain invulnerability.": "喷射短距离穿透水流；角色不突进，也不获得无敌。"
+}, "zh-CN");
+
+G.I18n.add({"Training adds 5 percentage points to evolved damage; training and mastery add, not multiply.":"训练为进化后伤害增加5个百分点；与精通加法合并，不再相乘。"}, "zh-CN");
+
+G.I18n.add({
+  "Rutas de movimientos y avisos especiales": "招式成长路线与特殊招式提醒",
+  "Las mejoras separan daño, frecuencia y cobertura; rutas propias conservan agua perforante, rayos encadenados y hojas de retorno.": "普通升级分别改善伤害、频率和覆盖；专属路线保留穿透水流、连锁电击和回旋叶刃的特色。",
+  "Entrenamiento y maestría suman sus bonos: el máximo conjunto es +69%, sin quitar puntos ni cambiar cómo se consiguen.": "训练与精通加法合并，合计最多+69%；保留点数、训练次数与原有获取方式。",
+  "Las cartas muestran propiedades antes y después, sin prometer un DPS fijo para efectos de área.": "升级卡显示关键属性前后变化，不再给范围效果标注未经验证的固定DPS增幅。",
+  "Un aviso central con sonido indica la carga especial disponible; los movimientos Z tienen una firma visual propia incluso en calidad baja.": "特殊招式就绪时增加中央提示和音效；Z招式新增专属演出，低画质仍可辨识。",
+  "Seis composiciones originales amplían la música local de nueve a quince pistas.": "新增六首原创配乐，本地曲库从九首扩充至十五首。",
+  "Acua Jet dispara agua sin mover al usuario; las ráfagas conservan un disparo central y todos los proyectiles reciben su entrenamiento.": "水流喷射改为发射水流而非角色突进；齐射保留中心弹，补齐高级弹幕的训练结算。",
+  "La música aleatoria continúa tras un fallo temporal de carga o una notificación de final perdida.": "修复随机音乐临时加载失败或结束通知丢失后不再续播。"
+}, "zh-CN");
+
+G.I18n.add({"Objetivos de cadena":"连锁目标上限","Orbes":"环绕球数量","Meteoros":"陨石数量","Minas":"地雷数量","Torretas simultáneas":"同时存在的炮台","Alcance de torreta":"炮台索敌距离"}, "zh-CN");
+
+G.I18n.add({"¡Especial listo! Elige uno por ciclo · V / L3":"特殊招式已就绪！本轮任选其一 · V / L3","El entrenamiento añade 5 puntos porcentuales al daño evolucionado; entrenamiento y maestría se suman.":"训练为进化后伤害增加5个百分点；与精通加法合并，不再相乘。","Un chorro corto de agua perforante; no desplaza al usuario ni otorga invulnerabilidad.":"喷射短距离穿透水流；角色不突进，也不获得无敌。"}, "zh-CN");

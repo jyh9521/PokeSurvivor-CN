@@ -79,7 +79,7 @@ G.Coop = (() => {
       const chunks=Math.ceil(text.length/8000);for(let i=0;i<chunks;i++)await control(uid,{k:'handoff-chunk',nonce,index:i,total:chunks,text:text.slice(i*8000,(i+1)*8000)});
       await until(()=>handoff?.ready===true);
       // After the receipt, only the NAS-authenticated epoch may switch authority.
-      const result=await G.NAS.api('room/transfer',{uid,nonce,protocol:16});return result;
+      const result=await G.NAS.api('room/transfer',{uid,nonce,protocol:17});return result;
     }catch(e){
       // A timed-out HTTP reply may already have committed; refresh before aborting.
       await G.Social.refreshPresence();if(G.Social.room?.host===uid)return {ok:true};
@@ -359,6 +359,7 @@ G.Coop = (() => {
           const move=G.Moves.instance(def.id,Math.max(1,Math.min(def.maxLvl,ev[8]|0)));
           if (ev[9]) G.Moves.evolve(move);
           move.training=Number.isSafeInteger(ev[11])?Math.max(0,Math.min(12,ev[11])):0;
+          move.mastery=Number.isSafeInteger(ev[12])?Math.max(0,Math.min(3,ev[12])):0;
           // No local damage prediction for melee: send confirmed hit feedback to the attacker too.
           G.Battle?.ingest(m.pl,m.pl.net?.battle);if(m.pl.net){m.pl.hp=m.pl.net.hp;m.pl.maxHp=m.pl.net.maxHp;}
           hitFrom=null;
@@ -529,7 +530,7 @@ G.Coop = (() => {
 
   function meleeHit(e,d,color,dx,dy,m,eff=null) {
     if (!active || host || !Number.isFinite(d) || d<=0) return;
-    outEv.push(['mh',++meleeSeq,e.id,d,color,r1(dx),r1(dy),m.id,m.lvl,m.evolved?1:0,eff,Math.max(0,Math.min(12,m.training||0))]);
+    outEv.push(['mh',++meleeSeq,e.id,d,color,r1(dx),r1(dy),m.id,m.lvl,m.evolved?1:0,eff,Math.max(0,Math.min(12,m.training||0)),Math.max(0,Math.min(3,m.mastery||0))]);
   }
 
   function battleHit(e,d,col,dx,dy,knock,m,eff){if(!active||host)return;outEv.push(['bh',++battleSeq,e.id,d,col,r1(dx),r1(dy),knock||0,m.id,eff]);}
