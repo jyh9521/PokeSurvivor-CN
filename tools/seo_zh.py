@@ -87,7 +87,7 @@ def generate(e):
     write(pid,'PokéSurvivor 属性相克表与天气效果','查看本作 18 种属性的相克倍率及天气效果：×1.6、×0.6、×0.3，双属性上限 ×2.4。',body)
 
     pid = 'moves'
-    kinds = {'projectile':'投射物','melee':'近战','beam':'光束','orbit':'环绕','nova':'爆发','aura':'光环','buff':'能力强化','boomerang':'回旋','chain':'连锁','mine':'地雷','meteor':'陨石','turret':'炮台','dash':'冲刺','trail':'轨迹','cone':'扇形','wave':'推进波','mark':'延迟印记','counter':'自动反击','decoy':'替身诱饵','curve':'曲线追踪','split':'分裂弹','spiral':'螺旋弹','ricochet':'跳弹','rolling':'滚动弹','lob':'抛物投掷'}
+    kinds = {'copy':'观察复制','projectile':'投射物','melee':'近战','beam':'光束','orbit':'环绕','nova':'爆发','aura':'光环','buff':'能力强化','boomerang':'回旋','chain':'连锁','mine':'地雷','meteor':'陨石','turret':'炮台','dash':'冲刺','trail':'轨迹','cone':'扇形','wave':'推进波','mark':'延迟印记','counter':'自动反击','decoy':'替身诱饵','curve':'曲线追踪','split':'分裂弹','spiral':'螺旋弹','ricochet':'跳弹','rolling':'滚动弹','lob':'抛物投掷'}
     rows = []
     for t in types:
         for m in [m for m in D['moves'] if m['type'] == t]:

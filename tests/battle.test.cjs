@@ -1,8 +1,8 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),crypto=require('node:crypto'),scene=require('./battle-fixture.cjs');
 
-test('all 975 species have six real stats, native abilities, learned moves and a 12-18 attack pool',()=>{
+test('all 975 species have six real stats, native abilities, learned moves and a nonempty source-backed attack pool',()=>{
  const {G}=scene();assert.equal(G.DEX.length,975);assert.equal(new Set(G.Moves.ALL.map(m=>m.id)).size,G.Moves.ALL.length);
- for(const mon of G.DEX){const d=G.BattleDex.species[mon.dex];assert.equal(d.stats.length,6);assert.ok(d.stats.every(v=>Number.isInteger(v)&&v>0));assert.ok(d.ability.id&&d.ability.zh);const pool=G.Moves.poolFor(mon);assert.ok(pool.length>=12&&pool.length<=18,mon.dex);assert.ok(pool.every(id=>G.Moves.BY_ID[id].kind!=='buff'&&!G.Moves.BY_ID[id].specialOnly));}
+ for(const mon of G.DEX){const d=G.BattleDex.species[mon.dex];assert.equal(d.stats.length,6);assert.ok(d.stats.every(v=>Number.isInteger(v)&&v>0));assert.ok(d.ability.id&&d.ability.zh);const pool=G.Moves.poolFor(mon);assert.ok(pool.length>0,mon.dex);assert.equal(new Set(pool).size,pool.length);for(const id of pool)assert.ok(G.BattleRules.ADAPTATIONS[mon.dex]?.includes(id)||mon.dex===235||G.BattleRules.sources(mon,id,G.BattleDex).length,mon.dex+':'+id);assert.ok(pool.every(id=>G.Moves.BY_ID[id].kind!=='buff'&&!G.Moves.BY_ID[id].specialOnly));}
  assert.deepEqual(Array.from(G.BattleDex.species[143].stats),[160,110,65,65,110,30]);assert.deepEqual(Array.from(G.BattleDex.species[242].stats),[255,10,10,75,135,55]);assert.equal(G.BattleDex.species[208].stats[2],200);
  assert.notDeepEqual(Array.from(G.Moves.poolFor(G.DEX_BY[143])),Array.from(G.Moves.poolFor(G.DEX_BY[242])));
 });
@@ -106,8 +106,8 @@ test('per-skill layered effects are bounded and quality changes never alter comb
  for(let i=0;i<1000;i++)G.SkillVFX.cast(p,G.Moves.BY_ID.surf,true);assert.ok(G.SkillVFX.count<=100);assert.equal(e.hp,1000);G.SkillVFX.update(10);assert.equal(G.SkillVFX.count,0);
 });
 
-test('room protocol advertises version twelve and rejects previous battle clients',async()=>{
- const os=require('node:os'),path=require('node:path'),{createApp}=require('../server/app.cjs'),dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-protocol5-')),app=createApp({dataDir:dir,campaigns:[]});try{await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+app.server.address().port,u=await app.store.credentials('BattleProtocol','password123',true),cookie='ps_nas='+app.store.session(u);assert.equal((await fetch(base+'/api/config').then(r=>r.json() )).protocol,17);const r=await fetch(base+'/api/room/create',{method:'POST',headers:{origin:base,cookie,'content-type':'application/json'},body:JSON.stringify({protocol:11})});assert.equal(r.status,409);}finally{await app.close();fs.rmSync(dir,{recursive:true,force:true});}
+test('room protocol advertises the current learnset version and rejects previous battle clients',async()=>{
+ const os=require('node:os'),path=require('node:path'),{createApp}=require('../server/app.cjs'),dir=fs.mkdtempSync(path.join(os.tmpdir(),'ps-protocol5-')),app=createApp({dataDir:dir,campaigns:[]});try{await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+app.server.address().port,u=await app.store.credentials('BattleProtocol','password123',true),cookie='ps_nas='+app.store.session(u);assert.equal((await fetch(base+'/api/config').then(r=>r.json() )).protocol,18);const r=await fetch(base+'/api/room/create',{method:'POST',headers:{origin:base,cookie,'content-type':'application/json'},body:JSON.stringify({protocol:17})});assert.equal(r.status,409);}finally{await app.close();fs.rmSync(dir,{recursive:true,force:true});}
 });
 
 function network(s,uid){const {G,ctx}=s;let receive;const sent=[];G.Net={uid,on:f=>receive=f,onPeer:()=>{},interval:()=>.1,slow:()=>false,viaTurn:()=>false,send:(u,m)=>sent.push([u,m]),toHost:m=>sent.push(['host',m])};G.Flow={};G.TeamStats={create:()=>({snapshot:()=>[],hit:()=>{},ingest:()=>{}})};vm.runInContext(fs.readFileSync('js/net/coop.js','utf8'),ctx);const p=s.player();G.Coop.begin({host:'host',members:Array.from({length:8},(_,i)=>({uid:i?'u'+i:'host',name:'p'+i,dex:6}))},p,{choosing:()=>false});return {p,receive,sent};}

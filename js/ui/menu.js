@@ -198,6 +198,7 @@ G.MenuUI = (() => {
         ${p.spriteForm?`<p class="sub center sprite-form">${G.T(p.spriteForm)}</p>`:''}
         <p class="trait-description"><b>${G.T('Species trait')}: ${trait.source?.[G.I18n.lang==='zh-CN'?'zh':G.I18n.lang==='es'?'es':'en']||G.T(trait.title)}</b><br>${G.T('Survivor adaptation')}: ${G.T(trait.desc)}</p>
         <p class="sub">${G.T('Battle role')}: ${G.T(G.BattleRules.role(p,G.BattleDex))} · ${G.T('Special forms')}: ${G.SpecialRules.megas(dex,viewForm).length?'Mega / ':''}Z${G.SpecialRules.maxAllowed(dex,viewForm)?' / '+G.T('Dynamax'):''}</p>
+        <details class="species-learnset"><summary>${G.T('Repertorio de ataques')} · ${G.Moves.poolFor(p).length}</summary>${G.BattleRules.ADAPTATIONS[p.dex]?'<p class="sub">'+G.T(G.Moves.BY_ID[G.Moves.startFor(p)].desc)+'</p>':''}<p class="sub">${G.Moves.poolFor(p).map(id=>G.T(G.Moves.BY_ID[id].name,'move')).join(' · ')}</p></details>
         <p style="font-size:14px;margin:10px 0 4px">Empieza con <b class="gold">${G.T(G.Moves.BY_ID[G.Moves.startFor(p)].name, 'move')}</b><br><small>${G.T(G.Moves.BY_ID[G.Moves.startFor(p)].damageClass==='physical'?'Physical · scales with Attack':'Special · scales with Special Attack')}</small></p>
         <p class="move-icons" title="Movimientos que puede aprender">
           ${G.Moves.poolFor(p).map(id => `<span title="${G.T(G.Moves.BY_ID[id].name, 'move')}">${G.Icons.html('move:' + id, 16)}</span>`).join('')}</p>
@@ -307,12 +308,13 @@ G.MenuUI = (() => {
     const mon = G.DEX_BY[upgDex];
     const ids = G.Moves.poolFor(mon).concat([G.startMoveOf(upgDex)]).filter((v, i, a) => a.indexOf(v) === i)
       .sort((a, b) => G.Moves.BY_ID[a].name.localeCompare(G.Moves.BY_ID[b].name, 'es'));
+    const outdated=list.some(id=>id&&!ids.includes(id));
     const el = document.createElement('div');
     el.className = 'panel bind-panel';
-    el.innerHTML = `<b>Atajos de movimientos</b>
+    el.innerHTML = `<b>Atajos de movimientos</b>${outdated?'<p class="sub">'+G.T('Los atajos antiguos se conservan, pero no conceden ataques fuera del repertorio actual. Puedes cambiarlos o dejarlos libres.')+'</p>':''}
       <p class="sub" style="margin:2px 0 8px">Elige qué movimiento va siempre en cada hueco (teclas 1-4 o los iconos de abajo), para la memoria muscular. Si aún no tienes tantos movimientos, va al hueco más cercano.</p>
       <div class="bind-slots">${[0, 1, 2, 3].map(i => `<label class="bind-slot"><span>${i + 1}</span>
-        <select class="field" data-slot="${i}"><option value="">Libre</option>${ids.map(id =>
+        <select class="field" data-slot="${i}"><option value="">Libre</option>${list[i]&&!ids.includes(list[i])?'<option value="'+(/^[a-z0-9-]{1,64}$/.test(list[i])?list[i]:'')+'" selected>'+G.T('Atajo antiguo no disponible en nuevas partidas')+'</option>':''}${ids.map(id =>
           `<option value="${id}" ${list[i] === id ? 'selected' : ''}>${G.T(G.Moves.BY_ID[id].name, 'move')}</option>`).join('')}</select></label>`).join('')}</div>`;
     el.querySelectorAll('select[data-slot]').forEach(sel => {
       sel.onchange = () => {

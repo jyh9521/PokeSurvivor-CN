@@ -10,18 +10,28 @@
       "battleId": 593,
       "spriteForm": "",
       "skillPool": [
-        "water-gun",
+        "bubble",
         "bubble-beam",
-        "whirlpool",
-        "surf",
+        "hex",
         "hydro-pump",
         "shadow-ball",
-        "hex",
-        "night-shade",
+        "surf",
+        "water-gun",
+        "whirlpool",
+        "dark-pulse",
+        "dazzling-gleam",
+        "giga-impact",
+        "hail",
+        "hyper-beam",
         "ice-beam",
         "icy-wind",
-        "giga-drain",
-        "substitute"
+        "night-shade",
+        "poison-sting",
+        "psychic",
+        "sludge-bomb",
+        "substitute",
+        "toxic",
+        "will-o-wisp"
       ],
       "opening": "water-gun"
     },
@@ -32,18 +42,20 @@
       "battleId": 668,
       "spriteForm": "Female sprite",
       "skillPool": [
-        "ember",
-        "flamethrower",
-        "fire-spin",
-        "heat-wave",
-        "hyper-voice",
-        "hyper-beam",
-        "dark-pulse",
-        "will-o-wisp",
-        "aerial-ace",
-        "quick-attack",
         "body-slam",
-        "substitute"
+        "ember",
+        "fire-spin",
+        "flamethrower",
+        "giga-impact",
+        "heat-wave",
+        "hyper-beam",
+        "hyper-voice",
+        "substitute",
+        "tackle",
+        "will-o-wisp",
+        "bulldoze",
+        "dark-pulse",
+        "toxic"
       ],
       "opening": "ember"
     },
@@ -54,20 +66,13 @@
       "battleId": 865,
       "spriteForm": "",
       "skillPool": [
-        "karate-chop",
-        "aerial-ace",
-        "wing-attack",
-        "metal-claw",
-        "psycho-cut",
-        "leaf-storm",
-        "quick-attack",
-        "body-slam",
+        "brick-break",
         "counter",
-        "rock-slide",
-        "poison-sting",
-        "shadow-sneak"
+        "body-slam",
+        "quick-attack",
+        "substitute"
       ],
-      "opening": "karate-chop"
+      "opening": "brick-break"
     },
     {
       "dex": 870,
@@ -76,20 +81,17 @@
       "battleId": 870,
       "spriteForm": "Brass sprite",
       "skillPool": [
-        "karate-chop",
-        "aura-sphere",
+        "brick-break",
         "counter",
         "body-slam",
+        "giga-impact",
+        "hyper-beam",
         "rock-slide",
-        "bulldoze",
-        "metal-claw",
-        "aerial-ace",
-        "quick-attack",
-        "tackle",
-        "meteor-mash",
-        "stealth-rock"
+        "seed-bomb",
+        "substitute",
+        "tackle"
       ],
-      "opening": "karate-chop"
+      "opening": "brick-break"
     },
     {
       "dex": 948,
@@ -98,18 +100,22 @@
       "battleId": 948,
       "spriteForm": "",
       "skillPool": [
-        "mud-shot",
+        "bullet-seed",
         "earth-power",
-        "bulldoze",
         "giga-drain",
         "leech-seed",
-        "bullet-seed",
-        "razor-leaf",
-        "leaf-storm",
-        "sludge",
+        "magical-leaf",
+        "mud-shot",
+        "seed-bomb",
+        "spikes",
+        "dazzling-gleam",
+        "flash-cannon",
+        "hex",
+        "sludge-bomb",
+        "substitute",
+        "tackle",
         "toxic",
-        "toxic-spikes",
-        "hex"
+        "toxic-spikes"
       ],
       "opening": "mud-shot"
     },
@@ -120,17 +126,10 @@
       "battleId": 10263,
       "spriteForm": "Roaming form",
       "skillPool": [
-        "night-shade",
-        "shadow-ball",
         "hex",
-        "shadow-sneak",
-        "confusion",
-        "psychic",
-        "dark-pulse",
-        "psybeam",
+        "shadow-ball",
+        "night-shade",
         "substitute",
-        "hyper-beam",
-        "rock-throw",
         "tackle"
       ],
       "opening": "shadow-ball"
@@ -143,17 +142,18 @@
       "spriteForm": "Temporary sprite",
       "skillPool": [
         "bulldoze",
+        "dark-pulse",
         "earth-power",
-        "rock-throw",
+        "mud-shot",
+        "spikes",
+        "body-slam",
+        "giga-impact",
+        "hex",
+        "hyper-beam",
         "rock-slide",
         "stealth-rock",
-        "spikes",
-        "bite",
-        "dark-pulse",
-        "body-slam",
-        "counter",
-        "mud-shot",
-        "hyper-beam"
+        "stone-edge",
+        "substitute"
       ],
       "opening": "bulldoze"
     },
@@ -164,18 +164,16 @@
       "battleId": 10268,
       "spriteForm": "Low-Power Mode sprite",
       "skillPool": [
+        "discharge",
+        "dragon-pulse",
         "thunder-shock",
         "thunderbolt",
-        "discharge",
-        "dragon-rage",
-        "dragon-pulse",
+        "body-slam",
+        "dazzling-gleam",
         "flash-cannon",
+        "giga-impact",
         "hyper-beam",
-        "aura-sphere",
-        "psybeam",
-        "air-slash",
-        "quick-attack",
-        "body-slam"
+        "substitute"
       ],
       "opening": "thunder-shock"
     },
@@ -186,20 +184,15 @@
       "battleId": 1025,
       "spriteForm": "",
       "skillPool": [
-        "sludge",
-        "toxic",
-        "toxic-spikes",
-        "poison-sting",
-        "shadow-ball",
         "hex",
+        "shadow-ball",
+        "sludge-bomb",
+        "toxic",
         "night-shade",
-        "shadow-sneak",
-        "dark-pulse",
-        "giga-drain",
-        "substitute",
-        "psychic"
+        "rollout",
+        "substitute"
       ],
-      "opening": "sludge"
+      "opening": "shadow-ball"
     }
   ]
 }

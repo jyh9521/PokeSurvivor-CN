@@ -24,14 +24,19 @@
     const key=Object.keys(groups).find(k=>groups[k].includes(id))||({tank:'carapace',healer:'sustain',skirmisher:'swift',caster:'focus',bruiser:'force',controller:'guard'}[r]);
     return {key,...TRAITS[key],...(key==='disguise'&&mon.formKey==='busted'?{desc:'Disguise is broken for this run.'}:{}),source:mon.formAbilityData||data?.species?.[mon.dex]?.ability,adapted:!groups[key].includes(id)};
   }
-  function pool(mon,data,defs){const entry=data?.species?.[mon.dex];if(!entry)return null;
-    if(Array.isArray(mon.skillPool))return [...new Set(mon.skillPool)].filter(id=>defs[id]&&defs[id].kind!=='buff'&&!defs[id].specialOnly).slice(0,18);
-    const family=Object.values(data.species).filter(s=>s.family===entry.family),native=new Set(entry.learned),learned=new Set(family.flatMap(s=>s.learned));
-    const priority=id=>native.has(id)?0:learned.has(id)?1:2;
-    const ids=[...learned,...(ROLES[role(mon,data)]||[]),'tackle','quick-attack','hyper-voice'];
-    const fallback=['body-slam','hyper-voice','substitute','counter','quick-attack','hyper-beam','bullet-seed','icy-wind','stealth-rock','air-slash','whirlpool','shadow-sneak','tackle'];
-    for(const id of fallback)if(new Set(ids.filter(id=>defs[id]&&defs[id].kind!=='buff')).size<12)ids.push(id);
-    return [...new Set(ids)].filter(id=>defs[id]&&defs[id].kind!=='buff'&&!defs[id].specialOnly).sort((a,b)=>priority(a)-priority(b)||Number(!mon.types.includes(defs[a].type))-Number(!mon.types.includes(defs[b].type))||a.localeCompare(b)).slice(0,18);
+  const ADAPTATIONS={132:['transform'],201:['hidden-power'],235:['sketch'],789:['struggle'],790:['struggle'],824:['struggle']};
+  const copyable=m=>m&&m.dmg>0&&!m.specialOnly&&m.kind!=='buff'&&!['struggle','transform','sketch'].includes(m.id);
+  function sources(mon,id,data){
+    const canonical=Object.entries(data?.legacyAliases||{}).find(([,legacy])=>legacy===id)?.[0]||id;
+    const records=mon.formSprite?data?.learnsets?.forms?.[mon.formSprite]:data?.learnsets?.species?.[mon.dex];
+    return records?.[canonical]||[];
+  }
+  function pool(mon,data,defs){if(!data?.species?.[mon.dex])return [];
+    if(ADAPTATIONS[mon.dex])return mon.dex===235?[...ADAPTATIONS[235],...Object.values(defs).filter(copyable).map(m=>m.id)]:ADAPTATIONS[mon.dex].filter(id=>defs[id]);
+    // Curated lists are ordering preferences, never permission to learn.
+    const preferred=new Set(mon.skillPool||[]);
+    return Object.keys(defs).filter(id=>!defs[id].specialOnly&&!defs[id].learningOnly&&(!defs[id].restrictedTo||defs[id].restrictedTo.includes(mon.dex))&&defs[id].kind!=='buff'&&sources(mon,id,data).length)
+      .sort((a,b)=>Number(!mon.types.includes(defs[a].type))-Number(!mon.types.includes(defs[b].type))||Number(!preferred.has(a))-Number(!preferred.has(b))||a.localeCompare(b));
   }
   function armor(value){return Math.min(.65,Math.max(0,value)/(Math.max(0,value)+180));}
   function classify(move,data){const c=move.damageClass||data?.moveClasses?.[move.id];return c==='status'&&move.dmg>0?'special':c||(move.kind==='melee'||move.kind==='dash'?'physical':'special');}
@@ -44,5 +49,5 @@
     if(filters.rarity==='shiny'&&!sh||/^\d$/.test(filters.rarity)&&mon.rarity!==+filters.rarity)return false;
     return String(filters.query||'').normalize('NFKC').toLocaleLowerCase().trim().split(/\s+/).filter(Boolean).every(q=>/^#\d+$/.test(q)?Number(q.slice(1))===mon.dex:/^0\d+$/.test(q)?Number(q)===mon.dex:text.includes(q));
   }
-  return {REGIONS,ROLES,TRAITS,stats,role,trait,pool,armor,classify,searchText,matches};
+  return {REGIONS,ROLES,TRAITS,ADAPTATIONS,copyable,sources,stats,role,trait,pool,armor,classify,searchText,matches};
 });

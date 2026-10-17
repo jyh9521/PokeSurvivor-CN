@@ -11,8 +11,8 @@ test('all imported normal/shiny sheets match pinned hashes and exact eight-direc
  for(const r of manifest.files){const b=fs.readFileSync(r.file);assert.equal(hash(b),r.sha256,r.file);assert.equal(b.toString('hex',0,8),'89504e470d0a1a0a');const entry=G.SPRITE_META[r.dex],m=r.shiny&&entry.sa?.[r.action]||entry.a[r.action];assert.equal(b.readUInt32BE(16),r.w);assert.equal(b.readUInt32BE(20),r.h);assert.equal(b.readUInt32BE(16)%m.w,0);assert.equal(b.readUInt32BE(20),m.h*m.r);assert.ok(m.r>=8&&m.n>0&&m.n<=b.readUInt32BE(16)/m.w&&m.d.every(n=>n>0));}
  for(const r of config.additions)for(const name of ['Idle','Walk','Attack'])assert.ok(G.SPRITE_META[r.dex].a[name]);
 });
-test('new partners have unique curated pools, matching practical opening attacks, valid combat and defensive stats',()=>{
- const {G,player,enemy}=scene();for(const row of config.additions){const mon=G.DEX_BY[row.dex],pool=G.Moves.poolFor(mon);assert.equal(pool.length,12);assert.equal(new Set(pool).size,12);assert.ok(pool.every(id=>G.Moves.BY_ID[id].kind!=='buff'&&!G.Moves.BY_ID[id].specialOnly));
+test('new partners have unique legal pools, matching practical opening attacks, valid combat and defensive stats',()=>{
+ const {G,player,enemy}=scene();for(const row of config.additions){const mon=G.DEX_BY[row.dex],pool=G.Moves.poolFor(mon);assert.ok(pool.length>0);assert.equal(new Set(pool).size,pool.length);for(const id of pool)assert.ok(G.BattleRules.sources(mon,id,G.BattleDex).length,mon.dex+':'+id);assert.ok(pool.every(id=>G.Moves.BY_ID[id].kind!=='buff'&&!G.Moves.BY_ID[id].specialOnly));
  assert.equal(G.Moves.startFor(mon),row.opening);const m=G.Moves.instance(row.opening,1);assert.ok(mon.types.includes(m.type));assert.ok(!['buff','counter','decoy','trail','mine'].includes(m.kind));const p=player(row.dex),e=enemy();assert.ok(p.maxHp>0&&p.baseStats.length===6);assert.ok(G.Battle.damage(p,e,m,m.dmg)>0);assert.ok(Number.isFinite(G.Battle.defend(p,100,false,'physical',0)));}
  assert.equal(new Set(config.additions.map(r=>G.Moves.poolFor(G.DEX_BY[r.dex]).join(','))).size,9);
 });

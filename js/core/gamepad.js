@@ -49,14 +49,18 @@ G.Gamepad=(()=>{
     if(!next){cancelCapture();if(active&&G.Game.state==='playing'&&!scope())G.Game.togglePause();stopRumble();active=null;previous=[];armed=false;mode(false);hints(null);return;}
     if(active?.index!==next.index||active?.id!==next.id){stopRumble();lastAxes=[0,0];previous=next.buttons.map(b=>!!b.pressed);armed=false;}active=next;const states=active.buttons.map(b=>!!b.pressed),read=i=>states[i];if(!states.some(Boolean))armed=true;const edge=i=>armed&&states[i]&&!previous[i];
     const axes=Array.from(active.axes||[],v=>Number(v)||0),x=axes[0]||0,y=axes[1]||0;
-    const significant=a=>a.some((v,i)=>i%2===0&&Math.hypot(v,a[i+1]||0)>.35),changed=axes.some((v,i)=>Math.abs(v-(lastAxes[i]||0))>.15);
-    if(significant(axes)&&(changed||!significant(lastAxes))||states.some((v,i)=>v&&!previous[i]))mode(true);
-    if(changed||!significant(axes))lastAxes=axes;
+    // Normalized axes intentionally expose only the two calibrated movement
+    // axes. Device activity must also see the raw right stick, without using
+    // that stick to move the character or changing stored calibration keys.
+    const activity=Array.from(raw.axes||[],v=>Number.isFinite(v)?Math.max(-1,Math.min(1,v)):0);
+    const significant=a=>a.some((v,i)=>i%2===0&&Math.hypot(v,a[i+1]||0)>.35),changed=activity.some((v,i)=>Math.abs(v-(lastAxes[i]||0))>.15);
+    if(significant(activity)&&(changed||!significant(lastAxes))||states.some((v,i)=>v&&!previous[i]))mode(true);
+    if(changed||!significant(activity))lastAxes=activity;
 
     if(capture){captureInput(raw);previous=states;axis=[0,0];hints(scope());return;}
     const root=scope(),all=targets(root);if(root!==scopeBefore){scopeBefore=root;repeatAt=performance.now()+160;lastDir='';if(using)ensure(root,all);}
     const playing=G.Game.state==='playing'&&!root;
-    if(playing&&!using&&touchWake&&!G.Touch?.stick&&significant(axes))mode(true);
+    if(playing&&!using&&touchWake&&!G.Touch?.stick&&significant(activity))mode(true);
     if(playing&&using){const len=Math.hypot(x,y);if(len>.2){const scale=Math.min(1,(len-.2)/.8)/len;axis=[x*scale,y*scale];}if(read(14)||read(15)||read(12)||read(13))axis=G.U.norm((read(15)?1:0)-(read(14)?1:0),(read(13)?1:0)-(read(12)?1:0));if(edge(10))G.BattleUI?.activate();if(edge(11))G.BattleUI?.cycle();if(edge(4))G.Input.inject(G.Input.bindings.previous[0]);if(edge(5))G.Input.inject(G.Input.bindings.next[0]);if(edge(0))G.Judgment?.cinematic?G.Input.inject('enter'):G.Coop?.ping('gather');if(edge(2))G.Coop?.ping('help');if(edge(3))G.Coop?.ping('danger');}
     else if(root&&using){if(using)ensure(root,all);const dir=read(14)?'left':read(15)?'right':read(12)?'up':read(13)?'down':Math.abs(x)>.6&&Math.abs(x)>=Math.abs(y)?x<0?'left':'right':Math.abs(y)>.6?y<0?'up':'down':'';
       if(dir&&(dir!==lastDir||performance.now()>=repeatAt)){navigate(root,all,dir);repeatAt=performance.now()+(dir!==lastDir?350:150);}lastDir=dir;if(edge(4)||edge(5)){G.UIFocus.page(root,edge(4)?-1:1);dirty=true;}if(edge(0))confirm(root,all);for(const b of root.querySelectorAll('[data-pad-shortcut]'))if(edge(Number(b.dataset.padShortcut))&&visible(b)&&!b.disabled)b.click();}

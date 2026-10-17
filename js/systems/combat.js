@@ -21,12 +21,14 @@ G.Combat = (() => {
 
   function tick(dt, pl, now) {
     if (pl.dead) return;
+    G.Moves.observe(pl,dt);
     // Vínculos: todos los movimientos del hueco activo, cada uno con su recarga.
     const group=pl.activeGroup();for(const m of group)tickMove(dt,pl,m,now);
     for(const m of pl.moves||[])if(m.autoSupport&&!group.includes(m))tickMove(dt,pl,m,now);
   }
 
   function tickMove(dt, pl, m, now) {
+    if(m.learningOnly)return;
     if (m.kind==='counter'&&!(pl.battle?.counterT>0)){m.t=0;return;}
     if (m.kind === 'orbit') { orbit(pl, m, dt, now); return; }
 
@@ -438,10 +440,14 @@ G.Combat = (() => {
     const direction=pl.aim;
     const ca = Math.cos(direction), sa = Math.sin(direction);
     const sx = pl.x, sy = pl.y;
+    // Phase through walls AND solid props (trees/rocks). Only the landing body
+    // must fit. Search backwards from full range; never extend the cast range
+    // to escape a thick obstacle or land inside the terrain.
     let len = 0;
-    for (let d = 2; d <= m.radius; d += 2) {
-      if (!G.World.isFree(sx + ca * d, sy + sa * d, pl.r, true)) break;
-      len = d;
+    const arena=G.World.arena,ts=(G.Tiles?.T||16)*(G.Sprites.PX||2);
+    const landing=(x,y)=>G.World.isFree(x,y,pl.r,true)&&(!arena||Math.hypot(x-(arena.tx+.5)*ts,y-(arena.ty+.5)*ts)<=Math.max(0,(arena.r-1)*ts-pl.r));
+    for (let d = Math.max(0,m.radius||0); d >= 2; d -= 2) {
+      if(landing(sx+ca*d,sy+sa*d)){len=d;break;}
     }
     // Estela: varias copias del golpe a lo largo del recorrido.
     for (let d = 0; d <= len; d += 22) G.FX.sp(vis.proj || 'streak', vis.pal, sx + ca * d, sy + sa * d - G.LIFT * 0.6, { life: 0.22, angle: pl.aim });
@@ -450,6 +456,7 @@ G.Combat = (() => {
     pl.x = sx + ca * len; pl.y = sy + sa * len;
     G.World.collide(pl);
     if(!G.World.isFree(pl.x,pl.y,pl.r,true)){pl.x=sx;pl.y=sy;len=0;}
+    else if(len>0)pl.lastFree={x:pl.x,y:pl.y};
     if(len>0){pl.riftSweeps||=[];pl.riftSweeps.push({sx,sy,x:pl.x,y:pl.y});if(pl.riftSweeps.length>4)pl.riftSweeps.shift();}
     if(len>0)pl.invuln = Math.max(pl.invuln || 0, 0.3);
     const w = m.width || 34;

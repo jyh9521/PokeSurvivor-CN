@@ -123,8 +123,9 @@ G.Game = (() => {
     pl.banned = new Set((save.pban && save.pban[mon.dex] || []).slice(0, perks.bans));
     // Mejora "Repertorio": un segundo movimiento de ataque al azar.
     if (perks.startMoves >= 2) {
-      const pool = G.Moves.poolFor(pl.mon).filter(id => !pl.hasMove(id) && !pl.banned.has(id) && G.Moves.BY_ID[id].kind !== 'buff');
+      const pool = G.Moves.poolFor(pl.mon,pl).filter(id => !pl.hasMove(id) && !pl.banned.has(id) && G.Moves.BY_ID[id].kind !== 'buff'&&!G.Moves.BY_ID[id].learningOnly);
       if (pool.length) pl.addMove(G.U.pick(pool));
+      else if([132,235].includes(pl.dex))pl.pendingCopiedStart=true;
       pl.setActive(0);
     }
 

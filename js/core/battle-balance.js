@@ -106,7 +106,13 @@
       focused:{dmg:3.6,pierce:1,size:1.1,cd:1.15},
       'water-gun':{dmg:3.6,pierce:2,size:1.3,cd:1.15},
       'thunderbolt':{dmg:1.7,count:2,radius:1.15,slow:.22},
-      'razor-leaf':{dmg:1.8,count:1,radius:1.12,cd:1.12}
+      'razor-leaf':{dmg:1.8,count:1,radius:1.12,cd:1.12},
+      // Species-identity additions: no generic 360-degree emergency attack,
+      // homing piercing beyond the actual cap, or free double poison bombs.
+      'hidden-power':{dmg:1.45,count:1,speed:1.12,size:1.1},
+      'struggle':{dmg:1.5,radius:1.1,arc:1.4},
+      'brick-break':{dmg:1.65,radius:1.12,arc:1.5},
+      'sludge-bomb':{dmg:1.45,radius:1.2}
     }
   };
   const moveGrowthFactor=m=>{const b=m.specialOnly?0:MOVE_GROWTH.masteryRate*Math.max(0,Math.min(MOVE_GROWTH.masteryMax,m.mastery||0));return(1+MOVE_GROWTH.trainingRate*Math.max(0,Math.min(MOVE_GROWTH.trainingMax,m.training||0))+b)/(1+b);};

@@ -33,7 +33,7 @@
   LADDERS.counter=LADDERS.melee;LADDERS.decoy=LADDERS.mark;
 
   const RAW = [
-    // ---------------- NORMAL (pool común a todos) ----------------
+    // ---------------- NORMAL (compatibility is species-specific) ----------------
     { id: 'tackle', name: 'Placaje', type: 'normal', kind: 'melee',
       desc: 'Golpe pesado en arco amplio; protege al acertar.',
       cd: 0.50, dmg: 13, radius: 48, arc: 1.7, knock: 90 },
@@ -356,7 +356,7 @@
 
   for(const m of RAW)if(G.BattleRules)m.damageClass=G.BattleRules.classify(m,G.BattleDex);
 
-  // Pool de movimientos por tipo. El pool `normal` lo tienen todos.
+  // Type index for catalog consumers; never grants learning permission.
   const POOL = {};
   for (const m of RAW) (POOL[m.type] = POOL[m.type] || []).push(m.id);
 
@@ -368,12 +368,40 @@
     BY_ID[m.id] = m;
   }
 
-  /** Movimientos que este Pokémon puede aprender (sus tipos + normal). */
-  function poolFor(mon) {
-    const rebuilt=G.BattleRules?.pool(mon,G.BattleDex,BY_ID);if(rebuilt)return rebuilt;
-    const ids = new Set(POOL.normal);
-    for (const t of mon.types) for (const id of (POOL[t] || [])) ids.add(id);
-    return [...ids];
+  /** Permission is species/form/source based, never minimum count or role. */
+  function poolFor(mon,player) {
+    if(mon.dex===132&&player?.copiedDex)return G.BattleRules.pool(G.DEX_BY[player.copiedDex],G.BattleDex,BY_ID).filter(id=>G.BattleRules.copyable(BY_ID[id]));
+    if(mon.dex===235&&player)return (player.sketchedMoves||[]).filter(id=>G.BattleRules.copyable(BY_ID[id]));
+    return G.BattleRules?.pool(mon,G.BattleDex,BY_ID)||[];
+  }
+  function learningText(mon,id){
+    if([132,235].includes(mon.dex))return G.T('Copia observada: solo durante esta partida.');
+    if(G.BattleRules.ADAPTATIONS[mon.dex]?.includes(id))return G.T('Adaptación explícita para esta especie.');
+    const methods=[...new Set(G.BattleRules.sources(mon,id,G.BattleDex).map(s=>G.BattleDex.learnsets.methods[s[1]]))];
+    return G.T('Repertorio histórico verificable')+': '+methods.map(m=>G.T('learn:'+m)).join(', ');
+  }
+  function observe(pl,dt=0){
+    if(pl.remote||pl.dead||![132,235].includes(pl.dex))return;
+    if(pl.dex===132&&pl.copiedDex)return;
+    pl.observeT=Math.max(0,(pl.observeT||0)-dt);if(pl.observeT>0)return;pl.observeT=.5;
+    const candidates=G.EnemyMgr?.queryCircle(pl.x,pl.y,300)||[];
+    const enemies=candidates.filter(e=>!e.dead&&G.DEX_BY[e.dex]&&![132,235].includes(e.dex)).sort((a,b)=>G.U.dist2(pl.x,pl.y,a.x,a.y)-G.U.dist2(pl.x,pl.y,b.x,b.y)||a.dex-b.dex);
+    for(const enemy of enemies){
+      if(pl.dex===235&&pl.observedSpecies?.includes(enemy.dex))continue;
+      const mon=G.DEX_BY[enemy.dex],ids=G.BattleRules.pool(mon,G.BattleDex,BY_ID).filter(id=>G.BattleRules.copyable(BY_ID[id]));
+      if(!ids.length)continue;
+      if(pl.dex===132)pl.copiedDex=enemy.dex;
+      else {pl.sketchedMoves=[...new Set([...(pl.sketchedMoves||[]),...ids])];pl.observedSpecies=[...(pl.observedSpecies||[]),enemy.dex];}
+      const placeholder=pl.moves.find(m=>m.learningOnly);
+      if(placeholder){
+        const oldId=placeholder.instanceId,opening=startFor(mon),id=ids.includes(opening)?opening:ids[0],next=instance(id);
+        for(const key of Object.keys(placeholder))delete placeholder[key];
+        Object.assign(placeholder,next,{instanceId:oldId});G.Sprites.prepareAction(pl.dex,placeholder,pl.shiny);
+        G.FX.ring(pl.x,pl.y,8,90,'#c4a0ff',.6,3);G.UI?.toast?.(G.T(pl.dex===132?'Transformación: repertorio copiado.':'Esquema: nuevo repertorio observado.'));
+      }
+      if(pl.pendingCopiedStart){const extra=poolFor(pl.mon,pl).filter(id=>!pl.hasMove(id)&&!pl.banned?.has(id)&&G.BattleRules.copyable(BY_ID[id]));if(extra.length&&pl.addMove(G.U.pick(extra)))pl.pendingCopiedStart=false;}
+      if(pl.dex===132)break;
+    }
   }
 
   /**
@@ -435,13 +463,13 @@
     dark: 'bite', normal: 'tackle'
   };
   function startFor(mon) {
+    if([132,201,235,789,790,824].includes(mon.dex))return G.BattleRules.ADAPTATIONS[mon.dex][0];
     if(G.BattleRules){const pool=poolFor(mon),stats=G.BattleRules.stats(mon,G.BattleDex),bias=stats[3]>stats[1]*1.15?'special':stats[1]>stats[3]*1.15?'physical':null,old=mon.start||START[mon.types[0]],native=new Set(G.BattleDex.species[mon.dex]?.learned||[]);
-      const basic=pool.filter(id=>!['counter','decoy','buff'].includes(BY_ID[id].kind)&&!BY_ID[id].specialOnly),score=id=>{const m=BY_ID[id];return (bias&&m.damageClass===bias?100:0)+(mon.types.includes(m.type)?40:0)+(native.has(id)?18:0)+(id===old?5:0)+Math.max(0,3-m.cd)*6-Math.max(0,m.cd-3)*15;};
+      const basic=pool.filter(id=>!['counter','decoy','buff','copy'].includes(BY_ID[id].kind)&&BY_ID[id].dmg>0&&!BY_ID[id].specialOnly),score=id=>{const m=BY_ID[id];return (bias&&m.damageClass===bias?100:0)+(mon.types.includes(m.type)?40:0)+(native.has(id)?18:0)+(id===old?5:0)-(['trail','mine'].includes(m.kind)?70:0)+Math.max(0,3-m.cd)*6-Math.max(0,m.cd-3)*15;};
       if(basic.includes(mon.opening)&&(!bias||BY_ID[mon.opening].damageClass===bias))return mon.opening;
       return basic.sort((a,b)=>score(b)-score(a)||a.localeCompare(b))[0]||pool[0]||'tackle';}
     if (mon.start && BY_ID[mon.start]) return mon.start;
-    for (const t of mon.types) if (START[t]) return START[t];
-    return 'tackle';
+    return poolFor(mon)[0]||null;
   }
 
   // ---------------- evolución de movimientos ----------------
@@ -518,6 +546,6 @@
   }
 
   function powerText(m){const value=round((m.dmg||0)*growthFactor(m));return G.T('Power')+' '+value+' · '+G.T('Cooldown')+' '+round(m.cd||0)+'s'+((m.count||1)>1?' · '+G.T(({chain:'Objetivos de cadena',orbit:'Orbes',meteor:'Meteoros',mine:'Minas',turret:'Torretas simultáneas'})[m.kind]||'Projectiles')+' '+m.count:'')+' · '+G.T('Per hit, before player stats and enemy defenses');}
-  G.Moves = { growthFactor,changeText,LADDERS,EVO_MODS,ROUTES:growth.routes,powerText, master, ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,
+  G.Moves = { observe,learningText,growthFactor,changeText,LADDERS,EVO_MODS,ROUTES:growth.routes,powerText, master, ALL: RAW, BY_ID, POOL, poolFor, instance, levelUp, nextUpText, startFor,
               EVO, NEED_NAME, evoInfo, evolve };
 })();

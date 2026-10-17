@@ -1,5 +1,11 @@
 /* New behaviors, not recolored copies: moving waves, delayed marks, reactive counters and decoys. */
 G.BattleMoves=[
+ {id:'transform',name:'Transform',desc:'Copia al primer enemigo cercano: adopta su repertorio de ataques, no sus PS, estadísticas, rasgos ni poderes de jefe. Dura esta partida.',type:'normal',kind:'copy',cd:.5,dmg:0,upgrades:[],learningOnly:true},
+ {id:'sketch',name:'Sketch',desc:'Observa especies enemigas cercanas para desbloquear sus ataques copiables durante esta partida. El primer ataque observado sustituye Esquema.',type:'normal',kind:'copy',cd:.5,dmg:0,upgrades:[],learningOnly:true},
+ {id:'hidden-power',name:'Hidden Power',desc:'Pulso exclusivo de Unown: tipo Psíquico fijo en esta adaptación; sus mejoras aumentan alcance y perforación.',restrictedTo:[201],type:'psychic',kind:'projectile',cd:1.15,dmg:22,count:1,speed:330,life:1.05,size:6,pierce:0,homing:1.5,upgrades:[{dmg:1.12},{life:1.15,size:1.1},{cd:.92},{dmg:1.15,pierce:1}]},
+ {id:'brick-break',name:'Brick Break',desc:'Golpe físico cercano: gran potencia contra élites, con un arco estrecho y sin proyectiles.',type:'fighting',damageClass:'physical',kind:'melee',cd:1.25,dmg:31,radius:85,arc:Math.PI*.9,knock:20,eliteBonus:1.25,upgrades:[{dmg:1.12},{radius:1.1},{cd:.92},{dmg:1.12,arc:1.15}]},
+ {id:'sludge-bomb',name:'Sludge Bomb',desc:'Lanza una bomba venenosa de impacto retardado; una explosión localizada en lugar de un haz o descarga inmediata.',type:'poison',damageClass:'special',kind:'lob',cd:1.8,dmg:32,radius:62,count:1,speed:180,life:.8,size:9,poison:.35,upgrades:[{dmg:1.12},{radius:1.12},{cd:.92},{dmg:1.12}]},
+ {id:'struggle',name:'Struggle',desc:'Ataque de emergencia para especies sin ataques implementados: corto alcance y sin acceso a un repertorio genérico.',type:'normal',kind:'melee',damageClass:'physical',cd:1.2,dmg:24,radius:70,arc:Math.PI*.85,knock:12,upgrades:[{dmg:1.12},{radius:1.12},{cd:.92},{dmg:1.15,arc:1.2}]},
  {id:'surf',type:'water',kind:'wave',cd:2.4,dmg:30,radius:210,width:100,speed:170,life:1.3,slow:.2},
  {id:'icy-wind',type:'ice',kind:'wave',cd:1.9,dmg:19,radius:170,width:110,speed:150,life:1.2,slow:.55},
  {id:'air-slash',type:'flying',kind:'wave',cd:1.3,dmg:22,radius:230,width:64,speed:240,life:1.1,knock:30},
