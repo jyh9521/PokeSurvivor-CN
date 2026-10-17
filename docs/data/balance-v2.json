@@ -3,7 +3,8 @@
   "stages": {
     "A": "a08068ed",
     "B": "1008b634",
-    "C": "fb76cc70"
+    "C": "fb76cc70",
+    "D": "edf7923348d63d593fbfc5038b43fa2dce501ee6"
   },
   "version": "0.17.0",
   "protocol": 16,

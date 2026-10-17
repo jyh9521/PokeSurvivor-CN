@@ -15,7 +15,7 @@ function run(r){
 const control=read('d-baseline-matrix-complete'),selected=read('d-verified-matrix');assert.ok(control.complete&&selected.complete);assert.equal(selected.cases,216);
 function party(d,n){const a=d.rows.slice(0,192).filter(x=>x.players===n);return {cases:a.length,exposures:a.length*n,survivors:a.reduce((s,x)=>s+x.alive,0),meanKps:mean(a.map(x=>x.kills/(x.seconds-x.from))),meanDamagePerPlayer:mean(a.map(x=>x.damageTaken/n)),maxCount:Math.max(...a.map(x=>x.maxCount)),meanXpPerPlayer:mean(a.map(x=>x.perPlayer.reduce((s,p)=>s+p.xpGained,0)/n))};}
 const perf=fs.readdirSync(path.join(dir,'performance')).filter(n=>/^full-frame-.*\.json$/.test(n)).map(n=>({file:n,...JSON.parse(fs.readFileSync(path.join(dir,'performance',n)))}));
-const result={baseline:'2587c650b603d4351911efa8ba9e1e439e1af416',stages:{A:'a08068ed',B:'1008b634',C:'fb76cc70'},version:'0.17.0',protocol:16,saveSchema:3,
+const result={baseline:'2587c650b603d4351911efa8ba9e1e439e1af416',stages:{A:'a08068ed',B:'1008b634',C:'fb76cc70',D:"edf7923348d63d593fbfc5038b43fa2dce501ee6"},version:'0.17.0',protocol:16,saveSchema:3,
  provenance:{continuous:'Real engine, open terrain, seeded automated planned choices, no revives; not human win rates.',party:selected.model,partySourceSha256:selected.sourceSha256,driverSha256:selected.driverSha256,normalCases:192,standing:12,special:12},
  continuous:Object.fromEntries(['xp-baseline','xp-strong-baseline','d-final-free-seeds','d-final-strong'].map(n=>[n,read(n).rows.map(run)])),
  party:[1,2,3,4].map(n=>({players:n,before:party(control,n),after:party(selected,n)})),

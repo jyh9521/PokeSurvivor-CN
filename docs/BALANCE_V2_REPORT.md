@@ -9,7 +9,7 @@
 |A|a08068ed|[单人诊断与安全精通](BALANCE_V2_A.md)|
 |B|1008b634|[经验与压制](BALANCE_V2_B.md)|
 |C|fb76cc70|[天气/预算与否决候选](BALANCE_V2_C.md)|
-|D|本报告所在阶段提交，`git log -- docs/BALANCE_V2_D.md`可定位|[组合/多人/回归](BALANCE_V2_D.md)|
+|D|edf7923348d63d593fbfc5038b43fa2dce501ee6|[组合/多人/回归](BALANCE_V2_D.md)|
 
 ## 根因及前后公式
 
