@@ -41,6 +41,7 @@
     "measure:moves": "node tools/measure-move-growth.cjs . artifacts/move-growth/replay.json",
     "measure:moves:dynamic": "node tools/measure-move-dynamic.cjs . artifacts/move-growth/replay-dynamic.json",
     "test:moves": "node --test tests/move-growth.test.cjs tests/music-rotation.test.cjs tests/melee.test.cjs",
+    "test:deploy": "python3 -m unittest discover -s tests -p deployment_test.py && node --test tests/deployment-api.test.cjs",
     "test:learnsets": "node --test tests/learnsets.test.cjs tests/dash-terrain.test.cjs tests/comfort.test.cjs tests/battle.test.cjs",
     "test:learnsets:browser": "node tests/learnsets-browser.cjs",
     "audit:learnsets": "python tools/check-learnset-sources.py",
