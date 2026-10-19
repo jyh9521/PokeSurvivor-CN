@@ -30,7 +30,7 @@ NAS 模式提供账号、浏览器与 NAS 双份存档、最多八人房间、�
 
 战斗数据走房主权威 WebRTC：优先玩家直连，失败后使用 Cloudflare Realtime TURN；NAS 负责账号、存档、排行榜、房间与鉴权信令。无需独立 VPS 或 Worker，TURN 密钥只保存在服务端。运行中的房主转移会先验证新拓扑，失败则保留原房主。
 
-部署目录、端口和反向代理见 [Unraid 部署说明](docs/UNRAID.md)；其中旧四人 / WebSocket 战斗段落属于早期版本，当前连接方式以 [P2P 主机说明](docs/HOST_P2P_0167.md)和 [TURN 设置与验证](docs/TURN_0168.md)为准。
+部署目录、端口和反向代理见 [Unraid 部署说明](docs/UNRAID.md)；Compose 与独立容器分别使用对应安全更新入口。当前连接方式见 [P2P 主机说明](docs/HOST_P2P_0167.md)和 [TURN 设置与验证](docs/TURN_0168.md)为准。
 
 ## 从源码构建
 

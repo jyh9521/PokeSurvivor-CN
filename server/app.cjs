@@ -77,7 +77,7 @@ function createApp({dataDir,root=path.resolve(__dirname,'..'),publicOrigin='',re
       if(!validOrigin(req))throw error(403,'Origin mismatch');rate('http:'+clientIP(req),600);
       if(req.method==='GET'&&url.pathname==='/api/config')return reply(res,200,{backend:'nas',version:1,registration,protocol:18,operations:operations.read()});
       if(req.method==='GET'&&url.pathname==='/api/operations')return reply(res,200,operations.read());
-      if(req.method==='GET'&&url.pathname==='/api/health')return reply(res,200,{ok:true,draining:operations.read().draining,activeRuns:runs.size,activeRooms:[...rooms.values()].filter(r=>!r.open&&r.phase!=='finished').length,ready:operationStatus().ready});
+      if(req.method==='GET'&&url.pathname==='/api/health')return reply(res,200,{ok:true,...require('./deployment-version.cjs'),draining:operations.read().draining,activeRuns:runs.size,activeRooms:[...rooms.values()].filter(r=>!r.open&&r.phase!=='finished').length,ready:operationStatus().ready});
       if(['POST','PUT','DELETE'].includes(req.method)&&!String(req.headers['content-type']).startsWith('application/json'))throw error(415,'JSON required');
       // Player history and restore remain disabled even for old clients.
       if(['/api/history','/api/restore'].includes(url.pathname))throw error(403,'玩家历史存档恢复已关闭。');

@@ -253,7 +253,9 @@ for key in CF_ACCOUNT_ID CF_TURN_KEY_ID CF_TURN_KEY_API_TOKEN CF_ANALYTICS_TOKEN
   printf '%s=%s\n' "$key" "${!key}" >> "$TURN_ENV"
 done
 say "已写入私有turn.env；没有打印密钥，也没有开通或部署任何Cloudflare付费资源。"
-say "现在按发布说明在游戏里启用维护并等待排空，再运行更新脚本。"
+say "向导只生成配置：Compose请合并CF_*到原.env；独立容器需显式加载此env文件。"
+say "既有容器新增/轮换密钥是单独配置变更；按docs/UNRAID.md在维护窗口应用并验证。"
+say "代码更新器保留实际容器环境，不会隐式读取这里的turn.env。"
 say "更新脚本会在停止旧容器前验证用量权限与短期凭证；失败时保留旧容器。"
 note "配置文件：$TURN_ENV"
 finish
